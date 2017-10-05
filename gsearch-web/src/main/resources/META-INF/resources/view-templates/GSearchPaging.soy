@@ -1,0 +1,75 @@
+{namespace GSearchPaging}
+
+/**
+ * Print paging.
+ *
+ * @param portletNamespace
+ * @param? results
+ */
+{template .render}
+
+	{if $results and $results.paging and $results.paging.pages}
+
+		<div id="{$portletNamespace}Paging">
+		
+			// Do we have a previous set of pages
+		
+			{if $results.paging.prevStart}
+				{call .prevStart}
+					{param prevStart: $results.paging.prevStart /}
+				{/call}
+			{/if}
+	
+			// Print pages
+			
+			{foreach $page in $results.paging.pages}
+				{call .page}
+					{param page: $page /}
+				{/call}
+			{/foreach}
+			
+			// Do we have a next set of pages
+		
+			{if $results.paging.nextStart}
+				{call .nextStart}
+					{param nextStart: $results.paging.nextStart /}
+				{/call}
+			{/if}
+		</div>
+	{/if}
+{/template}
+
+/**
+ * Print one page.
+ *
+ * @param page
+ */
+{template .page}
+	{let $selected: $page.selected ? 'selected' : '' /}
+	<span class="page {$selected}">
+		<a data-value="{$page.start}" href="#">{$page.number}</a>
+	</span>
+{/template}
+
+
+/**
+ * Print link to previous page set.
+ *
+ * @param prevStart
+ */
+{template .prevStart}
+	<span class="back">
+		<a data-value="{$prevStart}" href="#">&laquo;</a>
+	</span>
+{/template}
+
+/**
+ * Print link to next page set.
+ *
+ * @param nextStart
+ */
+{template .nextStart}
+	<span class="forward">
+		<a data-value="{$nextStart}" href="#">&raquo;</a>
+	</span>
+{/template}

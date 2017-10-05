@@ -1,0 +1,48 @@
+{namespace GSearchResults}
+
+/**
+ * Print search results
+ *
+ * @param? results
+ */
+{template .render}
+	{if $results.items and length($results.items) > 0}
+		{foreach $item in $results.items}
+			{call .resultItem}
+				{param item: $item /}
+			{/call}
+		{/foreach}
+	{else}
+		<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
+	{/if}
+{/template}
+
+/**
+ * Print one result item.
+ *
+ * @param item
+ */
+{template .resultItem}
+	<div class="row">
+		<div class="item">
+			<div class="heading">
+				{if $item.type != ''}
+					<span class="type"><a href="{$item.link}">[{$item.type}]</a></span>
+				{/if}				
+				<h1>
+					<a href="{$item.link}">{$item.title}</a>
+				</h1>
+			</div>
+			<div class="link">
+				<a href="{$item.link}">{$item.link}</a>
+			</div>
+			
+			<div class="description ">
+				{if $item.date != ''}
+					<strong>{$item.date}</strong> - 
+				{/if}
+				<span class="highlightable">{$item.description}</span>
+			</div>
+		</div>
+	</div>
+{/template}

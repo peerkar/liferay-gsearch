@@ -1,0 +1,131 @@
+@charset "UTF-8";
+.gsearch-web-portlet {
+  /* Common classes / styles */
+  /* Modal styles */
+  /* Fix LR TWBS modal issue */
+  /* Help */
+  /* Searchfield  */
+  /* Filters */
+  /* Stats  */
+  /* Sort */
+  /* Results */
+  /* Paging */ }
+  .gsearch-web-portlet a {
+    color: #1a0dab; }
+  .gsearch-web-portlet mark,
+  .gsearch-web-portlet .mark {
+    background: transparent;
+    box-shadow: none;
+    color: #000;
+    font-weight: bold;
+    padding: 0; }
+  .gsearch-web-portlet mark:before, .gsearch-web-portlet .mark:before {
+    background: transparent;
+    display: none; }
+  .gsearch-web-portlet .gsearch-container {
+    margin-bottom: 30px; }
+  .gsearch-web-portlet .autocomplete-field {
+    position: absolute; }
+  .gsearch-web-portlet .ajax-loader-placeholder {
+    background: url("../images/ajax-loader.gif") 50% 50% no-repeat;
+    min-height: 50px;
+    width: 100%; }
+  .gsearch-web-portlet .gsearch-dropdown {
+    margin-right: 10px; }
+    .gsearch-web-portlet .gsearch-dropdown button {
+      outline: 0 !important; }
+    .gsearch-web-portlet .gsearch-dropdown li.selected a {
+      color: #000; }
+    .gsearch-web-portlet .gsearch-dropdown li.selected a:before {
+      content: '• '; }
+  .gsearch-web-portlet .btn .caret {
+    margin-left: 5px; }
+  .gsearch-web-portlet .gsearch-centered {
+    margin: 0 auto;
+    float: none; }
+  .gsearch-web-portlet .modal {
+    display: none; }
+  .gsearch-web-portlet .modal-dialog {
+    position: relative; }
+  .gsearch-web-portlet .modal-body {
+    background: #fff;
+    min-height: 70px; }
+  .gsearch-web-portlet .modal-footer {
+    border-top: 1px solid #eceeef;
+    box-shadow: none;
+    text-align: right; }
+  .gsearch-web-portlet .gsearch-help {
+    margin-top: 30px;
+    text-align: right;
+    margin-bottom: 10px; }
+    .gsearch-web-portlet .gsearch-help .btn-link {
+      font-size: 95%;
+      padding-right: 0; }
+  .gsearch-web-portlet .gsearch-searchfield {
+    margin-top: 0px; }
+    .gsearch-web-portlet .gsearch-searchfield .message-wrapper {
+      float: left;
+      height: 1px;
+      width: 100%;
+      visibility: hidden; }
+  .gsearch-web-portlet .gsearch-filters {
+    margin-top: 10px; }
+    .gsearch-web-portlet .gsearch-filters a {
+      color: #888; }
+    @media only screen and (max-width: 767px) {
+      .gsearch-web-portlet .gsearch-filters .btn {
+        padding: 8px 12px; } }
+    .gsearch-web-portlet .gsearch-filters .btn-link {
+      color: #888; }
+    .gsearch-web-portlet .gsearch-filters .gsearch-dropdown {
+      display: inline-block;
+      margin-left: 20px; }
+      @media only screen and (max-width: 767px) {
+        .gsearch-web-portlet .gsearch-filters .gsearch-dropdown {
+          margin-left: 0; } }
+    .gsearch-web-portlet .gsearch-filters .item::first-child {
+      margin-left: 0px; }
+  .gsearch-web-portlet .gsearch-stats {
+    color: #ccc;
+    margin-top: 10px; }
+  .gsearch-web-portlet .gsearch-sort {
+    margin-top: 30px; }
+    .gsearch-web-portlet .gsearch-sort .btn-link {
+      padding-left: 0px; }
+  .gsearch-web-portlet .gsearch-results .item {
+    margin: 20px 0; }
+    .gsearch-web-portlet .gsearch-results .item .heading h1 {
+      display: inline-block;
+      font-size: 130%;
+      margin-bottom: 0;
+      margin-top: 0; }
+    .gsearch-web-portlet .gsearch-results .item .heading .type {
+      font-size: 77%;
+      margin-right: 10px;
+      vertical-align: super; }
+    .gsearch-web-portlet .gsearch-results .item .link {
+      margin-bottom: 5px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%; }
+    .gsearch-web-portlet .gsearch-results .item .link a {
+      color: #006621; }
+    .gsearch-web-portlet .gsearch-results .item .description {
+      color: #545454; }
+  .gsearch-web-portlet .gsearch-results .no-results {
+    margin-top: 30px; }
+  .gsearch-web-portlet .gsearch-paging {
+    margin: 30px 0; }
+    .gsearch-web-portlet .gsearch-paging .back,
+    .gsearch-web-portlet .gsearch-paging .forward {
+      font-size: 130%; }
+    .gsearch-web-portlet .gsearch-paging .page a {
+      padding: 10px; }
+    .gsearch-web-portlet .gsearch-paging .page.selected a {
+      background: #ccc;
+      color: #fff; }
+
+/* Darker modal mask */
+.modal-backdrop.in {
+  opacity: 0.5; }

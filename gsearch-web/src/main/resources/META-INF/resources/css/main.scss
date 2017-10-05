@@ -1,0 +1,234 @@
+@import "mixins";
+
+.gsearch-web-portlet {
+	
+	a { 
+		color:#1a0dab;
+	}
+	
+	mark,
+	.mark {
+		background: transparent;
+		box-shadow: none;
+		color: #000;
+		font-weight: bold;
+		padding: 0;
+	}
+	
+	mark:before, .mark:before {
+	    background: transparent;
+	    display: none;
+	}
+		
+	/* Common classes / styles */
+	
+	.gsearch-container {
+		margin-bottom: 30px;
+	}
+	
+	.autocomplete-field {
+		position: absolute;
+	}
+	
+	.ajax-loader-placeholder {
+		background:	url("../images/ajax-loader.gif") 50% 50% no-repeat;
+		min-height: 50px;
+		width: 100%;
+	}
+
+	.gsearch-dropdown {
+	
+		button {
+			outline: 0 !important;
+		}
+	
+		margin-right: 10px;
+	
+		li.selected a {
+			color: #000;
+		}
+
+		li.selected a:before {
+    		content: '• ';
+		}	
+	}
+	
+	.btn .caret {
+		margin-left: 5px;
+	}
+	
+	.gsearch-centered {
+		margin: 0 auto;
+		float: none;
+	}
+
+	/* Modal styles */
+	
+	/* Fix LR TWBS modal issue */
+	
+	.modal {
+		display: none;
+	}
+	
+	.modal-dialog {
+		position: relative;
+	}
+	
+	.modal-body {
+		background: #fff;
+		min-height: 70px;
+	}
+	
+	.modal-footer {
+		border-top: 1px solid #eceeef;	
+		box-shadow: none;
+		text-align: right;
+	}
+		
+	/* Help */
+	
+	.gsearch-help {
+	    margin-top: 30px;
+	    text-align: right;
+	    margin-bottom: 10px;
+	    
+	    .btn-link {
+		    font-size: 95%;
+		    padding-right: 0;
+	    }
+  	}
+	
+	/* Searchfield  */
+	
+	.gsearch-searchfield {
+		margin-top: 0px;
+		
+		.message-wrapper {
+			float: left;
+			height: 1px;
+			width: 100%;
+			visibility: hidden;
+		}
+	}
+	
+	/* Filters */
+	
+	.gsearch-filters {
+	
+		margin-top: 10px; 
+		
+		a {
+			color: #888;
+		}
+
+		.btn {
+			@include media-query(null, $screen-xs-max) {
+			    padding: 8px 12px;
+			}
+		}		
+	 
+		.btn-link {
+			color: #888;
+		}
+		
+		.gsearch-dropdown { 
+			display: inline-block;
+			margin-left: 20px;
+
+			@include media-query(null, $screen-xs-max) {
+				margin-left: 0;
+			}
+		}
+		
+		.item::first-child {
+			margin-left: 0px;
+		}
+
+	}
+		
+	/* Stats  */
+	
+	.gsearch-stats {
+		color: #ccc;
+		margin-top: 10px;
+	}
+
+	/* Sort */
+	
+	.gsearch-sort {
+		margin-top: 30px;
+		
+		.btn-link {
+			padding-left: 0px;
+		}
+	}
+	
+	/* Results */
+	
+	.gsearch-results {
+		.item {
+			margin: 20px 0;
+		
+			.heading {
+				 h1 {
+					display: inline-block;
+					font-size: 130%;
+					margin-bottom: 0;
+					margin-top: 0;
+				}
+				.type {
+					font-size: 77%;
+					margin-right: 10px;	
+					vertical-align: super;					
+				}
+			}
+	
+			.link {
+				margin-bottom: 5px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 100%;
+			}
+	
+			.link a {
+				color: #006621;
+			}
+	
+			.description {
+				color: #545454;
+			}
+		}
+		
+		.no-results {
+			margin-top: 30px;
+
+		}
+	}
+	
+	/* Paging */
+	
+	.gsearch-paging {
+		margin: 30px 0;
+	
+		.back, 
+		.forward {
+			font-size: 130%;
+		}
+	
+		.page a {
+			padding: 10px;
+		}
+	
+		.page.selected a {
+			background: #ccc;
+			color: #fff;
+		}
+	}
+}
+
+/* Darker modal mask */
+
+.modal-backdrop.in {
+	opacity: 0.5;
+}

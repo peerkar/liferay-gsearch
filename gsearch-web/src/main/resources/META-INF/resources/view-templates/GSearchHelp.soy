@@ -1,0 +1,40 @@
+{namespace GSearchHelp}
+
+/**
+ * Print help modal dialog.
+ *
+ * @param portletNamespace
+  */
+{template .render}
+
+	<div aria-hidden="true" aria-labelledby="{$portletNamespace}HelpModalTitle" class="modal fade" 
+		id="{$portletNamespace}HelpModal" role="dialog" tabindex="-1">
+		
+		<div class="modal-dialog" role="document">
+
+			<div class="modal-content">
+
+				<div class="modal-body ajax-loader-placeholder"></div>
+				
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal" type="button">
+						{msg desc=""}close{/msg}
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/template}
+
+/**
+ * Print help button.
+ *
+ * @param portletNamespace
+ */
+{template .button}
+	<button class="btn btn-link" id="#{$portletNamespace}HelpModalButton" data-target="#{$portletNamespace}HelpModal" 
+		data-toggle="modal" type="button">
+		{msg desc=""}syntax-help{/msg}
+	</button>
+{/template}
+

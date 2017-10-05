@@ -1,0 +1,44 @@
+{namespace GSearchSort}
+
+/**
+ * Print sort controls.
+ *
+ * @param portletNamespace
+ * @param? results
+ */
+{template .render}
+
+	{if $results and $results.items and length($results.items) > 0}
+	
+		<div>
+		
+			// Sort field
+			
+			<div class="dropdown gsearch-dropdown">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}SortField" type="button">
+					{msg desc=""}sort-by{/msg} : <span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}SortField" class="dropdown-menu" id="{$portletNamespace}SortFieldOptions">
+					<li class="selected"><a data-value="title" href="#">{msg desc=""}sort-by-title{/msg}</a></li>
+					<li><a data-value="last-modified" href="#">{msg desc=""}sort-by-modified{/msg}</a></li>
+				</ul>
+			</div>
+			
+			// Sort direction
+			
+			<div class="dropdown gsearch-dropdown">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}SortDirection" type="button">
+					{msg desc=""}sort-direction{/msg}: <span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}SortDirection" class="dropdown-menu" id="{$portletNamespace}SortDirectionOptions">
+					<li class="selected"><a data-value="asc" href="#">{msg desc=""}sort-asc{/msg}</a></li>
+					<li><a data-value="desc" href="#">{msg desc=""}sort-desc{/msg}</a></li>
+				</ul>
+			</div>
+		</div>
+	{/if}
+{/template}

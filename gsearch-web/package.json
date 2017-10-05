@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "mark.js": "^8.11.0",
+    "metal-autocomplete": "^2.1.0",
+    "metal-component": "^2.4.5",
+    "metal-soy": "^2.4.5"
+  },
+  "devDependencies": {
+    "liferay-module-config-generator": "^1.2.1",
+    "metal-ajax": "1.0.0",
+    "metal-dropdown": "1.0.0",
+    "metal-multimap": "1.0.0",
+    "metal-cli": "^4.0.1"
+  },
+  "name": "gsearch-web",
+  "version": "1.0.0"
+}

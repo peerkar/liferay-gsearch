@@ -1,0 +1,108 @@
+{namespace View}
+
+/**
+ * GSearch portlet main view.
+ *
+ * @param id
+ * @param portletNamespace
+ * @param? getQueryParam
+ * @param? setQueryParam
+ * @param? initialURLParameters
+ * @param? results
+ * @param? stats
+ *
+ */
+{template .render}
+
+	<div class="container-fluid gsearch-container" id="{$id}">
+	
+		// Help modal dialog
+	
+		{call GSearchHelp.render}
+			{param portletNamespace: $portletNamespace /}
+		{/call}
+
+		// Help button
+
+		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-help gsearch-centered">
+			<div class="row">
+				{call GSearchHelp.button}
+					{param portletNamespace: $portletNamespace /}
+				{/call}
+			</div>
+		</div>
+
+		// Searchfield
+
+		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-searchfield gsearch-centered">
+			<div class="row">
+				{call GSearchField.render}
+					{param portletNamespace: $portletNamespace /}				
+					{param setQueryParam: $setQueryParam /}
+					{param initialURLParameters: $initialURLParameters /}
+				{/call}
+			</div>
+		</div>
+
+		// Filters
+
+		<div class="col-xs-12 col-md-8 col-lg-8 gsearch-filters gsearch-centered">
+			<div class="row text-center">
+				{call GSearchFilters.render}
+					{param portletNamespace: $portletNamespace /}				
+					{param initialURLParameters: $initialURLParameters /}
+					{param getQueryParam: $getQueryParam /}
+					{param setQueryParam: $setQueryParam /}
+					{param results: $results /}
+				{/call}
+			</div>
+		</div>
+		
+		// Stats
+		
+		{if $stats}
+			<div class="col-xs-12 col-md-8 col-lg-8 gsearch-stats gsearch-centered">
+				<div class="row text-center">
+					{$stats}
+				</div>
+			</div>  			
+		{/if}
+
+		// Sort
+
+		<div class="col-xs-10 col-md-10 col-lg-10 gsearch-sort gsearch-centered">
+			<div class="row">
+				{call GSearchSort.render}
+					{param portletNamespace: $portletNamespace /}
+					{param initialURLParameters: $initialURLParameters /}
+					{param getQueryParam: $getQueryParam /}
+					{param setQueryParam: $setQueryParam /}
+				{/call}
+			</div>
+		</div>  			
+
+		// Results
+
+		{if $results}
+			<div class="col-xs-10 col-md-10 col-lg-10 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
+				{call GSearchResults.render}
+					{param results: $results /}
+				{/call}
+			</div>
+		{/if}
+
+		// Paging
+		
+		<div class="gsearch-paging gsearch-centered text-center">
+			<div class="row text-center">
+				{call GSearchPaging.render}
+					{param portletNamespace: $portletNamespace /}
+					{param initialURLParameters: $initialURLParameters /}
+					{param getQueryParam: $getQueryParam /}
+					{param setQueryParam: $setQueryParam /}
+					{param results: $results /}
+				{/call}
+			</div>
+		</div>		
+	</div>
+{/template}

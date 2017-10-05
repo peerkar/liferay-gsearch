@@ -1,0 +1,69 @@
+{namespace GSearchFilters}
+
+/**
+ * Print filters.
+ *
+ * @param portletNamespace
+ * @param? results
+ */
+{template .render}
+
+	// The condition here is just forcing this template to rerender to setup facets when getting new results... 
+
+	{if $results or not $results}
+		<div>
+			// Type filter
+			
+			<div class="dropdown gsearch-dropdown">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu" id="{$portletNamespace}TypeFilterOptions">
+					<li class="selected"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
+					<li class="com_liferay_journal_model_JournalArticle"><a data-value="web-content" href="#">{msg desc=""}web-contents{/msg} <span class="count"></span></a></li>
+					<li class="com_liferay_document_library_kernel_model_DLFileEntry"><a data-value="file" href="#">{msg desc=""}files{/msg} <span class="count"></span></a></li>
+					<li class="com_liferay_message_boards_kernel_model_MBMessage"><a data-value="discussion" href="#">{msg desc=""}discussions{/msg} <span class="count"></span></a></li>
+					<li class="com_liferay_blogs_kernel_model_BlogsEntry"><a data-value="blog" href="#">{msg desc=""}blogs{/msg} <span class="count"></span></a></li>
+					
+	
+					// Add more types here or even better, make configurable by preferences.
+					
+				</ul>
+			</div>
+			
+			// Scope filter
+	
+			<div class="dropdown gsearch-dropdown">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}ScopeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}ScopeFilter" class="dropdown-menu" id="{$portletNamespace}ScopeFilterOptions">
+					<li class="selected"><a data-value="all" href="#">{msg desc=""}search-everywhere{/msg}</a></li>
+					<li><a data-value="this-site" href="#">{msg desc=""}search-this-site-only{/msg}</a></li>
+				</ul>
+			</div>
+			
+		  	// Time filter
+		  
+			<div class="dropdown gsearch-dropdown">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+				data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
+					<li class="selected"><a href="#">{msg desc=""}anytime{/msg}</a></li>
+					<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
+					<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
+					<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+					<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+					<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+				</ul>
+			</div>
+		</div>
+	{/if}
+{/template}

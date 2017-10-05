@@ -1,0 +1,25 @@
+{namespace GSearchField}
+
+/**
+ * Print searchfield.
+ *
+ * @param portletNamespace
+ */
+{template .render}
+	<div>
+		<div class="input-group">
+			<input autofocus class="form-control input-lg" id="{$portletNamespace}SearchField"
+				maxlength="100" placeholder="{msg desc=""}keywords{/msg}" required="required" type="text" value="" />
+				
+			<span class="input-group-btn">
+				<button class="btn btn-primary input-lg" id="{$portletNamespace}SearchButton" type="button">
+					{msg desc=""}search{/msg}
+				</button>
+			</span>
+		</div>
+
+		// Hidden element for anchoring messages tooltip (not to searchfield)
+
+		<div class="message-wrapper" data-title="" id="{$portletNamespace}SearchFieldMessage"></div>
+	</div>
+{/template}
