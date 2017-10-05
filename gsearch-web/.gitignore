@@ -2,7 +2,8 @@
 .gradle
 .project
 .settings/
-package.lock.json
+.package.swp
+package-lock.json
 node_modules/
 bin/
 build/
