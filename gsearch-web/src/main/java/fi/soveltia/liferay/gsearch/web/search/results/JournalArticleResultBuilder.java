@@ -1,24 +1,22 @@
-
 package fi.soveltia.liferay.gsearch.web.search.results;
 
 import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalServiceUtil;
+import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.search.util.GSearchUtil;
 
@@ -27,15 +25,8 @@ import fi.soveltia.liferay.gsearch.web.search.util.GSearchUtil;
  * 
  * @author Petteri Karttunen
  */
+@Component(immediate = true)
 public class JournalArticleResultBuilder extends BaseResultBuilder {
-
-	public JournalArticleResultBuilder(
-		ResourceRequest resourceRequest,
-		ResourceResponse resourceResponse, Document document, String assetPublisherPageFriendlyURL) {
-		super(resourceRequest, resourceResponse, document);
-		
-		_assetPublisherPageFriendlyURL = assetPublisherPageFriendlyURL;
-	}
 
 	@Override
 	public String getLink()
@@ -44,11 +35,11 @@ public class JournalArticleResultBuilder extends BaseResultBuilder {
 		String link = null;
 
 		link = getAssetRenderer().getURLViewInContext(
-			(LiferayPortletRequest) _resourceRequest,
-			(LiferayPortletResponse) _resourceResponse, null);
+			(LiferayPortletRequest) _portletRequest,
+			(LiferayPortletResponse) _portletResponse, null);
 
 		if (Validator.isNull(link)) {
-			link = getNotLinkedJournalArticleUrl();
+			link = getNotLayoutBoundJournalArticleUrl();
 		}
 
 		return link;
@@ -61,23 +52,23 @@ public class JournalArticleResultBuilder extends BaseResultBuilder {
 	 * @return
 	 * @throws PortalException
 	 */
-	protected String getNotLinkedJournalArticleUrl()
+	protected String getNotLayoutBoundJournalArticleUrl()
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
-						(ThemeDisplay) _resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		Layout layout =
-			GSearchUtil.getAssetPublisherLayout(_resourceRequest, _assetPublisherPageFriendlyURL);
+		Layout layout = GSearchUtil.getAssetPublisherLayout(
+			_portletRequest, _assetPublisherPageFriendlyURL);
 
 		String assetPublisherInstanceId =
 			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
 
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
 			JournalArticle.class.getName(), getAssetRenderer().getClassPK());
 
 		JournalArticle journalArticle =
-			JournalArticleLocalServiceUtil.getLatestArticle(
+			_journalArticleLocalService.getLatestArticle(
 				assetEntry.getClassPK());
 
 		StringBundler sb = new StringBundler();
@@ -95,6 +86,21 @@ public class JournalArticleResultBuilder extends BaseResultBuilder {
 
 		return sb.toString();
 	}
-	
-	String _assetPublisherPageFriendlyURL;
+
+	@Reference(unbind = "-")
+	protected void setAssetEntryLocalService(
+		AssetEntryLocalService assetEntryLocalService) {
+
+		_assetEntryLocalService = assetEntryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setJournalArticleLocalService(
+		JournalArticleLocalService journalArticleLocalService) {
+
+		_journalArticleLocalService = journalArticleLocalService;
+	}
+
+	private static AssetEntryLocalService _assetEntryLocalService;
+	private static JournalArticleLocalService _journalArticleLocalService;
 }

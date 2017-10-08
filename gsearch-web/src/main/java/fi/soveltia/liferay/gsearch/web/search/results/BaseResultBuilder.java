@@ -17,7 +17,6 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -28,35 +27,19 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
-import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
-import fi.soveltia.liferay.gsearch.web.search.query.QueryBuilder;
-import fi.soveltia.liferay.gsearch.web.search.util.GSearchUtil;
+import fi.soveltia.liferay.gsearch.web.search.query.QueryBuilderImpl;
 
 /**
- * Base (Default) Result Builder.
+ * Base result builder.
  * 
  * @author Petteri Karttunen
  */
-public class BaseResultBuilder implements ResultBuilder {
-
-	public BaseResultBuilder(
-		ResourceRequest resourceRequest,
-		ResourceResponse resourceResponse, Document document) {
-
-		_resourceRequest = resourceRequest;
-		_resourceResponse = resourceResponse;
-		_document = document;
-		_locale = _resourceRequest.getLocale();
-		_resourceBundle = ResourceBundleUtil.getBundle(
-			"content.Language", _locale, GsearchWebPortlet.class);
-		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
-		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
-	}
+public abstract class BaseResultBuilder implements ResultBuilder {
 
 	@Override
 	public String getDate()
@@ -67,7 +50,7 @@ public class BaseResultBuilder implements ResultBuilder {
 		try {
 			if (Validator.isNotNull(_document.get(Field.MODIFIED_DATE))) {
 
-				Date lastModified = QueryBuilder.INDEX_DATE_FORMAT.parse(
+				Date lastModified = QueryBuilderImpl.INDEX_DATE_FORMAT.parse(
 					_document.get(Field.MODIFIED_DATE));
 
 				DateFormat dateFormat =
@@ -96,7 +79,7 @@ public class BaseResultBuilder implements ResultBuilder {
 		StringBundler sb = new StringBundler();
 		sb.append(
 			getAssetRenderer().getURLView(
-				(LiferayPortletResponse) _resourceResponse,
+				(LiferayPortletResponse) _portletResponse,
 				WindowState.MAXIMIZED));
 
 		return sb.toString();
@@ -120,7 +103,23 @@ public class BaseResultBuilder implements ResultBuilder {
 		return LanguageUtil.get(_resourceBundle, _entryClassName);
 	}
 
-	/**
+	@Override
+	public void setProperties(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL) {
+
+		_assetPublisherPageFriendlyURL = assetPublisherPageFriendlyURL;
+		_portletRequest = portletRequest;
+		_portletResponse = portletResponse;
+		_document = document;
+		_locale = _portletRequest.getLocale();
+		_resourceBundle = ResourceBundleUtil.getBundle(
+			"content.Language", _locale, GsearchWebPortlet.class);
+		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
+		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
+	}
+
+	/**s
 	 * Get AssetRenderer
 	 * 
 	 * @return
@@ -174,10 +173,8 @@ public class BaseResultBuilder implements ResultBuilder {
 			if (indexer != null) {
 				String snippet = _document.get(Field.SNIPPET);
 
-				com.liferay.portal.kernel.search.Summary summary =
-					indexer.getSummary(
-						_document, snippet, _resourceRequest,
-						_resourceResponse);
+				Summary summary = indexer.getSummary(
+					_document, snippet, _portletRequest, _portletResponse);
 
 				summary.setHighlight(true);
 
@@ -188,47 +185,15 @@ public class BaseResultBuilder implements ResultBuilder {
 		return _summary;
 	}
 
-	/**
-	 * Get redirect url.
-	 * 
-	 * @return String
-	 * @throws PortalException
-	 */
-	protected String getRedirectURL()
-		throws PortalException {
 
-		StringBundler sb = new StringBundler();
-
-		sb.append(GSearchUtil.getCurrentLayoutURL(_resourceRequest));
-		sb.append("?");
-		sb.append(GSearchWebKeys.KEYWORDS).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.KEYWORDS));
-		sb.append("&").append(GSearchWebKeys.SCOPE_FILTER).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.SCOPE_FILTER));
-		sb.append("&").append(GSearchWebKeys.TIME_FILTER).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.TIME_FILTER));
-		sb.append("&").append(GSearchWebKeys.TYPE_FILTER).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.TYPE_FILTER));
-		sb.append("&").append(GSearchWebKeys.SORT_FIELD).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.SORT_FIELD));
-		sb.append("&").append(GSearchWebKeys.SORT_DIRECTION).append("=").append(
-			ParamUtil.getString(
-				_resourceRequest, GSearchWebKeys.SORT_DIRECTION));
-		sb.append("&").append(GSearchWebKeys.START).append("=").append(
-			ParamUtil.getString(_resourceRequest, GSearchWebKeys.START));
-
-		return HtmlUtil.escapeURL(sb.toString());
-	}
-
+	protected String _assetPublisherPageFriendlyURL;
 	protected Document _document;
-	protected Locale _locale;
 	protected String _entryClassName;
 	protected long _entryClassPK;
-
-	protected ResourceRequest _resourceRequest;
-	protected ResourceResponse _resourceResponse;
-
 	protected IndexerRegistry _indexerRegistry;
+	protected Locale _locale;
+	protected PortletRequest _portletRequest;
+	protected PortletResponse _portletResponse;
 	protected ResourceBundle _resourceBundle;
 
 	private AssetRenderer<?> _assetRenderer;

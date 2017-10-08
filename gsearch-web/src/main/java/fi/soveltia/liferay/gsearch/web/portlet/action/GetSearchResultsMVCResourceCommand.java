@@ -18,6 +18,7 @@ import javax.portlet.ResourceResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
@@ -62,13 +63,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		// Get params
 
-		QueryParamsBuilder queryParamsBuilder =
-			new QueryParamsBuilder(resourceRequest, _gSearchDisplayConfiguration);
-
 		QueryParams queryParams = null;
 
 		try {
-			queryParams = queryParamsBuilder.buildQueryParams();
+			queryParams = _queryParamsBuilder.buildQueryParams(resourceRequest, _gSearchDisplayConfiguration);
 		}
 		catch (PortalException e) {
 
@@ -78,11 +76,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		try {
-			GSearch gsearch =
-				new GSearch(resourceRequest, resourceResponse, queryParams, _gSearchDisplayConfiguration);
-
-			responseObject = gsearch.getResults();
-
+			responseObject = _gsearch.getSearchResults(resourceRequest, resourceResponse, queryParams, _gSearchDisplayConfiguration);
 		}
 		catch (Exception e) {
 
@@ -97,6 +91,13 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
 	}
+
+	
+	@Reference
+	protected GSearch _gsearch;	
+	
+	@Reference
+	protected QueryParamsBuilder _queryParamsBuilder;
 	
 	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
 

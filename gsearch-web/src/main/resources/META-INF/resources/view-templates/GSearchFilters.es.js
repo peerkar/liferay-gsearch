@@ -112,12 +112,6 @@ class GSearchFilters extends Component {
 	 */
 	setTypeFacetCounts() {
 
-		// Empty existing values
-		
-		$('#' + this.portletNamespace + 'TypeFilterOptions .count').each(function() {
-			//$(this).html('');
-		});
-
 		// Populate counts
 		
 		if (this.results && this.results.facets) {

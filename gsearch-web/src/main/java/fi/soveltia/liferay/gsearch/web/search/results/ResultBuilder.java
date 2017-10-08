@@ -1,6 +1,11 @@
 
 package fi.soveltia.liferay.gsearch.web.search.results;
 
+import com.liferay.portal.kernel.search.Document;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 /**
  * Result Builder Interface
  * 
@@ -49,5 +54,17 @@ public interface ResultBuilder {
 	 */
 	public String getType()
 		throws Exception;
+
+	/**
+	 * Set builder properties
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param assetPublisherFriendlyURL
+	 */
+	public void setProperties(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherFriendlyURL);
 
 }

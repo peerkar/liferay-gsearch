@@ -9,12 +9,17 @@ import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.List;
 
-import javax.portlet.ResourceRequest;
+import javax.portlet.PortletRequest;
+
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 
 public class GSearchUtil {
 
@@ -40,23 +45,25 @@ public class GSearchUtil {
 				return p.getInstanceId();
 			}
 		}
-		
-		throw new PortalException("Couldn't find asset publisher on page " + layout.getFriendlyURL() + ". Please check configuration.");
+
+		throw new PortalException(
+			"Couldn't find asset publisher on page " + layout.getFriendlyURL() +
+				". Please check configuration.");
 	}
 
 	/**
-	 * Get AssetPublisher Layout 
+	 * Get AssetPublisher Layout
 	 * 
 	 * @param resourceRequest
 	 * @return
 	 * @throws PortalException
 	 */
 	public static Layout getAssetPublisherLayout(
-		ResourceRequest resourceRequest, String layoutFriendlyURL)
+		PortletRequest portletRequest, String layoutFriendlyURL)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		if (layoutFriendlyURL != null) {
 			return LayoutLocalServiceUtil.getFriendlyURLLayout(
@@ -64,7 +71,9 @@ public class GSearchUtil {
 				themeDisplay.getLayout().isPrivateLayout(), layoutFriendlyURL);
 		}
 
-		throw new PortalException("Couldn't find asset publisher layout for " +  layoutFriendlyURL + ". Please check configuration.");
+		throw new PortalException(
+			"Couldn't find asset publisher layout for " + layoutFriendlyURL +
+				". Please check configuration.");
 	}
 
 	/**
@@ -73,14 +82,48 @@ public class GSearchUtil {
 	 * @return String
 	 * @throws PortalException
 	 */
-	public static String getCurrentLayoutURL(ResourceRequest resourceRequest)
+	public static String getCurrentLayoutURL(PortletRequest portletRequest)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		Layout selectedLayout =
 			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
 		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
+	}
+	
+	
+
+	/**
+	 * Get redirect url.
+	 * 
+	 * @return String
+	 * @throws PortalException
+	 */
+	protected static String getRedirectURL(PortletRequest portletRequest)
+		throws PortalException {
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(GSearchUtil.getCurrentLayoutURL(portletRequest));
+		sb.append("?");
+		sb.append(GSearchWebKeys.KEYWORDS).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS));
+		sb.append("&").append(GSearchWebKeys.SCOPE_FILTER).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.SCOPE_FILTER));
+		sb.append("&").append(GSearchWebKeys.TIME_FILTER).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.TIME_FILTER));
+		sb.append("&").append(GSearchWebKeys.TYPE_FILTER).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.TYPE_FILTER));
+		sb.append("&").append(GSearchWebKeys.SORT_FIELD).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_FIELD));
+		sb.append("&").append(GSearchWebKeys.SORT_DIRECTION).append("=").append(
+			ParamUtil.getString(
+				portletRequest, GSearchWebKeys.SORT_DIRECTION));
+		sb.append("&").append(GSearchWebKeys.START).append("=").append(
+			ParamUtil.getString(portletRequest, GSearchWebKeys.START));
+
+		return HtmlUtil.escapeURL(sb.toString());
 	}
 }

@@ -6,8 +6,8 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 
-import javax.portlet.ResourceRequest;
-import javax.portlet.ResourceResponse;
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 /**
  * Result Builder Factory
@@ -17,27 +17,27 @@ import javax.portlet.ResourceResponse;
 public class ResultBuilderFactory {
 
 	public static ResultBuilder getResultBuilder(
-		ResourceRequest resourceRequest,
-		ResourceResponse resourceResponse, Document document, String assetPublisherPageFriendlyURL) {
+		PortletRequest portletRequest,
+		PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL) {
 
 		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
+		
+		ResultBuilder resultBuilder;
 
 		if (JournalArticle.class.getName().equals(entryClassName)) {
-
-			return new JournalArticleResultBuilder(
-				resourceRequest, resourceResponse, document, assetPublisherPageFriendlyURL);
-
+			resultBuilder = new JournalArticleResultBuilder();
 		}
 		else if (DLFileEntry.class.getName().equals(entryClassName)) {
-
-			return new DLFileEntryResultBuilder(
-				resourceRequest, resourceResponse, document);
+			resultBuilder = new DLFileEntryResultBuilder();
 
 		}
 		else {
-
-			return new BaseResultBuilder(
-				resourceRequest, resourceResponse, document);
+			resultBuilder = new GenericResultBuilder();
 		}
+
+		resultBuilder.setProperties(portletRequest,
+			portletResponse, document, assetPublisherPageFriendlyURL);
+		
+		return resultBuilder;
 	}
 }
