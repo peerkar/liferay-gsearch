@@ -7,3 +7,4 @@ node_modules/
 bin/
 build/
 .DS_Store
+rebel.xml
