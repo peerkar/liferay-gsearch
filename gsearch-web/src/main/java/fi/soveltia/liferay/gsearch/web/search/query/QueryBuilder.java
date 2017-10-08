@@ -73,16 +73,22 @@ public class QueryBuilder {
 		for (Class<?> c : clazzes) {
 			
 			if (c.getName().equals(JournalArticle.class.getName())) {
-				
+
+				BooleanQuery journalArticleQuery = new BooleanQueryImpl();
+
 				// Add version limitation to JournalArticle
 				
 				BooleanQuery journalArticleVersionQuery = getJournalArticleVersionCondition();
-				query.add(journalArticleVersionQuery, BooleanClauseOccur.SHOULD);				
+				journalArticleQuery.add(journalArticleVersionQuery, BooleanClauseOccur.MUST);				
 
 				// Add display date limitation to JournalArticle
 
-				//BooleanQuery journalArticleDisplayDateQuery = getJournalArticleDisplayDateCondition();
-				//query.add(journalArticleDisplayDateQuery, BooleanClauseOccur.SHOULD);				
+				BooleanQuery journalArticleDisplayDateQuery = getJournalArticleDisplayDateCondition();
+				journalArticleQuery.add(journalArticleDisplayDateQuery, BooleanClauseOccur.MUST);				
+			
+				journalArticleQuery.addTerm(Field.ENTRY_CLASS_NAME, c.getName(), false, BooleanClauseOccur.MUST);				
+
+				query.add(journalArticleQuery, BooleanClauseOccur.SHOULD);
 			
 			} else {
 				query.addTerm(Field.ENTRY_CLASS_NAME, c.getName(), false, BooleanClauseOccur.SHOULD);				
@@ -224,7 +230,7 @@ public class QueryBuilder {
 		BooleanQuery query = new BooleanQueryImpl();
 
 		query.addRequiredTerm(Field.ENTRY_CLASS_NAME, JournalArticle.class.getName());		
-		query.addRequiredTerm("head", true);		
+		query.addRequiredTerm("head", Boolean.TRUE.toString());		
 		
 		return query;
 	}
@@ -240,14 +246,13 @@ public class QueryBuilder {
 		BooleanQuery query = new BooleanQueryImpl();
 
 		Date now = new Date();
-		String nowString = INDEX_DATE_FORMAT.format(now);
 	
 		BooleanQuery from = new BooleanQueryImpl();
-		from.addRangeTerm("displayDate", Long.MIN_VALUE, (long)Long.valueOf(nowString));                      
+		from.addRangeTerm("displayDate_sortable", Long.MIN_VALUE, now.getTime());                      
 		query.add(from, BooleanClauseOccur.MUST);
 
 		BooleanQuery to = new BooleanQueryImpl();
-		to.addRangeTerm(Field.EXPIRATION_DATE, (long)Long.valueOf(nowString), Long.MAX_VALUE);                      
+		to.addRangeTerm("expirationDate_sortable", now.getTime(), Long.MAX_VALUE);                      
 		query.add(to, BooleanClauseOccur.MUST);
 		
 		return query;
