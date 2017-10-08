@@ -32,8 +32,7 @@ import fi.soveltia.liferay.gsearch.web.search.query.QueryParamsBuilder;
  * 
  * @author Petteri Karttunen
  */
-@Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration",
+@Component(configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
@@ -46,16 +45,17 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	@Activate
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
+
 		_gSearchDisplayConfiguration = ConfigurableUtil.createConfigurable(
 			GSearchDisplayConfiguration.class, properties);
 	}
-	
+
 	@Override
 	protected void doServeResource(
 		ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		if(_log.isDebugEnabled()) {
+		if (_log.isDebugEnabled()) {
 			_log.debug("GetSearchResultsMVCResourceCommand.doServeResource()");
 		}
 
@@ -66,7 +66,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		QueryParams queryParams = null;
 
 		try {
-			queryParams = _queryParamsBuilder.buildQueryParams(resourceRequest, _gSearchDisplayConfiguration);
+			queryParams = _queryParamsBuilder.buildQueryParams(
+				resourceRequest, _gSearchDisplayConfiguration);
 		}
 		catch (PortalException e) {
 
@@ -76,12 +77,14 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		try {
-			responseObject = _gsearch.getSearchResults(resourceRequest, resourceResponse, queryParams, _gSearchDisplayConfiguration);
+			responseObject = _gsearch.getSearchResults(
+				resourceRequest, resourceResponse, queryParams,
+				_gSearchDisplayConfiguration);
 		}
 		catch (Exception e) {
 
 			_log.error(e, e);
-			
+
 			return;
 
 		}
@@ -92,13 +95,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, responseObject);
 	}
 
-	
 	@Reference
-	protected GSearch _gsearch;	
-	
+	protected GSearch _gsearch;
+
 	@Reference
 	protected QueryParamsBuilder _queryParamsBuilder;
-	
+
 	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
 
 	private static final Log _log =

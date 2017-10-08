@@ -12,9 +12,7 @@ import org.osgi.service.component.annotations.Component;
  * 
  * @author Petteri Karttunen
  */
-@Component(
-	immediate = true
-)
+@Component(immediate = true)
 public class DLFileEntryResultBuilder extends BaseResultBuilder {
 
 	@Override

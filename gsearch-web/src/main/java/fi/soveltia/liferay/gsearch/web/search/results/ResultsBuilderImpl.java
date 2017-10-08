@@ -24,9 +24,7 @@ import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration
  * 
  * @author Petteri Karttunen
  */
-@Component (
-	immediate = true
-)
+@Component(immediate = true)
 public class ResultsBuilderImpl implements ResultsBuilder {
 
 	@Override

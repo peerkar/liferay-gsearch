@@ -62,7 +62,8 @@ public class GSearchImpl implements GSearch {
 		return getResults();
 	}
 
-	protected JSONObject getResults() throws Exception {
+	protected JSONObject getResults()
+		throws Exception {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -141,9 +142,9 @@ public class GSearchImpl implements GSearch {
 		searchContext.setBooleanClauses(new BooleanClause[] {
 			booleanClause
 		});
-		
-        FacetedSearcher facetedSearcher =
-                        facetedSearcherManager.createFacetedSearcher();
+
+		FacetedSearcher facetedSearcher =
+			facetedSearcherManager.createFacetedSearcher();
 
 		Hits hits = facetedSearcher.search(searchContext);
 
@@ -323,15 +324,15 @@ public class GSearchImpl implements GSearch {
 		searchContext.addFacet(assetCategoryTitlesFacet);
 	}
 
-    @Reference
-    protected FacetedSearcherManager facetedSearcherManager;
-		
+	@Reference
+	protected FacetedSearcherManager facetedSearcherManager;
+
 	@Reference
 	protected QueryBuilder _queryBuilder;
 
 	@Reference
 	protected ResultsBuilder _resultsBuilder;
-	
+
 	private GSearchDisplayConfiguration _gSearchDisplayConfiguration;
 	private QueryParams _queryParams;
 	private PortletRequest _portletRequest;

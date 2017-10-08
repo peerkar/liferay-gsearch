@@ -92,8 +92,6 @@ public class GSearchUtil {
 			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
 		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
 	}
-	
-	
 
 	/**
 	 * Get redirect url.
@@ -119,8 +117,7 @@ public class GSearchUtil {
 		sb.append("&").append(GSearchWebKeys.SORT_FIELD).append("=").append(
 			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_FIELD));
 		sb.append("&").append(GSearchWebKeys.SORT_DIRECTION).append("=").append(
-			ParamUtil.getString(
-				portletRequest, GSearchWebKeys.SORT_DIRECTION));
+			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_DIRECTION));
 		sb.append("&").append(GSearchWebKeys.START).append("=").append(
 			ParamUtil.getString(portletRequest, GSearchWebKeys.START));
 
