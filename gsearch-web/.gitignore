@@ -2,10 +2,10 @@
 .gradle
 .project
 .settings/
-.package.swp
-package-lock.json
+package.lock.json
 node_modules/
 bin/
 build/
 .DS_Store
 rebel.xml
+.sass-cache

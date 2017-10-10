@@ -8,3 +8,4 @@ bin/
 build/
 .DS_Store
 rebel.xml
+.sass-cache
