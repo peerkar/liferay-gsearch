@@ -138,12 +138,29 @@
 			@include media-query(null, $screen-xs-max) {
 				margin-left: 0;
 			}
+			
+			.count {
+				margin-left: 10px;
+			}
+			
+			.groupname {
+				font-size: 60%;
+				margin-left: 10px;
+			}
 		}
 		
 		.item::first-child {
 			margin-left: 0px;
 		}
-
+		
+		.basic-filters {
+			padding-bottom: 10px;
+		}
+		
+		.additional-filters {
+			border-top: 1px solid #ececec;
+			padding-top: 10px;
+		}
 	}
 		
 	/* Stats  */
@@ -170,6 +187,12 @@
 	/* Results */
 	
 	.gsearch-results {
+	
+		.suggestions {
+			font-size: 120%;
+			margin: 20px 0;
+		}
+	
 		.item {
 			margin: 20px 0;
 		
@@ -233,6 +256,19 @@
 
 /* Darker modal mask */
 
-.modal-backdrop.in {
-	opacity: 0.5;
+.modal-backdrop {
+	background: inherit;
+	opacity: 1;
+}
+
+.gsearch-autocomplete-list {
+	position: absolute;	
+	
+	.list-group-item.active,
+	.list-group-item.active:hover,
+	.list-group-item.active:focus,
+	 {
+		background: #f1f5f8;
+		border-color: #6b8b8d;
+	}
 }

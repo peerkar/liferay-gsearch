@@ -9,7 +9,7 @@ import org.osgi.service.component.annotations.Component;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 
 /**
- * GSearch Portlet
+ * GSearch portlet class.
  * 
  * @author Petteri Karttunen
  */

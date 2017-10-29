@@ -32,9 +32,11 @@
  * @param portletNamespace
  */
 {template .button}
-	<button class="btn btn-link" id="#{$portletNamespace}HelpModalButton" data-target="#{$portletNamespace}HelpModal" 
-		data-toggle="modal" type="button">
-		{msg desc=""}syntax-help{/msg}
-	</button>
+	<div class="row">
+		<button class="btn btn-link" id="#{$portletNamespace}HelpModalButton" data-target="#{$portletNamespace}HelpModal" 
+			data-toggle="modal" type="button">
+			{msg desc=""}syntax-help{/msg}
+		</button>
+	</div>
 {/template}
 

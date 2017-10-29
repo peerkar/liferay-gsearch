@@ -25,29 +25,29 @@
 		// Help button
 
 		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-help gsearch-centered">
-			<div class="row">
-				{call GSearchHelp.button}
-					{param portletNamespace: $portletNamespace /}
-				{/call}
-			</div>
+			{call GSearchHelp.button}
+				{param portletNamespace: $portletNamespace /}
+			{/call}
 		</div>
 
 		// Searchfield
 
 		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-searchfield gsearch-centered">
-			<div class="row">
-				{call GSearchField.render}
-					{param portletNamespace: $portletNamespace /}				
-					{param setQueryParam: $setQueryParam /}
-					{param initialURLParameters: $initialURLParameters /}
-				{/call}
-			</div>
+			{call GSearchField.render}
+				{param portletNamespace: $portletNamespace /}				
+				{param setQueryParam: $setQueryParam /}
+				{param initialURLParameters: $initialURLParameters /}
+			{/call}
 		</div>
 
 		// Filters
 
 		<div class="col-xs-12 col-md-8 col-lg-8 gsearch-filters gsearch-centered">
-			<div class="row text-center">
+		
+			// This dummy condition here is just forcing the template to rerender to setup facets when getting new results. 
+		
+			{if $results or not $results}
+			
 				{call GSearchFilters.render}
 					{param portletNamespace: $portletNamespace /}				
 					{param initialURLParameters: $initialURLParameters /}
@@ -55,7 +55,7 @@
 					{param setQueryParam: $setQueryParam /}
 					{param results: $results /}
 				{/call}
-			</div>
+			{/if}
 		</div>
 		
 		// Stats
@@ -71,14 +71,12 @@
 		// Sort
 
 		<div class="col-xs-10 col-md-10 col-lg-10 gsearch-sort gsearch-centered">
-			<div class="row">
-				{call GSearchSort.render}
-					{param portletNamespace: $portletNamespace /}
-					{param initialURLParameters: $initialURLParameters /}
-					{param getQueryParam: $getQueryParam /}
-					{param setQueryParam: $setQueryParam /}
-				{/call}
-			</div>
+			{call GSearchSort.render}
+				{param portletNamespace: $portletNamespace /}
+				{param initialURLParameters: $initialURLParameters /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+			{/call}
 		</div>  			
 
 		// Results
@@ -94,15 +92,13 @@
 		// Paging
 		
 		<div class="gsearch-paging gsearch-centered text-center">
-			<div class="row text-center">
-				{call GSearchPaging.render}
-					{param portletNamespace: $portletNamespace /}
-					{param initialURLParameters: $initialURLParameters /}
-					{param getQueryParam: $getQueryParam /}
-					{param setQueryParam: $setQueryParam /}
-					{param results: $results /}
-				{/call}
-			</div>
+			{call GSearchPaging.render}
+				{param portletNamespace: $portletNamespace /}
+				{param initialURLParameters: $initialURLParameters /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+				{param results: $results /}
+			{/call}
 		</div>		
 	</div>
 {/template}

@@ -22,14 +22,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
+import fi.soveltia.liferay.gsearch.web.search.menuoption.AssetTypeOptions;
+import fi.soveltia.liferay.gsearch.web.search.menuoption.DocumentExtensionOptions;
+import fi.soveltia.liferay.gsearch.web.search.menuoption.DocumentTypeOptions;
+import fi.soveltia.liferay.gsearch.web.search.menuoption.WebContentStructureOptions;
 
 /**
- * View Render Command
+ * View render command. Primary/default view.
  * 
  * @author Petteri Karttunen
  */
@@ -43,7 +48,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 	}, 
 	service = MVCRenderCommand.class
 )
-public class ViewMVCRenderCommand implements MVCRenderCommand {
+public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 	@Override
 	public String render(
@@ -61,27 +66,72 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		String portletNamespace = renderResponse.getNamespace();
 		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
 
-		// Help text resource url 
+		// Autocomplete on/off.
 		
 		template.put(
-			GSearchWebKeys.HELP_TEXT_URL, getHelpTextURL(renderResponse));
+			GSearchWebKeys.AUTO_COMPLETE_ENABLED, 
+			_gSearchDisplayConfiguration.enableAutoComplete());
+		
+		// Set help text resource url.
+		
+		template.put(
+			GSearchWebKeys.HELP_TEXT_URL, 
+			createResourceURL(renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
 
-		// Search results resource url 
+		// Set search results resource url.
 
 		template.put(
 			GSearchWebKeys.SEARCH_RESULTS_URL,
-			getSearchResultsURL(renderResponse));
-				
-		// Preferences
+			createResourceURL(renderResponse, GSearchResourceKeys.GET_SEARCH_RESULTS));
+
+		// Set autocomplete/suggestions resource url.
+
+		template.put(
+			GSearchWebKeys.SUGGESTIONS_URL,
+			createResourceURL(renderResponse, GSearchResourceKeys.GET_SUGGESTIONS));
+
+		try {
+		
+			// Set supported asset type options.
+			
+			template.put(
+				GSearchWebKeys.ASSET_TYPE_OPTIONS,
+				_assetTypeOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
+			
+			// Set document extension options.
+	
+			template.put(
+				GSearchWebKeys.DOCUMENT_EXTENSION_OPTIONS,
+				_documentExtensionOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
+			
+			// Set document type options.
+	
+			template.put(
+				GSearchWebKeys.DOCUMENT_TYPE_OPTIONS,
+				_documentTypeOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
+	
+			// Set web content structure options.
+	
+			template.put(
+				GSearchWebKeys.WEB_CONTENT_STRUCTURE_OPTIONS,
+				_webContentStructureOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
+
+		} catch (Exception e) {
+			_log.error(e, e);
+		}
+		
+		// Set request timeout.
 		
 		template.put(
 			GSearchWebKeys.REQUEST_TIMEOUT,
 			_gSearchDisplayConfiguration.requestTimeout());
 		
+		// Set query min length.
+		
 		template.put(
 			GSearchWebKeys.QUERY_MIN_LENGTH,
 			_gSearchDisplayConfiguration.queryMinLength());
-		
+				
 		// Get/set parameters from url
 		
 		setInitialParameters(renderRequest, template);
@@ -95,21 +145,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		_gSearchDisplayConfiguration = ConfigurableUtil.createConfigurable(
 			GSearchDisplayConfiguration.class, properties);
 	}
-
+	
 	/**
-	 * Get help text URL
+	 * Create resource URL for a resourceId
 	 * 
 	 * @param renderResponse
-	 * @return
+	 * @param resourceId
+	 * 
+	 * @return url string
 	 */
-	protected String getHelpTextURL(RenderResponse renderResponse) {
+	protected String createResourceURL(RenderResponse renderResponse, String resourceId) {
 
 		ResourceURL portletURL = renderResponse.createResourceURL();
 
-		portletURL.setResourceID(GSearchResourceKeys.GET_HELP_TEXT);
+		portletURL.setResourceID(resourceId);
 
 		return portletURL.toString();
-	}
+	}	
 	
 	/**
 	 * Set initial parameters for the templates.
@@ -125,9 +177,14 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		HttpServletRequest request = PortalUtil.getOriginalServletRequest(httpServletRequest);
 		
 		String keywords = ParamUtil.getString(request, GSearchWebKeys.KEYWORDS);
+
+		String documentExtensionFilter = ParamUtil.getString(request, GSearchWebKeys.DOCUMENT_EXTENSION_FILTER);
+		String documentTypeFilter = ParamUtil.getString(request, GSearchWebKeys.DOCUMENT_TYPE_FILTER);
 		String scopeFilter = ParamUtil.getString(request, GSearchWebKeys.SCOPE_FILTER);
 		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.TIME_FILTER);
 		String typeFilter = ParamUtil.getString(request, GSearchWebKeys.TYPE_FILTER);
+		String webContentStructureFilter = ParamUtil.getString(request, GSearchWebKeys.WEB_CONTENT_STRUCTURE_FILTER);
+
 		String sortField = ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
 		String sortDirection = ParamUtil.getString(request, GSearchWebKeys.SORT_DIRECTION);
 		String start = ParamUtil.getString(request, GSearchWebKeys.START);
@@ -136,6 +193,14 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 				
 		if (Validator.isNotNull(keywords)) {
 			initialParameters.put(GSearchWebKeys.KEYWORDS, keywords);
+		}
+
+		if (Validator.isNotNull(documentExtensionFilter)) {
+			initialParameters.put(GSearchWebKeys.DOCUMENT_EXTENSION_FILTER, documentExtensionFilter);
+		}
+
+		if (Validator.isNotNull(documentTypeFilter)) {
+			initialParameters.put(GSearchWebKeys.DOCUMENT_TYPE_FILTER, documentTypeFilter);
 		}
 
 		if (Validator.isNotNull(scopeFilter)) {
@@ -150,6 +215,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			initialParameters.put(GSearchWebKeys.TYPE_FILTER, typeFilter);
 		}
 
+		if (Validator.isNotNull(webContentStructureFilter)) {
+			initialParameters.put(GSearchWebKeys.WEB_CONTENT_STRUCTURE_FILTER, webContentStructureFilter);
+		}
+		
 		if (Validator.isNotNull(keywords)) {
 			initialParameters.put(GSearchWebKeys.SORT_DIRECTION, sortDirection);
 		}
@@ -167,24 +236,20 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		}
 	}
 
-	/**
-	 * Get search results URL
-	 * 
-	 * @param renderResponse
-	 * @return
-	 */
-	protected String getSearchResultsURL(RenderResponse renderResponse) {
+	@Reference
+	protected AssetTypeOptions _assetTypeOptions;
 
-		ResourceURL portletURL = renderResponse.createResourceURL();
+	@Reference
+	protected DocumentExtensionOptions _documentExtensionOptions;
 
-		portletURL.setResourceID(GSearchResourceKeys.GET_SEARCH_RESULTS);
-
-		return portletURL.toString();
-	}
+	@Reference
+	protected DocumentTypeOptions _documentTypeOptions;
 	
+	@Reference
+	protected WebContentStructureOptions _webContentStructureOptions;
+
 	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
-	
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewMVCRenderCommand.class);
-
 }

@@ -24,15 +24,16 @@ import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 import fi.soveltia.liferay.gsearch.web.search.GSearch;
-import fi.soveltia.liferay.gsearch.web.search.query.QueryParams;
-import fi.soveltia.liferay.gsearch.web.search.query.QueryParamsBuilder;
+import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
+import fi.soveltia.liferay.gsearch.web.search.queryparams.QueryParamsBuilder;
 
 /**
- * Get Search Results Resource Command
+ * Resource command for getting the search results.
  * 
  * @author Petteri Karttunen
  */
-@Component(configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration", 
+@Component(
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
@@ -61,7 +62,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONObject responseObject = null;
 
-		// Get params
+		// Build query parameters object.
 
 		QueryParams queryParams = null;
 
@@ -76,8 +77,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			return;
 		}
 
+		// Try to get search results.
+		
 		try {
-			responseObject = _gsearch.getSearchResults(
+			responseObject = _gSearch.getSearchResults(
 				resourceRequest, resourceResponse, queryParams,
 				_gSearchDisplayConfiguration);
 		}
@@ -86,17 +89,16 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			_log.error(e, e);
 
 			return;
-
 		}
 
-		// Write to output stream
+		// Write response to output stream.
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
 	}
 
 	@Reference
-	protected GSearch _gsearch;
+	protected GSearch _gSearch;
 
 	@Reference
 	protected QueryParamsBuilder _queryParamsBuilder;

@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.web.search.results;
+package fi.soveltia.liferay.gsearch.web.search.results.item;
 
 import com.liferay.portal.kernel.search.Document;
 
@@ -7,61 +7,65 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 /**
- * Result Builder Interface
+ * Asset type specific result item builder. Implementations of this class build a single result
+ * item.
  * 
  * @author Petteri Karttunen
  */
-public interface ResultBuilder {
+public interface ResultItemBuilder {
 
 	/**
-	 * Get hit date
+	 * Get item hit date
 	 * 
-	 * @return
+	 * @return string representation of item date
 	 * @throws Exception
 	 */
 	public String getDate()
 		throws Exception;
 
 	/**
-	 * Get description
+	 * Get item description
 	 * 
-	 * @return
+	 * @return item description
 	 */
 	public String getDescription()
 		throws Exception;
 
 	/**
-	 * Get Link
+	 * Get item Link
 	 * 
-	 * @return
+	 * @return item link
 	 * @throws Exception
 	 */
 	public String getLink()
 		throws Exception;
 
 	/**
-	 * Get Title
+	 * Get item Title
 	 * 
-	 * @return
+	 * @return item title
 	 */
 	public String getTitle()
 		throws Exception;
 
 	/**
-	 * Get Type
+	 * Get item type
 	 * 
-	 * @return
+	 * @return name of the item asset type
 	 */
 	public String getType()
 		throws Exception;
 
 	/**
-	 * Set builder properties
+	 * Set item builder properties
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document
+	 *            search document
 	 * @param assetPublisherFriendlyURL
+	 *            friendly url of the page where there is an assetpublisher for
+	 *            showing contents without any bound layout
 	 */
 	public void setProperties(
 		PortletRequest portletRequest, PortletResponse portletResponse,

@@ -1,7 +1,7 @@
 package fi.soveltia.liferay.gsearch.web.constants;
 
 /**
- * GSearch Portlet keys
+ * Portlet keys.
  * 
  * @author Petteri Karttunen
  */

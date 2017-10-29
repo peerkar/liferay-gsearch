@@ -10,9 +10,9 @@
 
 	{if $results and $results.paging and $results.paging.pages}
 
-		<div id="{$portletNamespace}Paging">
+		<div class="row text-center" id="{$portletNamespace}Paging">
 		
-			// Do we have a previous set of pages
+			// Do we have a previous set of pages?
 		
 			{if $results.paging.prevStart}
 				{call .prevStart}
@@ -28,7 +28,7 @@
 				{/call}
 			{/foreach}
 			
-			// Do we have a next set of pages
+			// Do we have a next set of pages?
 		
 			{if $results.paging.nextStart}
 				{call .nextStart}

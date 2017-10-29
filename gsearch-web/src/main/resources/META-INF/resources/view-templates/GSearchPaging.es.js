@@ -44,6 +44,9 @@ class GSearchPaging extends Component {
 		}
 	}	
 	
+	/**
+	 * @inheritDoc
+	 */
 	rendered() {
 		
 		// Set page click events
@@ -62,7 +65,6 @@ class GSearchPaging extends Component {
 			
 			event.preventDefault();
 		});			
-		
 	}
 }
 

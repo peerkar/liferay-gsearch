@@ -7,10 +7,10 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
-import fi.soveltia.liferay.gsearch.web.search.query.QueryParams;
+import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
 
 /**
- * GSearch interface.
+ * GSearch service. This is the main service for getting the search results.
  * 
  * @author Petteri Karttunen
  */
@@ -23,7 +23,7 @@ public interface GSearch {
 	 * @param portletResponse
 	 * @param queryParams
 	 * @param gSearchDisplayConfiguration
-	 * @return
+	 * @return search results JSON object
 	 * @throws Exception
 	 */
 	public JSONObject getSearchResults(
@@ -31,5 +31,4 @@ public interface GSearch {
 		QueryParams queryParams,
 		GSearchDisplayConfiguration gSearchDisplayConfiguration)
 		throws Exception;
-
 }

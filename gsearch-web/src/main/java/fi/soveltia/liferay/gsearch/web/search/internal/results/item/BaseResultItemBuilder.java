@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.web.search.results;
+package fi.soveltia.liferay.gsearch.web.search.internal.results.item;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
@@ -32,15 +32,19 @@ import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
 import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
-import fi.soveltia.liferay.gsearch.web.search.query.QueryBuilderImpl;
+import fi.soveltia.liferay.gsearch.web.search.internal.query.QueryBuilderImpl;
+import fi.soveltia.liferay.gsearch.web.search.results.item.ResultItemBuilder;
 
 /**
- * Base result builder.
+ * Abstract base result builder class.
  * 
  * @author Petteri Karttunen
  */
-public abstract class BaseResultBuilder implements ResultBuilder {
+public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDate()
 		throws ParseException {
@@ -65,6 +69,9 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		return dateString;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDescription()
 		throws SearchException {
@@ -72,6 +79,9 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		return HtmlUtil.stripHtml(getSummary().getContent());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getLink()
 		throws Exception {
@@ -85,6 +95,9 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		return sb.toString();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getTitle()
 		throws NumberFormatException, PortalException {
@@ -97,12 +110,18 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		return HtmlUtil.stripHtml(title);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getType() {
 
 		return LanguageUtil.get(_resourceBundle, _entryClassName);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setProperties(
 		PortletRequest portletRequest, PortletResponse portletResponse,
@@ -119,10 +138,10 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
 	}
 
-	/**s
-	 * Get AssetRenderer
+	/**
+	 * s Get AssetRenderer
 	 * 
-	 * @return
+	 * @return asset renderer object specific for the item type
 	 * @throws PortalException
 	 * @throws NumberFormatException
 	 */
@@ -142,10 +161,11 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 	}
 
 	/**
-	 * Get indexer for class
+	 * Get indexer for the item class name.
 	 * 
-	 * @param className
-	 * @return
+	 * @param name
+	 *            of the item class
+	 * @return indexer object
 	 */
 	protected Indexer<Object> getIndexer(String className) {
 
@@ -157,9 +177,9 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 	}
 
 	/**
-	 * Get document summary
+	 * Get document summary.
 	 * 
-	 * @return Summary
+	 * @return document summary object
 	 * @throws SearchException
 	 */
 	protected Summary getSummary()
@@ -185,7 +205,6 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 		return _summary;
 	}
 
-
 	protected String _assetPublisherPageFriendlyURL;
 	protected Document _document;
 	protected String _entryClassName;
@@ -200,5 +219,5 @@ public abstract class BaseResultBuilder implements ResultBuilder {
 	private Summary _summary = null;
 
 	private static final Log _log =
-		LogFactoryUtil.getLog(BaseResultBuilder.class);
+		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
 }

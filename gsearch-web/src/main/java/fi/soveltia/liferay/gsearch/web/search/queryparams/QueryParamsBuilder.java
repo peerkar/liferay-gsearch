@@ -1,14 +1,15 @@
 
-package fi.soveltia.liferay.gsearch.web.search.query;
+package fi.soveltia.liferay.gsearch.web.search.queryparams;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
 import javax.portlet.PortletRequest;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
+import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
 
 /**
- * QueryParamsBuilder interface. This service builds query params object from
+ * Query parameters builder. This service builds query params object from
  * request parameters.
  * 
  * @author Petteri Karttunen
@@ -16,15 +17,16 @@ import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration
 public interface QueryParamsBuilder {
 
 	/**
-	 * Parse parameters from request and build a QueryParam object.
+	 * Parse parameters from request and build a query params object.
 	 *
 	 * @param portletRequest
 	 * @param configuration
-	 * @return
+	 *            portlet configuration object
+	 * @return QueryParams object
 	 * @throws PortalException
 	 */
 	public QueryParams buildQueryParams(
 		PortletRequest portletRequest,
 		GSearchDisplayConfiguration configuration)
-		throws PortalException;
+		throws Exception;
 }

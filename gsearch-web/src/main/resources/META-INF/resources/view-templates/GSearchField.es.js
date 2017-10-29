@@ -1,9 +1,17 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
+import Ajax from 'metal-ajax/src/Ajax';
+import MultiMap from 'metal-multimap/src/MultiMap';
+
 import GSearchUtils from '../js/GSearchUtils.es';
+import GSearchAutocomplete from '../js/GSearchAutocomplete.es';
 
 import templates from './GSearchField.soy';
+
+// Autocompletion delay
+
+const AUTOCOMPLETE_DELAY = 150;
 
 /**
  * GSearch searchfield component.
@@ -17,7 +25,11 @@ class GSearchField extends Component {
 		
 		super(opt_config, opt_parentElement);
 		
+		this.autoCompleteEnabled = opt_config.autoCompleteEnabled;
+		
 		this.portletNamespace = opt_config.portletNamespace;
+
+		this.suggestionsURL = opt_config.suggestionsURL;
 
 		this.setQueryParam('queryMinLength', opt_config.queryMinLength);
 	}
@@ -31,9 +43,15 @@ class GSearchField extends Component {
 		
 		this.checkCallURLSelections();
 
-		// Set click events
+		// Set click events.
 			
 		this.setClickEvents();	
+
+		// Init autocomplete.
+
+		if (this.autoCompleteEnabled) {
+			this.initAutocomplete();
+		}
 	}
 
 	/**
@@ -57,12 +75,28 @@ class GSearchField extends Component {
 	}
 	
 	/**
-	 * Init autocomplete
+	 * Init autocomplete / suggester.
 	 */
-	initAutoComplete() {
-		// Coming soon
+	initAutocomplete() {
+		
+		let _self = this;
+		
+		let autocomplete = new GSearchAutocomplete ({
+			elementClasses: 'gsearch-autocomplete-list',
+			inputElement:document.querySelector('#' + this.portletNamespace + 'SearchField'),
+			data: function(keywords) {
+				if (keywords.length >= _self.getQueryParam('queryMinLength') && !_self.isSuggesting && keywords.slice(-1) != ' ') {
+					return _self.getSuggestions(keywords);
+				} else {
+					return;
+				}
+			},
+			select: function(keywords, event) {
+				$('#' + _self.portletNamespace + 'SearchField').val(keywords.text);
+			}
+		});
 	}
-	
+		
 	/**
 	 * Do search
 	 */
@@ -70,7 +104,7 @@ class GSearchField extends Component {
 
 		let keywords = $('#' + this.portletNamespace + 'SearchField').val().trim();
 
-		// Validate before setting
+		// Validate keywords.
 		
 		if (this.validateKeywords(keywords)) {
 			this.setQueryParam("keywords", keywords, true);
@@ -78,7 +112,56 @@ class GSearchField extends Component {
 	}
 	
 	/**
-	 * Set click events
+	 * Get suggestions
+	 */
+	getSuggestions(keywords) {
+
+		// Set this flag to manage concurrent suggest requests (delay between requests).
+		
+		this.isSuggesting = true;
+		
+		let _self = this;
+		
+		let params = new MultiMap();
+		
+		params.add(this.portletNamespace + 'q', keywords);
+		
+		return Ajax.request(
+			this.suggestionsURL,
+			'GET',
+			null,
+			null,
+			params,
+			this.requestTimeout
+		).then((response) => {
+				let suggestions = JSON.parse(response.responseText);
+
+				_self.releaseSuggesting();
+
+				return suggestions;
+
+		}).catch(function(error) {
+
+			_self.releaseSuggesting();
+
+			console.log(error);
+		});
+	}
+	
+	/**
+	 * Release isSuggesting flag.
+	 */
+	releaseSuggesting() {	
+		
+		let _self = this;
+		
+		setTimeout(function(){
+			_self.isSuggesting = false;
+		}, AUTOCOMPLETE_DELAY);	
+	}	
+	
+	/**
+	 * Set click events.
 	 */
 	setClickEvents() {
 
@@ -99,7 +182,7 @@ class GSearchField extends Component {
 	        }
 	    });	
 	}
-	
+		
 	/**
 	 * Show message
 	 * 
@@ -131,7 +214,7 @@ class GSearchField extends Component {
 		// Minimum length is defined in portlet configuration
 		
 		if (keywords.length < this.getQueryParam('queryMinLength')) {
-			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + this.queryMinLength);
+			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + this.getQueryParam('queryMinLength'));
 			return false;
 		}
 		
@@ -148,6 +231,9 @@ class GSearchField extends Component {
 GSearchField.STATE = {
 	initialURLParameters: {
 		value: null
+	},
+	isSuggesting: {
+		value: false
 	},
 	queryMinLength: {
 		validator: core.isNumber

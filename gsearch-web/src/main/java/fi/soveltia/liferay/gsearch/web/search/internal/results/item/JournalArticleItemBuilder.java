@@ -1,4 +1,4 @@
-package fi.soveltia.liferay.gsearch.web.search.results;
+package fi.soveltia.liferay.gsearch.web.search.internal.results.item;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -18,16 +18,21 @@ import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.web.search.util.GSearchUtil;
+import fi.soveltia.liferay.gsearch.web.search.internal.util.GSearchUtil;
 
 /**
- * JournalArticle Result Builder
+ * JournalArticle item type result builder.
  * 
  * @author Petteri Karttunen
  */
-@Component(immediate = true)
-public class JournalArticleResultBuilder extends BaseResultBuilder {
+@Component(
+	immediate = true
+)
+public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getLink()
 		throws Exception {
@@ -46,10 +51,10 @@ public class JournalArticleResultBuilder extends BaseResultBuilder {
 	}
 
 	/**
-	 * Get a view url for an article that's not bound to a layout or has a
+	 * Get a view url for an article which is not bound to a layout or has a
 	 * default view page.
 	 * 
-	 * @return
+	 * @return url string
 	 * @throws PortalException
 	 */
 	protected String getNotLayoutBoundJournalArticleUrl()
@@ -58,7 +63,7 @@ public class JournalArticleResultBuilder extends BaseResultBuilder {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		Layout layout = GSearchUtil.getAssetPublisherLayout(
+		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
 			_portletRequest, _assetPublisherPageFriendlyURL);
 
 		String assetPublisherInstanceId =

@@ -5,8 +5,11 @@ import com.liferay.portal.kernel.search.Query;
 
 import javax.portlet.PortletRequest;
 
+import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
+
 /**
- * QueryBuilder interface. This service builds the query for the backend.
+ * Main query builder. Implementations of this interface parse the query params
+ * object and build query for the backend.
  * 
  * @author Petteri Karttunen
  */
@@ -17,7 +20,7 @@ public interface QueryBuilder {
 	 * 
 	 * @param portletRequest
 	 * @param queryParams
-	 * @return
+	 * @return Query object
 	 * @throws Exception
 	 */
 	public Query buildQuery(

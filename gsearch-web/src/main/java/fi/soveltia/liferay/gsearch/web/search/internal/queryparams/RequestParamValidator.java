@@ -1,18 +1,18 @@
-package fi.soveltia.liferay.gsearch.web.search.query;
+package fi.soveltia.liferay.gsearch.web.search.internal.queryparams;
 
 import com.liferay.portal.kernel.util.Validator;
 
 /**
- * Request parameter validator
+ * Request parameter validator class.
  * 
  * @author Petteri Karttunen
  */
 public class RequestParamValidator {
 
 	/**
-	 * Validate keywords
+	 * Validate keywords.
 	 * 
-	 * @return
+	 * @return true if valid, false or not
 	 */
 	public boolean validateKeywords(String keywords) {
 
@@ -23,5 +23,7 @@ public class RequestParamValidator {
 		return false;
 	}
 
+	// Maximum length of keywords. Could be put in the configuration.
+	
 	public static final int KEYWORDS_MAX_LENGTH = 100;
 }

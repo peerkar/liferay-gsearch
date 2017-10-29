@@ -5,12 +5,12 @@ import Ajax from 'metal-ajax/src/Ajax';
 import MultiMap from 'metal-multimap/src/MultiMap';
 
 /**
- * GSearch Query
+ * GSearch Query class
  */
 class GSearchQuery extends State {
 
 	/**
-	 * Build url string for the browser address bar
+	 * Build url string for the browser address bar.
 	 */
 	buildAddressBarURL() {
 		
@@ -25,6 +25,19 @@ class GSearchQuery extends State {
 			.concat('&start=').concat(this.getStart())
 			.concat('&sortField=').concat(this.getSortField())
 			.concat('&sortDirection=').concat(this.getSortDirection());
+		
+		if(this.getDocumentExtensionFilter() != '') {
+			url = url.concat('&extension=').concat(this.getDocumentExtensionFilter())
+		}
+
+		if(this.getDocumentTypeFilter() != '') {
+			url = url.concat('&filetype=').concat(this.getDocumentTypeFilter())
+		}
+
+		if(this.getWebContentStructureFilter() != '') {
+			url = url.concat('&wcs=').concat(this.getWebContentStructureFilter())
+		}
+		
 		return encodeURI(url);
 	}
 	
@@ -40,6 +53,18 @@ class GSearchQuery extends State {
 		params.add('start', this.getStart());
 		params.add('sortField', this.getSortField());
 		params.add('sortDirection', this.getSortDirection());
+		
+		if(this.getDocumentExtensionFilter() != '') {
+			params.add('extension', this.getDocumentExtensionFilter());
+		}
+
+		if(this.getDocumentTypeFilter() != '') {
+			params.add('filetype', this.getDocumentTypeFilter());
+		}
+
+		if(this.getWebContentStructureFilter() != '') {
+			params.add('wcs', this.getWebContentStructureFilter());
+		}
 		
 		return params;
 	}
@@ -83,7 +108,23 @@ class GSearchQuery extends State {
 	setQueryMinLength(queryMinLength) {
 		this.queryMinLength = queryMinLength;
 	}
-	
+
+    getDocumentExtensionFilter()  {
+    	return this.documentExtensionFilter;
+    }
+    
+    setDocumentExtensionFilter(documentExtensionFilter)  {
+		this.documentExtensionFilter = documentExtensionFilter;
+    }
+    
+    getDocumentTypeFilter()  {
+    	return this.documentTypeFilter;
+    }
+    
+    setDocumentTypeFilter(documentTypeFilter)  {
+		this.documentTypeFilter = documentTypeFilter;
+    }
+    
     getScopeFilter()  {
     	return this.scopeFilter;
     }
@@ -108,6 +149,14 @@ class GSearchQuery extends State {
 		this.typeFilter = typeFilter;
 	}
 	
+    getWebContentStructureFilter()  {
+    	return this.webContentStructureFilter;
+    }
+    
+    setWebContentStructureFilter(webContentStructureFilter)  {
+		this.webContentStructureFilter = webContentStructureFilter;
+    }
+    	
 	validate() {
 		if (this.keywords.length < this.getQueryMinLength()) {
 			return false;
@@ -131,7 +180,7 @@ GSearchQuery.STATE = {
 		value: 0
 	},
 	sortField: {
-		value: 'title'
+		value: 'score'
 	},
 	sortDirection: {
 		value: 'asc'
@@ -142,6 +191,12 @@ GSearchQuery.STATE = {
 	queryMinLength: {
 		value: 3
 	},
+	documentExtensionFilter: {
+		value: ''
+	},
+	documentTypeFilter: {
+		value: ''
+	},
 	scopeFilter: {
 		value: 'all'
 	},
@@ -149,6 +204,9 @@ GSearchQuery.STATE = {
 		value: ''
 	},
 	typeFilter: {
+		value: ''
+	},
+	webContentStructureFilter: {
 		value: ''
 	}
 }

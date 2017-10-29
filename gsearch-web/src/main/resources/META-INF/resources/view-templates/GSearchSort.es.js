@@ -28,8 +28,6 @@ class GSearchSort extends Component {
 		// Check if we are getting selections from initially calling URL.
 		
 		this.checkCallURLSelections();
-		
-		
 	}
 	
 	/**
@@ -37,11 +35,11 @@ class GSearchSort extends Component {
 	 */
 	rendered() {
 
-		// Set dropdown selections
+		// Set dropdown lists selections.
 			
 		this.setDropDownSelectedItems();
 		
-		// Set click events
+		// Set click events for the dropdowns.
 		
 		this.setDropDownClickEvents();
 	}

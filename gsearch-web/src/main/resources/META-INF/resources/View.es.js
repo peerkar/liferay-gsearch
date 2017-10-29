@@ -28,7 +28,7 @@ class View extends Component {
 		
 		this.requestTimeout = opt_config.requestTimeout;
 
-		// If keywords parameter was from the call in the child template then execute search.
+		// If this was linked call i.e. if keyword parameter was present in the calling url, then execute search.
 		// Notice that nested templates are processed before parent.
 		
 		if (this.query.getKeywords() != '') {
@@ -36,10 +36,13 @@ class View extends Component {
 		}
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	created() {
 
 		// Create query object. 
-		// Need to create the query object here to be available 
+		// Need to create the query object here for that to be available 
 		// for the nested templates. Constructor of this template
 		// will be run after child templates.
 			
@@ -75,17 +78,17 @@ class View extends Component {
 	 */
 	executeQuery() {
 		
-		// Validate keywords
+		// Validate keywords.
 		
 		if (!this.query.validate()) {
 			return;
 		}
 
-		// Hide elements and show loader image
+		// Hide elements and show loader image.
 
 		this.setLoading(true);
 
-		// Build params
+		// Build params.
 		
 		let params = this.query.buildQueryParams();
 		
@@ -100,11 +103,11 @@ class View extends Component {
 
 			if (response.responseText) {
 				
-				// Set results object
+				// Set results object.
 				
 				this.results =  JSON.parse(response.responseText);
 				
-				// Update stats
+				// Update stats.
 				
 				if (this.results.items.length > 0) {
 				
@@ -118,11 +121,11 @@ class View extends Component {
 					this.stats = '';
 				}
 										
-				// Remove loading placeholder
+				// Remove loading placeholder.
 
 				this.setLoading(false);
 				
-				// Update browser address bar
+				// Update browser address bar.
 
 				this.updateAddressBar(this.query.buildAddressBarURL());
 			} else {
@@ -156,7 +159,7 @@ class View extends Component {
 	}
 	
 	/**
-	 * Update address bar
+	 * Update address bar.
 	 * 
 	 * @param {address} key
 	 */

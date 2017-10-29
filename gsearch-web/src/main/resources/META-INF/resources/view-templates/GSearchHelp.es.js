@@ -13,7 +13,6 @@ class GSearchHelp extends Component {
 	/**
 	 * @inheritDoc
 	 * 
-	 * See  https://web.liferay.com/community/forums/-/message_boards/message/85067601
 	 */
 	constructor(opt_config, opt_parentElement) {
 	
@@ -57,7 +56,7 @@ class GSearchHelp extends Component {
 			
 			if (response.responseText) {
 				
-				this.helpText = JSON.parse(response.responseText).text;
+				this.helpText = JSON.parse(response.responseText).helpText;
 				
 				$('#' + this.portletNamespace + 'HelpModal .modal-body').html(this.helpText);
 				$('#' + this.portletNamespace + 'HelpModal .modal-body').removeClass('ajax-loader-placeholder');

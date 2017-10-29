@@ -6,6 +6,33 @@
  * @param? results
  */
 {template .render}
+
+	// If there are suggestions then there's an alternative search done (which has to have results, by it's definition).
+
+	{if length($results.meta.querySuggestions) > 0}
+
+		<div class="row suggestions">
+
+			<p>{msg desc=""}search-for{/msg} <strong>{$results.meta.originalQueryTerms}</strong> {msg desc=""}gave-no-results{/msg}</p>
+
+			<p class="alternate-search">{msg desc=""}showing-results-for{/msg} <strong><i>{$results.meta.queryTerms}</i></strong></p>
+
+			// Show others on te list
+
+			{if length($results.meta.querySuggestions) > 1}
+	
+				<p class="other-suggestions">{msg desc=""}other-suggestions{/msg} </p>
+				<ul>
+					{foreach $item in $results.meta.querySuggestions}
+						{call .suggestionItem}
+							{param item: $item /}
+						{/call}
+					{/foreach}
+				</ul>
+			{/if}
+		</div>
+	{/if}
+	
 	{if $results.items and length($results.items) > 0}
 		{foreach $item in $results.items}
 			{call .resultItem}
@@ -46,3 +73,13 @@
 		</div>
 	</div>
 {/template}
+
+/**
+ * Print query suggestions text.
+ *
+ * @param item
+ */
+{template .suggestionItem}
+	<li>{$item}</li>
+{/template}
+	

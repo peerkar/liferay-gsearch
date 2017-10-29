@@ -10,7 +10,7 @@
 
 	{if $results and $results.items and length($results.items) > 0}
 	
-		<div>
+		<div class="row">
 		
 			// Sort field
 			
@@ -21,7 +21,8 @@
 					<span class="caret"></span>
 				</button>
 				<ul aria-labelledby="{$portletNamespace}SortField" class="dropdown-menu" id="{$portletNamespace}SortFieldOptions">
-					<li class="selected"><a data-value="title" href="#">{msg desc=""}sort-by-title{/msg}</a></li>
+					<li class="selected"><a data-value="score" href="#">{msg desc=""}sort-by-relevancy{/msg}</a></li>
+					<li><a data-value="title" href="#">{msg desc=""}sort-by-title{/msg}</a></li>
 					<li><a data-value="last-modified" href="#">{msg desc=""}sort-by-modified{/msg}</a></li>
 				</ul>
 			</div>

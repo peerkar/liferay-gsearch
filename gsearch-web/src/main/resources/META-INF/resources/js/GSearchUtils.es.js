@@ -4,7 +4,7 @@
 class GSearchUtils {
 
 	/**
-	 * Set initially selected item. Return true if found and correctly set, false if not.
+	 * Set initially selected option item. Return true if found and correctly set, false if not.
 	 * 
 	 * @param {String} optionElementId
 	 * @param {String} triggerElementId
@@ -53,7 +53,7 @@ class GSearchUtils {
 	}
 	
 	/**
-	 * Set dropdown selected item (text).
+	 * Set dropdown selected item and text for the selector.
 	 * 
 	 * @param {String} optionElementId
 	 * @param {String} triggerElementId

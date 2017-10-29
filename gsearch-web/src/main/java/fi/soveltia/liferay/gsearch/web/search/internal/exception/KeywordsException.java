@@ -1,9 +1,9 @@
-package fi.soveltia.liferay.gsearch.web.search.exception;
+package fi.soveltia.liferay.gsearch.web.search.internal.exception;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * Keywords Exception Class
+ * Keywords exception class.
  * 
  * @author Petteri Karttunen
  */

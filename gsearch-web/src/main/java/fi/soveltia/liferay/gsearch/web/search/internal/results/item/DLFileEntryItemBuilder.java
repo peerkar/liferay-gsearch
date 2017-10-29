@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.web.search.results;
+package fi.soveltia.liferay.gsearch.web.search.internal.results.item;
 
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -8,13 +8,18 @@ import com.liferay.portal.kernel.util.StringBundler;
 import org.osgi.service.component.annotations.Component;
 
 /**
- * DLFileEntry Result Builder
+ * DLFileEntry item type result builder.
  * 
  * @author Petteri Karttunen
  */
-@Component(immediate = true)
-public class DLFileEntryResultBuilder extends BaseResultBuilder {
+@Component(
+	immediate = true
+)
+public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getLink() {
 

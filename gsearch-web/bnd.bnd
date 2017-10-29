@@ -6,5 +6,5 @@ Require-Capability:\
 		filter:="(type=metal)"
 Include-Resource: \
 	package.json,\
-	META-INF/resources/js/mark.js = node_modules/mark.js/dist/mark.es6.js	
+	META-INF/resources/js/mark.js = node_modules/mark.js/dist/mark.es6.js
 Web-ContextPath: /gsearch-web

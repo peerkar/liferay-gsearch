@@ -26,7 +26,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPreferencesKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 
 /**
- * Configuration action
+ * Portlet configuration action class.
  * 
  * @author Petteri Karttunen
  */
@@ -73,21 +73,16 @@ public class GSearchDisplayConfigurationAction
 			actionRequest, GSearchPreferencesKeys.REQUEST_TIMEOUT, 10000);
 		String helpText = ParamUtil.getString(
 			actionRequest, GSearchPreferencesKeys.HELP_TEXT, "N/A");
-
 		String assetPublisherPageFriendlyURL = ParamUtil.getString(
 			actionRequest, GSearchPreferencesKeys.ASSET_PUBLISHER_PAGE_FRIENDLY_URL, null);
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Asset Publisher page friendly url:" + assetPublisherPageFriendlyURL);
-			_log.debug("Page size:" + pageSize);
-			_log.debug("Query min length:" + queryMinLength);
-			_log.debug("Request timeout:" + requestTimeout);
-			_log.debug("Helptext:" + helpText);
-		}
+		boolean keywordSuggestionsEnabled = ParamUtil.getBoolean(
+			actionRequest, GSearchPreferencesKeys.KEYWORD_SUGGESTIONS_ENABLED, true);
 
 		setPreference(
 			actionRequest, GSearchPreferencesKeys.ASSET_PUBLISHER_PAGE_FRIENDLY_URL,
 			assetPublisherPageFriendlyURL);
+		setPreference(
+			actionRequest, GSearchPreferencesKeys.KEYWORD_SUGGESTIONS_ENABLED, String.valueOf(keywordSuggestionsEnabled));
 		setPreference(
 			actionRequest, GSearchPreferencesKeys.PAGE_SIZE,
 			String.valueOf(pageSize));
@@ -111,9 +106,8 @@ public class GSearchDisplayConfigurationAction
 			GSearchDisplayConfiguration.class, properties);
 	}
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(GSearchDisplayConfigurationAction.class);
-
 	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
-
+	
+	private static final Log _log =
+					LogFactoryUtil.getLog(GSearchDisplayConfigurationAction.class);
 }

@@ -1,12 +1,14 @@
 
-package fi.soveltia.liferay.gsearch.web.search.util;
+package fi.soveltia.liferay.gsearch.web.search.internal.util;
 
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutTypePortlet;
 import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -15,19 +17,26 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
 
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 
+/**
+ * GSearch utility class.
+ * 
+ * @author Petteri Karttunen
+ *
+ */
 public class GSearchUtil {
 
 	/**
-	 * Try to find asset published instance on a layout
+	 * Try to find an asset publisher instance id on a layout
 	 * 
 	 * @param layout
-	 * @return
+	 * @return portlet instance id
 	 * @throws PortalException
 	 * @throws SystemException
 	 */
@@ -52,13 +61,13 @@ public class GSearchUtil {
 	}
 
 	/**
-	 * Get AssetPublisher Layout
+	 * Get layout by friendlyurl.
 	 * 
 	 * @param resourceRequest
-	 * @return
-	 * @throws PortalException
+	 * @return layout
+	 * @throws PortalException if layout is not found
 	 */
-	public static Layout getAssetPublisherLayout(
+	public static Layout getLayoutByFriendlyURL(
 		PortletRequest portletRequest, String layoutFriendlyURL)
 		throws PortalException {
 
@@ -77,12 +86,12 @@ public class GSearchUtil {
 	}
 
 	/**
-	 * Get current layout url
+	 * Get current layout friendly URL
 	 * 
-	 * @return String
+	 * @return String friendly URL for the current layout
 	 * @throws PortalException
 	 */
-	public static String getCurrentLayoutURL(PortletRequest portletRequest)
+	public static String getCurrentLayoutFriendlyURL(PortletRequest portletRequest)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
@@ -92,19 +101,19 @@ public class GSearchUtil {
 			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
 		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
 	}
-
+	
 	/**
 	 * Get redirect url.
 	 * 
-	 * @return String
+	 * @return redirect url
 	 * @throws PortalException
 	 */
-	protected static String getRedirectURL(PortletRequest portletRequest)
+	public static String getRedirectURL(PortletRequest portletRequest)
 		throws PortalException {
 
 		StringBundler sb = new StringBundler();
 
-		sb.append(GSearchUtil.getCurrentLayoutURL(portletRequest));
+		sb.append(GSearchUtil.getCurrentLayoutFriendlyURL(portletRequest));
 		sb.append("?");
 		sb.append(GSearchWebKeys.KEYWORDS).append("=").append(
 			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS));
@@ -123,4 +132,44 @@ public class GSearchUtil {
 
 		return HtmlUtil.escapeURL(sb.toString());
 	}
+	
+	/**
+	 * Get group ids available for current user.
+	 * 
+	 * @param themeDisplay
+	 * @return array of possible groupIds for a user
+	 * @throws PortalException
+	 */
+	public static long[] getUserAccessibleSiteGroupIds(ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		List<Long> groupIds = new ArrayList<Long>();
+
+		// Add global
+
+		groupIds.add(themeDisplay.getCompanyGroupId());
+
+		// For a guest user list all public sites
+
+		for (Group group : GroupLocalServiceUtil.getGroups(
+			themeDisplay.getCompanyId(), 0, true)) {
+
+			if (group.isActive() && !group.isStagingGroup() &&
+				group.hasPublicLayouts()) {
+				groupIds.add(group.getGroupId());
+			}
+		}
+
+		// For a logged in user additionally list all sites he's a member of
+
+		for (Group group : themeDisplay.getUser().getSiteGroups()) {
+			if (!groupIds.contains(group.getGroupId()) && group.isActive() &&
+				!group.isStagingGroup()) {
+				groupIds.add(group.getGroupId());
+			}
+		}
+
+		return groupIds.stream().mapToLong(l -> l).toArray();
+	}	
+	
 }
