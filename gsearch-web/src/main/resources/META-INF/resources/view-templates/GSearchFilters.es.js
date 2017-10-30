@@ -54,18 +54,24 @@ class GSearchFilters extends Component {
 
 		
 		// Set asset type facet counts.
-		// Change counts only when there's a new search (=keywords or scope change)
-		// Leave counts as is if additional filters change
+		// Change counts only when there's a new search (=keywords or scope change).
+		// Also, don't show counts if we're coming to the page from a bookmark url
+		// and already having there a filter. In that case we don't get all the counts.
 		
-		if (this.shouldRefreshFacets()) {
+		if (this.shouldRefreshFacets()) { 	
+
+			console.log(this.initialURLParameters && 
+					this.initialURLParameters['type'] == 'everything');
 			
-			if (this.results && this.results.facets) {
-				this.typefacets = this.results.facets;
+			if (!this.initialURLParameters || (this.initialURLParameters && 
+					this.initialURLParameters['type'] == 'everything')) {
+				
+				if (this.results && this.results.facets) {
+					this.typefacets = this.results.facets;
+				}
 			}
 		}
-
 		this.setFacetCounts(this.portletNamespace + 'TypeFilterOptions', this.typefacets);
-
 	}
 	
 	/**
@@ -88,16 +94,16 @@ class GSearchFilters extends Component {
 			if (documentExtension) {
 				if (GSearchUtils.setInitialOption(this.portletNamespace + 'DocumentExtensionFilterOptions', documentExtension)) {
 					this.setQueryParam('documentExtensionFilter', documentExtension, false);
-					$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
 				}
 			} 
+			$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
 
 			if (documentType) {
 				if (GSearchUtils.setInitialOption(this.portletNamespace + 'DocumentTypeFilterOptions', documentType)) {
 					this.setQueryParam('documentTypeFilter', documentType, false);
-					$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
 				}
 			} 
+			$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
 		}
 		
 		if (scope) {
@@ -122,10 +128,9 @@ class GSearchFilters extends Component {
 			if (webContentStructure) {
 				if (GSearchUtils.setInitialOption(this.portletNamespace + 'WebContentStructureFilterOptions', webContentStructure)) {
 					this.setQueryParam('webContentStructureFilter', webContentStructure, false);
-					
-					$('#' + this.portletNamespace + 'AdditionalFilters .wcfilter').removeClass('hide');
 				}
 			} 
+			$('#' + this.portletNamespace + 'AdditionalFilters .wcfilter').removeClass('hide');
 		}
 	}
 	
