@@ -51,6 +51,3 @@ Thanks to Tony Tawk for the Arabic translation!
 
 ## Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to your own purposes but if you like it and have ideas you would like to see in this application I'd be glad to hear about those. Also many thanks in advance for any reported bug findings.
-
-I hope 
-Enjoy!
