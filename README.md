@@ -21,7 +21,7 @@ Creating this application served originally two purposes: two experiment with SO
 * It's fast
 
 ## Requirements
-It's originally written to Liferay DXP FP 31 but it should work with CE (not tested).
+This application is written against Liferay DXP fixpack level 28. Compatibility with earlier levels is not tested.
 
 ## Installation
 1. Have a Liferay workspace (requirement) in you Liferay IDE. 
