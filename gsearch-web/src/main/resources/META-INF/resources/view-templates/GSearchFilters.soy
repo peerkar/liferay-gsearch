@@ -120,7 +120,7 @@
 {/template}
 
 /**
- * Print asset type options.
+ * Print dropdown options.
  *
  * @param options
  */
@@ -131,6 +131,7 @@
 		{else}
 			<li>
 		{/if}
+		
 		{if $item.facet}
 			<a data-facet="{$item.facet}" data-value="{$item.key}" href="#">
 		{else}
@@ -138,6 +139,7 @@
 		{/if}
 
 		{$item.name}
+
 		{if $item.groupName}
 			<span class="groupname">({$item.groupName})</span>
 		{/if}				
