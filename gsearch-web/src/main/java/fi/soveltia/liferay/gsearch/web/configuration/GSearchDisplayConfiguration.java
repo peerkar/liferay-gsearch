@@ -71,7 +71,8 @@ public interface GSearchDisplayConfiguration {
 
 	@Meta.AD(
 		deflt = "0.01f", 
-	    name = "The confidence level defines a factor applied to the input phrases score which is used as a threshold for other suggest candidates. Only candidates that score higher than the threshold will be included in the result. Please see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-suggesters-phrase.html",
+	    description = "The confidence level defines a factor applied to the input phrases score which is used as a threshold for other suggest candidates. Only candidates that score higher than the threshold will be included in the result. Please see https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-suggesters-phrase.html",
+	    name= "Keyword suggestion confidence level",
 		required = false
 	)
 	public float keywordSuggestionsConfidence();
@@ -112,7 +113,7 @@ public interface GSearchDisplayConfiguration {
 			"discussion;com.liferay.message.boards.kernel.model.MBMessage|blog;com.liferay.blogs.kernel.model.BlogsEntry|" +
 			"wikipage;com.liferay.wiki.model.WikiPage",
 	    name = "Supported asset type option",
-	    description = "Syntax: key;classname_of_supported_asset_type",
+	    description = "Syntax: translation_key;classname_of_supported_asset_type",
 	    required = false
 	)
 	public String[]assetTypeOptions();	
