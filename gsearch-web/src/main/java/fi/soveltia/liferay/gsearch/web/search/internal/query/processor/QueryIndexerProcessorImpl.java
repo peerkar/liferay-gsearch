@@ -1,6 +1,8 @@
 
 package fi.soveltia.liferay.gsearch.web.search.internal.query.processor;
 
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -13,6 +15,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
+import fi.soveltia.liferay.gsearch.web.search.internal.query.QueryBuilderImpl;
 import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
 import fi.soveltia.liferay.gsearch.web.search.query.processor.QueryIndexerProcessor;
 
@@ -38,17 +41,33 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 		QueryParams queryParams, Hits hits)
 		throws Exception {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("Processing QueryIndexer");
+		}
+
 		if (!gSearchDisplayConfiguration.enableQuerySuggestions() &&
 			!gSearchDisplayConfiguration.enableAutoComplete()) {
 			return true;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.debug("QueryIndexer is enabled");
+		}
+		
 		if (hits.getLength() >= gSearchDisplayConfiguration.queryIndexingThreshold()) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug("QueryIndexing threshold exceeded. Indexing keywords: " + queryParams.getKeywords());
+			}
+
 			addDocument(
 				queryParams.getCompanyId(), queryParams.getKeywords(),
 				queryParams.getLocale());
+		} else {
+			if (_log.isDebugEnabled()) {
+				_log.debug("QueryIndexing threshold wasn't exceeded. Not indexing keywords.");
+			}
 		}
-
 		return true;
 	}
 
@@ -67,4 +86,8 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 
 	@Reference
 	protected IndexWriterHelper _indexWriterHelper;
+	
+	private static final Log _log =
+					LogFactoryUtil.getLog(QueryBuilderImpl.class);
+	
 }
