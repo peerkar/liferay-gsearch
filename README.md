@@ -21,7 +21,8 @@ Creating this application served originally two purposes: two experiment with SO
 * It's fast
 
 ## Requirements
-This application is written against Liferay DXP fixpack level 28. Compatibility with earlier levels is not tested.
+This application is written against Liferay DXP fixpack level 28. It requires version 2.1.0 of the Soy portlet bridge.
+If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
 ## Installation
 1. Have a Liferay workspace (requirement) in you Liferay IDE. 
