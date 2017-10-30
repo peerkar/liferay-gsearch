@@ -60,7 +60,7 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		try {
 			response = _gSearchSuggester.getSuggestions(
-				resourceRequest, resourceResponse,
+				resourceRequest,
 				_gSearchDisplayConfiguration);
 		}
 		catch (Exception e) {

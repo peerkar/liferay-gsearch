@@ -4,7 +4,6 @@ package fi.soveltia.liferay.gsearch.web.search.suggest;
 import com.liferay.portal.kernel.json.JSONArray;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
 
@@ -16,7 +15,7 @@ import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration
 public interface GSearchKeywordSuggester {
 
 	/**
-	 * Get keyword suggestions.
+	 * Get keyword suggestions as JSON Array
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -26,8 +25,22 @@ public interface GSearchKeywordSuggester {
 	 * @throws Exception
 	 */
 	public JSONArray getSuggestions(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+		PortletRequest portletRequest,
 		GSearchDisplayConfiguration gSearchDisplayConfiguration)
 		throws Exception;
 
+	/**
+	 * Get keyword suggestions as string Array
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param keywords
+	 * @param gSearchDisplayConfiguration
+	 * @return suggestions JSON array
+	 * @throws Exception
+	 */
+	public String[] getSuggestionsAsStringArray(
+		PortletRequest portletRequest,
+		GSearchDisplayConfiguration gSearchDisplayConfiguration)
+		throws Exception;
 }

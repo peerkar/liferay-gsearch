@@ -88,6 +88,6 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 	protected IndexWriterHelper _indexWriterHelper;
 	
 	private static final Log _log =
-					LogFactoryUtil.getLog(QueryBuilderImpl.class);
+					LogFactoryUtil.getLog(QueryIndexerProcessorImpl.class);
 	
 }
