@@ -31,7 +31,7 @@ It's originally written to Liferay DXP FP 31 but it should work with CE (not tes
 
 ## Configuration
 After deploying there are two things to do:
-1. Create one page and place there an Asset Publisher portlet.
+1. Create a page and put there an Asset Publisher portlet. Typically, you would configure this page to be hidden from navigation menu.
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch display configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
 
 That page is needed for showing any contents that do not have a display page but are in the CMS only. By default the portlet searches for a page with friendlyURL "/viewasset" but you can change that in the  configuration.
