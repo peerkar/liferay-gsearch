@@ -29,6 +29,15 @@ It's originally written to Liferay DXP FP 31 but it should work with CE (not tes
 3. Do a Gradle refresh (in the context menu of Eclipse) for the modules directory
 4. Build and deploy to you Liferay (DXP) installation
 
+## Configuration
+After deploying there are two things to do:
+1. Create one page and place there an Asset Publisher portlet.
+2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch display configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+
+That page is needed for showing any contents that do not have a display page but are in the CMS only. By default the portlet searches for a page with friendlyURL "/viewasset" but you can change that in the  configuration.
+
+Please also see the other configuration settings and tune them to your likings.
+
 ## Installing Elasticsearch Server
 For tweaking, debugging and monitoring purposes it's highly recommended to run the application against separate Elasticsearch server (i.e. not embedded mode).
 
