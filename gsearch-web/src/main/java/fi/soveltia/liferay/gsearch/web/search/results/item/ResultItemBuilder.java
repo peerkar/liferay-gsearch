@@ -15,7 +15,7 @@ import javax.portlet.PortletResponse;
 public interface ResultItemBuilder {
 
 	/**
-	 * Get item hit date
+	 * Get item hit date.
 	 * 
 	 * @return string representation of item date
 	 * @throws Exception
@@ -24,15 +24,24 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item description
+	 * Get item description.
 	 * 
 	 * @return item description
 	 */
 	public String getDescription()
 		throws Exception;
 
+
 	/**
-	 * Get item Link
+	 * Get item image src i.e. src attribute for img tag.
+	 * 
+	 * @return item description
+	 */
+	public String getImageSrc()
+		throws Exception;
+
+	/**
+	 * Get item link.
 	 * 
 	 * @return item link
 	 * @throws Exception
@@ -41,7 +50,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item Title
+	 * Get item title.
 	 * 
 	 * @return item title
 	 */
@@ -57,7 +66,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Set item builder properties
+	 * Set item builder properties.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse

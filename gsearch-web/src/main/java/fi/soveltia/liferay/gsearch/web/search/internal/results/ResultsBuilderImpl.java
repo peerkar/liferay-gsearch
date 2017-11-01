@@ -126,6 +126,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		if (_hits == null || docs.length == 0) {
 			return jsonArray;
 		}
+		
+		// Show small images beside the result text?
+		
+		boolean showImages = _gSearchDisplayConfiguration.showSmallImages();
+
 
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
@@ -166,6 +171,12 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				jsonObject.put("description", resultItemBuilder.getDescription());
 
+				// Image src
+
+				if (showImages) {
+					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
+				}
+				 
 				// Type
 
 				jsonObject.put("type", resultItemBuilder.getType());

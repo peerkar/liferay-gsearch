@@ -37,6 +37,13 @@ public interface GSearchDisplayConfiguration {
 		required = false
 	)
 	public String assetPublisherPage();
+
+	@Meta.AD(
+		deflt = "false", 
+	    name = "Show result small images.",
+		required = false
+	)
+	public boolean showSmallImages();
 	
 	@Meta.AD(
 		deflt = "true", 

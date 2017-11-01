@@ -1,10 +1,8 @@
 package fi.soveltia.liferay.gsearch.web.search.internal.results.item;
 
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -18,6 +16,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.search.internal.util.GSearchUtil;
 
 /**
@@ -29,6 +28,18 @@ import fi.soveltia.liferay.gsearch.web.search.internal.util.GSearchUtil;
 	immediate = true
 )
 public class JournalArticleItemBuilder extends BaseResultItemBuilder {
+
+	/**
+	 * {@inheritDoc}
+	 * @throws Exception 
+	 */
+	@Override
+	public String getImageSrc() throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
+
+		return getJournalArticle().getArticleImageURL(themeDisplay);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -51,6 +62,20 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 	}
 
 	/**
+	 * Get journal article.
+	 * 
+	 * @return
+	 * @throws PortalException 
+	 */
+	protected JournalArticle getJournalArticle() throws PortalException {
+
+		if (_journalArticle == null) {
+			_journalArticle = _journalArticleService.getLatestArticle(_entryClassPK);
+		}
+		return _journalArticle;
+	}
+	
+	/**
 	 * Get a view url for an article which is not bound to a layout or has a
 	 * default view page.
 	 * 
@@ -69,12 +94,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 		String assetPublisherInstanceId =
 			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
 
-		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
-			JournalArticle.class.getName(), getAssetRenderer().getClassPK());
-
-		JournalArticle journalArticle =
-			_journalArticleLocalService.getLatestArticle(
-				assetEntry.getClassPK());
+		JournalArticle journalArticle = getJournalArticle();
 
 		StringBundler sb = new StringBundler();
 		sb.append(PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
@@ -93,19 +113,13 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 	}
 
 	@Reference(unbind = "-")
-	protected void setAssetEntryLocalService(
-		AssetEntryLocalService assetEntryLocalService) {
+	protected void setJournalArticleService(
+		JournalArticleService journalArticleService) {
 
-		_assetEntryLocalService = assetEntryLocalService;
+		_journalArticleService = journalArticleService;
 	}
 
-	@Reference(unbind = "-")
-	protected void setJournalArticleLocalService(
-		JournalArticleLocalService journalArticleLocalService) {
-
-		_journalArticleLocalService = journalArticleLocalService;
-	}
-
-	private static AssetEntryLocalService _assetEntryLocalService;
-	private static JournalArticleLocalService _journalArticleLocalService;
+	private static JournalArticleService _journalArticleService;
+	
+	protected JournalArticle _journalArticle;
 }

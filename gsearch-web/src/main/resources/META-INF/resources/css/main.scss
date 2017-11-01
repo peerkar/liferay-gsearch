@@ -196,34 +196,45 @@
 		.item {
 			margin: 20px 0;
 		
-			.heading {
-				 h1 {
-					display: inline-block;
-					font-size: 130%;
-					margin-bottom: 0;
-					margin-top: 0;
+			.image {
+				object-fit: cover;
+   			
+   				img {
+   					max-width: 100%;
+   				}
+			}
+   	
+			.content {
+		
+				.heading {
+					 h1 {
+						display: inline-block;
+						font-size: 130%;
+						margin-bottom: 0;
+						margin-top: 0;
+					}
+					.type {
+						font-size: 77%;
+						margin-right: 10px;	
+						vertical-align: super;					
+					}
 				}
-				.type {
-					font-size: 77%;
-					margin-right: 10px;	
-					vertical-align: super;					
+		
+				.link {
+					margin-bottom: 5px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					width: 100%;
 				}
-			}
-	
-			.link {
-				margin-bottom: 5px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-				width: 100%;
-			}
-	
-			.link a {
-				color: #006621;
-			}
-	
-			.description {
-				color: #545454;
+		
+				.link a {
+					color: #006621;
+				}
+		
+				.description {
+					color: #545454;
+				}
 			}
 		}
 		

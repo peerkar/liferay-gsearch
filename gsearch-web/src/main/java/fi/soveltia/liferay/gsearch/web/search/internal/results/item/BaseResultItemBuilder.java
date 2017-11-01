@@ -83,6 +83,12 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public abstract String getImageSrc() throws Exception;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLink()
 		throws Exception {
 
