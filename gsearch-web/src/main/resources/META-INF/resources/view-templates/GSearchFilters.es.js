@@ -60,9 +60,6 @@ class GSearchFilters extends Component {
 		
 		if (this.shouldRefreshFacets()) { 	
 
-			console.log(this.initialURLParameters && 
-					this.initialURLParameters['type'] == 'everything');
-			
 			if (!this.initialURLParameters || (this.initialURLParameters && 
 					this.initialURLParameters['type'] == 'everything')) {
 				
