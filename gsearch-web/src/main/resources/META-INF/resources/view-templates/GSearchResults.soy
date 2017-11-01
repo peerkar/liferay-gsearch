@@ -4,6 +4,7 @@
  * Print search results
  *
  * @param? results
+ * @param imageSearchLayoutEnabled
  */
 {template .render}
 
@@ -16,7 +17,7 @@
 	{/if}
 	
 	{if $results.items and length($results.items) > 0}
-		{if $results.meta.searchType == 'image'}
+		{if $imageSearchLayoutEnabled and $results.meta.searchType == 'image'}
 			<div class="row image-row">
 				{foreach $item in $results.items}
 					{call GSearchImageResult.imageItem}

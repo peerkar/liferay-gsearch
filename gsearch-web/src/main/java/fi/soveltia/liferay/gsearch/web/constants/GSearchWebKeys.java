@@ -31,7 +31,9 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String HELP_TEXT = "helpText";
 
 	public static final String HELP_TEXT_URL = "helpTextURL";
-	
+
+	public static final String IMAGE_SEARCH_LAYOUT_ENABLED = "imageSearchLayoutEnabled";
+
 	public static final String INITIAL_URL_PARAMETERS = "initialURLParameters";
 
 	public static final String KEYWORDS = "q";

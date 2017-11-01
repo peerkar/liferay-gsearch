@@ -40,10 +40,19 @@ public interface GSearchDisplayConfiguration {
 
 	@Meta.AD(
 		deflt = "false", 
+		description = "Show content small images in the results.",
 	    name = "Show result small images.",
 		required = false
 	)
 	public boolean showSmallImages();
+
+	@Meta.AD(
+		deflt = "false", 
+		description = "When this is enabled and you're doing a image search, results are shown as images (Google like).",
+	    name = "Enable image search layout.",
+		required = false
+	)
+	public boolean enableImageSearchLayout();
 	
 	@Meta.AD(
 		deflt = "true", 

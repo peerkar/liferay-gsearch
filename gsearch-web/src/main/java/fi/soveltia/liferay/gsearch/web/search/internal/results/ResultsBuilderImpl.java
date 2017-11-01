@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.web.search.internal.results;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -128,11 +129,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			return jsonArray;
 		}
 		
-		// Show small images beside the result text?
-		
-		boolean showImages = _gSearchDisplayConfiguration.showSmallImages();
-
-
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
 
@@ -173,8 +169,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				jsonObject.put("description", resultItemBuilder.getDescription());
 
 				// Image src
-
-				if (showImages) {
+				
+				if (_gSearchDisplayConfiguration.showSmallImages() || 
+  					(_gSearchDisplayConfiguration.enableImageSearchLayout() &&
+							document.get(Field.ENTRY_CLASS_NAME).equals(DLFileEntry.class.getName()))) {
+				
 					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
 				}
 				 

@@ -78,6 +78,12 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			GSearchWebKeys.HELP_TEXT_URL, 
 			createResourceURL(renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
 
+		// Enable image search layout.
+		
+		template.put(
+			GSearchWebKeys.IMAGE_SEARCH_LAYOUT_ENABLED, 
+			_gSearchDisplayConfiguration.enableImageSearchLayout());
+
 		// Set search results resource url.
 
 		template.put(
