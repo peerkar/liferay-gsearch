@@ -20,6 +20,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchSearchTypes;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.search.internal.exception.KeywordsException;
 import fi.soveltia.liferay.gsearch.web.search.queryparams.QueryParamsBuilder;
@@ -57,6 +58,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setDocumentExtensionParam();
 		setDocumentTypeParam();
 		setKeywordsParam();
+		setSearchTypeParams();
 		setTimeParam();
 		setTypeParam();
 		setWebContentStructureParam();
@@ -262,6 +264,27 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		_queryParams.setPageSize(_gSearchDisplayConfiguration.pageSize());
 	}
+	
+
+	/**
+	 * Set search type (normal / image search). 
+	 * 
+	 * Search type is determined from typefilter value 
+	 * 
+	 */
+	protected void setSearchTypeParams() {
+
+		String typeFilter =
+						ParamUtil.getString(_portletRequest, GSearchWebKeys.TYPE_FILTER);
+		String documentExtensionFilter =
+						ParamUtil.getString(_portletRequest, GSearchWebKeys.DOCUMENT_EXTENSION_FILTER);
+
+		if ("file".equals(typeFilter) && "image".equals(documentExtensionFilter)) {
+			_queryParams.setSearchType(GSearchSearchTypes.IMAGES);
+		} else {
+			_queryParams.setSearchType(GSearchSearchTypes.ALL);
+		}
+	}	
 
 	/**
 	 * Set sort. Default sort field equals to score.

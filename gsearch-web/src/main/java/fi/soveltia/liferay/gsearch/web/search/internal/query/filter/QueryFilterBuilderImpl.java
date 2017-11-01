@@ -80,14 +80,35 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		return _filter;
 	}	
+	
+	/**
+	 * Add DLFileEntry class condition
+	 * 
+	 * @param query
+	 * @param dedicatedTypeQuery
+	 * @throws ParseException
+	 */
+	protected void addDLFileEntryClassCondition(BooleanQuery query, boolean dedicatedTypeQuery) throws ParseException {
 
+		TermQuery condition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName()); 
+		query.add(condition, BooleanClauseOccur.SHOULD);
+	
+		// Extension and type conditions (apply only when this is a single type filtered query)
+	
+		if (dedicatedTypeQuery) {
+		
+			buildDocumentExtensionCondition();
+			buildDocumentTypeCondition();
+		}
+	}
+	
 	/**
 	 * Add journal article class condition.
 	 * 
 	 * @param query
 	 * @throws ParseException
 	 */
-	protected void addJournalArticleClassCondition(BooleanQuery query) throws ParseException {
+	protected void addJournalArticleClassCondition(BooleanQuery query, boolean dedicatedTypeQuery) throws ParseException {
 		
 		BooleanQuery journalArticleQuery = new BooleanQueryImpl();
 
@@ -112,6 +133,12 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		journalArticleQuery.add(versionQuery, BooleanClauseOccur.MUST);
 		
 		query.add(journalArticleQuery, BooleanClauseOccur.SHOULD);		
+		
+		// Structure condition (apply only when this is a single type filtered query)
+
+		if (dedicatedTypeQuery) {
+			buildWebContentStructureCondition();
+		}
 	}
 	
 	/**
@@ -126,33 +153,19 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		BooleanQuery query = new BooleanQueryImpl();
 
+		// Is this a single asset type targeted query
+		
+		boolean dedicatedTypeQuery = clazzes.size() == 1;
+		
 		for (Class<?> c : clazzes) {
 
 			// Handle journal article and DLFileEntry separately.
 
 			if (c.getName().equals(JournalArticle.class.getName())) {
-
-				addJournalArticleClassCondition(query);
-
-				// Structure condition (apply only when this is a type filtered query)
-
-				if (clazzes.size() == 1) {
-					buildWebContentStructureCondition();
-				}
-
+				addJournalArticleClassCondition(query, dedicatedTypeQuery);
 			}
 			else if (c.getName().equals(DLFileEntry.class.getName())) {
-
-				TermQuery condition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, c.getName()); 
-				query.add(condition, BooleanClauseOccur.SHOULD);
-
-				// Extension and type conditions (apply only when this is a type filtered query)
-
-				if (clazzes.size() == 1) {
-				
-					buildDocumentExtensionCondition();
-					buildDocumentTypeCondition();
-				}
+				addDLFileEntryClassCondition(query, dedicatedTypeQuery);
 			}
 			else {
 				

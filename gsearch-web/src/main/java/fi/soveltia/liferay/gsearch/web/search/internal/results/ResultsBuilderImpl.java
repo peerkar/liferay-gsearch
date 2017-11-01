@@ -27,6 +27,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchSearchTypes;
 import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
 import fi.soveltia.liferay.gsearch.web.search.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.web.search.results.item.ResultItemBuilder;
@@ -210,6 +211,12 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		String[] queryTerms = _queryParams.getKeywords().split(" ");
 
+		// Searchtype.
+		
+		if (_queryParams.getSearchType().equals(GSearchSearchTypes.IMAGES)) {
+			jsonObject.put("searchType", GSearchSearchTypes.IMAGES);
+		}
+		
 		// If this parameter is populated, there was an alternate search.
 		
 		String originalQueryTerms = _queryParams.getOriginalKeywords();

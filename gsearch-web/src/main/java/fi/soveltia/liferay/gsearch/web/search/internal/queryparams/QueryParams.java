@@ -24,6 +24,7 @@ public class QueryParams {
 	private Long documentTypeId = null;
 	private String keywords;
 	private String originalKeywords;
+	private String searchType;
 	private Date timeFrom = null;
 	private Date timeTo = null;
 	private String webContentStructureKey;
@@ -121,6 +122,18 @@ public class QueryParams {
 	public void setOriginalKeywords(String originalKeywords) {
 
 		this.originalKeywords = originalKeywords;
+	}
+
+	
+	public String getSearchType() {
+	
+		return searchType;
+	}
+
+	
+	public void setSearchType(String searchType) {
+	
+		this.searchType = searchType;
 	}
 
 	public Date getTimeFrom() {

@@ -10,35 +10,27 @@
 	// If there are suggestions then there's an alternative search done (which has to have results, by it's definition).
 
 	{if length($results.meta.querySuggestions) > 0}
-
-		<div class="row suggestions">
-
-			<p>{msg desc=""}search-for{/msg} <strong>{$results.meta.originalQueryTerms}</strong> {msg desc=""}gave-no-results{/msg}</p>
-
-			<p class="alternate-search">{msg desc=""}showing-results-for{/msg} <strong><i>{$results.meta.queryTerms}</i></strong></p>
-
-			// Show others on te list
-
-			{if length($results.meta.querySuggestions) > 1}
-	
-				<p class="other-suggestions">{msg desc=""}other-suggestions{/msg} </p>
-				<ul>
-					{foreach $item in $results.meta.querySuggestions}
-						{call .suggestionItem}
-							{param item: $item /}
-						{/call}
-					{/foreach}
-				</ul>
-			{/if}
-		</div>
+		{call .suggestions}
+			{param results: $results /}
+		{/call}
 	{/if}
 	
 	{if $results.items and length($results.items) > 0}
-		{foreach $item in $results.items}
-			{call .resultItem}
-				{param item: $item /}
-			{/call}
-		{/foreach}
+		{if $results.meta.searchType == 'image'}
+			<div class="row image-row">
+				{foreach $item in $results.items}
+					{call GSearchImageResult.imageItem}
+						{param item: $item /}
+					{/call}
+				{/foreach}
+			</div>
+		{else}	
+			{foreach $item in $results.items}
+				{call .resultItem}
+					{param item: $item /}
+				{/call}
+			{/foreach}
+		{/if}
 	{else}
 		<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
 	{/if}
@@ -54,9 +46,11 @@
 		<div class="item">
 
 			{if $item.imageSrc}
-				<div class="image col-md-2 col-lg-2 hidden-xs hidden-sm image">
+				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
-						<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+						<a href="{$item.link}">
+							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+						</a>
 					{/if}			
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">
@@ -78,9 +72,11 @@
 				
 				<div class="description ">
 					{if $item.date != ''}
-						<strong>{$item.date}</strong> - 
+						<strong>{$item.date}</strong>
 					{/if}
-					<span class="highlightable">{$item.description}</span>
+					{if $item.description != ''}
+						- <span class="highlightable">{$item.description}</span>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -88,7 +84,36 @@
 {/template}
 
 /**
- * Print query suggestions text.
+ * Print suggestions.
+ *
+ * @param results
+ */
+{template .suggestions}
+
+	<div class="row suggestions">
+
+		<p>{msg desc=""}search-for{/msg} <strong>{$results.meta.originalQueryTerms}</strong> {msg desc=""}gave-no-results{/msg}</p>
+
+		<p class="alternate-search">{msg desc=""}showing-results-for{/msg} <strong><i>{$results.meta.queryTerms}</i></strong></p>
+
+		// Show others on te list
+
+		{if length($results.meta.querySuggestions) > 1}
+
+			<p class="other-suggestions">{msg desc=""}other-suggestions{/msg} </p>
+			<ul>
+				{foreach $item in $results.meta.querySuggestions}
+					{call .suggestionItem}
+						{param item: $item /}
+					{/call}
+				{/foreach}
+			</ul>
+		{/if}
+	</div>
+{/template}
+
+/**
+ * Print single query suggestion.
  *
  * @param item
  */

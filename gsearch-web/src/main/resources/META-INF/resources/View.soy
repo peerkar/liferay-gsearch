@@ -70,7 +70,7 @@
 
 		// Sort
 
-		<div class="col-xs-10 col-md-10 col-lg-10 gsearch-sort gsearch-centered">
+		<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-sort gsearch-centered">
 			{call GSearchSort.render}
 				{param portletNamespace: $portletNamespace /}
 				{param initialURLParameters: $initialURLParameters /}
@@ -82,7 +82,11 @@
 		// Results
 
 		{if $results}
-			<div class="col-xs-10 col-md-10 col-lg-10 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
+			{if $results.meta.searchType == 'image'}
+				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
+			{else}
+				<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
+			{/if}
 				{call GSearchResults.render}
 					{param results: $results /}
 				{/call}

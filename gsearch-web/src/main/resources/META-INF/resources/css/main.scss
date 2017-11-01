@@ -188,15 +188,31 @@
 	
 	.gsearch-results {
 	
+		.image-row {
+			text-align: center;
+		}
+	
 		.suggestions {
 			font-size: 120%;
 			margin: 20px 0;
 		}
 	
+		.image {
+			display: inline-block;
+			margin: 0 10px 10px 0;
+			
+			img {
+				height: 200px;
+				max-width: 230px;
+				object-fit: cover;
+				object-position: 50% 50%;
+			}
+		}	
+	
 		.item {
 			margin: 20px 0;
 		
-			.image {
+			.smallimage {
 				object-fit: cover;
    			
    				img {
