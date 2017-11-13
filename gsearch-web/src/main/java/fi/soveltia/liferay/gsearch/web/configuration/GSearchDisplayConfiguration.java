@@ -8,6 +8,14 @@ import aQute.bnd.annotation.metatype.Meta;
 public interface GSearchDisplayConfiguration {
 
 	@Meta.AD(
+		deflt = "false", 
+		description = "Enable / disable Javascript console messages. Good for component lifecycle debugging.",
+	    name = "Javascript debugging enabled.",
+		required = false
+	)
+	public boolean jsDebuggingEnabled();
+
+	@Meta.AD(
 		deflt = "3", 
 	    name = "Search keywords minimum length, in characters",
 		required = false
@@ -24,7 +32,7 @@ public interface GSearchDisplayConfiguration {
 
 	@Meta.AD(
 		deflt = "10000", 
-		description = "Timeout, after which the search request stalls in UI",
+		description = "Timeout, after which the search request stalls (error in UI)",
 	    name = "Search request timeout in ms",
 		required = false
 	)
@@ -32,27 +40,11 @@ public interface GSearchDisplayConfiguration {
 	
 	@Meta.AD(
 		deflt = "/viewasset", 
-	    name = "Asset Publisher page friendly URL",
+	    name = "Asset publisher page friendly URL",
 	    description = "Friendly URL to a page to show search results if they cannot be shown in context.",
 		required = false
 	)
 	public String assetPublisherPage();
-
-	@Meta.AD(
-		deflt = "false", 
-		description = "Show content small images in the results.",
-	    name = "Show result small images.",
-		required = false
-	)
-	public boolean showSmallImages();
-
-	@Meta.AD(
-		deflt = "false", 
-		description = "When this is enabled and you're doing a image search, results are shown as images (Google like).",
-	    name = "Enable image search layout.",
-		required = false
-	)
-	public boolean enableImageSearchLayout();
 	
 	@Meta.AD(
 		deflt = "true", 
@@ -62,6 +54,14 @@ public interface GSearchDisplayConfiguration {
 	)
 	public boolean enableAutoComplete();
 
+	@Meta.AD(
+		deflt = "150", 
+	    description = "This is the time in ms between the subsequent suggestion requests.",
+	    name = "Search field autocompletion request delay",
+		required = false
+	)
+	public int autoCompleteRequestDelay();	
+	
 	@Meta.AD(
 		deflt = "5", 
 	    name = "Number of autocomplete suggestions to show",
@@ -136,10 +136,10 @@ public interface GSearchDisplayConfiguration {
 	
 	@Meta.AD(
 		deflt = "pdf;type.pdf;pdf|word;type.word;doc_docx|excel;type.excel;xls_xlsx|powerpoint;type.powerpoint;ppt_pptx|image;type.image;png_jpg_jpeg_gif_tif_tiff|video;type.video;mp4_avi",
-	    name = "Document Extension Filter Option",
+	    name = "Document Format Filter Option",
 	    description = "Syntax: filter_key;translation_key_for_ui;underscore_separated_extensions_list",
 	    required = false
 	)
-	public String[]documentExtensionOptions();
+	public String[]documentFormatOptions();
 	
 }

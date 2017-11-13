@@ -15,6 +15,10 @@ class GSearchPaging extends Component {
 	constructor(opt_config, opt_parentElement) {
 
 		super(opt_config, opt_parentElement);
+
+		this.debug = opt_config.JSDebugEnabled;
+
+		this.initialQueryParameters = opt_config.initialQueryParameters; 
 	}
 	
 	/**
@@ -22,34 +26,35 @@ class GSearchPaging extends Component {
 	 */
 	attached() {
 		
-		// Check if we are getting selections from initially calling URL.
+		if (this.debug) {
+			console.log("GSearchPaging.attached()");
+		}
 		
-		this.checkCallURLSelections();
+		// Set initial query parameters.
 		
+		if (this.initialQueryParameters['start']) {
+			this.setQueryParam('start', this.initialQueryParameters['start'], false);
+		}
 	}
-	
-	/**
-	 * Check and set selected items based on calling URL.
-	 */
-	checkCallURLSelections() {
 		
-		if (!this.initialURLParameters) {
-			return;
-		}
-
-		let start = this.initialURLParameters['start'];
-
-		if (start) {
-			this.setQueryParam('start', start, false);
-		}
-	}	
-	
 	/**
 	 * @inheritDoc
 	 */
 	rendered() {
 		
-		// Set page click events
+		if (this.debug) {
+			console.log("GSearchPaging.attached()");
+		}
+
+		// Set click events.
+		
+		this.setClickEvents();
+	}
+
+	/**
+	 * Set click events
+	 */
+	setClickEvents() {
 
 		let _self = this;
 		
@@ -78,15 +83,9 @@ GSearchPaging.STATE = {
 	getQueryParam: {
 		validator: core.isFunction
 	},
-	initialURLParameters: {
-		value: null
-	},
 	setQueryParam: {
 		validator: core.isFunction
 	},
-	results: {
-		value: null
-	}
 };
 
 // Register component

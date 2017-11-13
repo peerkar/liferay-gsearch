@@ -3,20 +3,23 @@
 /**
  * Print filters.
  *
- * @param portletNamespace
+ * @param? portletNamespace
  * @param? assetTypeOptions
- * @param? documentExtensionOptions
+ * @param? documentFormatOptions
  * @param? documentTypeOptions
  * @param? webContentStructureOptions
+ * @param? results
  */
 {template .render}
 
-	// The condition here is just forcing this template to rerender to setup facets when getting new results... 
+	// This dummy condition here is just forcing the template to rerender to setup facets when getting new results. 
+
+	{if $results or not $results}
 
 		<div class="row text-center">
 	
 			<div class="basic-filters">
-
+	
 				// Type filter
 				
 				<div class="dropdown gsearch-dropdown">
@@ -70,7 +73,7 @@
 			
 				// Web Content Structure filter
 				
-				<div class="dropdown gsearch-dropdown filter wcfilter hide">
+				<div class="dropdown gsearch-dropdown filter wcsfilter hide">
 					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
 						data-toggle="dropdown" id="{$portletNamespace}WebContentStructureFilter" type="button">
 						<span class="selection"></span>
@@ -100,23 +103,24 @@
 					</ul>
 				</div>
 	
-				// Document Extension
+				// Document Format
 				
-				<div class="dropdown gsearch-dropdown filter filefilter document-extensions hide">
+				<div class="dropdown gsearch-dropdown filter filefilter document-formats hide">
 					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}DocumentExtensionFilter" type="button">
+						data-toggle="dropdown" id="{$portletNamespace}DocumentFormatFilter" type="button">
 						<span class="selection"></span>
 						<span class="caret"></span>
 					</button>
-					<ul aria-labelledby="{$portletNamespace}DocumentExtensionFilter" class="dropdown-menu" id="{$portletNamespace}DocumentExtensionFilterOptions">
-						<li class="selected"><a data-value="" href="#">{msg desc=""}any-file-extension{/msg}</a></li>
+					<ul aria-labelledby="{$portletNamespace}DocumentFormatFilter" class="dropdown-menu" id="{$portletNamespace}DocumentFormatFilterOptions">
+						<li class="selected"><a data-value="" href="#">{msg desc=""}any-file-format{/msg}</a></li>
 						{call .options}
-							{param options: $documentExtensionOptions /}
+							{param options: $documentFormatOptions /}
 						{/call}
 					</ul>
 				</div>
 			</div>
 		</div>
+	{/if}
 {/template}
 
 /**
@@ -125,6 +129,7 @@
  * @param options
  */
 {template .options}
+
 	{foreach $item in $options}
 		{if $item.scope == 'all'}
 			<li class="all">		

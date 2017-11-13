@@ -20,13 +20,15 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String AUTO_COMPLETE_ENABLED = "autoCompleteEnabled";
 
-	public static final String DOCUMENT_EXTENSION_OPTIONS = "documentExtensionOptions";
+	public static final String AUTO_COMPLETE_REQUEST_DELAY = "autoCompleteRequestDelay";
 
+	public static final String DOCUMENT_FORMAT_OPTIONS = "documentFormatOptions";
+
+	public static final String DOCUMENT_FORMAT_FILTER = "df";
+	
 	public static final String DOCUMENT_TYPE_OPTIONS= "documentTypeOptions";
 
-	public static final String DOCUMENT_EXTENSION_FILTER = "extension";
-
-	public static final String DOCUMENT_TYPE_FILTER = "filetype";
+	public static final String DOCUMENT_TYPE_FILTER = "dt";
 	
 	public static final String HELP_TEXT = "helpText";
 
@@ -34,7 +36,9 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String IMAGE_SEARCH_LAYOUT_ENABLED = "imageSearchLayoutEnabled";
 
-	public static final String INITIAL_URL_PARAMETERS = "initialURLParameters";
+	public static final String INITIAL_QUERY_PARAMETERS = "initialQueryParameters";
+
+	public static final String JS_DEBUG_ENABLED = "JSDebugEnabled";
 
 	public static final String KEYWORDS = "q";
 	
@@ -45,6 +49,8 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String QUERY_MIN_LENGTH = "queryMinLength";
 
 	public static final String REQUEST_TIMEOUT = "requestTimeout";
+
+	public static final String RESULTS_LAYOUT = "resultsLayout";
 
 	public static final String SEARCH_QUERY_TIME = "searchQueryTime";
 

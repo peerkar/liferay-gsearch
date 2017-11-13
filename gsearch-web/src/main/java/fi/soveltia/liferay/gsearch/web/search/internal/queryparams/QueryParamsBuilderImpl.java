@@ -20,7 +20,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchSearchTypes;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.search.internal.exception.KeywordsException;
 import fi.soveltia.liferay.gsearch.web.search.queryparams.QueryParamsBuilder;
@@ -55,10 +55,10 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setLocaleParam();
 		setUserParam();
 
-		setDocumentExtensionParam();
+		setDocumentFormatParam();
 		setDocumentTypeParam();
 		setKeywordsParam();
-		setSearchTypeParams();
+		setResultsLayoutParam();
 		setTimeParam();
 		setTypeParam();
 		setWebContentStructureParam();
@@ -73,52 +73,57 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Parse asset class corresponding the filter key.
 	 * 
-	 * @param key search key
+	 * @param key
+	 *            search key
 	 * @return corresponding class.
-	 * @throws ClassNotFoundException, PatternSyntaxException 
+	 * @throws ClassNotFoundException,
+	 *             PatternSyntaxException
 	 */
-	protected Class<?> parseAssetClass(String key) throws ClassNotFoundException, PatternSyntaxException {
+	protected Class<?> parseAssetClass(String key)
+		throws ClassNotFoundException, PatternSyntaxException {
 
 		String[] configurationOptions =
-						_gSearchDisplayConfiguration.assetTypeOptions();
+			_gSearchDisplayConfiguration.assetTypeOptions();
 
 		Class<?> clazz = null;
 
 		// Syntax: filter_key;asset_class_name
-		
+
 		for (String option : configurationOptions) {
-			
+
 			String[] parts = option.split(";");
 
 			if (parts.length == 2) {
-				
-				if (parts[0].equals(key)){
-					clazz = Class.forName(parts[1]);	
+
+				if (parts[0].equals(key)) {
+					clazz = Class.forName(parts[1]);
 					break;
 				}
 			}
 		}
 
 		return clazz;
-	}	
-	
+	}
+
 	/**
 	 * Parse default set of asset classes to search for.
 	 * 
 	 * @return list of classes
-	 * @throws ClassNotFoundException, PatternSyntaxException 
+	 * @throws ClassNotFoundException,
+	 *             PatternSyntaxException
 	 */
-	protected List<Class<?>> parseDefaultAssetClasses() throws ClassNotFoundException, PatternSyntaxException {
+	protected List<Class<?>> parseDefaultAssetClasses()
+		throws ClassNotFoundException, PatternSyntaxException {
 
 		String[] configurationOptions =
-						_gSearchDisplayConfiguration.assetTypeOptions();
+			_gSearchDisplayConfiguration.assetTypeOptions();
 
 		List<Class<?>> classes = new ArrayList<Class<?>>();
-		
+
 		// Syntax: filter_key;asset_class_name
 
 		for (String option : configurationOptions) {
-			
+
 			String[] parts = option.split(";");
 
 			if (parts.length == 2) {
@@ -127,40 +132,46 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 
 		return classes;
-	}		
-	
-	/** Parse document extensions corresponding the filter key.
-	 *  
-	 * @param key defined in configuration options
-	 * @return corresponding array of file extensions
+	}
+
+	/**
+	 * Parse document format corresponding the filter key.
+	 * 
+	 * @param key
+	 *            defined in configuration options
+	 * @return corresponding array of file formats
 	 * @throws PatternSyntaxException
 	 */
-	protected String[] parseDocumentExtensions(String key) throws PatternSyntaxException {
+	protected String[] parseDocumentFormats(String key)
+		throws PatternSyntaxException {
+
 		String[] configurationOptions =
-						_gSearchDisplayConfiguration.documentExtensionOptions();
+			_gSearchDisplayConfiguration.documentFormatOptions();
 
-		//Syntax: filter_key;translation_key_for_ui;comma_separated_extensions_list
+		// Syntax:
+		// filter_key;translation_key_for_ui;comma_separated_extensions_list
 
-		String[]extensions = null;
-		
+		String[] formats = null;
+
 		try {
-		
-			for (String extension : configurationOptions) {
 
-				String[] parts = extension.split(";");
-	
+			for (String format : configurationOptions) {
+
+				String[] parts = format.split(";");
+
 				if (parts.length == 3) {
-					
-					if (parts[0].equals(key)){
-						extensions = parts[2].split("_");
+
+					if (parts[0].equals(key)) {
+						formats = parts[2].split("_");
 						break;
 					}
 				}
 			}
-		} catch (PatternSyntaxException e) {
+		}
+		catch (PatternSyntaxException e) {
 			_log.error(e, e);
 		}
-		return extensions;
+		return formats;
 	}
 
 	/**
@@ -175,18 +186,18 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Set document extensions (formats)
+	 * Set document formats
 	 */
-	protected void setDocumentExtensionParam() {
+	protected void setDocumentFormatParam() {
 
-		String documentExtensionFilter = ParamUtil.getString(
-			_portletRequest, GSearchWebKeys.DOCUMENT_EXTENSION_FILTER);
+		String documentFormatFilter = ParamUtil.getString(
+			_portletRequest, GSearchWebKeys.DOCUMENT_FORMAT_FILTER);
 
-		if (Validator.isNotNull(documentExtensionFilter)) {
-			String[] extensions = parseDocumentExtensions(documentExtensionFilter);
-			
-			if (extensions != null) {
-				_queryParams.setDocumentExtensions(extensions);
+		if (Validator.isNotNull(documentFormatFilter)) {
+			String[] formats = parseDocumentFormats(documentFormatFilter);
+
+			if (formats != null) {
+				_queryParams.setDocumentFormats(formats);
 			}
 		}
 	}
@@ -202,8 +213,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		if (documentTypeFilter > 0) {
 			_queryParams.setDocumentTypeId(documentTypeFilter);
 		}
-	}	
-	
+	}
+
 	/**
 	 * Set groups parameter.
 	 */
@@ -264,27 +275,35 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		_queryParams.setPageSize(_gSearchDisplayConfiguration.pageSize());
 	}
-	
 
 	/**
-	 * Set search type (normal / image search). 
-	 * 
-	 * Search type is determined from typefilter value 
-	 * 
+	 * Set search type (normal / image search). Search type is determined from
+	 * typefilter value
 	 */
-	protected void setSearchTypeParams() {
+	protected void setResultsLayoutParam() {
 
-		String typeFilter =
-						ParamUtil.getString(_portletRequest, GSearchWebKeys.TYPE_FILTER);
-		String documentExtensionFilter =
-						ParamUtil.getString(_portletRequest, GSearchWebKeys.DOCUMENT_EXTENSION_FILTER);
+		String resultsLayoutParam =
+			ParamUtil.getString(_portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
 
-		if ("file".equals(typeFilter) && "image".equals(documentExtensionFilter)) {
-			_queryParams.setSearchType(GSearchSearchTypes.IMAGES);
-		} else {
-			_queryParams.setSearchType(GSearchSearchTypes.ALL);
+		String typeFilterParam =
+			ParamUtil.getString(_portletRequest, GSearchWebKeys.TYPE_FILTER);
+		String formatFilterParam = ParamUtil.getString(
+			_portletRequest, GSearchWebKeys.DOCUMENT_FORMAT_FILTER);
+
+		boolean imageLayoutAllowed =
+			"image".equals(formatFilterParam) && "file".equals(typeFilterParam);
+
+		if (GSearchResultsLayouts.THUMBNAIL_LIST.equals(resultsLayoutParam)) {
+			_queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
 		}
-	}	
+		else if (GSearchResultsLayouts.IMAGE.equals(resultsLayoutParam) &&
+			imageLayoutAllowed) {
+			_queryParams.setResultsLayout(GSearchResultsLayouts.IMAGE);
+		}
+		else {
+			_queryParams.setResultsLayout(GSearchResultsLayouts.LIST);
+		}
+	}
 
 	/**
 	 * Set sort. Default sort field equals to score.
@@ -402,17 +421,18 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set types (asset types to search for).
 	 * 
-	 * @throws ClassNotFoundException 
-	 * @throws PatternSyntaxException 
+	 * @throws ClassNotFoundException
+	 * @throws PatternSyntaxException
 	 */
-	protected void setTypeParam() throws PatternSyntaxException, ClassNotFoundException {
+	protected void setTypeParam()
+		throws PatternSyntaxException, ClassNotFoundException {
 
 		String typeFilter =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.TYPE_FILTER);
 
 		List<Class<?>> clazzes = new ArrayList<Class<?>>();
-		
-		Class<?>clazz = parseAssetClass(typeFilter);
+
+		Class<?> clazz = parseAssetClass(typeFilter);
 
 		if (clazz != null) {
 			clazzes.add(clazz);
@@ -434,7 +454,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		_queryParams.setUserId(themeDisplay.getUserId());
 	}
-	
+
 	/**
 	 * Set web content structure parameter.
 	 */
@@ -446,7 +466,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		if (Validator.isNotNull(wcsFilter)) {
 			_queryParams.setWebContentStructureKey(wcsFilter);
 		}
-	}	
+	}
 
 	// Modification date field name in the index.
 
@@ -456,8 +476,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	private PortletRequest _portletRequest;
 	private QueryParams _queryParams;
 	private RequestParamValidator _queryParamValidator;
-	
+
 	private static final Log _log =
-					LogFactoryUtil.getLog(QueryParamsBuilderImpl.class);
+		LogFactoryUtil.getLog(QueryParamsBuilderImpl.class);
 
 }

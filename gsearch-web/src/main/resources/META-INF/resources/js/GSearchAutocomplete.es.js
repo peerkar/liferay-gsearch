@@ -10,8 +10,8 @@ const UP = 38;
 class GSearchAutocomplete extends Autocomplete {
 
 	/**
-	 * This is an override for the original Metal.js Autocomplete.
-	 * It simply removes SPACE from the select keys.
+	 * This is an override of the original Metal.js Autocomplete.
+	 * It simply removes SPACE from the suggestion select keys.
 	 *
 	 * @param {!Event} event
 	 * @protected

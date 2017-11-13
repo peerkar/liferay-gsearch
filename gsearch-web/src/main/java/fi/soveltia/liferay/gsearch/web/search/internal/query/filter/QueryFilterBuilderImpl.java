@@ -93,11 +93,11 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		TermQuery condition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName()); 
 		query.add(condition, BooleanClauseOccur.SHOULD);
 	
-		// Extension and type conditions (apply only when this is a single type filtered query)
+		// Format and type conditions (apply only when this is a single type filtered query)
 	
 		if (dedicatedTypeQuery) {
 		
-			buildDocumentExtensionCondition();
+			buildDocumentFormatCondition();
 			buildDocumentTypeCondition();
 		}
 	}
@@ -189,18 +189,18 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 * 
 	 * @throws ParseException
 	 */
-	protected void buildDocumentExtensionCondition()
+	protected void buildDocumentFormatCondition()
 		throws ParseException {
 
-		String[] extensions = _queryParams.getDocumentExtensions();
+		String[] formats = _queryParams.getDocumentFormats();
 
-		if (extensions != null) {
+		if (formats != null) {
 
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
-			for (String extension : extensions) {
+			for (String format : formats) {
 
-				TermQuery condition = new TermQueryImpl("extension", extension); 
+				TermQuery condition = new TermQueryImpl("extension", format); 
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
 			addAsQueryFilter(query);

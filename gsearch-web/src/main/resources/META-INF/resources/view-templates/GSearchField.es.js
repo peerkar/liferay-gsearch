@@ -9,10 +9,6 @@ import GSearchAutocomplete from '../js/GSearchAutocomplete.es';
 
 import templates from './GSearchField.soy';
 
-// Autocompletion delay
-
-const AUTOCOMPLETE_DELAY = 150;
-
 /**
  * GSearch searchfield component.
  */
@@ -22,26 +18,36 @@ class GSearchField extends Component {
 	 * @inheritDoc
 	 */
 	constructor(opt_config, opt_parentElement) {
-		
+				
 		super(opt_config, opt_parentElement);
 		
+		this.debug = opt_config.JSDebugEnabled;
+		
 		this.autoCompleteEnabled = opt_config.autoCompleteEnabled;
+
+		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay
 		
 		this.portletNamespace = opt_config.portletNamespace;
 
 		this.suggestionsURL = opt_config.suggestionsURL;
 
 		this.setQueryParam('queryMinLength', opt_config.queryMinLength);
+
+		this.initialQueryParameters = opt_config.initialQueryParameters; 
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
-	prepareStateForRender(states) {
+	attached() {
 		
-		// Check if we are getting selections from initially calling URL.
+		if (this.debug) {
+			console.log("GSearchField.attached()");
+		}
 		
-		this.checkCallURLSelections();
+		// Check if we are getting query parameters from initially calling URL.
+		
+		this.checkInitialQueryParameters();
 
 		// Set click events.
 			
@@ -53,23 +59,29 @@ class GSearchField extends Component {
 			this.initAutocomplete();
 		}
 	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	rendered() {
+		
+		if (this.debug) {
+			console.log("GSearchField.rendered()");
+		}
+	}
 
 	/**
-	 * Check and set query value based on calling URL.
+	 * Check intial query parameter.
 	 */
-	checkCallURLSelections() {
+	checkInitialQueryParameters() {
 		
-		if (!this.initialURLParameters) {
-			return;
-		}
-		
-		if (this.initialURLParameters['q']) {
+		if (this.initialQueryParameters['q']) {
 
-			let keywords = this.initialURLParameters['q'].trim();
+			let keywords = this.initialQueryParameters['q'].trim();
 
 			if (this.validateKeywords(keywords)) {
 				$('#' + this.portletNamespace + 'SearchField').val(keywords);
-				this.setQueryParam("keywords", keywords, false);
+				this.setQueryParam("q", keywords, false);
 			}
 		}
 	}
@@ -85,7 +97,8 @@ class GSearchField extends Component {
 			elementClasses: 'gsearch-autocomplete-list',
 			inputElement:document.querySelector('#' + this.portletNamespace + 'SearchField'),
 			data: function(keywords) {
-				if (keywords.length >= _self.getQueryParam('queryMinLength') && !_self.isSuggesting && keywords.slice(-1) != ' ') {
+				if (keywords.length >= _self.getQueryParam('queryMinLength') &&
+						!_self.isSuggesting && keywords.slice(-1) != ' ') {
 					return _self.getSuggestions(keywords);
 				} else {
 					return;
@@ -107,7 +120,7 @@ class GSearchField extends Component {
 		// Validate keywords.
 		
 		if (this.validateKeywords(keywords)) {
-			this.setQueryParam("keywords", keywords, true);
+			this.setQueryParam("q", keywords, true);
 		}
 	}
 	
@@ -116,7 +129,7 @@ class GSearchField extends Component {
 	 */
 	getSuggestions(keywords) {
 
-		// Set this flag to manage concurrent suggest requests (delay between requests).
+		// Set this flag to control concurrent suggest requests (delay between requests).
 		
 		this.isSuggesting = true;
 		
@@ -157,7 +170,7 @@ class GSearchField extends Component {
 		
 		setTimeout(function(){
 			_self.isSuggesting = false;
-		}, AUTOCOMPLETE_DELAY);	
+		}, this.autoCompleteRequestDelay);	
 	}	
 	
 	/**
@@ -214,7 +227,8 @@ class GSearchField extends Component {
 		// Minimum length is defined in portlet configuration
 		
 		if (keywords.length < this.getQueryParam('queryMinLength')) {
-			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + this.getQueryParam('queryMinLength'));
+			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + 
+					this.getQueryParam('queryMinLength'));
 			return false;
 		}
 		
@@ -229,14 +243,8 @@ class GSearchField extends Component {
  * @static
  */
 GSearchField.STATE = {
-	initialURLParameters: {
-		value: null
-	},
 	isSuggesting: {
 		value: false
-	},
-	queryMinLength: {
-		validator: core.isNumber
 	},
 	getQueryParam: {
 		validator: core.isFunction

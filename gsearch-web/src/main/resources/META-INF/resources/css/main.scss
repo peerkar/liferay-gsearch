@@ -6,6 +6,8 @@
 		color:#1a0dab;
 	}
 	
+	/* Highlighting (Mark.js) */
+	
 	mark,
 	.mark {
 		background: transparent;
@@ -182,6 +184,42 @@
 		.gsearch-dropdown { 
 			float: left;
 		}
+	}
+
+	/* Results layout */
+	
+	.gsearch-results-layout {
+		
+		padding: 0;
+	
+		.options {
+			float: right;
+			list-style-type: none;
+			
+			li {
+				display: inline-block;
+			}
+			
+			a {
+				display: inline-block;
+				margin-right: 15px;
+				border: 1px solid #1a0dab;
+				box-shadow: 4px 4px 1px -1px #b8bcc1;
+			}
+
+			.selected a,
+			.a:hover {
+			    background: #a6dfd8;
+			    box-shadow: none !important;
+			}
+			
+			img {
+				max-width: 30px;
+				padding: 4px;
+			}
+		}
+	
+	
 	}
 	
 	/* Results */

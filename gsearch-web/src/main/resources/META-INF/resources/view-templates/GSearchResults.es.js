@@ -1,10 +1,11 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
+
 import templates from './GSearchResults.soy';
-import imagetemplates from './GSearchImageResult.soy';
+import querySuggestionTemplates from './GSearchQuerySuggestions.soy';
 
 /**
- * GSearchResults component.
+ * GSearch results component.
  */
 class GSearchResults extends Component {
 	
@@ -15,9 +16,12 @@ class GSearchResults extends Component {
 	constructor(opt_config, opt_parentElement) {
 	
 		super(opt_config, opt_parentElement);
+		
+		this.debug = opt_config.JSDebugEnabled;
+
 		this.portletNamespace = opt_config.portletNamespace;
 	}
-
+	
 	/**
 	 * Highlight query terms in results
 	 * 
@@ -37,7 +41,12 @@ class GSearchResults extends Component {
 	 * @inheritDoc
 	 * 
 	 */
-	rendered() {
+	rendered() {		
+		
+		if (this.debug) {
+			console.log("GSearchResults.rendered()");
+		}
+		
 		this.doHighlight();
 	}
 }

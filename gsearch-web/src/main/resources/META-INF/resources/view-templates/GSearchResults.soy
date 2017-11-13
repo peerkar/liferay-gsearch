@@ -4,23 +4,22 @@
  * Print search results
  *
  * @param? results
- * @param imageSearchLayoutEnabled
  */
 {template .render}
 
 	// If there are suggestions then there's an alternative search done (which has to have results, by it's definition).
 
 	{if length($results.meta.querySuggestions) > 0}
-		{call .suggestions}
+		{call GSearchQuerySuggestions.suggestions}
 			{param results: $results /}
 		{/call}
 	{/if}
 	
 	{if $results.items and length($results.items) > 0}
-		{if $imageSearchLayoutEnabled and $results.meta.searchType == 'image'}
+		{if $results.meta.resultsLayout == 'image'}
 			<div class="row image-row">
 				{foreach $item in $results.items}
-					{call GSearchImageResult.imageItem}
+					{call .imageItem}
 						{param item: $item /}
 					{/call}
 				{/foreach}
@@ -38,13 +37,34 @@
 {/template}
 
 /**
+ * Print one image result item (Image search).
+ *
+ * @param item
+ */
+{template .imageItem}
+	<div class="image">
+		{if $item.imageSrc != ''}
+			<a href="{$item.link}">
+				<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+			</a>
+		{/if}
+		<div class="meta">
+		</div>			
+	</div>
+{/template}
+
+/**
  * Print one result item.
  *
  * @param item
  */
 {template .resultItem}
+
 	<div class="row">
+	
 		<div class="item">
+
+			// Do we have a thumbnail?
 
 			{if $item.imageSrc}
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
@@ -84,41 +104,6 @@
 	</div>
 {/template}
 
-/**
- * Print suggestions.
- *
- * @param results
- */
-{template .suggestions}
 
-	<div class="row suggestions">
 
-		<p>{msg desc=""}search-for{/msg} <strong>{$results.meta.originalQueryTerms}</strong> {msg desc=""}gave-no-results{/msg}</p>
-
-		<p class="alternate-search">{msg desc=""}showing-results-for{/msg} <strong><i>{$results.meta.queryTerms}</i></strong></p>
-
-		// Show others on te list
-
-		{if length($results.meta.querySuggestions) > 1}
-
-			<p class="other-suggestions">{msg desc=""}other-suggestions{/msg} </p>
-			<ul>
-				{foreach $item in $results.meta.querySuggestions}
-					{call .suggestionItem}
-						{param item: $item /}
-					{/call}
-				{/foreach}
-			</ul>
-		{/if}
-	</div>
-{/template}
-
-/**
- * Print single query suggestion.
- *
- * @param item
- */
-{template .suggestionItem}
-	<li>{$item}</li>
-{/template}
 	

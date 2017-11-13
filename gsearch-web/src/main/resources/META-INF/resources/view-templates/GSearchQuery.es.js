@@ -26,12 +26,16 @@ class GSearchQuery extends State {
 			.concat('&sortField=').concat(this.getSortField())
 			.concat('&sortDirection=').concat(this.getSortDirection());
 		
-		if(this.getDocumentExtensionFilter() != '') {
-			url = url.concat('&extension=').concat(this.getDocumentExtensionFilter())
+		if (this.getResultsLayout() != '') {
+			url = url.concat('&resultsLayout=').concat(this.getResultsLayout())
+		}
+		
+		if(this.getDocumentFormatFilter() != '') {
+			url = url.concat('&df=').concat(this.getDocumentFormatFilter())
 		}
 
 		if(this.getDocumentTypeFilter() != '') {
-			url = url.concat('&filetype=').concat(this.getDocumentTypeFilter())
+			url = url.concat('&dt=').concat(this.getDocumentTypeFilter())
 		}
 
 		if(this.getWebContentStructureFilter() != '') {
@@ -53,13 +57,17 @@ class GSearchQuery extends State {
 		params.add('start', this.getStart());
 		params.add('sortField', this.getSortField());
 		params.add('sortDirection', this.getSortDirection());
+
+		if (this.getResultsLayout() != '') {
+			params.add('resultsLayout', this.getResultsLayout());
+		}
 		
-		if(this.getDocumentExtensionFilter() != '') {
-			params.add('extension', this.getDocumentExtensionFilter());
+		if(this.getDocumentFormatFilter() != '') {
+			params.add('df', this.getDocumentFormatFilter());
 		}
 
 		if(this.getDocumentTypeFilter() != '') {
-			params.add('filetype', this.getDocumentTypeFilter());
+			params.add('dt', this.getDocumentTypeFilter());
 		}
 
 		if(this.getWebContentStructureFilter() != '') {
@@ -94,11 +102,11 @@ class GSearchQuery extends State {
     }
     
     getKeywords()  {
-    	return this.keywords;
+    	return this.q;
     }
     
-	setKeywords(keywords)  {
-    	this.keywords = keywords;
+	setKeywords(q)  {
+    	this.q = q;
     }
 
 	getQueryMinLength() {
@@ -109,56 +117,64 @@ class GSearchQuery extends State {
 		this.queryMinLength = queryMinLength;
 	}
 
-    getDocumentExtensionFilter()  {
-    	return this.documentExtensionFilter;
+    getDocumentFormatFilter()  {
+    	return this.df;
     }
     
-    setDocumentExtensionFilter(documentExtensionFilter)  {
-		this.documentExtensionFilter = documentExtensionFilter;
+    setDocumentFormatFilter(df)  {
+		this.df = df;
     }
     
     getDocumentTypeFilter()  {
-    	return this.documentTypeFilter;
+    	return this.dt;
     }
     
-    setDocumentTypeFilter(documentTypeFilter)  {
-		this.documentTypeFilter = documentTypeFilter;
+    setDocumentTypeFilter(dt)  {
+		this.dt = dt;
     }
     
+    getResultsLayout()  {
+    	return this.resultsLayout;
+    }
+    
+    setResultsLayout(resultsLayout)  {
+		this.resultsLayout = resultsLayout;
+    }
+
     getScopeFilter()  {
-    	return this.scopeFilter;
+    	return this.scope;
     }
     
-    setScopeFilter(scopeFilter)  {
-		this.scopeFilter = scopeFilter;
+    setScopeFilter(scope)  {
+		this.scope = scope;
     }
     
     getTimeFilter()  {
-    	return this.timeFilter;
+    	return this.time;
     }
     
-    setTimeFilter(timeFilter) {
-    	this.timeFilter = timeFilter;
+    setTimeFilter(time) {
+    	this.time = time;
 	}
     
     getTypeFilter()  {
-    	return this.typeFilter;
+    	return this.type;
     }
 	
-	setTypeFilter(typeFilter) {
-		this.typeFilter = typeFilter;
+	setTypeFilter(type) {
+		this.type = type;
 	}
 	
     getWebContentStructureFilter()  {
-    	return this.webContentStructureFilter;
+    	return this.wcs;
     }
     
-    setWebContentStructureFilter(webContentStructureFilter)  {
-		this.webContentStructureFilter = webContentStructureFilter;
+    setWebContentStructureFilter(wcs)  {
+		this.wcs = wcs;
     }
     	
 	validate() {
-		if (this.keywords.length < this.getQueryMinLength()) {
+		if (this.q.length < this.getQueryMinLength()) {
 			return false;
 		}
 		return true;
@@ -185,28 +201,31 @@ GSearchQuery.STATE = {
 	sortDirection: {
 		value: 'asc'
 	},
-	keywords: {
+	q: {
 		value: ''
 	},
 	queryMinLength: {
 		value: 3
 	},
-	documentExtensionFilter: {
+	df: {
 		value: ''
 	},
-	documentTypeFilter: {
+	dt: {
 		value: ''
 	},
-	scopeFilter: {
+	resultsLayout: {
+		value: ''
+	},
+	scope: {
 		value: 'all'
 	},
-	timeFilter: {
+	time: {
 		value: ''
 	},
-	typeFilter: {
-		value: ''
+	type: {
+		value: 'everything'
 	},
-	webContentStructureFilter: {
+	wcs: {
 		value: ''
 	}
 }

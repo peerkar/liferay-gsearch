@@ -9,6 +9,7 @@ import GSearchFilters from './view-templates/GSearchFilters.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
 import GSearchResults from './view-templates/GSearchResults.es';
+import GSearchResultsLayouts from './view-templates/GSearchResultsLayouts.es';
 import GSearchSort from './view-templates/GSearchSort.es';
 
 import templates from './View.soy';

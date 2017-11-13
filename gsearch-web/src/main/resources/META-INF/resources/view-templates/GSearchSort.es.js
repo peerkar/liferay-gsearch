@@ -1,6 +1,7 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
+
 import GSearchUtils from '../js/GSearchUtils.es';
 
 import templates from './GSearchSort.soy';
@@ -16,6 +17,10 @@ class GSearchSort extends Component {
 	constructor(opt_config, opt_parentElement) {
 
 		super(opt_config, opt_parentElement);
+		
+		this.debug = opt_config.JSDebugEnabled;
+
+		this.initialQueryParameters = opt_config.initialQueryParameters; 
 
 		this.portletNamespace = opt_config.portletNamespace;
 	}
@@ -25,9 +30,23 @@ class GSearchSort extends Component {
 	 */
 	attached() {
 		
-		// Check if we are getting selections from initially calling URL.
+		if (this.debug) {
+			console.log("GSearchSort.attached()");
+		}
 		
-		this.checkCallURLSelections();
+		// Set initial query parameters.
+		
+		if (this.initialQueryParameters['sortDirection']) {
+			this.setQueryParam('sortDirection', this.initialQueryParameters['sortDirection'], false);
+		}
+
+		if (this.initialQueryParameters['sortField']) {
+			this.setQueryParam('sortField', this.initialQueryParameters['sortField'], false);
+		}
+		
+		// Setup options lists.
+		
+		this.setupOptionLists();
 	}
 	
 	/**
@@ -35,62 +54,31 @@ class GSearchSort extends Component {
 	 */
 	rendered() {
 
-		// Set dropdown lists selections.
-			
-		this.setDropDownSelectedItems();
-		
-		// Set click events for the dropdowns.
-		
-		this.setDropDownClickEvents();
+		if (this.debug) {
+			console.log("GSearchSort.attached()");
+		}
 	}
 	
 	/**
-	 * Check and set selected items based on calling URL.
+	 * Setup option lists.
 	 */
-	checkCallURLSelections() {
+	setupOptionLists() {
 
-		if (!this.initialURLParameters) {
-			return;
-		}
+		GSearchUtils.setupOptionList(
+			this.portletNamespace + 'SortDirectionOptions', 
+			this.portletNamespace + 'SortDirection', 
+			this.getQueryParam, 
+			this.setQueryParam, 
+			'sortDirection'
+		);
 		
-		let sortDirection = this.initialURLParameters['sortDirection'];
-		let sortField = this.initialURLParameters['sortField'];
-
-		if (sortDirection) {
-			if (GSearchUtils.setInitialOption(this.portletNamespace + 'SortDirectionOptions', sortDirection)) {
-				this.setQueryParam('sortDirection', sortDirection, false);
-			}
-		} 
-		
-		if (sortField) {
-			if (GSearchUtils.setInitialOption(this.portletNamespace + 'SortFieldOptions', sortField)) {
-				this.setQueryParam('sortField', sortField, false);
-			}
-		}
-	}
-		
-	/**
-	 * Set dropdown click events.
-	 */
-	setDropDownClickEvents() {
-		
-		GSearchUtils.setDropDownClickEvents(this.portletNamespace + 'SortDirectionOptions', 
-				this.portletNamespace + 'SortDirection', this.getQueryParam, 
-				this.setQueryParam, 'sortDirection');
-		GSearchUtils.setDropDownClickEvents(this.portletNamespace + 'SortFieldOptions', 
-				this.portletNamespace + 'SortField', this.getQueryParam, 
-				this.setQueryParam, 'sortField');
-	}
-
-	/**
-	 * Set dropdown selected items
-	 */
-	setDropDownSelectedItems() {
-
-		GSearchUtils.setDropDownSelectedItem(this.portletNamespace + 'SortDirectionOptions', 
-				this.portletNamespace + 'SortDirection');
-		GSearchUtils.setDropDownSelectedItem(this.portletNamespace + 'SortFieldOptions', 
-				this.portletNamespace + 'SortField');
+		GSearchUtils.setupOptionList(
+			this.portletNamespace + 'SortFieldOptions', 
+			this.portletNamespace + 'SortField', 
+			this.getQueryParam, 
+			this.setQueryParam, 
+			'sortField'
+		);
 	}
 }
 
@@ -101,9 +89,6 @@ class GSearchSort extends Component {
  * @static
  */
 GSearchSort.STATE = {
-	initialURLParameters: {
-		value: null
-	},
 	getQueryParam: {
 		validator: core.isFunction
 	},

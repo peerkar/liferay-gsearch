@@ -1,6 +1,7 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import Ajax from 'metal-ajax/src/Ajax';
+
 import GSearchUtils from '../js/GSearchUtils.es';
 
 import templates from './GSearchHelp.soy';
@@ -18,8 +19,12 @@ class GSearchHelp extends Component {
 	
 		super(opt_config, opt_parentElement);
 
+		this.debug = opt_config.JSDebugEnabled;
+
 		this.helpTextURL = opt_config.helpTextURL;
+
 		this.portletNamespace = opt_config.portletNamespace;
+
 		this.requestTimeout = opt_config.requestTimeout;
 	}
 	
@@ -27,6 +32,10 @@ class GSearchHelp extends Component {
 	 * @inheritDoc
 	 */ 
 	attached() {
+
+		if (this.debug) {
+			console.log("GSearchHelp.attached()");
+		}
 
 		let _self = this;
 
@@ -70,6 +79,15 @@ class GSearchHelp extends Component {
 		}).catch(function(reason) {
 			alert(Liferay.Language.get('there-was-an-error'));
 		});
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	rendered() {
+		if (this.debug) {
+			console.log("GSearchHelp.rendered()");
+		}
 	}
 }
 

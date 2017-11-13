@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchSearchTypes;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.web.search.internal.queryparams.QueryParams;
 import fi.soveltia.liferay.gsearch.web.search.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.web.search.results.item.ResultItemBuilder;
@@ -170,9 +170,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Image src
 				
-				if (_gSearchDisplayConfiguration.showSmallImages() || 
-  					(_gSearchDisplayConfiguration.enableImageSearchLayout() &&
-							document.get(Field.ENTRY_CLASS_NAME).equals(DLFileEntry.class.getName()))) {
+				if (_queryParams.getResultsLayout().equals(GSearchResultsLayouts.THUMBNAIL_LIST) || 
+						_queryParams.getResultsLayout().equals(GSearchResultsLayouts.IMAGE) &&
+							document.get(Field.ENTRY_CLASS_NAME).equals(DLFileEntry.class.getName())) {
 				
 					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
 				}
@@ -210,11 +210,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		String[] queryTerms = _queryParams.getKeywords().split(" ");
 
-		// Searchtype.
-		
-		if (_queryParams.getSearchType().equals(GSearchSearchTypes.IMAGES)) {
-			jsonObject.put("searchType", GSearchSearchTypes.IMAGES);
-		}
+		jsonObject.put("resultsLayout", _queryParams.getResultsLayout());
 		
 		// If this parameter is populated, there was an alternate search.
 		
@@ -332,7 +328,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		return pagingObject;
 	}
-
+	
 	@Reference
 	protected ResultItemBuilderFactory _resultsBuilderFactory;
 

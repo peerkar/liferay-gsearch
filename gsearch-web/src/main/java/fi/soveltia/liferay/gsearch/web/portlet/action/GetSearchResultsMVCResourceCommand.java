@@ -55,7 +55,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	protected void doServeResource(
 		ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
-
+		
 		if (_log.isDebugEnabled()) {
 			_log.debug("GetSearchResultsMVCResourceCommand.doServeResource()");
 		}

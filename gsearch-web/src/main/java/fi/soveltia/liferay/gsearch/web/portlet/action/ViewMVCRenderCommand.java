@@ -29,7 +29,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 import fi.soveltia.liferay.gsearch.web.search.menuoption.AssetTypeOptions;
-import fi.soveltia.liferay.gsearch.web.search.menuoption.DocumentExtensionOptions;
+import fi.soveltia.liferay.gsearch.web.search.menuoption.DocumentFormatOptions;
 import fi.soveltia.liferay.gsearch.web.search.menuoption.DocumentTypeOptions;
 import fi.soveltia.liferay.gsearch.web.search.menuoption.WebContentStructureOptions;
 
@@ -71,18 +71,18 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		template.put(
 			GSearchWebKeys.AUTO_COMPLETE_ENABLED, 
 			_gSearchDisplayConfiguration.enableAutoComplete());
+
+		// Autocomplete request delay.
+		
+		template.put(
+			GSearchWebKeys.AUTO_COMPLETE_REQUEST_DELAY, 
+			_gSearchDisplayConfiguration.autoCompleteRequestDelay());
 		
 		// Set help text resource url.
 		
 		template.put(
 			GSearchWebKeys.HELP_TEXT_URL, 
 			createResourceURL(renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
-
-		// Enable image search layout.
-		
-		template.put(
-			GSearchWebKeys.IMAGE_SEARCH_LAYOUT_ENABLED, 
-			_gSearchDisplayConfiguration.enableImageSearchLayout());
 
 		// Set search results resource url.
 
@@ -104,11 +104,11 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 				GSearchWebKeys.ASSET_TYPE_OPTIONS,
 				_assetTypeOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
 			
-			// Set document extension options.
+			// Set document format options.
 	
 			template.put(
-				GSearchWebKeys.DOCUMENT_EXTENSION_OPTIONS,
-				_documentExtensionOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
+				GSearchWebKeys.DOCUMENT_FORMAT_OPTIONS,
+				_documentFormatOptions.getOptions(renderRequest, _gSearchDisplayConfiguration));
 			
 			// Set document type options.
 	
@@ -138,8 +138,14 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			GSearchWebKeys.QUERY_MIN_LENGTH,
 			_gSearchDisplayConfiguration.queryMinLength());
 				
-		// Get/set parameters from url
+		// Enable / disable JS console logging messages.
 		
+		template.put(
+			GSearchWebKeys.JS_DEBUG_ENABLED,
+			_gSearchDisplayConfiguration.jsDebuggingEnabled());
+		
+		// Get/set parameters from url
+
 		setInitialParameters(renderRequest, template);
 
 		return "View";
@@ -184,7 +190,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		String keywords = ParamUtil.getString(request, GSearchWebKeys.KEYWORDS);
 
-		String documentExtensionFilter = ParamUtil.getString(request, GSearchWebKeys.DOCUMENT_EXTENSION_FILTER);
+		String documentFormatFilter = ParamUtil.getString(request, GSearchWebKeys.DOCUMENT_FORMAT_FILTER);
 		String documentTypeFilter = ParamUtil.getString(request, GSearchWebKeys.DOCUMENT_TYPE_FILTER);
 		String scopeFilter = ParamUtil.getString(request, GSearchWebKeys.SCOPE_FILTER);
 		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.TIME_FILTER);
@@ -201,8 +207,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			initialParameters.put(GSearchWebKeys.KEYWORDS, keywords);
 		}
 
-		if (Validator.isNotNull(documentExtensionFilter)) {
-			initialParameters.put(GSearchWebKeys.DOCUMENT_EXTENSION_FILTER, documentExtensionFilter);
+		if (Validator.isNotNull(documentFormatFilter)) {
+			initialParameters.put(GSearchWebKeys.DOCUMENT_FORMAT_FILTER, documentFormatFilter);
 		}
 
 		if (Validator.isNotNull(documentTypeFilter)) {
@@ -225,7 +231,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			initialParameters.put(GSearchWebKeys.WEB_CONTENT_STRUCTURE_FILTER, webContentStructureFilter);
 		}
 		
-		if (Validator.isNotNull(keywords)) {
+		if (Validator.isNotNull(sortDirection)) {
 			initialParameters.put(GSearchWebKeys.SORT_DIRECTION, sortDirection);
 		}
 
@@ -237,16 +243,14 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			initialParameters.put(GSearchWebKeys.START, start);
 		}
 		
-		if (initialParameters.size() > 0) {
-			template.put(GSearchWebKeys.INITIAL_URL_PARAMETERS, initialParameters);
-		}
+		template.put(GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
 	}
 
 	@Reference
 	protected AssetTypeOptions _assetTypeOptions;
 
 	@Reference
-	protected DocumentExtensionOptions _documentExtensionOptions;
+	protected DocumentFormatOptions _documentFormatOptions;
 
 	@Reference
 	protected DocumentTypeOptions _documentTypeOptions;

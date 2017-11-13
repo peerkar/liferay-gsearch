@@ -20,11 +20,11 @@ public class QueryParams {
 	long userId;
 
 	private List<Class<?>> clazzes;
-	private String[] documentExtensions;
+	private String[] documentFormats;
 	private Long documentTypeId = null;
 	private String keywords;
 	private String originalKeywords;
-	private String searchType;
+	private String resultsLayout;
 	private Date timeFrom = null;
 	private Date timeTo = null;
 	private String webContentStructureKey;
@@ -84,14 +84,14 @@ public class QueryParams {
 		this.clazzes = clazzes;
 	}
 
-	public String[] getDocumentExtensions() {
+	public String[] getDocumentFormats() {
 
-		return documentExtensions;
+		return documentFormats;
 	}
 
-	public void setDocumentExtensions(String[] documentExtensions) {
+	public void setDocumentFormats(String[] documentFormats) {
 
-		this.documentExtensions = documentExtensions;
+		this.documentFormats = documentFormats;
 	}
 
 	public Long getDocumentTypeId() {
@@ -124,16 +124,14 @@ public class QueryParams {
 		this.originalKeywords = originalKeywords;
 	}
 
-	
-	public String getSearchType() {
-	
-		return searchType;
+	public String getResultsLayout() {
+
+		return resultsLayout;
 	}
 
-	
-	public void setSearchType(String searchType) {
-	
-		this.searchType = searchType;
+	public void setResultsLayout(String resultsLayout) {
+
+		this.resultsLayout = resultsLayout;
 	}
 
 	public Date getTimeFrom() {
