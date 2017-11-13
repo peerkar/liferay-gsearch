@@ -9,6 +9,9 @@ This is the Google Like search project for Liferay DXP. The code is originally c
 
 The portlet is written using SOY and Metal.JS. 
 
+![](https://web.liferay.com/documents/78288332/0/gsearch-blog-part2.gif/5a55c403-7ead-491b-b583-5881f7786684?t=1509349505916)
+
+
 ## Why?
 Creating this application served originally for two purposes: to experiment with SOY & Metal.JS (which are a really great combination) but more importantly: to make a simple, fast and bookmarkable Liferay search with optimized querying and filtering. 
 
@@ -31,6 +34,11 @@ This application is written against Liferay DXP fixpack level 28. It requires ve
 If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
 ## Installation
+
+Download the latest jar [here:](https://github.com/peerkar/liferay-gsearch/tree/master/gsearch-web/latest)
+
+OR
+
 1. Have a Liferay workspace (requirement) in you Liferay IDE. 
 2. Clone this repository in the modules directory
 3. Do a Gradle refresh (in the context menu of Eclipse) for the modules directory
