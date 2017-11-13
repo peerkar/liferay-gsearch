@@ -21,8 +21,6 @@ class GSearchHelp extends Component {
 
 		this.debug = opt_config.JSDebugEnabled;
 		
-		console.log("HELP");
-
 		this.helpTextURL = opt_config.helpTextURL;
 
 		this.portletNamespace = opt_config.portletNamespace;
