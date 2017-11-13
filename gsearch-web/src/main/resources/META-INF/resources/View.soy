@@ -17,12 +17,16 @@
 	
 		// Help modal dialog
 	
-		{call GSearchHelp.render /}
+		{call GSearchHelp.render}
+			{param portletNamespace: $portletNamespace /}
+		{/call}
 
 		// Help button
 
 		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-help gsearch-centered">
-			{call GSearchHelp.button /}
+			{call GSearchHelp.button}
+				{param portletNamespace: $portletNamespace /}
+			{/call}
 		</div>
 
 		// Searchfield

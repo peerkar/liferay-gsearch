@@ -20,6 +20,8 @@ class GSearchHelp extends Component {
 		super(opt_config, opt_parentElement);
 
 		this.debug = opt_config.JSDebugEnabled;
+		
+		console.log("HELP");
 
 		this.helpTextURL = opt_config.helpTextURL;
 
