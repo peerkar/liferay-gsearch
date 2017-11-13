@@ -12,6 +12,8 @@ The portlet is written using SOY and Metal.JS.
 ![](https://web.liferay.com/documents/78288332/0/gsearch-blog-part2.gif/5a55c403-7ead-491b-b583-5881f7786684?t=1509349505916)
 
 
+![](https://web.liferay.com/documents/78288332/0/gsearch-blog-part3-22.gif/1aff17ed-b92d-4286-905e-7592616b14ca?t=1509366661107)
+
 ## Why?
 Creating this application served originally for two purposes: to experiment with SOY & Metal.JS (which are a really great combination) but more importantly: to make a simple, fast and bookmarkable Liferay search with optimized querying and filtering. 
 
