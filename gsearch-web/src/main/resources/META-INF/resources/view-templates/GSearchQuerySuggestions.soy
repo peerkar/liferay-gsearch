@@ -1,0 +1,39 @@
+{namespace GSearchQuerySuggestions}
+
+/**
+ * Print suggestions.
+ *
+ * @param results
+ */
+{template .suggestions}
+
+	<div class="row suggestions">
+
+		<p>{msg desc=""}search-for{/msg} <strong>{$results.meta.originalQueryTerms}</strong> {msg desc=""}gave-no-results{/msg}</p>
+
+		<p class="alternate-search">{msg desc=""}showing-results-for{/msg} <strong><i>{$results.meta.queryTerms}</i></strong></p>
+
+		// Show other suggestions on the list
+
+		{if length($results.meta.querySuggestions) > 1}
+
+			<p class="other-suggestions">{msg desc=""}other-suggestions{/msg} </p>
+			<ul>
+				{foreach $item in $results.meta.querySuggestions}
+					{call .suggestionItem}
+						{param item: $item /}
+					{/call}
+				{/foreach}
+			</ul>
+		{/if}
+	</div>
+{/template}
+
+/**
+ * Print single suggestion.
+ *
+ * @param item
+ */
+{template .suggestionItem}
+	<li>{$item}</li>
+{/template}

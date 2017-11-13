@@ -1,0 +1,33 @@
+{namespace GSearchResultsLayout}
+
+/**
+ * Print results layout options.
+ *
+ * @param? portletNamespace
+ * @param? results
+ */
+{template .render}
+
+	{if $results and length($results.items) > 0}
+
+		<div class="row">
+			<ul class="options" id="{$portletNamespace}LayoutOptions">
+				<li class="list-layout selected">
+					<a data-value="list" href="#" title="{msg desc=""}list-laoyut{/msg}">
+						<img src="/o/gsearch-web/images/icon-list.png"/>
+					</a>
+				</li>
+				<li class="thumbnail-list-layout">
+					<a data-value="thumbnailList" href="#" title="{msg desc=""}thumbnail-laoyut{/msg}">
+						<img src="/o/gsearch-web/images/icon-thumbnail-list.png" />
+					</a>
+				</li>
+				<li class="image-layout hide">
+					<a data-value="image" href="#" title="{msg desc=""}image-laoyut{/msg}">
+						<img src="/o/gsearch-web/images/icon-image-list.png" />
+					</a>
+				</li>
+			</ul>
+		</div>
+	{/if}
+{/template}
