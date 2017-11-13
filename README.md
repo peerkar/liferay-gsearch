@@ -1,11 +1,16 @@
 # Liferay GSearch
 
-This is the Google Like search for Liferay DXP by Petteri Karttunen. The code is originally created for the blog series https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search.
+This is the Google Like search project for Liferay DXP. The code is originally created for the blog series:
+
+ * [Part 1](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search)
+ * [Part 2](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-ii-filter-by-structure-and-document-type)
+ * [Part 3](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iii-autocompletion-suggestions)
+ * [Part 4](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iv-query-tuning-and-lucene-syntax)
 
 The portlet is written using SOY and Metal.JS. 
 
 ## Why?
-Creating this application served originally two purposes: two experiment with SOY & Metal.JS (which are a really great combination) but more importantly: to make a simple, fast and bookmarkable Liferay search with optimized querying and filtering. 
+Creating this application served originally for two purposes: to experiment with SOY & Metal.JS (which are a really great combination) but more importantly: to make a simple, fast and bookmarkable Liferay search with optimized querying and filtering. 
 
 ## Features
 
@@ -18,6 +23,7 @@ Creating this application served originally two purposes: two experiment with SO
 * Sorting by score, title and modification date
 * Autocomplete / keyword suggester (configurable)
 * Query suggester (configurable) & alternate search
+* Selectable result layouts, image layout for image search
 * It's fast
 
 ## Requirements
@@ -46,9 +52,20 @@ Installation instructions are [here](https://dev.liferay.com/discover/deployment
 
 ElasticHQ is an excellent Elasticsearch plugin for managing and monitoring indexes and Elastic cluster. Installation instructions [here](http://www.elastichq.org/support_plugin.html). After installation point your browser (by default) to http://localhost:9200/_plugin/hq/
 
+## Roadmap
+This is an ongoing project. Next upcoming features:
+
+ * Support for Elasticsearch 5.6
+ * Considerably better support for Elasticsearch StringQuery type.
+ * Support for audience targeting. Dynamic field boosting by means of machine learning.
+ * Integration tests
+
 
 ## Credits
 Thanks to Tony Tawk for the Arabic translation!
 
 ## Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to your own purposes but if you like it and have ideas you would like to see in this application I'd be glad to hear about those. Also many thanks in advance for any reported bug findings.
+	
+
+
