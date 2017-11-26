@@ -1,0 +1,21 @@
+Bundle-Name: Liferay GSearch Core API
+Bundle-SymbolicName: fi.soveltia.liferay.gsearch.core.api
+Bundle-Version: 1.0.0
+Export-package:\
+	 fi.soveltia.liferay.gsearch.core.api,\
+	 fi.soveltia.liferay.gsearch.core.api.configuration,\
+	 fi.soveltia.liferay.gsearch.core.api.constants,\
+	 fi.soveltia.liferay.gsearch.core.api.facet,\
+	 fi.soveltia.liferay.gsearch.core.api.facet.translator,\
+	 fi.soveltia.liferay.gsearch.core.api.menuoption,\
+	 fi.soveltia.liferay.gsearch.core.api.query,\
+	 fi.soveltia.liferay.gsearch.core.api.query.ct,\
+	 fi.soveltia.liferay.gsearch.core.api.query.filter,\
+	 fi.soveltia.liferay.gsearch.core.api.query.keyword,\
+	 fi.soveltia.liferay.gsearch.core.api.query.processor,\
+	 fi.soveltia.liferay.gsearch.core.api.queryparams,\
+	 fi.soveltia.liferay.gsearch.core.api.results,\
+	 fi.soveltia.liferay.gsearch.core.api.results.item,\
+	 fi.soveltia.liferay.gsearch.core.api.suggest,\
+	 fi.soveltia.liferay.gsearch.core.configuration
+	 
