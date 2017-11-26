@@ -1,6 +1,5 @@
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -8,20 +7,15 @@ import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 
-import java.util.Map;
-
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
+import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
-import fi.soveltia.liferay.gsearch.web.search.suggest.GSearchKeywordSuggester;
 
 /**
  * Resource command for getting keyword suggestions (autocomplete).
@@ -29,7 +23,6 @@ import fi.soveltia.liferay.gsearch.web.search.suggest.GSearchKeywordSuggester;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
@@ -39,14 +32,6 @@ import fi.soveltia.liferay.gsearch.web.search.suggest.GSearchKeywordSuggester;
 )
 public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
-	@Activate
-	@Modified
-	protected void activate(Map<Object, Object> properties) {
-
-		_gSearchDisplayConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchDisplayConfiguration.class, properties);
-	}
-
 	@Override
 	protected void doServeResource(
 		ResourceRequest resourceRequest, ResourceResponse resourceResponse)
@@ -55,13 +40,12 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		if (_log.isDebugEnabled()) {
 			_log.debug("GetSuggestionsMVCResourceCommand.doServeResource()");
 		}
-
+		
 		JSONArray response = null;
 
 		try {
 			response = _gSearchSuggester.getSuggestions(
-				resourceRequest,
-				_gSearchDisplayConfiguration);
+				resourceRequest);
 		}
 		catch (Exception e) {
 
@@ -76,10 +60,14 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, response);
 	}	
 	
+	@Reference(unbind = "-")
+	protected void setGSearchKeywordSuggester(GSearchKeywordSuggester gSearchSuggester) {
+
+		_gSearchSuggester = gSearchSuggester;
+	}
+	
 	@Reference
 	protected GSearchKeywordSuggester _gSearchSuggester;
-
-	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(GetSuggestionsMVCResourceCommand.class);

@@ -6,7 +6,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.ConfigurationAction;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
-import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.Map;
 
@@ -21,8 +20,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Modified;
 
-import fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchPreferencesKeys;
+import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 
 /**
@@ -31,7 +29,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration",
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration",
 	configurationPolicy = ConfigurationPolicy.OPTIONAL, 
 	immediate = true,
 	property = {
@@ -39,7 +37,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 	},
 	service = ConfigurationAction.class
 )
-public class GSearchDisplayConfigurationAction
+public class GSearchConfigurationAction
 	extends DefaultConfigurationAction {
 
 	@Override
@@ -49,8 +47,8 @@ public class GSearchDisplayConfigurationAction
 		throws Exception {
 
 		httpServletRequest.setAttribute(
-			GSearchDisplayConfiguration.class.getName(),
-			_gSearchDisplayConfiguration);
+			GSearchConfiguration.class.getName(),
+			_gSearchConfiguration);
 
 		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
@@ -65,36 +63,6 @@ public class GSearchDisplayConfigurationAction
 			_log.debug("GSearchDisplayConfigurationAction.processAction()");
 		}
 
-		int pageSize = ParamUtil.getInteger(
-			actionRequest, GSearchPreferencesKeys.PAGE_SIZE, 10);
-		int queryMinLength = ParamUtil.getInteger(
-			actionRequest, GSearchPreferencesKeys.QUERY_MIN_LENGTH, 3);
-		int requestTimeout = ParamUtil.getInteger(
-			actionRequest, GSearchPreferencesKeys.REQUEST_TIMEOUT, 10000);
-		String helpText = ParamUtil.getString(
-			actionRequest, GSearchPreferencesKeys.HELP_TEXT, "N/A");
-		String assetPublisherPageFriendlyURL = ParamUtil.getString(
-			actionRequest, GSearchPreferencesKeys.ASSET_PUBLISHER_PAGE_FRIENDLY_URL, null);
-		boolean keywordSuggestionsEnabled = ParamUtil.getBoolean(
-			actionRequest, GSearchPreferencesKeys.KEYWORD_SUGGESTIONS_ENABLED, true);
-
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.ASSET_PUBLISHER_PAGE_FRIENDLY_URL,
-			assetPublisherPageFriendlyURL);
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.KEYWORD_SUGGESTIONS_ENABLED, String.valueOf(keywordSuggestionsEnabled));
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.PAGE_SIZE,
-			String.valueOf(pageSize));
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.QUERY_MIN_LENGTH,
-			String.valueOf(queryMinLength));
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.REQUEST_TIMEOUT,
-			String.valueOf(requestTimeout));
-		setPreference(
-			actionRequest, GSearchPreferencesKeys.HELP_TEXT, helpText);
-
 		super.processAction(portletConfig, actionRequest, actionResponse);
 	}
 
@@ -102,12 +70,12 @@ public class GSearchDisplayConfigurationAction
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
 
-		_gSearchDisplayConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchDisplayConfiguration.class, properties);
+		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
+			GSearchConfiguration.class, properties);
 	}
 
-	private volatile GSearchDisplayConfiguration _gSearchDisplayConfiguration;
+	private volatile GSearchConfiguration _gSearchConfiguration;
 	
 	private static final Log _log =
-					LogFactoryUtil.getLog(GSearchDisplayConfigurationAction.class);
+					LogFactoryUtil.getLog(GSearchConfigurationAction.class);
 }

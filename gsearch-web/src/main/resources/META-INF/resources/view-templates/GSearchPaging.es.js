@@ -2,6 +2,8 @@ import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 
+import GSearchUtils from '../js/GSearchUtils.es';
+
 import templates from './GSearchPaging.soy';
 
 /**
@@ -32,8 +34,10 @@ class GSearchPaging extends Component {
 		
 		// Set initial query parameters.
 		
-		if (this.initialQueryParameters['start']) {
-			this.setQueryParam('start', this.initialQueryParameters['start'], false);
+		let paramValue = this.initialQueryParameters['start'];
+		
+		if (paramValue) {
+			this.setQueryParam('start', paramValue, false);
 		}
 	}
 		
@@ -43,7 +47,7 @@ class GSearchPaging extends Component {
 	rendered() {
 		
 		if (this.debug) {
-			console.log("GSearchPaging.attached()");
+			console.log("GSearchPaging.rendered()");
 		}
 
 		// Set click events.
@@ -85,7 +89,7 @@ GSearchPaging.STATE = {
 	},
 	setQueryParam: {
 		validator: core.isFunction
-	},
+	}
 };
 
 // Register component

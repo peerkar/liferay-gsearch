@@ -2,7 +2,6 @@ import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 
 import templates from './GSearchResults.soy';
-import querySuggestionTemplates from './GSearchQuerySuggestions.soy';
 
 /**
  * GSearch results component.

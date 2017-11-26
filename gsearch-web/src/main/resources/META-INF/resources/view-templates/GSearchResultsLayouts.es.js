@@ -35,17 +35,11 @@ class GSearchResultsLayout extends Component {
 			console.log("GSearchResultsLayout.attached()");
 		}
 
-		// Set initial query parameters.
+		// Set initial query parameters from calling url.
 		
-		if (this.initialQueryParameters['resultsLayout']) {
-			this.setQueryParam('resultsLayout', this.initialQueryParameters['resultsLayout'], false);
-		}
-
-		// Setup options lists.
-		
-		this.setupOptionLists();
+		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, 
+				this.templateParameters, this.setQueryParam);		
 	}
-	
 	
 	/**
 	 * @inheritDoc
@@ -56,9 +50,9 @@ class GSearchResultsLayout extends Component {
 			console.log("GSearchResultsLayout.rendered()");
 		}
 
-		// Show image layout option if file format filter is "image".
-
-		if (this.getQueryParam('type') == 'file' && this.getQueryParam('df') == 'image') {
+		// Show image layout option if type filter is "file" or extension is "image".
+		
+		if (this.getQueryParam('type') == 'file' || this.getQueryParam('extension') == 'Image') {
 			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
 		} else {
 			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
@@ -69,13 +63,9 @@ class GSearchResultsLayout extends Component {
 		if (this.results) {
 			this.setQueryParam('resultsLayout', this.results.meta.resultsLayout, false);
 		}
-	}
-			
-	/**
-	 * Setup option lists.
-	 */
-	setupOptionLists() {
-		
+	
+		// Setup options lists.
+
 		GSearchUtils.setupOptionList(
 			this.portletNamespace + 'LayoutOptions', 
 			null, 
@@ -83,7 +73,7 @@ class GSearchResultsLayout extends Component {
 			this.setQueryParam, 
 			'resultsLayout'
 		);
-	}	
+	}
 }
 	
 /** 
@@ -99,9 +89,12 @@ GSearchResultsLayout.STATE = {
 	results: {
 		value: null
 	},
+	templateParameters: {
+		value: ['resultsLayout']
+	},
 	setQueryParam: {
 		validator: core.isFunction
-	},
+	}
 };
 
 // Register component

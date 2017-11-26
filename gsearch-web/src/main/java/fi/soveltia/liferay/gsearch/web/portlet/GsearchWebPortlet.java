@@ -33,7 +33,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=gsearch-web-portlet",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.copy-request-parameters=true",
+		"javax.portlet.init-param.copy-request-parameters=false",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=View",
 		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,

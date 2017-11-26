@@ -31,7 +31,7 @@ class GSearchField extends Component {
 
 		this.suggestionsURL = opt_config.suggestionsURL;
 
-		this.setQueryParam('queryMinLength', opt_config.queryMinLength);
+		this.queryMinLength, opt_config.queryMinLength;
 
 		this.initialQueryParameters = opt_config.initialQueryParameters; 
 	}
@@ -97,7 +97,7 @@ class GSearchField extends Component {
 			elementClasses: 'gsearch-autocomplete-list',
 			inputElement:document.querySelector('#' + this.portletNamespace + 'SearchField'),
 			data: function(keywords) {
-				if (keywords.length >= _self.getQueryParam('queryMinLength') &&
+				if (keywords.length >= _self.queryMinLength &&
 						!_self.isSuggesting && keywords.slice(-1) != ' ') {
 					return _self.getSuggestions(keywords);
 				} else {
@@ -226,9 +226,9 @@ class GSearchField extends Component {
 
 		// Minimum length is defined in portlet configuration
 		
-		if (keywords.length < this.getQueryParam('queryMinLength')) {
+		if (keywords.length < this.queryMinLength) {
 			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + 
-					this.getQueryParam('queryMinLength'));
+					this.queryMinLength);
 			return false;
 		}
 		
@@ -248,6 +248,9 @@ GSearchField.STATE = {
 	},
 	getQueryParam: {
 		validator: core.isFunction
+	},
+	queryMinLength: {
+		value: 3
 	},
 	setQueryParam: {
 		validator: core.isFunction

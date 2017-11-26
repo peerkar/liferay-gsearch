@@ -8,20 +8,19 @@
  * @param? getQueryParam
  * @param? setQueryParam
  * @param? results
- * @param? stats
  *
  */
 {template .render}
 
 	<div class="container-fluid gsearch-container" id="{$id}">
 	
-		// Help modal dialog
+		// Help modal dialog.
 	
 		{call GSearchHelp.render}
 			{param portletNamespace: $portletNamespace /}
 		{/call}
 
-		// Help button
+		// Help button.
 
 		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-help gsearch-centered">
 			{call GSearchHelp.button}
@@ -29,73 +28,101 @@
 			{/call}
 		</div>
 
-		// Searchfield
+		// Searchfield.
 
-		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-searchfield gsearch-centered">
+		<div class="col-xs-12 col-sm-10 col-md-6 col-lg-6 gsearch-searchfield gsearch-centered">
 			{call GSearchField.render}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
 			{/call}			
 		</div>
 
-		// Filters
+		// Basic Filters.
 
-		<div class="col-xs-12 col-md-8 col-lg-8 gsearch-filters gsearch-centered">
+		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-filters gsearch-centered">
 			{call GSearchFilters.render}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
 				{param results: $results /}
 			{/call}
 		</div>
-				
-		// Stats
-		
-		{if $stats}
-			<div class="col-xs-12 col-md-8 col-lg-8 gsearch-stats gsearch-centered">
-				<div class="row text-center">
-					{$stats}
-				</div>
-			</div>  			
-		{/if}
 
-		// Sort
+		// Facets.
 
-		{if $results and length($results.items) > 0}
-		
-			<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-sort gsearch-centered">
-				{call GSearchSort.render}
-					{param getQueryParam: $getQueryParam /}
-					{param setQueryParam: $setQueryParam /}
-				{/call}				
-			</div>  			
-		{/if}
-
-		// Results layout
-
-		<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-results-layout gsearch-centered">
-			{call GSearchResultsLayout.render}
+		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-filters gsearch-centered">
+			{call GSearchFacets.render}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
 				{param results: $results /}
 			{/call}
+		</div>
+
+		// Stats.
+
+		{if $results and length($results.items) > 0}
+
+			<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10  gsearch-stats gsearch-centered">
+				<div class="row text-center">
+					{msg desc=""}page-{$results.paging.currentPage}-{$results.meta.totalPages}-of-{$results.meta.totalHits}-total-search-took-{$results.meta.executionTime}{/msg}
+				</div>
+			</div>  			
+		{/if}
+
+			
+		<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-centered">
+
+			<div class="row">
+
+				// Sort.
+			
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 gsearch-sort">
+					{call GSearchSort.render}
+						{param getQueryParam: $getQueryParam /}
+						{param setQueryParam: $setQueryParam /}
+						{param results: $results /}
+					{/call}				
+				</div>
+				
+				// Results layout.
+
+				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 gsearch-results-layout">
+					{call GSearchResultsLayout.render}
+						{param getQueryParam: $getQueryParam /}
+						{param setQueryParam: $setQueryParam /}
+						{param results: $results /}
+					{/call}
+				</div>
+			</div>  			
 		</div>  			
 
-		// Results
-
 		{if $results}
-			{if $results.meta.resultsLayout == 'image'}
-				<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
-			{else}
-				<div class="col-xs-10 col-sm-10 col-md-10 col-lg-10 gsearch-results gsearch-centered" id="{$portletNamespace}SearchResults">
-			{/if}
+
+			// Wider layout for images.
+			
+			{let $width: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
+			
+			<div class="col-xs-{$width} col-sm-{$width} col-md-{$width} col-lg-{$width} gsearch-results 
+				gsearch-centered" id="{$portletNamespace}SearchResults">
+	
+				// Query suggestions.
+	
+				{if length($results.meta.querySuggestions) > 0}
+					{call GSearchQuerySuggestions.render}
+						{param results: $results /}
+					{/call}
+				{/if}
+				
+				// Results.
+	
 				{call GSearchResults.render}
 					{param results: $results /}
 				{/call}
+	
 			</div>
 		{/if}
-
-		// Paging
 		
+		// Paging.
+
 		<div class="gsearch-paging gsearch-centered text-center">
 			{call GSearchPaging.render}
 				{param getQueryParam: $getQueryParam /}

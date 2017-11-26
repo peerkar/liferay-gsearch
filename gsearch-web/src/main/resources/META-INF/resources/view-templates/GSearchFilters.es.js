@@ -27,48 +27,20 @@ class GSearchFilters extends Component {
 		this.portletNamespace = opt_config.portletNamespace;
 
 		this.assetTypeOptions = opt_config.assetTypeOptions;
-		
-		this.documentFormatOptions = opt_config.documentFormatOptions;
-
-		this.documentTypeOptions = opt_config.documentTypeOptions;
-	
-		this.webContentStructureOptions = opt_config.webContentStructureOptions;
 	}
 
 	/**
 	 * @inheritDoc
 	 */
 	attached() {
-		
+
 		if (this.debug) {
 			console.log("GSearchFilters.attached()");
 		}
 		
-		// Set initial query parameters.
-		
-		if (this.initialQueryParameters['df']) {
-			this.setQueryParam('df', this.initialQueryParameters['df'], false);
-		}
+		// Set initial query parameters from calling url.
 
-		if (this.initialQueryParameters['dt']) {
-			this.setQueryParam('dt', this.initialQueryParameters['dt'], false);
-		}
-
-		if (this.initialQueryParameters['scope']) {
-			this.setQueryParam('scope', this.initialQueryParameters['scope'], false);
-		}
-
-		if (this.initialQueryParameters['time']) {
-			this.setQueryParam('time', this.initialQueryParameters['time'], false);
-		}
-
-		if (this.initialQueryParameters['type']) {
-			this.setQueryParam('type', this.initialQueryParameters['type'], false);
-		}
-
-		if (this.initialQueryParameters['wcs']) {
-			this.setQueryParam('wcs', this.initialQueryParameters['wcs'], false);
-		}
+		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
 	}
 	
 	/**
@@ -82,205 +54,68 @@ class GSearchFilters extends Component {
 		
 		// Setup options lists.
 
-		this.setupOptionLists();
+		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'BasicFilters', 'optionmenu', 
+				this.getQueryParam, this.setQueryParam);
 
-		// Show / hide option items based on scope selection.
-		
-		this.setAdditionalFiltersVisibility();
-
-		// Show / hide option items based on scope selection.
-		
-		this.setAdditionalFilterItemsVisibility(this.getQueryParam('scope'));
-		
 		// Update asset type facet counts.
 		
 		this.updateAssetTypeFacetCounts();
 	}
-
+		
 	/**
-	 * Set additional filter menu visibility.
+	 * Update asset type facet counts. 
 	 */
-	setAdditionalFiltersVisibility() {
-
-		// Additional filters visibility
+	updateAssetTypeFacetCounts() {		
 		
-		if (this.getQueryParam('type') == 'file') {
-			$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
-			$('#' + this.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
-		} else if (this.getQueryParam('type') == 'web-content') {
-			$('#' + this.portletNamespace + 'AdditionalFilters .wcfilter').removeClass('hide');
-		}		
-	}
-	
-	/**
-	 * 	Show / hide option items based on scope selection.
-	 *  .all-classed items are from all sites. Others from current site.
-	 * 
- 	 * @param {String} scope
-	 */
-	setAdditionalFilterItemsVisibility(scope) {
-
-		if (scope == 'all') {
-			$('#' + this.portletNamespace + 'DocumentFormatFilterOptions li,' +
-					'#' + this.portletNamespace + 'DocumentTypeFilterOptions li,' +
-					'#' + this.portletNamespace + 'WebContentStructureFilterOptions li').removeClass('hide');
-		} else {
-			$('#' + this.portletNamespace + 'DocumentFormatFilterOptions li .all,' +
-				'#' + this.portletNamespace + 'DocumentTypeFilterOptions li .all,' +
-				'#' + this.portletNamespace + 'WebContentStructureFilterOptions li .all').addClass('hide');
-		}
-	}	
-
-	/**
-	 * Setup option lists.
-	 */
-	setupOptionLists() {
-
-		let _self = this;
-		
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'DocumentFormatFilterOptions',
-			this.portletNamespace + 'DocumentFormatFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'df'
-		);
-
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'DocumentTypeFilterOptions',
-			this.portletNamespace + 'DocumentTypeFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'dt'
-		);
-		
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'ScopeFilterOptions', 
-			this.portletNamespace + 'ScopeFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'scope'
-		);
-
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'TimeFilterOptions', 
-			this.portletNamespace + 'TimeFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'time'
-		);
-
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'TypeFilterOptions',
-			this.portletNamespace + 'TypeFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'type'
-		);
-
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'WebContentStructureFilterOptions',
-			this.portletNamespace + 'WebContentStructureFilter', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'wcs'
-		);
-		
-		// Set events for showing additional filters
-		
-		$('#' + this.portletNamespace + 'ScopeFilterOptions li a').on('click', function(event) {
-
-			let scope = $(this).attr('data-value');
-
-			_self.setAdditionalFilterItemsVisibility(scope);
+		if (this.results && this.results.facets) {
 			
-			event.preventDefault();		
-		});
-
-		$('#' + this.portletNamespace + 'TypeFilterOptions li a').on('click', function(event) {
-
-			$('#' + _self.portletNamespace + 'AdditionalFilters .filter').addClass('hide');
-
-			let type = $(this).attr('data-value');
+			let entryClassNameFacets = null;
 			
-			if (type == 'web-content') {
-				$('#' + _self.portletNamespace + 'AdditionalFilters .wcsfilter').removeClass('hide');
-			} else if (type == 'file') {
-				$('#' + _self.portletNamespace + 'AdditionalFilters .filefilter').removeClass('hide');
-			}
-			event.preventDefault();		
-		});
-	}
-	
-	/**
-	 * Set facets counts.
-	 * 
- 	 * @param {String} optionsElementId
-	 */
-	setFacetCounts(optionsElementId, facets) {
-
-		// Populate counts
-		
-		if (facets) {
-
-			let length = facets.length;
+			let length = this.results.facets.length;
 
 			for (let i = 0; i < length; i++) {
 
-				let term =  facets[i].term;
-				let frequency =  facets[i].frequency;
-				let element = $('#' + optionsElementId + ' li a[data-facet="' + term + '"]');
-
-				if (element) {
-					$(element).find('.count').html('(' + frequency + ')');
+				if(this.results.facets[i].fieldName == 'entryClassName') {
+					entryClassNameFacets = this.results.facets[i].values;
+					break;
 				}
 			}
-		} else {
-			$('#' + optionsElementId + ' li .count').html('');
-		}
+			
+			if (entryClassNameFacets) {
+
+				let valueCount = entryClassNameFacets.length;
+				
+				for (let i = 0; i < valueCount; i++) {
+
+					let term =  entryClassNameFacets[i].term;
+					let frequency =  entryClassNameFacets[i].frequency;
+					let element = $('#' + this.portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
+				
+					if (element) {
+						$(element).find('.count').html('(' + frequency + ')');
+					}
+				}
+			} else {
+				$('#' + this.portletNamespace + 'TypeFilterOptions li .count').html('');
+			}
+		}			
 	}
 	
 	/**
-	 * Update asset type facet counts.
+	 * @inheritDoc 
 	 */
-	updateAssetTypeFacetCounts() {		
-
-		let refresh = false;
-		
-		// Check if parameters have changed so that we need to update type facets
-		
-		let currentState = this.getQueryParam('scope') + this.getQueryParam('q');
-		let currentType = this.getQueryParam('type');
-		
-		if (this.previousState != currentState) {
-			refresh = true;
-		} else if (this.previousType != currentType && currentType == 'everything') {
-			refresh = true;
-		}
-		
-		this.previousState = currentState;
-		this.previousType = currentType;
+	shouldUpdate(changes, propsChanges) {
 
 		if (this.debug) {
-			console.log("Facets need refresh: " + refresh);
+			console.log("GSearchFilters.willUpdate()");
 		}		
-		
-		// Change counts only when there's a new search (=keywords or scope change).
-		// Also, don't show counts if we're coming to the page from a bookmark url
-		// and already having there a filter. In that case we don't get all the counts.
-		
-		if (refresh) { 	
-			
-			if (this.getQueryParam('type') == 'everything') {
-				if (this.results && this.results.facets) {
-					this.typefacets = this.results.facets;
-				}
-			} else {
-				this.typefacets = null;
-			}
-		}
-		this.setFacetCounts(this.portletNamespace + 'TypeFilterOptions', this.typefacets);
-	}
+
+    	// Detach event listeners and facet element on rerender.
+
+		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'BasicFilters', 'optionmenu');
+
+		return true;
+    }	
 }
 
 /**
@@ -297,7 +132,10 @@ GSearchFilters.STATE = {
 	},	
 	setQueryParam: {
 		validator: core.isFunction
-	}
+	},
+	templateParameters: {
+		value: ['type','scope','time']
+	}	
 };
 
 // Register component

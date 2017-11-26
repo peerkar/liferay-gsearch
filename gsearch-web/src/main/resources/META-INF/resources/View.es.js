@@ -6,8 +6,10 @@ import GSearchUtils from './js/GSearchUtils.es';
 import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
 import GSearchFilters from './view-templates/GSearchFilters.es';
+import GSearchFacets from './view-templates/GSearchFacets.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
+import GSearchQuerySuggestions from './view-templates/GSearchQuerySuggestions.soy';
 import GSearchResults from './view-templates/GSearchResults.es';
 import GSearchResultsLayouts from './view-templates/GSearchResultsLayouts.es';
 import GSearchSort from './view-templates/GSearchSort.es';
@@ -23,24 +25,89 @@ class View extends Component {
 		
 		super(opt_config, opt_parentElement);
 		
+		this.debug = opt_config.JSDebugEnabled;
+
+		this.initialQueryParameters = opt_config.initialQueryParameters; 
+
 		this.searchResultsURL = opt_config.searchResultsURL;
 
 		this.portletNamespace = opt_config.portletNamespace;
 		
+		this.queryMinLength = opt_config.queryMinLength;
+
 		this.requestTimeout = opt_config.requestTimeout;
 
-		// If this was linked call i.e. if keyword parameter was present in the calling url, then execute search.
-		// Notice that nested templates are processed before parent.
+		// If this was linked call i.e. if keyword parameter was present in the calling url, 
+		// then execute search. Notice that nested templates are processed before parent.
 		
-		if (this.query.getKeywords() != '') {
+		if (this.initialQueryParameters['q']) {
+
 			this.executeQuery();
+			
+		} else {
+
+			// Reset possibly cached state
+			
+			this.query.parameters = new Object();
+			
 		}
 	}
 
 	/**
 	 * @inheritDoc
 	 */
+	attached() {
+		
+		if (this.debug) {
+			console.log("View.attached()");
+		}
+	}
+	
+	/**
+	 * Check parameters.
+	 *
+     * As asset type is here separated from other facet selections  
+     * we check here selections not to get into deadlock kind of user 
+     * experience.
+	 *  
+	 */
+	checkParameters() {
+
+		// Clear facet selections if asset type changes.
+				
+		if (this.query.type != '' && typeof this.query.parameters['type'] !== 'undefined' && 
+				this.query.type != this.query.parameters['type']) {
+
+			let oldParameters = this.query.parameters;
+			
+			this.query.parameters = new Object();
+			this.query.parameters['q'] = oldParameters['q'];
+			this.query.parameters['type'] = oldParameters['type'];
+			
+			if (typeof oldParameters['scope'] !== 'undefined') {
+				this.query.parameters['scope'] = oldParameters['scope'];
+			}
+
+			if (typeof oldParameters['time'] !== 'undefined') {
+				this.query.parameters['time'] = oldParameters['time'];
+			}
+			
+			this.query.type = oldParameters['type'];
+
+		} else if (typeof this.query.parameters['type'] !== 'undefined'){
+
+			this.query.type = this.query.parameters['type'];
+		}
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
 	created() {
+		
+		if (this.debug) {
+			console.log("View.created()");
+		}
 
 		// Create query object. 
 		// Need to create the query object here for that to be available 
@@ -56,7 +123,7 @@ class View extends Component {
 	 * @param {String} key
 	 */
 	getQueryParam(key) {
-		return this.query[key];
+		return this.query.parameters[key];
 	}
 
 	/**
@@ -67,7 +134,8 @@ class View extends Component {
 	 * @param {boolean} refresh Refresh results
 	 */
 	setQueryParam(key, value, refresh=true) {
-		this.query[key] = value;
+
+		this.query.parameters[key] = value;
 		
 		if (refresh) {
 			this.executeQuery();
@@ -79,20 +147,26 @@ class View extends Component {
 	 */
 	executeQuery() {
 		
-		// Validate keywords.
+		// Check that there's a query 
 		
-		if (!this.query.validate()) {
+		if (typeof this.query.parameters['q'] == 'undefined' ||
+			this.query.parameters['q'].length < this.queryMinLength) {		
+			
 			return;
 		}
-
+		
 		// Hide elements and show loader image.
 
 		this.setLoading(true);
 
+		// Check parameters
+		
+		this.checkParameters();
+		
 		// Build params.
 		
 		let params = this.query.buildQueryParams();
-		
+				
 		Ajax.request(
 				this.searchResultsURL,
 				'GET',
@@ -107,21 +181,7 @@ class View extends Component {
 				// Set results object.
 				
 				this.results =  JSON.parse(response.responseText);
-				
-				// Update stats.
-				
-				if (this.results.items.length > 0) {
-				
-					this.stats =  Liferay.Language.get('search-stats')
-						.replace('{currentPage}', this.results.paging.currentPage)
-						.replace('{executionTime}', this.results.meta.executionTime)
-						.replace('{totalHits}', this.results.meta.totalHits)
-						.replace('{totalPages}', this.results.meta.totalPages);
-				} else {
-					
-					this.stats = '';
-				}
-										
+														
 				// Remove loading placeholder.
 
 				this.setLoading(false);
@@ -140,6 +200,15 @@ class View extends Component {
 			console.log(reason);
 			alert(Liferay.Language.get('there-was-an-error'));
 		});
+	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	rendered() {
+		if (this.debug) {
+			console.log("View.rendered()");
+		}
 	}
 
 	/**
@@ -166,7 +235,7 @@ class View extends Component {
 	 */
 	updateAddressBar(address) {
 		if (window.history.pushState) {
-			window.history.pushState(null, this.query.getKeywords() + '-' + Liferay.Language.get('search'), address);
+			window.history.pushState(null, this.query.parameters['q'] + '-' + Liferay.Language.get('search'), address);
 		} else {
 			document.location.hash = address;
 		}		

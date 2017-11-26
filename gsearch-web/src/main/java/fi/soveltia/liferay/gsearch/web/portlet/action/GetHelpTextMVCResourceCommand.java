@@ -18,8 +18,8 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
 
@@ -29,7 +29,6 @@ import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.GSearchDisplayConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,

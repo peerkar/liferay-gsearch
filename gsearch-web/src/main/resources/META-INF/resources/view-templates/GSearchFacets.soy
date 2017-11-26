@@ -1,0 +1,83 @@
+{namespace GSearchFacets}
+
+/**
+ * Print facets.
+ *
+ * @param? portletNamespace
+ * @param? results
+ */
+{template .render}
+
+		{if $results and length($results.facets) > 0}
+
+			<div class="row text-center gsearch-facets" id="{$portletNamespace}Facets">
+			
+				{foreach $item in $results.facets}
+	
+					// Don't render entryClassName (is main menu)
+	
+					{if $item.fieldName != 'entryClassName'}
+					
+						{call .dropdown}
+							{param portletNamespace: $portletNamespace /}
+							{param facet: $item /}
+						{/call}
+					{/if}
+				{/foreach}
+			</div>
+		{/if}
+{/template}
+			
+/**
+ * Print single facet dropdown.
+ *
+ * @param portletNamespace
+ * @param facet
+ */
+{template .dropdown}
+	
+	<div class="dropdown gsearch-dropdown optionmenu facet" data-paramname="{$facet.fieldName}">
+	
+		<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+			data-toggle="dropdown" id="{$portletNamespace}{$facet.fieldName}" type="button">
+			<span class="selection"></span>
+			<span class="caret"></span>
+		</button>
+
+		<ul aria-labelledby="{$portletNamespace}{$facet.fieldName}" class="dropdown-menu" 
+				id="{$portletNamespace}{$facet.fieldName}Options">
+
+			<li class="selected"><a data-value="" href="#">{$facet.anyOption}</a></li>
+			{call .options}
+				{param facetName: $facet.fieldName /}
+				{param options: $facet.values /}
+			{/call}
+		</ul>
+
+	</div>
+{/template}
+
+/**
+ * Print facet dropdown options.
+ *
+ * @param facetName
+ * @param options
+ */
+{template .options}
+
+	{foreach $item in $options}
+		<li>
+			<a data-facet="{$facetName}" data-value="{$item.term}" href="#">
+				{$item.name}
+
+				{if $item.groupName}
+					<span class="groupname">({$item.groupName})</span>
+				{/if}				
+
+				<span class="count">{$item.frequency}</span>
+			</a>
+		</li>
+
+	{/foreach}
+{/template}
+

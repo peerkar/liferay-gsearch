@@ -1,6 +1,7 @@
 /**
  * GSearch utility class
  */
+
 class GSearchUtils {
 	
 	/**
@@ -19,14 +20,77 @@ class GSearchUtils {
 		}
 		return true;
 	}
+	
+	/**
+	 * Remove event listeners
+	 *
+	 * @param {String} menuWrapperElementId
+	 * @param {String} menuClass
+	 */
+	static bulkCleanUpOptionListEvents(menuWrapperElementId, menuClass) {
 
+		$('#' + menuWrapperElementId + ' .' + menuClass + ' li a').each(function() {	
+			$(this).unbind();
+		});			
+	}
+	
+	/**
+	 * Bulk setup option lists.
+ 	 *
+	 * @param {String} menuWrapperElementId
+	 * @param {String} triggerElementId
+	 * @param {Object} queryParamGetter
+	 * @param {Object} queryParamSetter
+ 	 *
+	 */
+	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
+
+		$('#' + menuWrapperElementId + ' .' + menuClass).each(function() {
+
+			let options = $(this).find('.dropdown-menu').attr('id');
+			let trigger = $(this).find('button').attr('id');
+			let paramName = $(this).attr('data-paramname')
+			
+			GSearchUtils.setupOptionList(
+				options, 
+				trigger, 
+				queryParamGetter, 
+				queryParamSetter, 
+				paramName
+			);
+		});			
+	}
+	
+	/**
+	 * Set initial query parameters.
+	 * 
+	 * @param {String} parameterArray
+	 * @param {Object} queryParamSetter
+	 * 
+	 */
+	static setInitialQueryParameters(valueArray, keyArray, queryParamSetter) {
+
+		if (!(valueArray && keyArray)) {
+			return;
+		}
+		
+		for (let field of keyArray) {
+
+			let value = valueArray[field];
+
+			if (value) {
+				queryParamSetter(field, value, false);
+			}
+		}
+	}	
+		
 	/**
 	 * Setup option list.
 	 *
 	 * @param {String} optionElementId
 	 * @param {String} triggerElementId
-	 * @param {String} queryParamGetter
-	 * @param {String} queryParamSetter
+	 * @param {Object} queryParamGetter
+	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
 	 * @param {String} initialValue
 	 */
@@ -35,14 +99,16 @@ class GSearchUtils {
 		// Set initially selected item
 		
 		let initialValue = queryParamGetter(queryParam);
-		
-		let selectedItem = GSearchUtils.setOptionListSelectedItem(optionElementId, triggerElementId, initialValue);
+
+		let selectedItem = GSearchUtils.setOptionListSelectedItem(optionElementId, 
+				triggerElementId, initialValue);
 
 		if (selectedItem) {
 			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItem);
 		}
 		
-		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter, queryParamSetter, queryParam) 
+		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId, 
+				queryParamGetter, queryParamSetter, queryParam) 
 	}
 	
 	/**
@@ -86,7 +152,7 @@ class GSearchUtils {
 	static setOptionListSelectedItem(optionElementId, triggerElementId, value) {
 
 		let selectedItem = null;
-		
+
 		$('#' + optionElementId + ' li a').each(function() {
 
 			// Try to find a default selected item
@@ -101,11 +167,9 @@ class GSearchUtils {
 				$(this).parent().addClass('selected');
 				
 				selectedItem = this;
-
-				return;
 			}
 		});
-		
+
 		return selectedItem;
 	}
 	

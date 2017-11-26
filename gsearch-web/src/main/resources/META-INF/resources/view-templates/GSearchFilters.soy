@@ -5,119 +5,62 @@
  *
  * @param? portletNamespace
  * @param? assetTypeOptions
- * @param? documentFormatOptions
- * @param? documentTypeOptions
- * @param? webContentStructureOptions
  * @param? results
  */
 {template .render}
 
-	// This dummy condition here is just forcing the template to rerender to setup facets when getting new results. 
-
+	// Dummy condition to force refresh.
+	
 	{if $results or not $results}
 
-		<div class="row text-center">
+		<div class="row text-center" id="{$portletNamespace}BasicFilters">
 	
-			<div class="basic-filters">
-	
-				// Type filter
-				
-				<div class="dropdown gsearch-dropdown">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu" id="{$portletNamespace}TypeFilterOptions">
-						<li class="selected"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
-						{call .options}
-							{param options: $assetTypeOptions /}
-						{/call}
-					</ul>
-				</div>
-				
-				// Scope filter
-		
-				<div class="dropdown gsearch-dropdown">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}ScopeFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}ScopeFilter" class="dropdown-menu" id="{$portletNamespace}ScopeFilterOptions">
-						<li class="selected"><a data-value="all" href="#">{msg desc=""}search-everywhere{/msg}</a></li>
-						<li><a data-value="this-site" href="#">{msg desc=""}search-this-site-only{/msg}</a></li>
-					</ul>
-				</div>
-				
-			  	// Time filter
-			  
-				<div class="dropdown gsearch-dropdown">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-					data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
-						<li class="selected"><a href="#">{msg desc=""}anytime{/msg}</a></li>
-						<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
-						<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
-						<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
-						<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
-						<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
-					</ul>
-				</div>
+			// Type filter
+			
+			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="type">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu" id="{$portletNamespace}TypeFilterOptions">
+					<li class="selected"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
+					{call .assetTypeOptions}
+						{param options: $assetTypeOptions /}
+					{/call}
+				</ul>
 			</div>
 			
-			<div class="additional-filters" id="{$portletNamespace}AdditionalFilters">
-			
-				// Web Content Structure filter
-				
-				<div class="dropdown gsearch-dropdown filter wcsfilter hide">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}WebContentStructureFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}WebContentStructureFilter" class="dropdown-menu" id="{$portletNamespace}WebContentStructureFilterOptions">
-						<li class="selected"><a data-value="" href="#">{msg desc=""}any-web-content-structure{/msg}</a></li>
-						{call .options}
-							{param options: $webContentStructureOptions /}
-						{/call}
-					</ul>
-				</div>
-			
-				// Document Type
-				
-				<div class="dropdown gsearch-dropdown filter filefilter document-types hide">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}DocumentTypeFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}DocumentTypeFilter" class="dropdown-menu" id="{$portletNamespace}DocumentTypeFilterOptions">
-						<li class="selected"><a data-value="" href="#">{msg desc=""}any-file-type{/msg}</a></li>
-						{call .options}
-							{param options: $documentTypeOptions /}
-						{/call}
-					</ul>
-				</div>
+			// Scope filter
 	
-				// Document Format
-				
-				<div class="dropdown gsearch-dropdown filter filefilter document-formats hide">
-					<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-						data-toggle="dropdown" id="{$portletNamespace}DocumentFormatFilter" type="button">
-						<span class="selection"></span>
-						<span class="caret"></span>
-					</button>
-					<ul aria-labelledby="{$portletNamespace}DocumentFormatFilter" class="dropdown-menu" id="{$portletNamespace}DocumentFormatFilterOptions">
-						<li class="selected"><a data-value="" href="#">{msg desc=""}any-file-format{/msg}</a></li>
-						{call .options}
-							{param options: $documentFormatOptions /}
-						{/call}
-					</ul>
-				</div>
+			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="scope">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+					data-toggle="dropdown" id="{$portletNamespace}ScopeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}ScopeFilter" class="dropdown-menu" id="{$portletNamespace}ScopeFilterOptions">
+					<li class="selected"><a data-value="all" href="#">{msg desc=""}search-everywhere{/msg}</a></li>
+					<li><a data-value="this-site" href="#">{msg desc=""}search-this-site-only{/msg}</a></li>
+				</ul>
+			</div>
+			
+		  	// Time filter
+		  
+			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time">
+				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+				data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
+					<span class="selection"></span>
+					<span class="caret"></span>
+				</button>
+				<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
+					<li class="selected"><a href="#">{msg desc=""}anytime{/msg}</a></li>
+					<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
+					<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
+					<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+					<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+					<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+				</ul>
 			</div>
 		</div>
 	{/if}
@@ -128,27 +71,16 @@
  *
  * @param options
  */
-{template .options}
+{template .assetTypeOptions}
 
 	{foreach $item in $options}
-		{if $item.scope == 'all'}
-			<li class="all">		
-		{else}
-			<li>
-		{/if}
-		
-		{if $item.facet}
-			<a data-facet="{$item.facet}" data-value="{$item.key}" href="#">
-		{else}
-			<a data-value="{$item.key}" href="#">
-		{/if}
-
-		{$item.name}
-
-		{if $item.groupName}
-			<span class="groupname">({$item.groupName})</span>
-		{/if}				
-		<span class="count"></span></a></li>
+	
+		<li>
+			<a data-facet="{$item.entryClassName}" data-value="{$item.key}" href="#">
+				{$item.localization}
+				<span class="count"></span>
+			</a>
+		</li>
 	{/foreach}
 {/template}
 

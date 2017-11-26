@@ -23,6 +23,8 @@ class GSearchSort extends Component {
 		this.initialQueryParameters = opt_config.initialQueryParameters; 
 
 		this.portletNamespace = opt_config.portletNamespace;
+
+		this.sortOptions = opt_config.sortOptions;
 	}
 	
 	/**
@@ -34,51 +36,24 @@ class GSearchSort extends Component {
 			console.log("GSearchSort.attached()");
 		}
 		
-		// Set initial query parameters.
-		
-		if (this.initialQueryParameters['sortDirection']) {
-			this.setQueryParam('sortDirection', this.initialQueryParameters['sortDirection'], false);
-		}
+		// Set initial query parameters from calling url.
 
-		if (this.initialQueryParameters['sortField']) {
-			this.setQueryParam('sortField', this.initialQueryParameters['sortField'], false);
-		}
-		
-		// Setup options lists.
-		
-		this.setupOptionLists();
+		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	rendered() {
-
-		if (this.debug) {
-			console.log("GSearchSort.attached()");
-		}
-	}
-	
-	/**
-	 * Setup option lists.
-	 */
-	setupOptionLists() {
-
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'SortDirectionOptions', 
-			this.portletNamespace + 'SortDirection', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'sortDirection'
-		);
 		
-		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'SortFieldOptions', 
-			this.portletNamespace + 'SortField', 
-			this.getQueryParam, 
-			this.setQueryParam, 
-			'sortField'
-		);
+		if (this.debug) {
+			console.log("GSearchSort.rendered()");
+		}
+
+		// Setup options lists.
+		
+		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'Sort', 'optionmenu', 
+			this.getQueryParam, this.setQueryParam);
 	}
 }
 
@@ -94,6 +69,9 @@ GSearchSort.STATE = {
 	},
 	setQueryParam: {
 		validator: core.isFunction
+	},
+	templateParameters: {
+		value: ['sortField','sortDirection']
 	}
 };
 
