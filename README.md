@@ -23,12 +23,12 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 * Automatic alternate search 
 * Support for Boolean operators and Lucene syntax
 * Configurables:
- * Asset types to search for
- * Facets to retrieve
- * Sort fields
- * Fields to search for and their boosting
- * Experimental machine learning features to improve relevancy by means of:
- * Audience targeting and boost for matching contents
+    * Asset types to search for
+    * Facets to retrieve
+    * Sort fields
+    * Fields to search for and their boosting
+* Experimental machine learning features to improve relevancy by means of:
+    * Audience targeting and boost for matching contents
 * Ability to include non-Liferay resources in the search results
 * Speed ; It's fast
 
@@ -48,7 +48,11 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 
 
 # Requirements
-This application is written on Liferay DXP fixpack level 28. It requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
+
+* Liferay DXP SP5 or minimum FP28
+* Audience Targeting Installed
+
+This application requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
 If you are interested to get this to work with CE, please take a look at the FAQ below.
 
@@ -70,11 +74,6 @@ UI module written using SOY & Metal.js.
 A custom Elasticsearch adapter which fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
-
-
-## Step 0 / Install Audience Targeting Module
-
-This module is currently needed to run. You can however, remove the dependency quite easily by removing the CTQueryBuilderImpl class, the reference in QueryBuilderImpl and depedency in build.gradle.
 
 ## Step 1 / Option 1 (The Easy Way)
 
