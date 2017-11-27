@@ -9,29 +9,27 @@ This is the Google like search project for Liferay DXP. The code is originally c
  * [Part 5: Finale](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-v-finale)
 
 
-## Why?
-This project originally served for two purposes: experimenting with SOY & Metal.JS (which are a really great combination) but more importantly: to make a fast, bookmarkable, easily configurable and tunable, dynamic Liferay search.
+## Background
+This project served many purposes for me. I wanted to experimenting with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to create an alternative search for Liferay which would have many of the features currently missing in the standard search portlet.
 
 ## Features
 
 * Google like  appearance and UX (at least I hope so)
 * Completely ajaxed interface (no page transitions)
-* 3 selectable search result layouts (for example Google like image search layout)
+* 3 selectable search result layouts (image card layout available for files / image)
 * Sortable search results (not available in default Liferay search)
 * Bookmarkable searches with short urls which can easily be collected to Google Analytics
 * Autocompletion & query suggestions
 * Automatic alternate search 
 * Support for Boolean operators and Lucene syntax
-* Selectable (configurable):
+* Configurable:
  * Asset types to search for
  * Facets to retrieve
  * Sort fields
  * Fields to search for and their boosting
 * Experimental machine learning features to improve relevancy by means of:
  * Audience targeting
- * Geodistance information of the asset
 * Ability to include non-Liferay resources in the search results
-
 * Speed ; It's fast
 
 # Screenshots
@@ -42,49 +40,53 @@ This project originally served for two purposes: experimenting with SOY & Metal.
 
 ## Configuration
 
-## Requirements
+## Non-Liferay Assets in the Search Results
+
+
+# Requirements
 This application is written on Liferay DXP fixpack level 28. It requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
-You can also get it to work on 7 CE GA3 but some changes to the dependencies are needed. For your convenience, there are downloadable Jar-files in the Installation section. Also please note that you cannot use the Audience Targeting -feature, as it's not available in CE. 
+If you are interested to get this to work with CE, please take a look at the FAQ below.
 
 # About Project Modules
 
-## gsearch-core
-This is the backend code for the portlet.
+## gsearch-core-api
+API module for the search backend logic.
 
-## gsearch-web
-This is the portlet UI module. It's written using SOY & Metal.js
-
-## gsearch-localization
-This is the localization module.
+## gsearch-core-impl
+Implementation module for the backend logic.
 
 ## gsearch-query-api
 This module contains contains the extension for portal search API's StringQuery type, the QueryStringQuery query type.
 
-## gsearch-permission-handler
-This module takes care of updating the role permissions to index when changed.
+## gsearch-web
+UI module written using SOY & Metal.js.
 
-The custom search adapter is in a separate repository...
+## gsearch-elasticsearch-adapter
+A custom Elasticsearch adapter which fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
 
-## Step 1 / Option 1 (Easy Way)
-Download the latest jars and just deploy them - except of the custom adapter (Step 2). Before this, please see the requirements and after deploying, please see that all the modules have been properly activated. The modules to install are:
+## Step 1 / Option 1 (The Easy Way)
 
- * fi.soveltia.liferay.gsearch.core-VERSION.jar
- * fi.soveltia.liferay.gsearch.web-VERSION.jar
- * fi.soveltia.liferay.gsearch.query-api-VERSION.jar
- * fi.soveltia.liferay.gsearch.permission-VERSION.jar
- * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
+Download the latest jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy all but the custom search adapter (Step 2). Before this, please see the requirements and after deploying, please see that all the modules have been properly activated. The modules to install are:
 
-Get the files for DXP (FP 28+) [here](https://github.com/peerkar/liferay-gsearch/tree/master/gsearch-web/latest/dxp) and for Liferay 7 CE GA 3 [here](https://github.com/peerkar/liferay-gsearch/tree/master/latest/ce)
+* fi.soveltia.liferay.gsearch.core-api-VERSION.jar
+* fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
+* fi.soveltia.liferay.gsearch.query-VERSION.jar
+* fi.soveltia.liferay.gsearch.web-VERSION.jar
 
-After installing the easiest way to check that modules have been properly installed, is to use Gogo shell. For example: "telnet localhost 11311" and then "lb -s GSearch"
+After installing the easiest way to check that modules have been properly installed, is to use Gogo shell. For example: 
+
+```
+> telnet localhost 11311
+> lb -s GSearch"
+
+```
 
 Check that status of all the modules is active.
 
-
-## Step 1 / Option 2
+## Step 1 / Option 2 (The Advanced Way)
 If you want to build everything by yourself, you need to have:
 
 1. Liferay workspace 
@@ -94,31 +96,31 @@ If you want to build everything by yourself, you need to have:
 
 If you need to build the Elasticsearch adapter please see the NOTES.md in gsearch-doc folder
 
-
 ## Step 2 - Installing the Custom Elasticsearch Adapter
+
+If you want to use the custom search adapter and take all the advantages of it, you have to uninstall the standard search adapter. Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search won't work.
 
 You can uninstall the Elasticsearch adapter from control panel apps management or, preferably, from Gogo shell:
 
+```
 > telnet localhost 11311
-> 
-> lb -s com.liferay.portal.search.elasticsearch (to get the bundle id)
-> 
+> lb -s com.liferay.portal.search.elasticsearch (to get the bundle_id)
 > uninstall bundle_id
+```
+After that you can deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier. Please see again from Gogo shell that it's deployed properly. 
 
-After that you can deploy the custom adapter. Please see from Gogo shell that it's deployed properly.
+# Configuration
 
-One importan thing to remember: the default adapter gets installed on every reboot. 
+After succesfully deploying the modules, you have to configure the portlet. There's no automagic here: it doesn't work otherwise. Steps:
 
-## Configuration
+1. Create a page and put there an Asset Publisher portlet to show any contents that are not boud to any layout (page). By default this pages' friendlyUrl should be viewasset. Typically, you would configure this page to be hidden from navigation menu.
+2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+3. Configure the mappings below:
 
-After succesfully deploying the modules, there are quite a few configuration options available but only one mandatory thing to do, to get this to work: a page with an asset publisher to show the contents that are not bound to a display portlet. To configure:
 
-1. Create a page and put there an Asset Publisher portlet. Typically, you would configure this page to be hidden from navigation menu.
-2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch display configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+## Search types Sample Configuration
 
-By default the portlet searches for a page with friendlyURL "/viewasset" but you can change that in the  configuration.
-
-### Search types Sample Configuration 
+```
 [
 	{
 		"key": "web-content",
@@ -145,9 +147,10 @@ By default the portlet searches for a page with friendlyURL "/viewasset" but you
 		"entryClassName": "non-liferay-type"
 	}
 ]
+```
 
-### Facets Sample configuration
-
+## Facets Sample configuration
+```
 [
 	{
 		"fieldName": "entryClassName",
@@ -204,9 +207,11 @@ By default the portlet searches for a page with friendlyURL "/viewasset" but you
 		"icon": "icons/icon-tag.png"
 	}
 ]
+```
 
-### Sortfields Sample Configuration
+## Sortfields Sample Configuration
 
+```
 [
 	{
 		"key": "score",
@@ -230,9 +235,10 @@ By default the portlet searches for a page with friendlyURL "/viewasset" but you
 		"localized": false
 	}
 ]	
+```
 
-
-### Search Fields Sample Configuration
+## Search Fields Sample Configuration
+```
 [
 {
 		"fieldName": "title",
@@ -253,49 +259,55 @@ By default the portlet searches for a page with friendlyURL "/viewasset" but you
 		"boostForLocalizedVersion": 1.5
 	}
 ]
+```
 
 #FAQ
 
+## Does This Work on CE
+It's not tested but bascially, the only thing preventing this to work on CE is the dependency to a new version of Soy bridge. You can downgrade that dependency in the web modules build.gradle and see if it works. 
 
+Also please note that you cannot use the Audience Targeting -feature (in configuration), as it's not available in CE. 
 
 ## How Can I Make Non-Liferay Assets Findable in Index
+To get this portlet to find "external" assets in the Liferay index you have to index those assets to that portal company's index, you want them to be findable at. It's possible to spread the search across multiple indexes but that would require some more customization of the search adapter.
 
-If you want to make this search to spread search over multiple indexes you have to modify the custom search adapter a little further.
+There's a sample non Liferay result item builder (gsearch-core-impl) and here's how you can test it. Add a sample document into your index:
 
-With this solution you only have to take care of following prequisites:
-- External assets have to be indexed in the same index as Liferay documents.
-- External assets have to be defined in the configuration and they have to have following fields:
-	- title which can be localized title_en_US etc.
-	- entryClassName
-	- modified
-
-Well actually you can just write you own result item handler to provide these.
-
-Also take care that you the fields you want to sort on
-
+```
 curl -XPOST 'localhost:9200/liferay-20116/LiferayDocumentType/?pretty' -H 'Content-Type: application/json' -d'
 {
-  "title": "Lucifer Simpsons Southpark Non Liferay Asset In Elasticsearch Index Hey",
-  "description": "This is definitely not a Liferay Asset. Check it out by yourself.",
-  "content":  "Still trying this out...",
-  "modified":  "20171028095357",
-	"entryClassName": "non-liferay-type",
-	"treePath": "http://www.google.fi",
-	"companyId": "20116",
-	"stagingGroup": "false",
-	"status": "0",
-	"roleId": "20123",
-	"groupRoleId": "20143-20131",
-	"entryClassPK": "0"
+   "title": "Non Liferay Asset In Elasticsearch Index Hey",
+   "description": "This is definitely not a Liferay Asset. Check it out by yourself.",
+   "content":  "Still trying this out...",
+   "modified":  "20171028095357",
+   "entryClassName": "non-liferay-type",
+   "treePath": "http://www.google.fi",
+   "companyId": "20116",
+   "stagingGroup": "false",
+   "status": "0",
+   "roleId": "20123",
+   "groupRoleId": "20143-20131",
+   "entryClassPK": "0"
 }
 '
+```
 
+Things to know about the fields:
 
+* title, content, description: the fields which are targeted for search. There can also be localized versions of those.
+* modified: modification date. See syntax from other Liferay documents
+* entryClassName: this should match the type you configured in GSearch configuration
+* treePath: this is just a random field existing in the type mapping we use for the link. That can be any other of the mapping, as long as you implement the getLink() method of the result item builder.
+* companyId: your portal instance's id
+* stagingGroup: this just tell's that this is a "live" content
+* status: 0 = published
+* roleId: roles allowed to view this content
+* groupRoleId: group roles allowed to view the content
+* entryClassPK: any long value. Doesn't really matter here.
 
 
 ## How Do I Connect a Search Field in a Theme to This Portlet?
-That's easy. Just put there a form / field and link it to the page, you put the GSearch portlet.
-You can find the parameter list in the source code but only q parameter is required.
+That's easy. Just put there a form / field and link it to the page, you previously put the GSearch portlet. You can find the parameter list in the source code but only q parameter is required.
 
 
 ## Installing Elasticsearch Server
@@ -316,6 +328,3 @@ Thanks to Tony Tawk for the Arabic translation!
 ## Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-
-
-
