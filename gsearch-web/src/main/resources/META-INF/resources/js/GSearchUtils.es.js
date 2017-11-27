@@ -80,6 +80,11 @@ class GSearchUtils {
 
 			if (value) {
 				queryParamSetter(field, value, false);
+			} else {
+				
+				// Reset possibly cached state
+				
+				queryParamSetter(field, '', false);
 			}
 		}
 	}	
