@@ -71,6 +71,11 @@ A custom Elasticsearch adapter which fully implements the Elasticsearch QueryStr
 
 # Installation
 
+
+## Step 0 / Install Audience Targeting Module
+
+This module is currently needed to run. You can however, remove the dependency quite easily by removing the CTQueryBuilderImpl class, the reference in QueryBuilderImpl and depedency in build.gradle.
+
 ## Step 1 / Option 1 (The Easy Way)
 
 Download the latest jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy all but the custom search adapter (Step 2). Before this, please see the requirements and after deploying, please see that all the modules have been properly activated. The modules to install are:
