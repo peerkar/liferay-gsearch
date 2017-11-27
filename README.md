@@ -9,10 +9,10 @@ This is the Google like search project for Liferay DXP. The code is originally c
  * [Part 5: Finale](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-v-finale)
 
 
-## Background
-This project served many purposes for me. I wanted to experimenting with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to create an alternative search for Liferay which would have many of the features currently missing in the standard search portlet.
+# Background
+This project served many purposes for me. I wanted to experimenting with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to create an alternative search portlet for Liferay. I wanted to have portlet with Lucene syntax support and default AND search, a portlet I could easily tune and which would have many of the features currently missing in the standard search portlet.
 
-## Features
+# Features
 
 * Google like  appearance and UX (at least I hope so)
 * Completely ajaxed interface (no page transitions)
@@ -22,25 +22,29 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 * Autocompletion & query suggestions
 * Automatic alternate search 
 * Support for Boolean operators and Lucene syntax
-* Configurable:
+* Configurables:
  * Asset types to search for
  * Facets to retrieve
  * Sort fields
  * Fields to search for and their boosting
-* Experimental machine learning features to improve relevancy by means of:
- * Audience targeting
+ * Experimental machine learning features to improve relevancy by means of:
+ * Audience targeting and boost for matching contents
 * Ability to include non-Liferay resources in the search results
 * Speed ; It's fast
 
 # Screenshots
 
-## Autocomplete
+## Basic Usage
+![Basic Usage](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/basic-usage.gif)
 
 ## Image Layout
+![Image Layout](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/image-layout.gif)
 
 ## Configuration
+![Configuration ](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/configuration.gif)
 
 ## Non-Liferay Assets in the Search Results
+![Non Liferay Assets](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/non-liferay-asset.gif)
 
 
 # Requirements
@@ -94,11 +98,11 @@ If you want to build everything by yourself, you need to have:
 3. Do a Gradle refresh (in the context menu of Eclipse) for the modules directory
 4. Build and deploy to you Liferay (DXP) installation
 
-If you need to build the Elasticsearch adapter please see the NOTES.md in gsearch-doc folder
+If you need to build the Elasticsearch adapter please see (this repository)[https://github.com/peerkar/gsearch-elasticsearch-adapter]
 
 ## Step 2 - Installing the Custom Elasticsearch Adapter
 
-If you want to use the custom search adapter and take all the advantages of it, you have to uninstall the standard search adapter. Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search won't work.
+This is not mandatory but if you want to use the custom search adapter and take all the advantages of it (search field configuration), especially affecting relevancy, you have to uninstall the standard search adapter. Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search won't work.
 
 You can uninstall the Elasticsearch adapter from control panel apps management or, preferably, from Gogo shell:
 
@@ -111,7 +115,7 @@ After that you can deploy the custom adapter (com.liferay.portal.search.elastics
 
 # Configuration
 
-After succesfully deploying the modules, you have to configure the portlet. There's no automagic here: it doesn't work otherwise. Steps:
+After succesfully deploying the modules, you have to configure the portlet. There's no automagic here ; it doesn't work otherwise. There are quite a few options available but at minimum, you have to configure the Asset Publisher page and add JSON configurations. Steps:
 
 1. Create a page and put there an Asset Publisher portlet to show any contents that are not boud to any layout (page). By default this pages' friendlyUrl should be viewasset. Typically, you would configure this page to be hidden from navigation menu.
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
@@ -260,13 +264,24 @@ After succesfully deploying the modules, you have to configure the portlet. Ther
 	}
 ]
 ```
+## Enabling Audience Targeting
 
+There are just two things to do: in the configuration, enable Audience Targeting and set the boost factor for the contents matching to user's user segments. Create test segments & contents having those segments and play with the boost to see, how it affects the relevancy.
+
+# Important Note About Permissions
+Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
+
+This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
+ 
 #FAQ
 
 ## Does This Work on CE
 It's not tested but bascially, the only thing preventing this to work on CE is the dependency to a new version of Soy bridge. You can downgrade that dependency in the web modules build.gradle and see if it works. 
 
 Also please note that you cannot use the Audience Targeting -feature (in configuration), as it's not available in CE. 
+
+## Do I Have to Use the Custom Search Adapter?
+No you don't but you loose the goodies of search field configuration as they won't work without.
 
 ## How Can I Make Non-Liferay Assets Findable in Index
 To get this portlet to find "external" assets in the Liferay index you have to index those assets to that portal company's index, you want them to be findable at. It's possible to spread the search across multiple indexes but that would require some more customization of the search adapter.
@@ -317,14 +332,19 @@ Installation instructions are [here](https://dev.liferay.com/discover/deployment
 
 ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and monitoring indexes and Elastic cluster. Installation instructions [here](http://www.elastichq.org/support_plugin.html). After installation point your browser (by default) to http://localhost:9200/_plugin/hq/
 
-## Roadmap
+## There's Audience Targeting Integration Now. How Could I Add Something Like GeoDistance There?
+
+See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
+
+# Roadmap
 Upcoming:
 
  * Integration tests
 
-## Credits
+# Credits
 Thanks to Tony Tawk for the Arabic translation!
 
-## Disclaimer
+# Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
+
