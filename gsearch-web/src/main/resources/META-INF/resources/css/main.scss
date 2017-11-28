@@ -116,8 +116,12 @@
 	/* Facets */
 
 	.gsearch-facets {
-		background: #f9f9f9;
-		margin-top: 10px;	
+	
+		margin-top: 15px;
+	
+		.facets {
+			background: #f9f9f9;
+		}
 	}
 	
 	/* Filters */

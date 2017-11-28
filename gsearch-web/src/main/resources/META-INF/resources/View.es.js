@@ -75,8 +75,15 @@ class View extends Component {
 
 		// Clear facet selections if asset type changes.
 				
-		if (this.query.type != '' && typeof this.query.parameters['type'] !== 'undefined' && 
-				this.query.type != this.query.parameters['type']) {
+		let typeSelectionChanged = this.query.type != '' && 
+				typeof this.query.parameters['type'] !== 'undefined' && 
+					this.query.type != this.query.parameters['type']
+		
+		// Facet selection have to be invalidated also on keywords change. 
+		
+		let keywordsChanged = this.query.q != this.query.parameters['q']
+			
+		if (typeSelectionChanged || keywordsChanged) {
 
 			let oldParameters = this.query.parameters;
 			
@@ -92,7 +99,10 @@ class View extends Component {
 				this.query.parameters['time'] = oldParameters['time'];
 			}
 			
+			// Persist current values
+			
 			this.query.type = oldParameters['type'];
+			this.query.q = oldParameters['q'];
 
 		} else if (typeof this.query.parameters['type'] !== 'undefined'){
 

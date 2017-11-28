@@ -72,6 +72,9 @@ GSearchQuery.STATE = {
 	parameters: {
 		value: Object,
 	},
+	q: {
+		value: ''
+	},
 	type: {
 		value: ''
 	}
