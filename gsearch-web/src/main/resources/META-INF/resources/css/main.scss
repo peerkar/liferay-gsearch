@@ -32,6 +32,11 @@
 	
 	.modal-dialog {
 		position: relative;
+		
+		@include media-query(null, $screen-xs-max) {
+			position: inherit;
+		}
+		
 	}
 	
 	.modal-body {
