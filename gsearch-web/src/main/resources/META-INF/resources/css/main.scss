@@ -217,6 +217,10 @@
 			
 			li {
 				display: inline-block;
+				
+				@include media-query(null, $screen-xs-max) {
+					margin-bottom: 10px;
+				}
 			}
 			
 			a {

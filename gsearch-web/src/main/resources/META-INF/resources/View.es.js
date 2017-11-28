@@ -98,7 +98,11 @@ class View extends Component {
 			if (typeof oldParameters['time'] !== 'undefined') {
 				this.query.parameters['time'] = oldParameters['time'];
 			}
-			
+
+			if (typeof oldParameters['resultsLayout'] !== 'undefined') {
+				this.query.parameters['resultsLayout'] = oldParameters['resultsLayout'];
+			}
+
 			// Persist current values
 			
 			this.query.type = oldParameters['type'];
