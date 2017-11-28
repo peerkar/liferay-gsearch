@@ -129,6 +129,10 @@
 	.gsearch-filters {
 	
 		margin-top: 10px; 
+
+		@include media-query(null, $screen-xs-max) {
+			margin-top: 20px;
+		}
 		
 		a {
 			color: #888;
@@ -150,6 +154,7 @@
 
 			@include media-query(null, $screen-xs-max) {
 				margin-left: 0;
+				margin-right: 0;
 			}
 			
 			.count {

@@ -75,7 +75,7 @@
 
 				// Sort.
 			
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 gsearch-sort">
+				<div class="col-xs-8 col-sm-8 col-md-6 col-lg-6 gsearch-sort">
 					{call GSearchSort.render}
 						{param getQueryParam: $getQueryParam /}
 						{param setQueryParam: $setQueryParam /}
@@ -85,7 +85,7 @@
 				
 				// Results layout.
 
-				<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 gsearch-results-layout">
+				<div class="col-xs-4 col-sm-4 col-md-6 col-lg-6 gsearch-results-layout">
 					{call GSearchResultsLayout.render}
 						{param getQueryParam: $getQueryParam /}
 						{param setQueryParam: $setQueryParam /}
@@ -99,9 +99,10 @@
 
 			// Wider layout for images.
 			
-			{let $width: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
+			{let $widthlg: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
+			{let $widthsm: $results.meta.resultsLayout == 'image' ? '12' : '12' /}
 			
-			<div class="col-xs-{$width} col-sm-{$width} col-md-{$width} col-lg-{$width} gsearch-results 
+			<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-results 
 				gsearch-centered" id="{$portletNamespace}SearchResults">
 	
 				// Query suggestions.
