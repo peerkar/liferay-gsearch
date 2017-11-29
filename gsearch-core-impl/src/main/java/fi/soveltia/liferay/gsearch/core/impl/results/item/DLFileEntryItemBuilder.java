@@ -77,6 +77,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 		String mimeType =  _document.get("mimeType");
 		
 		// Format
+
 		metaData.put("format", translateMimetype(mimeType));
 		
 		// Size
@@ -168,39 +169,51 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 	protected String getTikaRawMetadataField(String key) throws Exception {
 
 		StringBundler sb = new StringBundler();
+		
 		sb.append("ddm__text__");
 		sb.append(String.valueOf(getTikaRawStructureId()));
 		sb.append("__TIFF_IMAGE_");
 		sb.append(key);
 		sb.append("_");
 		sb.append(_locale.toString());
-		sb.append("_sortable");
-		
+
 		return sb.toString();
 	}
 	
 	/**
 	 * Get the id for structure holding image metadata ("TIKARAWMETADATA")
 	 * 
+	 * Using static map here to reduce DB queries.
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	protected long getTikaRawStructureId() throws Exception{
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
+
+		long companyId = themeDisplay.getCompanyId();
 		
-		if (TIKARAW_STRUCTURE_ID == null) {
+		if (TIKARAW_STRUCTURE_ID_MAP == null || TIKARAW_STRUCTURE_ID_MAP.get(companyId) == null) {
 
 			DynamicQuery structureQuery = _ddmStructureLocalService.dynamicQuery();
 			structureQuery.add(
 				RestrictionsFactoryUtil.eq("structureKey", "TIKARAWMETADATA"));
+			structureQuery.add(
+				RestrictionsFactoryUtil.eq("companyId", companyId));
 
 			List<DDMStructure> structures =
 							DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
 						
 			DDMStructure structure =  structures.get(0);
-			
-			TIKARAW_STRUCTURE_ID = structure.getStructureId();
+
+			TIKARAW_STRUCTURE_ID_MAP = new HashMap<Long, Long>();
+
+			TIKARAW_STRUCTURE_ID_MAP.put(companyId, structure.getStructureId());
+
 		}
-		return TIKARAW_STRUCTURE_ID;
+		
+		return TIKARAW_STRUCTURE_ID_MAP.get(companyId);
 	}
 	
 	protected final static String MIMETYPE_WORD = "application_vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -210,7 +223,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 	protected static final long KBYTES = 1024;
 	protected static final long MBYTES = 1024 * 1024;
 	
-	protected static Long TIKARAW_STRUCTURE_ID = null;
+	protected Map<Long, Long> TIKARAW_STRUCTURE_ID_MAP = null;
 
 	@Reference(unbind = "-")
 	protected void setDDMStructureLocalService(

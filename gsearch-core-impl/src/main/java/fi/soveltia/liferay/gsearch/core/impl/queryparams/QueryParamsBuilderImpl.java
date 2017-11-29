@@ -377,8 +377,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			sort1 = new Sort(fieldName, fieldType, reverse);		
 		}
 		
-		System.out.println(fieldName);
-		
 		// Set secondary sort. Use score or modified.
 		
 		if (fieldName == null) {
