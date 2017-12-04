@@ -54,6 +54,8 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 
 This application requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
+Some of the features require the custom Elasticsearch adapter.
+
 If you are interested to get this to work with CE, please take a look at the FAQ below.
 
 # About Project Modules
@@ -71,7 +73,7 @@ This module contains contains the extension for portal search API's StringQuery 
 UI module written using SOY & Metal.js.
 
 ## gsearch-elasticsearch-adapter
-A custom Elasticsearch adapter which fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
+A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
 
@@ -117,7 +119,7 @@ You can uninstall the Elasticsearch adapter from control panel apps management o
 ```
 After that you can deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier. Please see again from Gogo shell that it's deployed properly. 
 
-# Configuration
+# Step 3 - Configuration
 
 After succesfully deploying the modules, you have to configure the portlet. There's no automagic here ; it doesn't work otherwise. There are quite a few options available but at minimum, you have to configure the Asset Publisher page and add JSON configurations. Steps:
 
@@ -125,6 +127,54 @@ After succesfully deploying the modules, you have to configure the portlet. Ther
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
 3. Configure the mappings below:
 
+## Suggester Sample Configuration
+
+If you don't want to use the custom Elasticsearch adapter (loosing much of the suggester functionalities), please use the settings below:
+
+
+```
+[
+	{
+		"suggesterName": "phrase",
+		"suggesterType": "phrase",
+		"fieldPrefix": "keywordSearch_",
+		"fieldSuffix": "",
+		"isLocalized": true,
+		"numberOfSuggestions":  5,
+		"confidence": "0.1f",
+		"gramSize": "2",
+		"maxErrors": "2.0f",
+		"realWordErrorLikelihood": "0.95f"
+	}
+]	
+```
+
+If you want to use the custom Elasticsearch adapter, please use this one:
+
+```
+[
+	{
+		"suggesterName": "phrase",
+		"suggesterType": "phrase",
+		"fieldPrefix": "keywordSearch_",
+		"fieldSuffix": ".ngram",
+		"isLocalized": true,
+		"numberOfSuggestions":  5,
+		"confidence": "0.1f",
+		"gramSize": "2",
+		"maxErrors": "2.0f",
+		"realWordErrorLikelihood": "0.95f"
+	},
+	{
+		"suggesterName": "completion",
+		"suggesterType": "completion",
+		"fieldPrefix": "keywordSearch_",
+		"fieldSuffix": ".suggest",
+		"isLocalized": true,
+		"numberOfSuggestions":  5
+	}
+]	
+```
 
 ## Search types Sample Configuration
 
@@ -268,9 +318,73 @@ After succesfully deploying the modules, you have to configure the portlet. Ther
 	}
 ]
 ```
-## Enabling Audience Targeting
+
+## Step 4 - Updating Suggester mapping
+
+If you are not using the custom Elasticsearch adapter, you can skip this one. Otherwise create querySuggestion mapping.
+
+Please change the index name in the sample (liferay-20116) to correspond to your company id. 
+
+Please also note that this mapping chnage might fail if you have already suggestions in the index. The best way is to do this right after reindexing.
+
+```
+curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
+{
+		"dynamic_templates": [
+			{
+				"template_keywordSearch": {
+					"mapping": {
+						"type": "string",
+						"fields": {
+							"ngram": {
+								"type": "string",
+			          "search_analyzer": "standard",
+								"analyzer": "gsearch_shingle_analyzer"
+							},
+							"suggest" : {
+								"type" : "completion",
+								"analyzer" : "simple",
+								"search_analyzer" : "simple"
+							}
+						}
+					},
+					"match": "keywordSearch_*",
+					"match_mapping_type": "string"
+				}
+			}
+		],
+		"properties": {
+			"companyId": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			},
+			"groupId": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			},
+			"priority": {
+				"index": "not_analyzed",
+				"type": "float"
+			},
+			"uid": {
+				"index": "not_analyzed",
+				"store": "yes",
+				"type": "string"
+			}
+		}
+	}
+}'
+```
+
+## Step 6 - Enabling Audience Targeting
 
 There are just two things to do: in the configuration, enable Audience Targeting and set the boost factor for the contents matching to user's user segments. Create test segments & contents having those segments and play with the boost to see, how it affects the relevancy.
+
+## Step 7 - Reindex
+
+And you are ready.
 
 # Important Note About Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
@@ -359,7 +473,7 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 * Keywords suggester / autocomplete refactoring:
 	* UI component changed from Metal.js to Devbridge Autocomplete
 	* Suggester configuration changed to a JSON string
-	* Using aggregate suggester by default now
+	* Switched to aggregate suggester by default now
 	* Added configuration for the completion type suggest field
 	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
 	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
