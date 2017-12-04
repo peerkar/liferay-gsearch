@@ -327,7 +327,7 @@ If you are not using the custom Elasticsearch adapter, you can skip this one. Ot
 
 Please change the index name in the sample (liferay-20116) to correspond to your company id. 
 
-Please also note that this mapping chnage might fail if you have already suggestions in the index. The best way is to do this right after reindexing.
+Please also note that this mapping change might fail if you have already suggestions in the index. The best way is to do this right after reindexing.
 
 ```
 curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
@@ -380,11 +380,11 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 }'
 ```
 
-## Step 6 - Enabling Audience Targeting
+## Step 5 - Enabling Audience Targeting
 
 There are just two things to do: in the configuration, enable Audience Targeting and set the boost factor for the contents matching to user's user segments. Create test segments & contents having those segments and play with the boost to see, how it affects the relevancy.
 
-## Step 7 - Reindex
+## Step 6 - Reindex
 
 And you are ready.
 
