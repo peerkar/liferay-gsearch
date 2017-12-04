@@ -4,7 +4,12 @@ import com.liferay.content.targeting.service.UserSegmentLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.TermQuery;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 
 import java.util.Map;
 
@@ -31,7 +36,7 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 public class CTQueryBuilderImpl implements CTQueryBuilder {
 
 	@Override
-	public String buildCTQuery(
+	public BooleanQuery buildCTQuery(
 		PortletRequest portletRequest)
 		throws Exception {
 
@@ -45,25 +50,19 @@ public class CTQueryBuilderImpl implements CTQueryBuilder {
 			_log.debug("Found " + userSegmentIds.length + " user segments.");
 		}
 
-		StringBundler sb = new StringBundler();
+		BooleanQuery query = new BooleanQueryImpl();
 		
-		sb.append("AND (");
-
 		for (int i = 0; i < userSegmentIds.length; i++) {
 
 			long ctCategoryId = _userSegmentLocalService.getUserSegment(userSegmentIds[i]).getAssetCategoryId();
-						
-			if (i > 0) {
-				sb.append(" OR ");
-			}
-			sb.append("assetCategoryIds:");
-			sb.append(String.valueOf(ctCategoryId));
-			sb.append("^");
-			sb.append(_gSearchConfiguration.audienceTargetingBoost());
+
+			TermQuery condition = new TermQueryImpl(Field.ASSET_CATEGORY_IDS, String.valueOf(ctCategoryId)); 
+			query.add(condition, BooleanClauseOccur.SHOULD);
 		}
-		sb.append(" OR *)");
 				
-		return sb.toString();
+		query.setBoost(_gSearchConfiguration.audienceTargetingBoost());
+
+		return query;
 	}
 	
 

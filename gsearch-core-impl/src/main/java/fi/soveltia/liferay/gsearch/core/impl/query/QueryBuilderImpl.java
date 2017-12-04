@@ -101,10 +101,10 @@ public class QueryBuilderImpl implements QueryBuilder {
 		
 		if (_gSearchConfiguration.enableAudienceTargeting()) {
 		
-			String ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
+			BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
 	
 			if (ctQuery != null) {
-				searchPhrase.append(" ").append(ctQuery);
+				query.add(ctQuery, BooleanClauseOccur.SHOULD);
 			}
 		}		
 		

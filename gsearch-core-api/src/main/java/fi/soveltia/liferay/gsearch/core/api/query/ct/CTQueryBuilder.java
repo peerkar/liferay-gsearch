@@ -1,6 +1,8 @@
 
 package fi.soveltia.liferay.gsearch.core.api.query.ct;
 
+import com.liferay.portal.kernel.search.BooleanQuery;
+
 import javax.portlet.PortletRequest;
 
 /**
@@ -14,9 +16,9 @@ public interface CTQueryBuilder {
 	 * Build query.
 	 * 
 	 * @param portletRequest
-	 * @return string
+	 * @return BooleanQuery
 	 * @throws Exception
 	 */
-	public String buildCTQuery(PortletRequest portletRequest)
+	public BooleanQuery buildCTQuery(PortletRequest portletRequest)
 		throws Exception;
 }
