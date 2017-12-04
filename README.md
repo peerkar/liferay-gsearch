@@ -19,7 +19,7 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 * 3 selectable search result layouts (image card layout available for files / image)
 * Sortable search results (not available in default Liferay search)
 * Bookmarkable searches with short urls which can easily be collected to Google Analytics
-* Autocompletion & query suggestions
+* Autocompletion using aggregate query suggestions (phrase and completion suggesters)
 * Automatic alternate search 
 * Support for Boolean operators and Lucene syntax
 * Configurables:
@@ -76,6 +76,8 @@ UI module written using SOY & Metal.js.
 A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
+Yes, there are quite many steps in installing this but it'll pay off in the end :)
+
 
 ## Step 1 / Option 1 (The Easy Way)
 
@@ -119,7 +121,7 @@ You can uninstall the Elasticsearch adapter from control panel apps management o
 ```
 After that you can deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier. Please see again from Gogo shell that it's deployed properly. 
 
-# Step 3 - Configuration
+## Step 3 - Configuration
 
 After succesfully deploying the modules, you have to configure the portlet. There's no automagic here ; it doesn't work otherwise. There are quite a few options available but at minimum, you have to configure the Asset Publisher page and add JSON configurations. Steps:
 
@@ -127,7 +129,7 @@ After succesfully deploying the modules, you have to configure the portlet. Ther
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
 3. Configure the mappings below:
 
-## Suggester Sample Configuration
+### Step 3.1 - Suggester Sample Configuration
 
 If you don't want to use the custom Elasticsearch adapter (loosing much of the suggester functionalities), please use the settings below:
 
@@ -176,7 +178,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]	
 ```
 
-## Search types Sample Configuration
+### Step 3.2 - Search types Sample Configuration
 
 ```
 [
@@ -207,7 +209,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]
 ```
 
-## Facets Sample configuration
+### Step 3.3 -  Facets Sample configuration
 ```
 [
 	{
@@ -267,7 +269,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]
 ```
 
-## Sortfields Sample Configuration
+### Step 3.4 -  Sortfields Sample Configuration
 
 ```
 [
@@ -295,7 +297,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]	
 ```
 
-## Search Fields Sample Configuration
+### Step 3.5 Search Fields Sample Configuration
 ```
 [
 {
