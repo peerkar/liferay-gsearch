@@ -65,36 +65,13 @@ public interface GSearchConfiguration {
 	public int autoCompleteRequestDelay();	
 	
 	@Meta.AD(
-		deflt = "5", 
-	    name = "autocomplete-max-suggestions-name",
+		deflt = "[Please get the default configuration from project README page.",
+		description = "suggest-configuration-desc",
+	    name = "suggest-configuration-name",
 		required = false
 	)
-	public int keywordSuggestionsMax();
+	public String suggestConfiguration();
 
-	@Meta.AD(
-		deflt = "0.95", 
-		description = "keyword-suggestions-error-likelihood-desc",
-	    name = "keyword-suggestions-error-likelihood-name",
-		required = false
-	)
-	public float keywordSuggestionsRealWordErrorLikelihood();
-	
-	@Meta.AD(
-		deflt = "2.0", 
-		description = "keyword-suggestions-max-errors-desc",
-	    name = "keyword-suggestions-max-errors-name",
-		required = false
-	)
-	public float keywordSuggestionsMaxErrors();
-
-	@Meta.AD(
-		deflt = "0.01f", 
-	    description = "keyword-suggestions-confidence-desc",
-	    name= "keyword-suggestions-confidence-name",
-		required = false
-	)
-	public float keywordSuggestionsConfidence();
-		
 	@Meta.AD(
 		deflt = "true", 
 	    description = "enable-query-suggestions-name-desc",

@@ -4,6 +4,8 @@ import core from 'metal/src/core';
 import Ajax from 'metal-ajax/src/Ajax';
 import MultiMap from 'metal-multimap/src/MultiMap';
 
+import devbridgeAutocomplete from '../js/DevbridgeAutocomplete.es';  
+
 import GSearchUtils from '../js/GSearchUtils.es';
 import GSearchAutocomplete from '../js/GSearchAutocomplete.es';
 
@@ -90,23 +92,37 @@ class GSearchField extends Component {
 	 * Init autocomplete / suggester.
 	 */
 	initAutocomplete() {
-		
+
 		let _self = this;
-		
-		let autocomplete = new GSearchAutocomplete ({
-			elementClasses: 'gsearch-autocomplete-list',
-			inputElement:document.querySelector('#' + this.portletNamespace + 'SearchField'),
-			data: function(keywords) {
-				if (keywords.length >= _self.queryMinLength &&
-						!_self.isSuggesting && keywords.slice(-1) != ' ') {
-					return _self.getSuggestions(keywords);
-				} else {
-					return;
-				}
-			},
-			select: function(keywords, event) {
-				$('#' + _self.portletNamespace + 'SearchField').val(keywords.text);
-			}
+		 
+		$('#' + this.portletNamespace + 'SearchField').devbridgeAutocomplete({
+			dataType: 'json',
+			deferRequestBy: _self.autoCompleteRequestDelay,
+			minChars: _self.queryMinLength,
+			noCache: true,
+		    onSelect: function (suggestion) {
+		    	this.setQueryParam("q", keywords, true);		    	
+		    },
+			paramName: 'q',
+			serviceUrl: _self.suggestionsURL,
+			transformResult: function(response) {
+				console.log("transform");
+				console.log(response);
+    			if (response) {
+				    return {
+	    				suggestions: $.map(response, function(item) {
+				    		return {
+				    			value: item, 
+				    			data: item
+				    		};
+				        })
+				    };
+    			} else {
+    				return {
+    					suggestions: []
+    				}
+	    		}
+			}		
 		});
 	}
 		
@@ -129,10 +145,6 @@ class GSearchField extends Component {
 	 */
 	getSuggestions(keywords) {
 
-		// Set this flag to control concurrent suggest requests (delay between requests).
-		
-		this.isSuggesting = true;
-		
 		let _self = this;
 		
 		let params = new MultiMap();
@@ -149,30 +161,14 @@ class GSearchField extends Component {
 		).then((response) => {
 				let suggestions = JSON.parse(response.responseText);
 
-				_self.releaseSuggesting();
-
 				return suggestions;
 
 		}).catch(function(error) {
 
-			_self.releaseSuggesting();
-
 			console.log(error);
 		});
 	}
-	
-	/**
-	 * Release isSuggesting flag.
-	 */
-	releaseSuggesting() {	
-		
-		let _self = this;
-		
-		setTimeout(function(){
-			_self.isSuggesting = false;
-		}, this.autoCompleteRequestDelay);	
-	}	
-	
+
 	/**
 	 * Set click events.
 	 */
@@ -243,9 +239,6 @@ class GSearchField extends Component {
  * @static
  */
 GSearchField.STATE = {
-	isSuggesting: {
-		value: false
-	},
 	getQueryParam: {
 		validator: core.isFunction
 	},

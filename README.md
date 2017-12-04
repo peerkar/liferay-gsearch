@@ -340,6 +340,7 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
+
 # Roadmap
 Upcoming:
 
@@ -351,4 +352,17 @@ Thanks to Tony Tawk for the Arabic translation!
 # Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
+# Changelog
 
+## 2017-12-4
+
+* Keywords suggester / autocomplete refactoring:
+	* UI component changed from Metal.js to Devbridge Autocomplete
+	* Suggester configuration changed to a JSON string
+	* Using aggregate suggester by default now
+	* Added configuration for the completion type suggest field
+	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
+	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
+	* Added querySuggestion type mapping to custom Elasticsearch adapter project, in keyword-query-type-mapping.json
+
+	

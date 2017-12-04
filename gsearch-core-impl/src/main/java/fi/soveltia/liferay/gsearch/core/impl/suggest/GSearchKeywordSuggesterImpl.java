@@ -4,10 +4,12 @@ package fi.soveltia.liferay.gsearch.core.impl.suggest;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.suggest.AggregateSuggester;
+import com.liferay.portal.kernel.search.suggest.CompletionSuggester;
 import com.liferay.portal.kernel.search.suggest.PhraseSuggester;
 import com.liferay.portal.kernel.search.suggest.QuerySuggester;
 import com.liferay.portal.kernel.search.suggest.Suggester;
@@ -15,13 +17,16 @@ import com.liferay.portal.kernel.search.suggest.SuggesterResult;
 import com.liferay.portal.kernel.search.suggest.SuggesterResult.Entry;
 import com.liferay.portal.kernel.search.suggest.SuggesterResult.Entry.Option;
 import com.liferay.portal.kernel.search.suggest.SuggesterResults;
-import com.liferay.portal.kernel.search.suggest.TermSuggester;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
@@ -87,42 +92,72 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
+		
+		String keywords =
+						ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
 
+		AggregateSuggester aggregateSuggester =
+						new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
+
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.suggestConfiguration());
+		
+		for (int i = 0; i < configurationArray.length(); i++) {
+			
+			JSONObject item = configurationArray.getJSONObject(i);
+		
+			String suggesterType = item.getString("suggesterType");
+
+			Suggester suggester = null;
+			if ("phrase".equals(suggesterType)) {
+				suggester = getPhraseSuggester(item, locale, keywords);
+				
+			} else if ("completion".equals(suggesterType)) {
+				suggester = getCompletionSuggester(item, locale, keywords);
+			}
+
+			if (suggester != null) {
+				aggregateSuggester.addSuggester(suggester);
+			}
+		}
+		
 		// Create searchcontext.
 
 		SearchContext searchContext = new SearchContext();
 		searchContext.setCompanyId(themeDisplay.getCompanyId());
 
-		String keywords =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
-
-		String suggestionField =
-			"keywordSearch_" + themeDisplay.getLanguageId();
-
-		Suggester suggester = getPhraseSuggester(
-			suggestionField, keywords);
-
 		// Build results JSON object.
 
 		List<String>suggestions = new ArrayList<String>();
 		
-		SuggesterResults suggesterResults =
-			_querySuggester.suggest(searchContext, suggester);
+		SuggesterResults suggesters =
+			_querySuggester.suggest(searchContext, aggregateSuggester);
 
-		SuggesterResult suggesterResult =
-			suggesterResults.getSuggesterResult(suggester.getName());
+		Collection<SuggesterResult> suggesterResults =
+						suggesters.getSuggesterResults();
 
-		if (suggesterResult != null) {
+		if (suggesterResults != null) {
 
-			for (Entry entry : suggesterResult.getEntries()) {
+			_log.info(suggesterResults.size());
 
-				for (Option option : entry.getOptions()) {
 
-					if (_log.isDebugEnabled()) {
-						_log.debug("Adding suggestion:" + option.getText());
+			for (SuggesterResult suggesterResult : suggesterResults) {
+
+				_log.info(suggesterResults.size());
+
+				for (Entry entry : suggesterResult.getEntries()) {
+	
+					for (Option option : entry.getOptions()) {
+	
+						if (_log.isDebugEnabled()) {
+							_log.debug("Adding suggestion:" + option.getText());
+						}
+	
+						if (!suggestions.contains(option.getText())) {
+							suggestions.add(option.getText());
+						}
 					}
-
-					suggestions.add(option.getText());
 				}
 			}
 		}
@@ -130,73 +165,79 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	}
 
 	/**
-	 * Get aggregate suggester.
+	 * Get completion suggester
 	 * 
-	 * @param GSearchConfiguration
-	 * @param suggestionField
+	 * @param configuration
+	 * @param locale
 	 * @param keywords
 	 * @return
+	 * @throws Exception
 	 */
-	protected Suggester getAggregateSuggester(
-		GSearchConfiguration GSearchConfiguration,
-		String suggestionField, String keywords) {
+	protected Suggester getCompletionSuggester(
+		JSONObject configuration, Locale locale, String keywords) throws Exception {
 
-		AggregateSuggester suggester =
-			new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
+		StringBundler sb = new StringBundler();
 
-		suggester.addSuggester(
-			getTermSuggester(
-				GSearchConfiguration, suggestionField, keywords));
+		sb.append(configuration.getString("fieldPrefix"));
+
+		if (configuration.getBoolean(("isLocalized"))) {
+			sb.append(locale.toString());
+		}
+		sb.append(configuration.getString("fieldSuffix"));
+		
+		CompletionSuggester suggester = new CompletionSuggester(
+			configuration.getString("suggesterName"), sb.toString(), keywords);
+		
+		suggester.setSize(configuration.getInt("numberOfSuggestions"));
+		
+		String analyzer = configuration.getString("analyzer");
+
+		if (analyzer != null) {
+			suggester.setAnalyzer(analyzer);
+		}
 
 		return suggester;
 	}
-
+	
 	/**
 	 * Get phrase suggester.
 	 * 
-	 * @param suggestionField
+	 * @param configuration
+	 * @param locale
 	 * @param keywords
 	 * @return
+	 * @throws Exception
 	 */
 	protected Suggester getPhraseSuggester(
-		String suggestionField, String keywords) {
+		JSONObject configuration, Locale locale, String keywords) throws Exception {
+		
+		StringBundler sb = new StringBundler();
 
+		sb.append(configuration.getString("fieldPrefix"));
+
+		if (configuration.getBoolean(("isLocalized"))) {
+			sb.append(locale.toString());
+		}
+		sb.append(configuration.getString("fieldSuffix"));
+		
 		PhraseSuggester suggester = new PhraseSuggester(
-			GSEARCH_SUGGESTION_NAME, suggestionField, keywords);
+			configuration.getString("suggesterName"), sb.toString(), keywords);
+	
+		
+		int size = GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
+		suggester.setSize(size);
+		
+		float confidence = GetterUtil.getFloat(configuration.get("confidence"), 0.1f);
+		suggester.setConfidence(confidence);
 
-		// These are the most important parameter when tuning how easily to
-		// triger showing suggestion
-		// Please see the elasticsearch documentation for more information.
+		int gramSize = GetterUtil.getInteger(configuration.get("gramSize"), 2);
+		suggester.setGramSize(gramSize);
 
-		suggester.setRealWordErrorLikelihood(
-			_gSearchConfiguration.keywordSuggestionsRealWordErrorLikelihood());
-		suggester.setMaxErrors(
-			_gSearchConfiguration.keywordSuggestionsMaxErrors());
-		suggester.setSize(_gSearchConfiguration.keywordSuggestionsMax());
-		suggester.setConfidence(
-			_gSearchConfiguration.keywordSuggestionsConfidence());
+		float maxErrors = GetterUtil.getFloat(configuration.get("maxErrors"), 2.0f);
+		suggester.setMaxErrors(maxErrors);
 
-		return suggester;
-	}
-
-	/**
-	 * Get term suggester.
-	 * 
-	 * @param GSearchConfiguration
-	 * @param suggestionField
-	 * @param keywords
-	 * @return
-	 */
-	protected Suggester getTermSuggester(
-		GSearchConfiguration GSearchConfiguration,
-		String suggestionField, String keywords) {
-
-		// Termsuggester example.
-		// There are quite a few options to set for the suggester
-		// but this is here only serving as a baseline.
-
-		TermSuggester suggester = new TermSuggester(
-			GSEARCH_SUGGESTION_NAME, suggestionField, keywords);
+		float realWordErrorLikelihood = GetterUtil.getFloat(configuration.get("realWordErrorLikelihood"), 0.95f);
+		suggester.setRealWordErrorLikelihood(realWordErrorLikelihood);
 
 		return suggester;
 	}
