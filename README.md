@@ -451,10 +451,10 @@ Things to know about the fields:
 
 
 ## How Do I Connect a Search Field in a Theme to This Portlet?
-That's easy. Just put there a form / field and link it to the page, you previously put the GSearch portlet. You can find the parameter list in the source code but only q parameter is required.
+That's easy. Just create a search form and make to link/submit (GET) to the page having the search portlet. You can find the parameter list in the source code but only required parameter is "q", having the keywords.
 
 
-## Can I Use This With and Embedded Elasticsearch Server
+## Can I Use This With an Embedded Elasticsearch Server
 If you don't want to use the custom Elasticsearch adapter, you can run this also with an embedded server. However not only the custom adapter brings a lot of extra value to this search portlet, but it makes debugging and tweaking easy or in some cases, even possible. Please remember that using embedded server is not supported option in a production environment anyways.
 
 Installation instructions are [here](https://dev.liferay.com/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch).
