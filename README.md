@@ -127,7 +127,7 @@ After succesfully deploying the modules there are some configuration stest that 
 
 ### Step 3.1 - Configure Asset Publisher Page
 
-1. Create a page and put there an Asset Publisher portlet to show any contents that are not boud to any layout (page). By default this pages' friendlyUrl should be "/viewasset". Typically, you would configure this page to be hidden from navigation menu.
+1. Create a page and put there an Asset Publisher portlet to show any contents that are not bound to any layout (page). By default this pages' friendlyUrl should be "/viewasset". Typically, you would configure this page to be hidden from navigation menu.
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
 
 ### Step 3.2 - Suggester Sample Configuration
@@ -383,7 +383,7 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 
 ## Step 5 - Enabling Audience Targeting
 
-There are just two things to do: in the configuration, enable Audience Targeting and set the boost factor for the contents matching to user's user segments. Create test segments & contents having those segments and play with the boost to see, how it affects the relevancy.
+Installing Audience Targeting plugin is mandatory for this portlet whether you plan to use the feature or not. After installing the plugin there are two things to do: in the configuration, enable Audience Targeting and set the boost factor for the contents matching to user's user segments. Create test segments & contents having those segments and play with the boost to see, how it affects the relevancy.
 
 ## Step 6 - Reindex
 
