@@ -397,9 +397,13 @@ This is how Liferay works at least currently. This issue will be revisited later
 # FAQ
 
 ## Does This Work on CE
-It's not tested but bascially, the only thing preventing this to work on CE is the dependency to a new version of Soy bridge. You can downgrade that dependency in the web modules build.gradle and see if it works. 
 
-Also please note that you cannot use the Audience Targeting -feature (in configuration), as it's not available in CE. 
+It's not tested but basically there are two things preventing this to work on CE: new version of Soy bridge and Audience Targeting plugin dependency. You can however remove these barriers fairly easy:
+
+* Downgrade the Soy bridge dependency in the web module's build.gradle, rebuild  and see if it works. Other way around, you can also try to upgrade the bridge to the portal instance. 
+* Remove Audience Targeting dependencies from build.gradle and in the gsearch-core-impl, remove the CTQueryBuilderImpl.java class and modify QueryBuilderImpl.java not to use the before mentioned class. Rebuild.
+
+If you need help with creating a CE compatible version, please create a ticket.
 
 ## Do I Have to Use the Custom Search Adapter?
 No you don't but you loose the goodies of search field configuration as they won't work without.
