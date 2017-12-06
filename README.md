@@ -394,7 +394,7 @@ Search result permissions rely currently on three fields in the indexed document
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
  
-#FAQ
+# FAQ
 
 ## Does This Work on CE
 It's not tested but bascially, the only thing preventing this to work on CE is the dependency to a new version of Soy bridge. You can downgrade that dependency in the web modules build.gradle and see if it works. 
