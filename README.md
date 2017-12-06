@@ -406,7 +406,7 @@ It's not tested but basically there are two things preventing this to work on CE
 If you need help with creating a CE compatible version, please create a ticket.
 
 ## Do I Have to Use the Custom Search Adapter?
-No you don't but you loose the goodies of search field configuration as they won't work without.
+No you don't but then you loose the possibility to fine tune search field configuration and their boosts as well as a much better autocompletion / keyword suggester functionality.
 
 ## How Does the Suggester Work?
 The suggester works by storing succesfull search keywords/phrases and offering them as autocompletion options. That's the way Google works, too.
