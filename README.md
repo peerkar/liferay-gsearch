@@ -54,14 +54,14 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 
 This application requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
-Some of the features require the custom Elasticsearch adapter.
+Some of the features require the custom Elasticsearch adapter. If you plan to use that, please also install a standalone Elasticsearch server to be able to configure custom mappings. Installing a standalone server is anyways recommended.
 
 If you are interested to get this to work with CE, please take a look at the FAQ below.
 
 # About Project Modules
 
 ## gsearch-core-api
-API module for the search backend logic.
+API module for the backend logic.
 
 ## gsearch-core-impl
 Implementation module for the backend logic.
@@ -76,12 +76,12 @@ UI module written using SOY & Metal.js.
 A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
-Yes, there are quite many steps in installing this but it'll pay off in the end :)
+There are quite many steps in installing this but it'll pay off in the end :)
 
 
 ## Step 1 / Option 1 (The Easy Way)
 
-Download the latest jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy all but the custom search adapter (Step 2). Before this, please see the requirements and after deploying, please see that all the modules have been properly activated. The modules to install are:
+Download the latest jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy all but the custom search adapter (Step 2). The modules to install are:
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
@@ -110,7 +110,7 @@ If you need to build the Elasticsearch adapter please see (this repository)[http
 
 ## Step 2 - Installing the Custom Elasticsearch Adapter
 
-This is not mandatory but if you want to use the custom search adapter and take all the advantages of it (search field configuration), especially affecting relevancy, you have to uninstall the standard search adapter. Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search won't work.
+This is not mandatory but if you want to use the custom search adapter and take all the advantages of it, especially affecting relevancy and keywords suggester, you have to uninstall the standard search adapter and use this one. Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search just won't work.
 
 You can uninstall the Elasticsearch adapter from control panel apps management or, preferably, from Gogo shell:
 
@@ -123,13 +123,14 @@ After that you can deploy the custom adapter (com.liferay.portal.search.elastics
 
 ## Step 3 - Configuration
 
-After succesfully deploying the modules, you have to configure the portlet. There's no automagic here ; it doesn't work otherwise. There are quite a few options available but at minimum, you have to configure the Asset Publisher page and add JSON configurations. Steps:
+After succesfully deploying the modules there are some configuration stest that has to be made to get the portlet to work. Portlet configuration can be found in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration. Below are the mandatory steps. 
 
-1. Create a page and put there an Asset Publisher portlet to show any contents that are not boud to any layout (page). By default this pages' friendlyUrl should be viewasset. Typically, you would configure this page to be hidden from navigation menu.
+### Step 3.1 - Configure Asset Publisher Page
+
+1. Create a page and put there an Asset Publisher portlet to show any contents that are not boud to any layout (page). By default this pages' friendlyUrl should be "/viewasset". Typically, you would configure this page to be hidden from navigation menu.
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
-3. Configure the mappings below:
 
-### Step 3.1 - Suggester Sample Configuration
+### Step 3.2 - Suggester Sample Configuration
 
 If you don't want to use the custom Elasticsearch adapter (loosing much of the suggester functionalities), please use the settings below:
 
@@ -178,7 +179,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]	
 ```
 
-### Step 3.2 - Search types Sample Configuration
+### Step 3.3 - Search types Sample Configuration
 
 ```
 [
@@ -209,7 +210,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]
 ```
 
-### Step 3.3 -  Facets Sample configuration
+### Step 3.4 -  Facets Sample configuration
 ```
 [
 	{
@@ -269,7 +270,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]
 ```
 
-### Step 3.4 -  Sortfields Sample Configuration
+### Step 3.5 -  Sortfields Sample Configuration
 
 ```
 [
@@ -297,7 +298,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]	
 ```
 
-### Step 3.5 Search Fields Sample Configuration
+### Step 3.6 Search Fields Sample Configuration
 ```
 [
 {
@@ -323,7 +324,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 
 ## Step 4 - Updating Suggester mapping
 
-If you are not using the custom Elasticsearch adapter, you can skip this one. Otherwise create querySuggestion mapping.
+If you are not using the custom Elasticsearch adapter, you can skip this one. Otherwise create querySuggestion mapping from command line using CURL (or using Kibana). If the command succeeds, you should get an "acknowledged" output from the script.
 
 Please change the index name in the sample (liferay-20116) to correspond to your company id. 
 
@@ -403,6 +404,13 @@ Also please note that you cannot use the Audience Targeting -feature (in configu
 ## Do I Have to Use the Custom Search Adapter?
 No you don't but you loose the goodies of search field configuration as they won't work without.
 
+## How Does the Suggester Work?
+The suggester works by storing succesfull search keywords/phrases and offering them as autocompletion options. That's the way Google works, too.
+
+Obviously, after installing there are no stored queries, so you have to teach the suggester to make it offer opions. Have also a look at the configuration options.
+
+Remember that search phrases are not persisted but are index time only. If you reindex, the options have to be rebuilt again. 
+
 ## How Can I Make Non-Liferay Assets Findable in Index
 To get this portlet to find "external" assets in the Liferay index you have to index those assets to that portal company's index, you want them to be findable at. It's possible to spread the search across multiple indexes but that would require some more customization of the search adapter.
 
@@ -445,8 +453,8 @@ Things to know about the fields:
 That's easy. Just put there a form / field and link it to the page, you previously put the GSearch portlet. You can find the parameter list in the source code but only q parameter is required.
 
 
-## Installing Elasticsearch Server
-For tweaking, debugging and monitoring purposes it's highly recommended to run this application against separate Elasticsearch server (i.e. not embedded mode).
+## Can I Use This With and Embedded Elasticsearch Server
+If you don't want to use the custom Elasticsearch adapter, you can run this also with an embedded server. However not only the custom adapter brings a lot of extra value to this search portlet, but it makes debugging and tweaking easy or in some cases, even possible. Please remember that using embedded server is not supported option in a production environment anyways.
 
 Installation instructions are [here](https://dev.liferay.com/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch).
 
@@ -479,6 +487,4 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 	* Added configuration for the completion type suggest field
 	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
 	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
-	* Added querySuggestion type mapping to custom Elasticsearch adapter project, in keyword-query-type-mapping.json
 
-	
