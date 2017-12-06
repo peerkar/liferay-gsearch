@@ -49,10 +49,8 @@ This project served many purposes for me. I wanted to experimenting with SOY & M
 
 # Requirements
 
-* Liferay DXP SP5 or minimum FP28
+* Liferay DXP SP5 or at least fixpack version 28
 * Audience Targeting Installed
-
-This application requires version 2.1.0 of the Soy portlet bridge. If you are using Liferay DXP service pack bundles, the minimum requirement is SP5.
 
 Some of the features require the custom Elasticsearch adapter. If you plan to use that, please also install a standalone Elasticsearch server to be able to configure custom mappings. Installing a standalone server is anyways recommended.
 
@@ -76,8 +74,7 @@ UI module written using SOY & Metal.js.
 A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 # Installation
-There are quite many steps in installing this but it'll pay off in the end :)
-
+There are quite many steps in installing this but it'll pay off in the end :) If you find the instructions insufficient or need more information, please leave a ticket and I'll do my best. 
 
 ## Step 1 / Option 1 (The Easy Way)
 
