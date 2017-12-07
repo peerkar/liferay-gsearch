@@ -106,9 +106,8 @@ class GSearchField extends Component {
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,
 			transformResult: function(response) {
-				console.log("transform");
-				console.log(response);
-    			if (response) {
+
+				if (response) {
 				    return {
 	    				suggestions: $.map(response, function(item) {
 				    		return {
