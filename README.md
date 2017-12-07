@@ -3,12 +3,9 @@
 This is the Google like search project for Liferay DXP. The code is originally created for the blog series:
 
  * [Part 1: Creating a google like search](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search)
- * [Part 2: Filter by structure and document type](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-ii-filter
--by-structure-and-document-type)
- * [Part 3: Autocompletion and suggestions](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iii-autocompleti
-on-suggestions)
- * [Part 4: Query tuning and Lucene syntax](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iv-query-tuning-
-and-lucene-syntax)
+ * [Part 2: Filter by structure and document type](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-ii-filter-by-structure-and-document-type)
+ * [Part 3: Autocompletion and suggestions](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iii-autocompletion-suggestions)
+ * [Part 4: Query tuning and Lucene syntax](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-iv-query-tuning-and-lucene-syntax)
  * [Part 5: Finale](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-v-finale)
 
 
@@ -113,7 +110,7 @@ If you want to build everything by yourself, you need to have:
 3. Do a Gradle refresh (in the context menu of Eclipse) for the modules directory
 4. Build and deploy to you Liferay (DXP) installation
 
-If you need to build the Elasticsearch adapter please see (this repository)[https://github.com/peerkar/gsearch-elasticsearch-adapter]
+If you need to build the Elasticsearch adapter please see [this repository](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
 ## Step 2 - Install the Custom Elasticsearch Adapter
 
