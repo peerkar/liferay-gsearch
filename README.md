@@ -536,4 +536,3 @@ Thanks to Tony Tawk for the Arabic translation!
 # Disclaimer
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and
  would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
-＀
