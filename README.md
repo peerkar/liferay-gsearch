@@ -143,12 +143,13 @@ There's then just one more thing to do:
 2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page frien
 dly URL" to the friendly of of the page you just created.
 
-
 You can find the sample configurations in the end of this documentation. 
 
-## Step 4 - Enable Audience Targeting
+## Step 4 - Install Audience Targeting Plugin
 
-Installing Audience Targeting plugin is mandatory for this portlet whether you plan to use the feature or not. After installing the plugin you have to enable it from portlet configuration. You can also adjust the boost factor there. Create test segments & contents having those segments and play with the boost to see, how it affects hits relevancy.
+Installing Audience Targeting plugin is currently mandatory for this portlet whether you plan to use the feature or not.
+
+Using audience targeting to boost search results of user's segment is disabled by default so if you choose to use it, you have to enable it in the portlet configuration. You can also adjust the boost factor there. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
 ## Step 5 - Update Suggester mapping
 
@@ -224,7 +225,7 @@ This is how Liferay works at least currently. This issue will be revisited later
  
 # FAQ
 
-## This Portlet Doesn't Returns the Same Results as the Standard Liferay Search Portlet?!
+## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
 That's right. By default this portlet targets the search only to title, description and content fields (with localization support) and not for example username, tags, categories etc. which I thought, are generally better suitable for secondary facet filtering. For example, if I want to find documents where my name is mentioned in the content, I don't want to get all the documents where I'm a document author (username field). In the portlet configuration however, you can configure the target fields and their boost factors without any restrictions to your likings.
 
