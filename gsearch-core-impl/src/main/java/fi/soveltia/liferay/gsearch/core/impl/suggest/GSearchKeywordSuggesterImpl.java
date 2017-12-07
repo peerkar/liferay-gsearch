@@ -130,7 +130,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		// Build results JSON object.
 
 		List<String>suggestions = new ArrayList<String>();
-		
+				
 		SuggesterResults suggesters =
 			_querySuggester.suggest(searchContext, aggregateSuggester);
 

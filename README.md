@@ -10,7 +10,7 @@ This is the Google like search project for Liferay DXP. The code is originally c
 
 
 # Background
-This project served many purposes for me. I wanted to experiment with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to have a highly configurable, alternative search portlet for Liferay having support for Boolean operators and Lucene syntax support and many other features currently missing in the standard search portlet, like autocompletion. I wanted to have a search portlet with better control over hits relevancy.
+This project served many purposes for me. I wanted to experiment with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to have a highly configurable, alternative search portlet for Liferay having support for Boolean operators and Lucene syntax and many other features currently missing in the standard search portlet, like autocompletion. I wanted to have a search portlet with better control over hits relevancy.
 
 # Features
 
@@ -224,9 +224,9 @@ This is how Liferay works at least currently. This issue will be revisited later
  
 # FAQ
 
-## This Portlet Returns Different Results than the Standard Search?!
+## This Portlet Doesn't Returns the Same Results as the Standard Liferay Search Portlet?!
 
-That's right. By default this portlet targets the search only to title, description and content fields (with localization support). In the portlet configuration however, you can configure it to target the search to any field you like.
+That's right. By default this portlet targets the search only to title, description and content fields (with localization support) and not for example username, tags, categories etc. which I thought, are generally better suitable for secondary facet filtering. For example, if I want to find documents where my name is mentioned in the content, I don't want to get all the documents where I'm a document author (username field). In the portlet configuration however, you can configure the target fields and their boost factors without any restrictions to your likings.
 
 ## Does This Work on CE?
 
