@@ -162,49 +162,48 @@ Please also note that this mapping change might fail if you have already suggest
 ```
 curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
 {
-		"dynamic_templates": [
-			{
-				"template_keywordSearch": {
-					"mapping": {
+	"dynamic_templates": [
+	{
+		"template_keywordSearch": {
+			"mapping": {
+				"type": "string",
+				"fields": {
+					"ngram": {
 						"type": "string",
-						"fields": {
-							"ngram": {
-								"type": "string",
-			          "search_analyzer": "standard",
-								"analyzer": "gsearch_shingle_analyzer"
-							},
-							"suggest" : {
-								"type" : "completion",
-								"analyzer" : "simple",
-								"search_analyzer" : "simple"
-							}
-						}
+					        "search_analyzer": "standard",
+						"analyzer": "gsearch_shingle_analyzer"
 					},
-					"match": "keywordSearch_*",
-					"match_mapping_type": "string"
+					"suggest" : {
+						"type" : "completion",
+						"analyzer" : "simple",
+						"search_analyzer" : "simple"
+					}
 				}
-			}
-		],
-		"properties": {
-			"companyId": {
-				"index": "not_analyzed",
-				"store": "yes",
-				"type": "string"
 			},
-			"groupId": {
-				"index": "not_analyzed",
-				"store": "yes",
-				"type": "string"
-			},
-			"priority": {
-				"index": "not_analyzed",
-				"type": "float"
-			},
-			"uid": {
-				"index": "not_analyzed",
-				"store": "yes",
-				"type": "string"
-			}
+			"match": "keywordSearch_*",
+			"match_mapping_type": "string"
+		}
+	}
+	],
+	"properties": {
+		"companyId": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
+		},
+		"groupId": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
+		},
+		"priority": {
+			"index": "not_analyzed",
+			"type": "float"
+		},
+		"uid": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
 		}
 	}
 }'
