@@ -52,7 +52,7 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 ## Mandatory
 
 * Liferay DXP SP5 or at least fixpack version 28
-* Audience Targeting plugn Installed
+* Audience Targeting plugin Installed
 
 ## Optional
 
@@ -209,9 +209,23 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 }'
 ```
 
-## Step 6 - Reindex
+## Step 6 - Reindex 
 
-And you are ready to go.
+If you were transitioning from embedded Elasticsearch server to standalone server, please reindex search indexes from Control panel -> Server Administration. 
+
+To be sure that index type mappings have been refreshed please aldo restart the portal and Elasticsearch server and you are ready to go.
+
+# Troubleshooting
+
+## Querysuggester Not Working
+
+This might happen at least of two reasons:
+
+ 1. You are not using the custom Elasticsearch adapter but are using the query suggester configuration for the custom adapter. Please check the configuration samples below in this document.
+ 2. querySuggestion type mapping has not been refreshed, probably because there was an existing one already. Please reindex and immediately after reindexing, run the CURL command from Step 5. 
+
+In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
+
 
 # Important Notes
 
