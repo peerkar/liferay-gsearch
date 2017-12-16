@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringBundler;
 
 import java.text.DateFormat;
@@ -25,6 +24,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
@@ -100,11 +101,17 @@ public class QueryBuilderImpl implements QueryBuilder {
 		// Content targeting
 		
 		if (_gSearchConfiguration.enableAudienceTargeting()) {
+			
+			if (_ctQueryBuilder == null) {
+				_log.error("Audience targeting is enable but the gsearch-audience-targeting module " +
+					"seems not to be installed.");
+			} else {
 		
-			BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
-	
-			if (ctQuery != null) {
-				query.add(ctQuery, BooleanClauseOccur.SHOULD);
+				BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
+		
+				if (ctQuery != null) {
+					query.add(ctQuery, BooleanClauseOccur.SHOULD);
+				}
 			}
 		}		
 		
@@ -147,17 +154,14 @@ public class QueryBuilderImpl implements QueryBuilder {
 		return query;
 	}	
 
-	@Reference(unbind = "-")
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "-"
+	)
 	protected void setCTQueryBuilder(CTQueryBuilder ctQueryBuilder) {
 
 		_ctQueryBuilder = ctQueryBuilder;
-	}
-
-	
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
-
-		_portal = portal;
 	}
 
 	@Reference(unbind = "-")
@@ -171,14 +175,9 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	protected volatile GSearchConfiguration _gSearchConfiguration;
 
-	@Reference
-	protected CTQueryBuilder _ctQueryBuilder;
+	private CTQueryBuilder _ctQueryBuilder;
 	
-	@Reference
-	protected Portal _portal;
-
-	@Reference
-	protected QueryFilterBuilder _queryFilterBuilder;
+	private QueryFilterBuilder _queryFilterBuilder;
 
 	@SuppressWarnings("unused")
 	private static final Log _log =
