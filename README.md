@@ -8,6 +8,7 @@
 1. [Requirements](#Requirements)
 1. [Project Modules](#Modules)
 1. [Installation](#Installation)
+1. [Enabling Audience Targeting support](#Audience_Targeting)
 1. [Sample Configurations](#Configurations)
 1. [Troubleshooting](#Troubleshooting)
 1. [Important Notes](#Important)
@@ -70,7 +71,6 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 ## Mandatory <a name="Requirements_Mandatory"></a>
 
 * Liferay DXP SP5 or at least fixpack version 28
-* Audience Targeting plugin Installed
 
 If you are interested to get this to work with CE, please take a look at the FAQ below.
 
@@ -93,6 +93,9 @@ This module contains contains the extension for portal search API's StringQuery 
 ## gsearch-web <a name="Modules_Web"></a>
 UI module written using SOY & Metal.js.
 
+## gsearch-audience-targeting <a name="Modules_Audience_Targeting"></a>
+Module enabling Audience Targeting support.
+
 ## gsearch-elasticsearch-adapter <a name="Modules_Adapter"></a>
 A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
 
@@ -105,7 +108,7 @@ If you are updating the modules, please remove the older versions from osgi/modu
 
 ### Option 1 (The Easy Way) 
 
-Download the latest jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy all but the custom search adapter (Step 2). The modules to install now are:
+Download followin jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
@@ -162,13 +165,7 @@ There's then just one more thing to do:
 
 You can find the sample configurations in the end of this documentation. 
 
-## Step 4 - Install Audience Targeting Plugin <a name="Installation_4"></a>
-
-Installing Audience Targeting plugin is currently mandatory for this portlet whether you plan to use the feature or not.
-
-Using audience targeting to boost search results of user's segment is disabled by default so if you choose to use it, you have to enable it in the portlet configuration. You can also adjust the boost factor there. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
-
-## Step 5 - Update Suggester mapping <a name="Installation_5"></a>
+## Step 4 - Update Suggester mapping <a name="Installation_5"></a>
 
 If you are not using the custom Elasticsearch adapter, you can skip this one. Otherwise create querySuggestion mapping from command line using CURL (or with Kibana). If the command succeeds, you should get an "acknowledged" output from the script.
 
@@ -226,13 +223,23 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 }'
 ```
 
-## Step 6 - Reindex <a name="Installation_6"></a>
+## Step 5 - Reindex <a name="Installation_6"></a>
 
 If you were transitioning from embedded Elasticsearch server to standalone server, please reindex search indexes from Control panel -> Server Administration. 
 
 To be sure that index type mappings have been refreshed please aldo restart the portal and Elasticsearch server and you are ready to go.
 
-# 7 Sample Configurations <a name="Configurations"></a>
+# 7 Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
+
+Downloadg the followin jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
+
+* fi.soveltia.liferay.gsearch.ct-VERSION.jar
+
+After the module has been installed, please enable that in the portlet configuration ontrol Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
+
+With this feature you can boost relevancy for the contents falling into current user's user segments. You can adjust the boost factor in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
+
+# 8 Sample Configurations <a name="Configurations"></a>
 
 Please see the portlet configuration in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
@@ -430,7 +437,7 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ```
 
 
-# 8 Troubleshooting <a name="Troubleshooting"></a>
+# 9 Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -442,14 +449,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 9 Important Notes <a name="Important"></a>
+# 10 Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 10 FAQ <a name="FAQ"></a>
+# 11 FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -457,10 +464,9 @@ That's right. By default this portlet targets the search only to title, descript
 
 ## Does This Work on CE?
 
-It's not tested but basically there are two things preventing this to work on CE: new version of Soy bridge and Audience Targeting plugin dependency. You can however remove these barriers fairly easy:
+It's not tested but basically there is one thing preventing this to work on CE: new version of Soy bridge. You can however remove this barrier fairly easy:
 
 * Downgrade the Soy bridge dependency in the web module's build.gradle, rebuild  and see if it works. Other way around, you can also try to upgrade the bridge to the portal instance. 
-* Remove Audience Targeting dependencies from build.gradle and in the gsearch-core-impl, remove the CTQueryBuilderImpl.java class and modify QueryBuilderImpl.java not to use the before mentioned class. Rebuild.
 
 If you need help with creating a CE compatible version, please create a ticket.
 
@@ -529,18 +535,22 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 11 Project Roadmap <a name="Roadmap"></a>
+# 12 Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 12 Credits <a name="Credits"></a>
+# 13 Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 13 Disclaimer <a name="Disclaimer"></a>
+# 14 Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 14 Changelog <a name="Changelog"></a>
+# 15 Changelog <a name="Changelog"></a>
+
+## 2017-12-16
+
+* Removed Audience Targeting requirement and put the functionality in its' own module. 
 
 ## 2017-12-4
 
