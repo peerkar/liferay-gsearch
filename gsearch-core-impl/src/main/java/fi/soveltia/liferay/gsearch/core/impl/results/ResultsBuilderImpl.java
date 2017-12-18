@@ -454,12 +454,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return sortedList;
 	}	
 	
-	@Reference
-	protected FacetTranslatorFactory _facetTranslatorFactory;	
-
-	@Reference
-	protected ResultItemBuilderFactory _resultsBuilderFactory;	
-	
 	protected Hits _hits;
 
 	protected PortletRequest _portletRequest;
@@ -469,8 +463,12 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	protected QueryParams _queryParams;
 
 	protected ResourceBundle _resourceBundle;
-	
+
+	private FacetTranslatorFactory _facetTranslatorFactory;	
+
 	private volatile GSearchConfiguration _gSearchConfiguration;
+
+	private ResultItemBuilderFactory _resultsBuilderFactory;	
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ResultsBuilderImpl.class);

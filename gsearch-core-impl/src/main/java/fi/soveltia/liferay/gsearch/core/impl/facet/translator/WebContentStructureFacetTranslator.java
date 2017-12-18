@@ -120,11 +120,9 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 		_groupLocalService = groupLocalService;
 	}
 
-	@Reference
-	protected static DDMStructureLocalService _ddmStructureLocalService;
-	
 	protected String _facetName;
 
-	@Reference
-	protected static GroupLocalService _groupLocalService;	
+	private static DDMStructureLocalService _ddmStructureLocalService;
+
+	private static GroupLocalService _groupLocalService;	
 }

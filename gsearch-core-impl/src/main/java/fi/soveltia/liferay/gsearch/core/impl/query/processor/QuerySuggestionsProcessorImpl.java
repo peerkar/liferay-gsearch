@@ -143,22 +143,33 @@ public class QuerySuggestionsProcessorImpl
 	}
 
 	@Reference(unbind = "-")
+	protected void setGSearchKeywordSuggester(
+		GSearchKeywordSuggester gSearchSuggester) {
+
+		_gSearchSuggester = gSearchSuggester;
+	}
+
+	@Reference(unbind = "-")
 	protected void setIndexSearchHelper(
 		IndexSearcherHelper indexSearcherHelper) {
 
 		_indexSearcherHelper = indexSearcherHelper;
 	}
-	
-	@Reference
-	protected GSearchKeywordSuggester _gSearchSuggester;
-	
-	@Reference
-	protected IndexSearcherHelper _indexSearcherHelper;
 
-	@Reference
-	protected QueryBuilder _queryBuilder;
+	@Reference(unbind = "-")
+	protected void setQueryBuilder(
+		QueryBuilder queryBuilder) {
+
+		_queryBuilder = queryBuilder;
+	}
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
+
+	private GSearchKeywordSuggester _gSearchSuggester;
+	
+	private IndexSearcherHelper _indexSearcherHelper;
+
+	private QueryBuilder _queryBuilder;
 
 	private static final Log _log =
 					LogFactoryUtil.getLog(QuerySuggestionsProcessorImpl.class);

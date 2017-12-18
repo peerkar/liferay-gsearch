@@ -116,11 +116,9 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 		_groupLocalService = groupLocalService;
 	}
 
-	@Reference
-	protected static DLFileEntryTypeService _dLFileEntryTypeService;
-
 	protected String _facetName;
 
-	@Reference
-	protected static GroupLocalService _groupLocalService;
+	private static DLFileEntryTypeService _dLFileEntryTypeService;
+
+	private static GroupLocalService _groupLocalService;
 }

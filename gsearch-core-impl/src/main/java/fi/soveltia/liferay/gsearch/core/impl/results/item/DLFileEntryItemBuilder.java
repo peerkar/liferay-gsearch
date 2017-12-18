@@ -216,15 +216,6 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 		return TIKARAW_STRUCTURE_ID_MAP.get(companyId);
 	}
 	
-	protected final static String MIMETYPE_WORD = "application_vnd.openxmlformats-officedocument.wordprocessingml.document";
-	protected final static String MIMETYPE_EXCEL = "application_vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	protected final static String MIMETYPE_POWERPOINT = "application_vnd.openxmlformats-officedocument.presentationml.presentation";
-
-	protected static final long KBYTES = 1024;
-	protected static final long MBYTES = 1024 * 1024;
-	
-	protected Map<Long, Long> TIKARAW_STRUCTURE_ID_MAP = null;
-
 	@Reference(unbind = "-")
 	protected void setDDMStructureLocalService(
 		DDMStructureLocalService ddmStructureLocalService) {
@@ -239,9 +230,16 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 		_dLAppService = dLAppService;
 	}	
 
-	@Reference
-	protected static DDMStructureLocalService _ddmStructureLocalService;
+	protected final static String MIMETYPE_WORD = "application_vnd.openxmlformats-officedocument.wordprocessingml.document";
+	protected final static String MIMETYPE_EXCEL = "application_vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+	protected final static String MIMETYPE_POWERPOINT = "application_vnd.openxmlformats-officedocument.presentationml.presentation";
+
+	protected static final long KBYTES = 1024;
+	protected static final long MBYTES = 1024 * 1024;
 	
-	@Reference
-	protected static DLAppService _dLAppService;
+	protected Map<Long, Long> TIKARAW_STRUCTURE_ID_MAP = null;
+
+	private static DDMStructureLocalService _ddmStructureLocalService;
+	
+	private static DLAppService _dLAppService;
 }

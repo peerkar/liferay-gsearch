@@ -26,5 +26,4 @@ public class WikiPageItemBuilder extends BaseResultItemBuilder {
 	}
 	
 	public static final String DEFAULT_IMAGE = "/o/gsearch-web/images/asset-types/wiki.png";
-
 }

@@ -459,14 +459,12 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	private BooleanFilter _filter;
 
-	@Reference
 	private Portal _portal;
 
 	private PortletRequest _portletRequest;
 
 	private QueryParams _queryParams;
 
-	@Reference
 	private RoleLocalService _roleLocalService;
 
 	private static final Log _log =

@@ -489,16 +489,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		_queryParams.setUserId(themeDisplay.getUserId());
 	}
-	
-	@Reference
-	protected FacetTranslatorFactory _facetTranslatorFactory;	
-	
-	@Reference
-	protected RequestParamValidator _requestParamValidator;
 
 	// Modification date field name in the index.
 
 	private static final String MODIFIED_SORT_FIELD = "modified_sortable";
+
+	private FacetTranslatorFactory _facetTranslatorFactory;	
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
 	
@@ -506,4 +502,5 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	private QueryParams _queryParams;
 	
+	private RequestParamValidator _requestParamValidator;
 }

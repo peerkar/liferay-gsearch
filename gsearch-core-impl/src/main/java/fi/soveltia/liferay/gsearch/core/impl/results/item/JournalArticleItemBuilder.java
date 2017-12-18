@@ -119,8 +119,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 		_journalArticleService = journalArticleService;
 	}
 
-	@Reference
-	protected static JournalArticleService _journalArticleService;
-	
 	protected JournalArticle _journalArticle;
+	
+	private static JournalArticleService _journalArticleService;
 }

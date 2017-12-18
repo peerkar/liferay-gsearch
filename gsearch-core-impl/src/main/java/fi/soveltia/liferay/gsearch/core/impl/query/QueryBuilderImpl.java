@@ -47,14 +47,6 @@ import fi.soveltia.liferay.gsearch.query.QueryStringQuery;
 )
 public class QueryBuilderImpl implements QueryBuilder {
 
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
-	}	
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -76,7 +68,14 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 		return query;
 	}
-	
+
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
+			GSearchConfiguration.class, properties);
+	}	
+		
 	/**
 	 * Build query.
      * 
@@ -179,7 +178,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 	
 	private QueryFilterBuilder _queryFilterBuilder;
 
-	@SuppressWarnings("unused")
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryBuilderImpl.class);
 }

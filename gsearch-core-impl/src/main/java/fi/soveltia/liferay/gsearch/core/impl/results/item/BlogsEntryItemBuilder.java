@@ -36,6 +36,5 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder {
 		_blogsEntryService = blogsEntryService;
 	}
 
-	@Reference
-	protected static BlogsEntryService _blogsEntryService;
+	private static BlogsEntryService _blogsEntryService;
 }

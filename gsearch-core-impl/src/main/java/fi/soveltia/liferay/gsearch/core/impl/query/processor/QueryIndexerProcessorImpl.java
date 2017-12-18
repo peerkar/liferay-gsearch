@@ -94,8 +94,7 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 		_indexWriterHelper = indexWriterHelper;
 	}
 
-	@Reference
-	protected IndexWriterHelper _indexWriterHelper;
+	private IndexWriterHelper _indexWriterHelper;
 	
 	private volatile GSearchConfiguration _gSearchConfiguration;
 

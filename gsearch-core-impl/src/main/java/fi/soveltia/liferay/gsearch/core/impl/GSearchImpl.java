@@ -198,23 +198,17 @@ public class GSearchImpl implements GSearch {
 		_resultsBuilder = resultsBuilder;
 	}
 	
-	@Reference
-	protected IndexSearcherHelper _indexSearcherHelper;
+	private IndexSearcherHelper _indexSearcherHelper;
 	
-	@Reference
-	protected QueryBuilder _queryBuilder;
+	private QueryBuilder _queryBuilder;
 
-	@Reference
-	protected FacetsBuilder _facetsBuilder;
+	private FacetsBuilder _facetsBuilder;
 	
-	@Reference
-	protected QueryIndexerProcessor _queryIndexerProcessor;
+	private QueryIndexerProcessor _queryIndexerProcessor;
 
-	@Reference
-	protected QuerySuggestionsProcessor _querySuggestionsProcessor;
+	private QuerySuggestionsProcessor _querySuggestionsProcessor;
 
-	@Reference
-	protected ResultsBuilder _resultsBuilder;
+	private ResultsBuilder _resultsBuilder;
 
 	private QueryParams _queryParams;
 	private PortletRequest _portletRequest;

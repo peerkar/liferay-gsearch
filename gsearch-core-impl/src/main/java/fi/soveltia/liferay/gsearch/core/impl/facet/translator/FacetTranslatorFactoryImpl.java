@@ -5,6 +5,11 @@ import org.osgi.service.component.annotations.Component;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
 
+/**
+* Facet translator factory implementation. 
+* 
+* {@see FacetTranslatorFactory}
+*/
 @Component(
 	immediate = true, 
 	service = FacetTranslatorFactory.class

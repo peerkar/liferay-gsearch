@@ -52,13 +52,6 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 )
 public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
-	}		
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -81,7 +74,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		}
 		return resultsArray;
 	}
-	
+		
 	/**
 	 * {@inheritDoc}
 	 */
@@ -139,9 +132,6 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 		if (suggesterResults != null) {
 
-			_log.info(suggesterResults.size());
-
-
 			for (SuggesterResult suggesterResult : suggesterResults) {
 
 				_log.info(suggesterResults.size());
@@ -164,6 +154,13 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		return suggestions.stream().toArray(String[]::new);
 	}
 
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
+			GSearchConfiguration.class, properties);
+	}		
+	
 	/**
 	 * Get completion suggester
 	 * 
@@ -242,18 +239,17 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		return suggester;
 	}
 
-	public static final String GSEARCH_SUGGESTION_NAME = "gsearchSuggestion";
-
 	@Reference(unbind = "-")
 	protected void setQuerySuggester(QuerySuggester querySuggester) {
 
 		_querySuggester = querySuggester;
 	}
 
-	@Reference
-	protected QuerySuggester _querySuggester;
+	public static final String GSEARCH_SUGGESTION_NAME = "gsearchSuggestion";
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
+
+	private QuerySuggester _querySuggester;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(GSearchKeywordSuggesterImpl.class);
