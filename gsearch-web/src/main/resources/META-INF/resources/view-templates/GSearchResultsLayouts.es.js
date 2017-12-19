@@ -9,7 +9,7 @@ import templates from './GSearchResultsLayouts.soy';
 /**
  * GSearch results layout component.
  */
-class GSearchResultsLayout extends Component {
+class GSearchResultsLayouts extends Component {
 	
 	/**
 	 * @inheritDoc
@@ -32,7 +32,7 @@ class GSearchResultsLayout extends Component {
 	attached() {
 
 		if (this.debug) {
-			console.log("GSearchResultsLayout.attached()");
+			console.log("GSearchResultsLayouts.attached()");
 		}
 
 		// Set initial query parameters from calling url.
@@ -82,7 +82,7 @@ class GSearchResultsLayout extends Component {
  * @type {!Object}
  * @static
  */
-GSearchResultsLayout.STATE = {
+GSearchResultsLayouts.STATE = {
 	getQueryParam: {
 		validator: core.isFunction
 	},
@@ -99,6 +99,6 @@ GSearchResultsLayout.STATE = {
 
 // Register component
 
-Soy.register(GSearchResultsLayout, templates);
+Soy.register(GSearchResultsLayouts, templates);
 
-export default GSearchResultsLayout;	
+export default GSearchResultsLayouts;	

@@ -28,7 +28,7 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelpe
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 
 /**
  * View render command. Primary/default view.
@@ -39,9 +39,8 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration",
 	immediate = true, 
 	property = {
-		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
-		"mvc.command.name=/", 
-		"mvc.command.name=View"
+		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
+		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class
 )
@@ -249,7 +248,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		if (Validator.isNotNull(resultsLayout)) {
 			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, resultsLayout);
 		}
-
 		
 		template.put(GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
 	}

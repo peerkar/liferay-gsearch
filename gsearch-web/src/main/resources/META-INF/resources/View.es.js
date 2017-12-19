@@ -21,9 +21,9 @@ import templates from './View.soy';
  */
 class View extends Component {
 
-	constructor(opt_config, opt_parentElement) {
+	constructor(opt_config) {
 		
-		super(opt_config, opt_parentElement);
+		super(opt_config);		
 		
 		this.debug = opt_config.JSDebugEnabled;
 

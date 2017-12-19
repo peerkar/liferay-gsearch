@@ -5,9 +5,7 @@ import Ajax from 'metal-ajax/src/Ajax';
 import MultiMap from 'metal-multimap/src/MultiMap';
 
 import devbridgeAutocomplete from '../js/DevbridgeAutocomplete.es';  
-
 import GSearchUtils from '../js/GSearchUtils.es';
-import GSearchAutocomplete from '../js/GSearchAutocomplete.es';
 
 import templates from './GSearchField.soy';
 
@@ -99,9 +97,9 @@ class GSearchField extends Component {
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
 			minChars: _self.queryMinLength,
-			noCache: true,
+			noCache: false,
 		    onSelect: function (suggestion) {
-		    	this.setQueryParam("q", keywords, true);		    	
+		    	// Do search on button click only
 		    },
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,

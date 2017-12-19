@@ -19,7 +19,7 @@ import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.queryparams.QueryParamsBuilder;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 
 /**
  * Resource command for getting the search results.
@@ -29,7 +29,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 @Component(
 	immediate = true, 
 	property = {
-		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
+		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"mvc.command.name=" + GSearchResourceKeys.GET_SEARCH_RESULTS
 	}, 
 	service = MVCResourceCommand.class

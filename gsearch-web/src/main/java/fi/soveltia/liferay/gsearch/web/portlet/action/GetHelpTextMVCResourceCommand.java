@@ -20,8 +20,8 @@ import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
-import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
+import fi.soveltia.liferay.gsearch.web.portlet.GSearchPortlet;
 
 /**
  * Resource command for getting the help text.
@@ -31,7 +31,7 @@ import fi.soveltia.liferay.gsearch.web.portlet.GsearchWebPortlet;
 @Component(
 	immediate = true, 
 	property = {
-		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
+		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"mvc.command.name=" + GSearchResourceKeys.GET_HELP_TEXT
 	}, 
 	service = MVCResourceCommand.class
@@ -64,7 +64,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", resourceRequest.getLocale(),
-			GsearchWebPortlet.class);
+			GSearchPortlet.class);
 
 		return LanguageUtil.get(resourceBundle, "helptext");
 	}

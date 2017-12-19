@@ -1,1 +1,0 @@
-<div class="text-center">Please use Control Panel -> System Settings -> Other -> GSearch for configuration.</div>

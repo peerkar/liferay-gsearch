@@ -15,7 +15,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 
 /**
  * Resource command for getting keyword suggestions (autocomplete).
@@ -25,7 +25,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GsearchWebPortletKeys;
 @Component(
 	immediate = true, 
 	property = {
-		"javax.portlet.name=" + GsearchWebPortletKeys.SEARCH_PORTLET,
+		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"mvc.command.name=" + GSearchResourceKeys.GET_SUGGESTIONS
 	}, 
 	service = MVCResourceCommand.class
