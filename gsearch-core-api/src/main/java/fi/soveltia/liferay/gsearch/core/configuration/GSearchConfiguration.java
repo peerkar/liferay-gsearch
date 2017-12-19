@@ -39,7 +39,15 @@ public interface GSearchConfiguration {
 		required = false
 	)
 	public int requestTimeout();
-	
+
+	@Meta.AD(
+		deflt = "/search", 
+	    name = "search-portlet-page-name",
+	    description = "search-portlet-page-desc",
+		required = false
+	)
+	public String searchPortletPage();
+
 	@Meta.AD(
 		deflt = "/viewasset", 
 	    name = "asset-publisher-page-name",
