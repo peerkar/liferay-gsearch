@@ -1,0 +1,71 @@
+.gsearch-miniportlet {
+	
+	.textinput {
+		border: 1px solid #D6DCE2;
+		color: #29353D;
+		padding: 0 0 0 10px;
+	}
+
+	.textinput:focus {
+		animation: glow 800ms ease-out infinite alternate;
+		color: #000;
+		outline: none;
+	}
+
+	.textinput:focus::-webkit-input-placeholder, 
+	.textinput:focus:-moz-placeholder {
+		color: #efefef;
+	}
+	
+	.btn-secondary {
+		margin-left: 0 !important;
+	}
+	
+	.btn-secondary:active,
+	.btn-secondary:hover,
+	.btn-secondary:focus {
+		outline: none;
+	}
+
+	@keyframes glow {
+		0% {
+			border-color: #D6DCE2;
+			box-shadow: 0 0 1px rgba(56,114,210,.1), 0 0 1px rgba(56,114,210,.1), 0 1px 0 rgba(56,114,210,.1);
+		}	
+		100% {
+			border-color: #869CAD;
+			box-shadow: 0 0 2px rgba(56,114,210,.4), 0 0 2px rgba(56,114,210,.6), 0 1px 10px rgba(56,114,210,.6);
+		}
+	} 
+}
+
+/* Devbridge Autocomplete */
+
+.autocomplete-suggestions { 
+	background: #FFF; 
+	border: 1px solid #999; 
+	overflow: auto; 
+}
+
+.autocomplete-suggestion { 
+	overflow: hidden; 
+	padding: 2px 5px; 
+	white-space: nowrap; 
+}
+.autocomplete-selected { 
+	background: #F0F0F0; 
+}
+
+.autocomplete-suggestions strong { 
+	font-weight: bold; 
+	color: #000; 
+}
+
+.autocomplete-group { 
+	padding: 2px 5px; 
+}
+
+.autocomplete-group strong { 
+	display: block; 
+	border-bottom: 1px solid #000; 
+}

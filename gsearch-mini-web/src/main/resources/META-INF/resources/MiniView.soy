@@ -1,0 +1,33 @@
+{namespace MiniView}
+
+/**
+ * GSearch miniportlet main view.
+ *
+ * @param id
+ * @param portletNamespace
+ */
+{template .render}
+
+	<div class="container-fluid gsearch-container" id="{$id}">
+
+		<div class="input-group">
+		
+			<input autofocus class="form-control input-lg textinput" id="{$portletNamespace}MiniSearchField" 
+				name="{$portletNamespace}MiniSearchField" maxlength="100" 
+					placeholder="{msg desc=""}keywords{/msg}" required="required" type="text" value="" />
+				
+			<span class="input-group-btn">
+				<button class="btn btn-secondary" id="{$portletNamespace}MiniSearchButton" type="button">
+					<svg class="lexicon-icon">
+				        <use xlink:href="/o/classic-theme/images/lexicon/icons.svg#search" />
+					</svg>
+				</button>
+			</span>
+		</div>
+		
+		// Hidden element for anchoring messages tooltip
+		
+		<div class="message-wrapper" data-title="" id="{$portletNamespace}MiniSearchFieldMessage"></div>
+	</div>
+	
+{/template}
