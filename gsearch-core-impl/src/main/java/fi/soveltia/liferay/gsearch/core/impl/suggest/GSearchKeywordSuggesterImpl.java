@@ -134,8 +134,6 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 			for (SuggesterResult suggesterResult : suggesterResults) {
 
-				_log.info(suggesterResults.size());
-
 				for (Entry entry : suggesterResult.getEntries()) {
 	
 					for (Option option : entry.getOptions()) {
