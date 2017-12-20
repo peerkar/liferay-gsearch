@@ -418,9 +418,11 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 					Field.GROUP_ROLE_ID, l + "-" + r.getRoleId());
 				query.add(groupTermQuery, BooleanClauseOccur.SHOULD);
 
-				_log.info(
-					"Group " + g.getName(_queryParams.getLocale()) + ": Role " +
-						r.getName() + "(" + r.getRoleId() + ")");
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Group " + g.getName(_queryParams.getLocale()) + ": Role " +
+							r.getName() + "(" + r.getRoleId() + ")");
+				}
 			}
 		}
 
