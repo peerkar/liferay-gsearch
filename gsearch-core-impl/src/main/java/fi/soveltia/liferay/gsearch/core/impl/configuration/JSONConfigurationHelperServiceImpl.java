@@ -5,6 +5,8 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.Locale;
@@ -17,6 +19,7 @@ import org.osgi.service.component.annotations.Modified;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelperService;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.GSearchImpl;
 
 /**
  * JSON configuration helper service implementation.
@@ -90,10 +93,17 @@ public class JSONConfigurationHelperServiceImpl implements JSONConfigurationHelp
 			_resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", locale, JSONConfigurationHelperServiceImpl.class);
 		}
-		return _resourceBundle.getString(key);
+		try {
+			return _resourceBundle.getString(key);
+		} catch (Exception e) {
+			_log.error(e, e);
+		}
+		return key;
 	}
 	
 	private volatile GSearchConfiguration _gSearchConfiguration;
 
 	private ResourceBundle _resourceBundle;
+	
+	private static final Log _log = LogFactoryUtil.getLog(JSONConfigurationHelperServiceImpl.class);
 }
