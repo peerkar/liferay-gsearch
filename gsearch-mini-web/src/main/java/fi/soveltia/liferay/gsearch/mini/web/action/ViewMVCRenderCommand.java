@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.template.Template;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -51,7 +52,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			
 		// Hide portlet if we are on the search page
 
-		if (getCurrentFriendlyURL(renderRequest).equals(_gSearchConfiguration.searchPortletPage())) {
+		if (getCurrentFriendlyURL(renderRequest).startsWith(_gSearchConfiguration.searchPortletPage())) {
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 		}
 		
