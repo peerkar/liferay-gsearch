@@ -1,4 +1,6 @@
 # Liferay GSearch
+The Google like search for Liferay 7 CE and Liferay DXP.
+
 
 # Table of contents
 
@@ -118,7 +120,7 @@ __If you are updating the modules__:
 
 ### Option 1 (The Easy Way) 
 
-Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
+Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
@@ -242,7 +244,7 @@ To be sure that index type mappings have been refreshed please aldo restart the 
 
 # 7 Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
 
-Downloadg the followin jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
 * fi.soveltia.liferay.gsearch.ct-VERSION.jar
 
@@ -251,8 +253,12 @@ After the module has been installed, please enable that in the portlet configura
 With this feature you can boost relevancy for the contents falling into current user's user segments. You can adjust the boost factor in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
 # 8 Embedding Search Field into a Theme <a name="Search_Field"></a>
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
+* fi.soveltia.liferay.gsearch.mini.web-VERSION.jar
 
+Please see the gsearch-test-theme templates folder for an example of how to embed that into a theme.
+There's also a theme binary in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) if you want to test it.
 
 # 9 Sample Configurations <a name="Configurations"></a>
 
@@ -483,7 +489,7 @@ This defines the main query. You can have there just a single query or construct
 ```
 
 
-# 9 Troubleshooting <a name="Troubleshooting"></a>
+# 10 Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -495,14 +501,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 10 Important Notes <a name="Important"></a>
+# 11 Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 11 FAQ <a name="FAQ"></a>
+# 12 FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -583,18 +589,18 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 12 Project Roadmap <a name="Roadmap"></a>
+# 13 Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 13 Credits <a name="Credits"></a>
+# 14 Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 14 Disclaimer <a name="Disclaimer"></a>
+# 15 Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 15 Changelog <a name="Changelog"></a>
+# 16 Changelog <a name="Changelog"></a>
 
 ## 2017-12-21
 
