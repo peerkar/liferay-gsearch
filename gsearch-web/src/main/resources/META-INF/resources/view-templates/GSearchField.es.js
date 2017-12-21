@@ -119,7 +119,8 @@ class GSearchField extends Component {
     					suggestions: []
     				}
 	    		}
-			}		
+			},
+			triggerSelectOnValidInput: false
 		});
 	}
 		
