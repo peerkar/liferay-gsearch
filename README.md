@@ -9,6 +9,7 @@
 1. [Project Modules](#Modules)
 1. [Installation](#Installation)
 1. [Enabling Audience Targeting support](#Audience_Targeting)
+1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
 1. [Troubleshooting](#Troubleshooting)
 1. [Important Notes](#Important)
@@ -22,7 +23,7 @@
 
 # 1 Background <a name="Background"></a>
 
-This is the Google like search project for Liferay DXP. The code is originally created for the blog series:
+This is the Google like search project for Liferay CE & DXP. The code is originally created for the blog series:
 
  * [Part 1: Creating a google like search](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search)
  * [Part 2: Filter by structure and document type](https://web.liferay.com/web/petteri.karttunen/blog/-/blogs/creating-a-google-like-search-part-ii-filter-by-structure-and-document-type)
@@ -70,9 +71,7 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 
 ## Mandatory <a name="Requirements_Mandatory"></a>
 
-* Liferay DXP SP5 or at least fixpack version 28
-
-If you are interested to get this to work with CE, please take a look at the FAQ below.
+* At least Liferay __DXP SP5__ / fixpack version 28 OR Liferay __CE GA5__
 
 ## Optional <a name="Requirements_Optional"></a>
 
@@ -81,34 +80,45 @@ Some of the features require the custom Elasticsearch adapter. If you plan to us
 
 # 5 Project Modules <a name="Modules"></a>
 
-## gsearch-core-api <a name="Modules_Api"></a>
+## gsearch-core-api 
 API module for the backend logic.
 
-## gsearch-core-impl <a name="Modules_Impl"></a>
+## gsearch-core-impl 
 Implementation module for the backend logic.
 
-## gsearch-query-api <a name="Modules_Query"></a>
-This module contains contains the extension for portal search API's StringQuery type, the QueryStringQuery query type.
+## gsearch-query-api 
+This module contains contains the extension for portal search API's StringQuery type, the QueryStringQuery query type.  
 
-## gsearch-web <a name="Modules_Web"></a>
+## gsearch-web 
 UI module written using SOY & Metal.js.
+
+## gsearch-mini-web 
+Miniportlet for adding a search field into a theme. Please see the gsearch-test-theme for an example.
+
+## gsearch-test-theme
+A test theme embedding miniportlet into it.
 
 ## gsearch-audience-targeting <a name="Modules_Audience_Targeting"></a>
 Module enabling Audience Targeting support.
 
 ## gsearch-elasticsearch-adapter <a name="Modules_Adapter"></a>
-A custom Elasticsearch adapter which adds some suggester analysis settings and fully implements the Elasticsearch QueryStringQuery into Liferay portal search API. Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter)
+A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery translator into Liferay portal search API. It has also index setting customizations: custom analyzers for keyword suggester and ascii folding filter for the title, description and content fields to better support non-ascii characters (for us non English speaking people).
+
+Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter).
 
 # 6 Installation <a name="Installation"></a>
 If you find the instructions insufficient or need more information, please leave a ticket and I'll do my best. 
 
-If you are updating the modules, please remove the older versions from osgi/modules first.
+__If you are updating the modules__:
+
+* Please remember to remove the older versions from osgi/modules and clean up osgi/state folder first.
+* Please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/) to the osgi/configs folder.
 
 ## Step 1 <a name="Installation_1"></a>
 
 ### Option 1 (The Easy Way) 
 
-Download followin jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
+Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and deploy:
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
@@ -137,7 +147,7 @@ If you need to build the Elasticsearch adapter please see [this repository](http
 
 ## Step 2 - Install the Custom Elasticsearch Adapter <a name="Installation_2"></a>
 
-This is not mandatory but if you want to have all the features and configurability there, then use this one. 
+This is not mandatory but if you want to have all the features and configurability there, then use this one and use a standalone Elasticsearch server.
 
 First, uninstall the standard Elasticsearch adapter from control panel apps management or, preferably, from Gogo shell:
 
@@ -146,9 +156,10 @@ First, uninstall the standard Elasticsearch adapter from control panel apps mana
 > lb -s com.liferay.portal.search.elasticsearch (to get the bundle_id)
 > uninstall bundle_id
 ```
-After that, deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp). Please see again from Gogo shell that it's deployed properly. 
+After that, deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/). Please see again from Gogo shell that it's deployed properly. 
 
 Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search just won't work before you uninstall either one.
+
 
 ## Step 3 - Configuration <a name="Installation_3"></a>
 
@@ -156,7 +167,7 @@ After succesfully deploying the modules portlet has to be configured. Otherwise 
 
 Portlet configuration can be found in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
-The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/dxp) and copy it to Liferay\_home\_folder/osgi/configs/
+The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/) and copy it to Liferay\_home\_folder/osgi/configs/
 
 There's then just one more thing to do:
 
@@ -239,10 +250,17 @@ After the module has been installed, please enable that in the portlet configura
 
 With this feature you can boost relevancy for the contents falling into current user's user segments. You can adjust the boost factor in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
-# 8 Sample Configurations <a name="Configurations"></a>
+# 8 Embedding Search Field into a Theme <a name="Search_Field"></a>
+
+
+
+# 9 Sample Configurations <a name="Configurations"></a>
 
 Please see the portlet configuration in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
+Documentation about the configuration values is sparse at the moment but I'll try to improve it with time. If you want to know what all those fields are about, the best source of information is Elasticsearch documentation and code of this application. 
+
+If you are having problems with configuration (portlet stops working) it's usually because of malformed JSON. Please see Tomcat log first, if you're having problems.  
 
 ### Suggester Sample Configuration
 
@@ -295,6 +313,8 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 
 ### Search types Sample Configuration
 
+This configuration defines the asset types to search for.
+
 ```
 [
 	{
@@ -325,6 +345,9 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ```
 
 ### Facets Sample configuration
+
+This configuration defines the available facets in the secondary filter menu. You can add there any indexed field.
+
 ```
 [
 	{
@@ -386,6 +409,8 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 
 ### Sortfields Sample Configuration
 
+Sort fields. You can add there any indexed field. Translations need to be added to gsearch-core-api module localization file. Please see [Sort.java](https://github.com/liferay/liferay-portal/blob/master/portal-kernel/src/com/liferay/portal/kernel/search/Sort.java) for the available values for "fieldType".
+
 ```
 [
 	{
@@ -412,26 +437,47 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 ]	
 ```
 
-### Search Fields Sample Configuration
+### Query Sample Configuration
+
+This defines the main query. You can have there just a single query or construct it of many queries. The supported types ("queryType") at the moment are query_string, match and wildcard. Please see the gsearch-core-impl module QueryBuilders code for more information.
+
 ```
 [
-{
-		"fieldName": "title",
-		"localized": true,
-		"boost": 2,
-		"boostForLocalizedVersion": 3
+	{
+		"queryType": "query_string",
+		"occur": "must",
+		"operator": "and",
+		"fuzziness": "",
+		"boost": 1,
+		"fields": [
+			{
+				"fieldName": "title",
+				"localized": true,
+				"boost": 2,
+				"boostForLocalizedVersion": 3
+			},
+			{
+				"fieldName": "description",
+				"localized": true,
+				"boost": 1,
+				"boostForLocalizedVersion": 1.5
+			},
+			{
+				"fieldName": "content",
+				"localized": true,
+				"boost": 1,
+				"boostForLocalizedVersion": 1.5
+			}
+		]
 	},
 	{
-		"fieldName": "description",
-		"localized": true,
-		"boost": 1,
-		"boostForLocalizedVersion": 1.5
-	},
-	{
-		"fieldName": "content",
-		"localized": true,
-		"boost": 1,
-		"boostForLocalizedVersion": 1.5
+		"queryType": "wildcard",
+		"occur": "should",
+		"fieldName": "userName",
+		"boost": "0.5",
+		"keywordSplitter":  " ",
+		"valuePrefix":  "*",
+		"valueSuffix":  "*"
 	}
 ]
 ```
@@ -521,7 +567,9 @@ Things to know about the fields:
 
 
 ## How Do I Connect a Search Field in a Theme to This Portlet?
-That's easy. Just create a search form and make to link/submit (GET) to the page having the search portlet. You can find the parameter list in the source code but only required parameter is "q", having the keywords.
+Please see the gsearch-test-theme for an example how to embed a Miniportlet (with autocompletion) into a theme.
+
+If you want to create your own form/field, just create a search form and make it to redirect (GET) to the page having the search portlet. You can find the parameter list in the source code but only required parameter is "q", having the keywords.
 
 
 ## Can I Use This With an Embedded Elasticsearch Server
@@ -548,6 +596,17 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 	
 # 15 Changelog <a name="Changelog"></a>
 
+## 2017-12-21
+
+* Validated CE support.
+* Added Minisearch portlet for embedding a searchfield into a theme.
+* Added a test theme for Minisearch portlet.
+* Changed searchfield configuration into a more flexible query configuration. Now the main query can be constructed of multiple queries.
+* Bugs fixed:
+ * Custom ES adapter adding fields twice into QueryStringQuery
+ * Query suggester splitting suggestions into a comma separated list
+
+
 ## 2017-12-16
 
 * Removed Audience Targeting requirement and put the functionality in its' own module. 
@@ -561,5 +620,3 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 	* Added configuration for the completion type suggest field
 	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
 	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
-
-＀
