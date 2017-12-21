@@ -10,7 +10,6 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -143,16 +142,6 @@ public class GSearchImpl implements GSearch {
 		searchContext.setStart(_queryParams.getStart());
 		searchContext.setEnd(_queryParams.getEnd());
 		searchContext.setSorts(_queryParams.getSorts());
-
-		// Create Queryconfig.
-
-		QueryConfig queryConfig = new QueryConfig();
-
-		// Enable results highlighting
-
-		queryConfig.setHighlightEnabled(true);
-
-		searchContext.setQueryConfig(queryConfig);
 
 		// Set facets.
 

@@ -9,10 +9,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,10 +28,12 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.builder.MatchQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.builder.QueryStringQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.builder.WildcardQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.ct.CTQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
-import fi.soveltia.liferay.gsearch.query.Operator;
 import fi.soveltia.liferay.gsearch.query.QueryStringQuery;
 
 /**
@@ -57,14 +58,24 @@ public class QueryBuilderImpl implements QueryBuilder {
 		
 		// Build query
 
-		BooleanQuery query = abuildQuery(portletRequest, queryParams);
-
+		BooleanQuery query = constructQuery(portletRequest, queryParams);
+		
+		// Add Audience targeting query
+		
+		if (_gSearchConfiguration.enableAudienceTargeting()) {
+			addCTQuery(portletRequest, query);
+		}		
+		
 		// Add filters
 
 		BooleanFilter preBooleanFilter =
 			_queryFilterBuilder.buildQueryFilter(portletRequest, queryParams);
 		
 		query.setPreBooleanFilter(preBooleanFilter);
+
+		// Set query config
+		
+		setQueryConfig(query);
 
 		return query;
 	}
@@ -77,79 +88,99 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}	
 		
 	/**
-	 * Build query.
-     * 
-	 * We are using here the custom QueryStringQuery type which is an
+	 * Add Audience targeting query.
+	 * 
+	 * @param portletRequest
+	 * @param query
+	 * @throws Exception
+	 */
+	protected void addCTQuery(PortletRequest portletRequest, BooleanQuery query) throws Exception {
+
+		if (_ctQueryBuilder == null) {
+			_log.error("Audience targeting is enable but the gsearch-audience-targeting module " +
+				"seems not to be installed.");
+		} else {
+	
+			BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
+	
+			if (ctQuery != null) {
+				query.add(ctQuery, BooleanClauseOccur.SHOULD);
+			}
+		}				
+	}
+	
+	/**
+	 * Construct query.
+	 * 
+	 * Please note that QueryStringQuery type is an
 	 * extension of Liferay StringQuery. Thus, if you don't want to use
 	 * the custom search adapter, this falls silently to the default StringQuery.
 	 * Remember however that with standard adapter you loose the possibility to
 	 * define target fields or boosts (configuration) - or, they just don't get applied.
 	 * 
+	 * @param portletRequest
 	 * @param queryParams
 	 * @return
 	 * @throws Exception
 	 */
-	protected BooleanQuery abuildQuery(PortletRequest portletRequest, QueryParams queryParams) throws Exception {
+	protected BooleanQuery constructQuery(PortletRequest portletRequest, QueryParams queryParams) throws Exception {
 		
 		BooleanQuery query = new BooleanQueryImpl();
 		
-		StringBundler searchPhrase = new StringBundler();
-		
-		searchPhrase.append(queryParams.getKeywords());
-		
-		// Content targeting
-		
-		if (_gSearchConfiguration.enableAudienceTargeting()) {
-			
-			if (_ctQueryBuilder == null) {
-				_log.error("Audience targeting is enable but the gsearch-audience-targeting module " +
-					"seems not to be installed.");
-			} else {
-		
-				BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
-		
-				if (ctQuery != null) {
-					query.add(ctQuery, BooleanClauseOccur.SHOULD);
-				}
-			}
-		}		
-		
 		// Build query
 		
-		QueryStringQuery queryStringQuery = new QueryStringQuery(searchPhrase.toString());
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.searchFieldConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_gSearchConfiguration.searchFieldConfiguration());
 		
+		Query subQuery;
+
 		for (int i = 0; i < configurationArray.length(); i++) {
 			
-			JSONObject item = configurationArray.getJSONObject(i);
+			JSONObject queryItem = configurationArray.getJSONObject(i);
 
-			// Add non translated version
-			
-			String fieldName = item.getString("fieldName");
-			float boost =  GetterUtil.getFloat(item.getString("boost"), 1f);
+			subQuery =  null;
 
-			queryStringQuery.addField(fieldName, boost);
-			
-			// Add translated version
-			
-			boolean isLocalized = GetterUtil.getBoolean(item.get("localized"), false);
-			
-			if (isLocalized) {
+			String queryType = queryItem.getString("queryType");
+			String occurString = queryItem.getString("queryType");
+
+			BooleanClauseOccur occur;
+			if ("MUST".equals(occurString)) {
+				occur = BooleanClauseOccur.MUST;
+			} else if ("MUST_NOT".equals(occurString)) {
+				occur = BooleanClauseOccur.MUST_NOT;
+			} else {
+				occur = BooleanClauseOccur.SHOULD;
+			}
+	 		
+			if ("match".equals(queryType)) {
+
+				boolean isLocalized = queryItem.getBoolean("localized");
+
+				if (isLocalized) {
+					subQuery = _matchQueryBuilder.buildLocalizedQuery(queryItem, queryParams);
+				} else {
+					subQuery =  _matchQueryBuilder.buildQuery(queryItem, queryParams);
+				}
+			} else if ("wildcard".equals(queryType)) {
 				
-				String localizedFieldName = fieldName + "_" + queryParams.getLocale().toString();
-				float localizedBoost =  GetterUtil.getFloat(item.getString("boostForLocalizedVersion"), 1f);
+				String keywordSplitter = queryItem.getString("keywordSplitter");
 
-				queryStringQuery.addField(localizedFieldName, localizedBoost);
+				if (keywordSplitter != null && keywordSplitter.length() > 0) {
+
+					subQuery = _wildcardQueryBuilder.buildSplittedQuery(queryItem, queryParams);
+				} else {
+					
+					subQuery = _wildcardQueryBuilder.buildQuery(queryItem, queryParams);
+				}
+				
+			} else if ("query_string".equals(queryType)) {
+				subQuery = (QueryStringQuery)_queryStringQueryBuilder.buildQuery(queryItem, queryParams);
+			}
+			
+			if (subQuery != null) {
+				query.add(subQuery,occur);
 			}
 		}
-		
-		// Set default operator AND
- 		
-		queryStringQuery.setDefaultOperator(Operator.AND);
-		
-		query.add(queryStringQuery, BooleanClauseOccur.MUST);
-		
 		return query;
 	}	
 
@@ -164,9 +195,40 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}
 
 	@Reference(unbind = "-")
+	protected void setMatchQueryBuilder(MatchQueryBuilder matchQueryBuilder) {
+
+		_matchQueryBuilder = matchQueryBuilder;
+	}
+
+	@Reference(unbind = "-")
 	protected void setQueryFilterBuilder(QueryFilterBuilder queryFilterBuilder) {
 
 		_queryFilterBuilder = queryFilterBuilder;
+	}
+
+	@Reference(unbind = "-")
+	protected void setQueryStringQueryBuilder(QueryStringQueryBuilder queryStringQueryBuilder) {
+
+		_queryStringQueryBuilder = queryStringQueryBuilder;
+	}
+
+	@Reference(unbind = "-")
+	protected void setWildcardQueryBuilder(WildcardQueryBuilder wildcardQueryBuilder) {
+
+		_wildcardQueryBuilder = wildcardQueryBuilder;
+	}
+
+	/**
+	 * Set queryconfig.
+	 * 
+	 * @param query
+	 */
+	protected void setQueryConfig(BooleanQuery query) {
+
+		// Create Queryconfig.
+
+		// QueryConfig queryConfig = new QueryConfig();
+		// query.setQueryConfig(queryConfig);
 	}
 
 	public static final DateFormat INDEX_DATE_FORMAT =
@@ -175,8 +237,14 @@ public class QueryBuilderImpl implements QueryBuilder {
 	protected volatile GSearchConfiguration _gSearchConfiguration;
 
 	private CTQueryBuilder _ctQueryBuilder;
-	
+
+	private MatchQueryBuilder _matchQueryBuilder;
+
 	private QueryFilterBuilder _queryFilterBuilder;
+	
+	private QueryStringQueryBuilder _queryStringQueryBuilder;
+
+	private WildcardQueryBuilder _wildcardQueryBuilder;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryBuilderImpl.class);

@@ -378,7 +378,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 		
 		// Set secondary sort. Use score or modified.
-		
+
 		if (fieldName == null) {
 			sort2 = new Sort(MODIFIED_SORT_FIELD, Sort.LONG_TYPE, reverse);
 		} else {

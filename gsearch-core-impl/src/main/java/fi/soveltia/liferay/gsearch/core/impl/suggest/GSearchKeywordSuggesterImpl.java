@@ -137,7 +137,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 				for (Entry entry : suggesterResult.getEntries()) {
 	
 					for (Option option : entry.getOptions()) {
-	
+
 						if (_log.isDebugEnabled()) {
 							_log.debug("Adding suggestion:" + option.getText());
 						}

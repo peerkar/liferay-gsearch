@@ -19,7 +19,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -297,8 +296,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		String[] queryTerms = _queryParams.getKeywords().split(" ");
-
 		jsonObject.put("resultsLayout", _queryParams.getResultsLayout());
 		
 		// If this parameter is populated, there was an alternate search.
@@ -309,7 +306,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			jsonObject.put("originalQueryTerms", originalQueryTerms);
 		}
 		
-		jsonObject.put("queryTerms", Arrays.asList(queryTerms));
+		jsonObject.put("queryTerms", _queryParams.getKeywords());
 
 		jsonObject.put(
 			"executionTime", String.format("%.3f", _hits.getSearchTime()));
