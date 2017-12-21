@@ -92,7 +92,8 @@ class MiniView extends Component {
     					suggestions: []
     				}
 	    		}
-			}		
+			},
+			triggerSelectOnValidInput: false
 		});
 	}	
 	
