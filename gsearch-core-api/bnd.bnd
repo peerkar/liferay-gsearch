@@ -10,6 +10,7 @@ Export-package:\
 	 fi.soveltia.liferay.gsearch.core.api.menuoption,\
 	 fi.soveltia.liferay.gsearch.core.api.query,\
 	 fi.soveltia.liferay.gsearch.core.api.query.ct,\
+	 fi.soveltia.liferay.gsearch.core.api.query.builder,\
 	 fi.soveltia.liferay.gsearch.core.api.query.filter,\
 	 fi.soveltia.liferay.gsearch.core.api.query.keyword,\
 	 fi.soveltia.liferay.gsearch.core.api.query.processor,\
