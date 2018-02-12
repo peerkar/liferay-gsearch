@@ -152,8 +152,11 @@ If you need to build the Elasticsearch adapter please see [this repository](http
 
 This is not mandatory but if you want to have all the features and configurability there, then use this one and use a standalone Elasticsearch server. 
 
-Deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/). Please see again from Gogo shell that it's deployed properly. 
+Download following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
+* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar)
+
+Please see again from Gogo shell that it's deployed properly. Please note that custom adapter should disable (stop) the default adapter.
 
 ```
 > telnet localhost 11311
@@ -161,7 +164,8 @@ Deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEAR
 
 ```
 
-Please note that custom adapter disables (stops) the default adapter. If you get errors in log and search doesn't work, please restart portal so that adapter loads correctly.
+ If you get errors in log and search doesn't work, please restart portal so that new adapter loads correctly.
+ 
 
 ## Step 3 - Configuration <a name="Installation_3"></a>
 
