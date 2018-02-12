@@ -181,11 +181,25 @@ class GSearchUtils {
 	/**
 	 * Set text for the trigger element.
 	 * 
+	 * If there's a text element in the selected element, 
+	 * use contents of that as a source.
+	 * 
 	 * @param {String} triggerElementId
 	 * @param {Object} selectedItem
 	 */
 	static setOptionListTriggerElementText(triggerElementId, selectedItem) {
-		$('#' + triggerElementId + ' .selection').html($(selectedItem).html());
+		
+		let textElement = $(selectedItem).find('.text');
+		
+		let text = null;
+		
+		if (textElement.length > 0) {
+			text = $(textElement).html();
+		} else {
+			text = $(selectedItem).html();
+		}
+		
+		$('#' + triggerElementId + ' .selection').html(text);
 	}
 
 	/**

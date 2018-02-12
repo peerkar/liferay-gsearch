@@ -13,6 +13,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Enabling Audience Targeting support](#Audience_Targeting)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
+1. [Custom querySuggestion Mapping](#querySuggestion)
 1. [Troubleshooting](#Troubleshooting)
 1. [Important Notes](#Important)
 1. [FAQ](#FAQ)
@@ -131,7 +132,7 @@ After installing the easiest way to check that modules have been properly instal
 
 ```
 > telnet localhost 11311
-> lb -s GSearch"
+> lb -s gsear
 
 ```
 
@@ -149,19 +150,18 @@ If you need to build the Elasticsearch adapter please see [this repository](http
 
 ## Step 2 - Install the Custom Elasticsearch Adapter <a name="Installation_2"></a>
 
-This is not mandatory but if you want to have all the features and configurability there, then use this one and use a standalone Elasticsearch server.
+This is not mandatory but if you want to have all the features and configurability there, then use this one and use a standalone Elasticsearch server. 
 
-First, uninstall the standard Elasticsearch adapter from control panel apps management or, preferably, from Gogo shell:
+Deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/). Please see again from Gogo shell that it's deployed properly. 
+
 
 ```
 > telnet localhost 11311
-> lb -s com.liferay.portal.search.elasticsearch (to get the bundle_id)
-> uninstall bundle_id
+> lb -s gsear
+
 ```
-After that, deploy the custom adapter (com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar) which you downloaded earlier from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/). Please see again from Gogo shell that it's deployed properly. 
 
-Please note that by default the standard search adapter reinstalls every time, you reboot the portal. It's not fatal if both adapters start simultaneously but search just won't work before you uninstall either one.
-
+Please note that custom adapter disables (stops) the default adapter. If you get errors in log and search doesn't work, please restart portal so that adapter loads correctly.
 
 ## Step 3 - Configuration <a name="Installation_3"></a>
 
@@ -178,63 +178,6 @@ There's then just one more thing to do:
 
 You can find the sample configurations in the end of this documentation. 
 
-## Step 4 - Update Suggester mapping <a name="Installation_5"></a>
-
-If you are not using the custom Elasticsearch adapter, you can skip this one. Otherwise create querySuggestion mapping from command line using CURL (or with Kibana). If the command succeeds, you should get an "acknowledged" output from the script.
-
-Please change the index name in the sample (liferay-20116) to correspond to your company id. 
-
-Please also note that this mapping change might fail if you have already suggestions in the index. The best way is to do this right after reindexing.
-
-```
-curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
-{
-	"dynamic_templates": [
-	{
-		"template_keywordSearch": {
-			"mapping": {
-				"type": "string",
-				"fields": {
-					"ngram": {
-						"type": "string",
-					        "search_analyzer": "standard",
-						"analyzer": "gsearch_shingle_analyzer"
-					},
-					"suggest" : {
-						"type" : "completion",
-						"analyzer" : "simple",
-						"search_analyzer" : "simple"
-					}
-				}
-			},
-			"match": "keywordSearch_*",
-			"match_mapping_type": "string"
-		}
-	}
-	],
-	"properties": {
-		"companyId": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		},
-		"groupId": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		},
-		"priority": {
-			"index": "not_analyzed",
-			"type": "float"
-		},
-		"uid": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		}
-	}
-}'
-```
 
 ## Step 5 - Reindex <a name="Installation_6"></a>
 
@@ -488,8 +431,61 @@ This defines the main query. You can have there just a single query or construct
 ]
 ```
 
+# 10 Custom querySuggestion Mapping<a name="querySuggestion"></a>
 
-# 10 Troubleshooting <a name="Troubleshooting"></a>
+Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by:
+
+curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
+{
+	"dynamic_templates": [
+	{
+		"template_keywordSearch": {
+			"mapping": {
+				"type": "string",
+				"fields": {
+					"ngram": {
+						"type": "string",
+					        "search_analyzer": "standard",
+						"analyzer": "gsearch_shingle_analyzer"
+					},
+					"suggest" : {
+						"type" : "completion",
+						"analyzer" : "simple",
+						"search_analyzer" : "simple"
+					}
+				}
+			},
+			"match": "keywordSearch_*",
+			"match_mapping_type": "string"
+		}
+	}
+	],
+	"properties": {
+		"companyId": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
+		},
+		"groupId": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
+		},
+		"priority": {
+			"index": "not_analyzed",
+			"type": "float"
+		},
+		"uid": {
+			"index": "not_analyzed",
+			"store": "yes",
+			"type": "string"
+		}
+	}
+}'
+```
+
+
+# 11 Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -501,14 +497,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 11 Important Notes <a name="Important"></a>
+# 12 Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 12 FAQ <a name="FAQ"></a>
+# 13 FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -589,18 +585,25 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 13 Project Roadmap <a name="Roadmap"></a>
+# 14 Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 14 Credits <a name="Credits"></a>
+# 15 Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 15 Disclaimer <a name="Disclaimer"></a>
+# 16 Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 16 Changelog <a name="Changelog"></a>
+# 17 Changelog <a name="Changelog"></a>
+
+## 2018-02-12
+
+* Made custom querySuggestion mapping automatic on custom adapter installation
+* Made custom adapter to stop standard adapter automatically
+* Accepted pull request on case insensitive property handling
+
 
 ## 2017-12-21
 

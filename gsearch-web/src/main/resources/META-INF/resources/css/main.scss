@@ -155,7 +155,6 @@
 		
 		.gsearch-dropdown { 
 			display: inline-block;
-			margin-left: 20px;
 
 			@include media-query(null, $screen-xs-max) {
 				margin-left: 0;

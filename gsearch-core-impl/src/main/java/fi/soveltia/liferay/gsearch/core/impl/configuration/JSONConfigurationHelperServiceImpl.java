@@ -19,7 +19,6 @@ import org.osgi.service.component.annotations.Modified;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelperService;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
-import fi.soveltia.liferay.gsearch.core.impl.GSearchImpl;
 
 /**
  * JSON configuration helper service implementation.
