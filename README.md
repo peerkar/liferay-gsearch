@@ -9,7 +9,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Screenshots](#Screenshots)
 1. [Requirements](#Requirements)
 1. [Project Modules](#Modules)
-1. [Quick Installation Guide](#Quick_Installation)
+1. [Quick Installation Guide](#Quick_Guide)
 1. [Installation Guide](#Installation)
 1. [Enabling Audience Targeting support](#Audience_Targeting)
 1. [Embedding Search Field into a Theme](#Search_Field)
@@ -114,7 +114,7 @@ Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-ela
 
 This installs the basic functionality. If you're having problems or want to install all the features, see full instructions below.
 
-1) Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
+1) Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
