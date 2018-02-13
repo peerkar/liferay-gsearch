@@ -43,14 +43,16 @@
  */
 {template .imageItem}
 
+	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
+
 	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3">	
 	
 		<a href="{$item.link}" title="{$item.title}">	
 		
 		<div class="card">
 
-			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$item.imageSrc}');">
-				<img class="sr-only" alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}">
+			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$itemImage}');">
+				<img class="sr-only" alt="{$item.title}" src="{$itemImage}" title="{$item.title}">
 				<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
 			</div>
 
