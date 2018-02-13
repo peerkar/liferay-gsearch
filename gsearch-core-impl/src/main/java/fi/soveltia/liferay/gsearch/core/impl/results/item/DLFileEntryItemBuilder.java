@@ -239,13 +239,13 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 		mimeTypes.put("application_vnd.openxmlformats-officedocument.presentationml.presentation", "pptx");
 		mimeTypes.put("application_vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
 
-		mimeTypes.put("vnd.ms-excel", "xls");
-		mimeTypes.put("vnd.ms-powerpoint", "ppt");
-		mimeTypes.put("vnd.ms-word", "doc");
+		mimeTypes.put("application_vnd.ms-excel", "xls");
+		mimeTypes.put("application_vnd.ms-powerpoint", "ppt");
+		mimeTypes.put("application_vnd.ms-word", "doc");
 
-		mimeTypes.put("vnd.oasis.opendocument.presentation", "odp");
-		mimeTypes.put("vnd.oasis.opendocument.spreadsheet", "ods");
-		mimeTypes.put("vnd.oasis.opendocument.text", "odt");
+		mimeTypes.put("application_vnd.oasis.opendocument.presentation", "odp");
+		mimeTypes.put("application_vnd.oasis.opendocument.spreadsheet", "ods");
+		mimeTypes.put("application_vnd.oasis.opendocument.text", "odt");
 	}
 	
 	protected static final long KBYTES = 1024;
