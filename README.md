@@ -9,7 +9,8 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Screenshots](#Screenshots)
 1. [Requirements](#Requirements)
 1. [Project Modules](#Modules)
-1. [Installation](#Installation)
+1. [Quick Installation Guide](#Quick_Installation)
+1. [Installation Guide](#Installation)
 1. [Enabling Audience Targeting support](#Audience_Targeting)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
@@ -109,9 +110,7 @@ A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery trans
 
 Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter).
 
-# 6 Installation <a name="Installation"></a>
-
-__Quick Guide __
+# 6 Quick Installation Guide <a name="Quick_Guide"></a>
 
 This installs the basic functionality. If you're having problems or want to install all the features, see full instructions below.
 
@@ -128,6 +127,8 @@ This installs the basic functionality. If you're having problems or want to inst
 
 3) Do full reindex.
 
+
+# 7 Installation Guide <a name="Installation"></a>
 
 __If you are updating the modules__:
 
@@ -207,7 +208,7 @@ If you were transitioning from embedded Elasticsearch server to standalone serve
 
 To be sure that index type mappings have been refreshed please aldo restart the portal and Elasticsearch server and you are ready to go.
 
-# 7 Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
+# 8 Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
 
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
@@ -217,7 +218,7 @@ After the module has been installed, please enable that in the portlet configura
 
 With this feature you can boost relevancy for the contents falling into current user's user segments. You can adjust the boost factor in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
-# 8 Embedding Search Field into a Theme <a name="Search_Field"></a>
+# 9 Embedding Search Field into a Theme <a name="Search_Field"></a>
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
 * fi.soveltia.liferay.gsearch.mini.web-VERSION.jar
@@ -225,7 +226,7 @@ Download the following jar from [latest folder](https://github.com/peerkar/lifer
 Please see the gsearch-test-theme templates folder for an example of how to embed that into a theme.
 There's also a theme binary in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) if you want to test it.
 
-# 9 Sample Configurations <a name="Configurations"></a>
+# 10 Sample Configurations <a name="Configurations"></a>
 
 Please see the portlet configuration in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
@@ -483,7 +484,7 @@ The example below defines three should (OR) queries. In the first, all the keywo
 ]
 ```
 
-# 10 Custom querySuggestion Mapping<a name="querySuggestion"></a>
+# 11 Custom querySuggestion Mapping<a name="querySuggestion"></a>
 
 Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by running the curl script:
 
@@ -538,7 +539,7 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 ```
 
 
-# 11 Troubleshooting <a name="Troubleshooting"></a>
+# 12 Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -550,14 +551,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 12 Important Notes <a name="Important"></a>
+# 13 Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 13 FAQ <a name="FAQ"></a>
+# 14 FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -638,18 +639,18 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 14 Project Roadmap <a name="Roadmap"></a>
+# 15 Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 15 Credits <a name="Credits"></a>
+# 16 Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 16 Disclaimer <a name="Disclaimer"></a>
+# 17 Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 17 Changelog <a name="Changelog"></a>
+# 18 Changelog <a name="Changelog"></a>
 
 ## 2018-02-12
 
