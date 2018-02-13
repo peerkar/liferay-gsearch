@@ -390,18 +390,21 @@ Sort fields. You can add there any indexed field. Translations need to be added 
 ]	
 ```
 
-### Query Sample Configuration
+### Sample Query Configuration
 
 This defines the main query. You can have there just a single query or construct it of many queries. The supported types ("queryType") at the moment are query_string, match and wildcard. Please see the gsearch-core-impl module QueryBuilders code for more information.
+
+The example below defines three should (OR) queries. In the first, all the keywords have to match (AND) and it gets a boost of 2. In the second, any of the keywords have to match and it gets only a boost of 1. The third brings a boost of 1.2 if any of the keywords match the userName field. In other words, following results can be expected from this configuration this query configuration: hits matching all the keywords get to the top of the search results, hits matching just some of the keywords are secondary. If keywords match the username field they get some extra boost.
+
 
 ```
 [
 	{
 		"queryType": "query_string",
-		"occur": "must",
+		"occur": "should",
 		"operator": "and",
 		"fuzziness": "",
-		"boost": 1,
+		"boost": 2,
 		"fields": [
 			{
 				"fieldName": "title",
@@ -424,10 +427,37 @@ This defines the main query. You can have there just a single query or construct
 		]
 	},
 	{
+		"queryType": "query_string",
+		"occur": "should",
+		"operator": "or",
+		"fuzziness": "",
+		"boost": 1,
+		"fields": [
+			{
+				"fieldName": "title",
+				"localized": true,
+				"boost": 2,
+				"boostForLocalizedVersion": 3
+			},
+			{
+				"fieldName": "description",
+				"localized": true,
+				"boost": 1,
+				"boostForLocalizedVersion": 1.5
+			},
+			{
+				"fieldName": "content",
+				"localized": true,
+				"boost": 1,
+				"boostForLocalizedVersion": 1.5
+			}
+		]
+	},	
+	{
 		"queryType": "wildcard",
 		"occur": "should",
 		"fieldName": "userName",
-		"boost": "0.5",
+		"boost": "1.2",
 		"keywordSplitter":  " ",
 		"valuePrefix":  "*",
 		"valueSuffix":  "*"
