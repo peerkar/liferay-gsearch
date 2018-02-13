@@ -144,15 +144,15 @@ public class QueryBuilderImpl implements QueryBuilder {
 			String occurString = queryItem.getString("queryType");
 
 			BooleanClauseOccur occur;
-			if ("MUST".equals(occurString)) {
+			if ("MUST".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST;
-			} else if ("MUST_NOT".equals(occurString)) {
+			} else if ("MUST_NOT".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST_NOT;
 			} else {
 				occur = BooleanClauseOccur.SHOULD;
 			}
 	 		
-			if ("match".equals(queryType)) {
+			if ("MATCH".equalsIgnoreCase(queryType)) {
 
 				boolean isLocalized = queryItem.getBoolean("localized");
 
@@ -161,7 +161,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 				} else {
 					subQuery =  _matchQueryBuilder.buildQuery(queryItem, queryParams);
 				}
-			} else if ("wildcard".equals(queryType)) {
+			} else if ("WILDCARD".equalsIgnoreCase(queryType)) {
 				
 				String keywordSplitter = queryItem.getString("keywordSplitter");
 
@@ -173,7 +173,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 					subQuery = _wildcardQueryBuilder.buildQuery(queryItem, queryParams);
 				}
 				
-			} else if ("query_string".equals(queryType)) {
+			} else if ("QUERY_STRING".equalsIgnoreCase(queryType)) {
 				subQuery = (QueryStringQuery)_queryStringQueryBuilder.buildQuery(queryItem, queryParams);
 			}
 			
