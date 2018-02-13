@@ -1,23 +1,17 @@
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
-import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * JournalArticle item type result builder.
@@ -55,7 +49,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 			(LiferayPortletResponse) _portletResponse, null);
 
 		if (Validator.isNull(link)) {
-			link = getNotLayoutBoundJournalArticleUrl();
+			link = getNotLayoutBoundJournalArticleUrl(getJournalArticle());
 		}
 
 		return link;
@@ -73,43 +67,6 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 			_journalArticle = _journalArticleService.getLatestArticle(_entryClassPK);
 		}
 		return _journalArticle;
-	}
-	
-	/**
-	 * Get a view url for an article which is not bound to a layout or has a
-	 * default view page.
-	 * 
-	 * @return url string
-	 * @throws PortalException
-	 */
-	protected String getNotLayoutBoundJournalArticleUrl()
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
-			_portletRequest, _assetPublisherPageFriendlyURL);
-
-		String assetPublisherInstanceId =
-			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
-
-		JournalArticle journalArticle = getJournalArticle();
-
-		StringBundler sb = new StringBundler();
-		sb.append(PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
-		sb.append("/-/asset_publisher/");
-		sb.append(assetPublisherInstanceId);
-		sb.append("/content/");
-		sb.append(journalArticle.getUrlTitle());
-		sb.append("?_");
-		sb.append(AssetPublisherPortletKeys.ASSET_PUBLISHER);
-		sb.append("_INSTANCE_");
-		sb.append(assetPublisherInstanceId);
-		sb.append("_groupId=");
-		sb.append(journalArticle.getGroupId());
-
-		return sb.toString();
 	}
 
 	@Reference(unbind = "-")

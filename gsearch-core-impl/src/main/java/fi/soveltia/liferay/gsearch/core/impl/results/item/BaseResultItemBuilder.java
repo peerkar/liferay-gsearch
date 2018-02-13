@@ -4,9 +4,12 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -15,9 +18,12 @@ import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -31,6 +37,7 @@ import javax.portlet.WindowState;
 
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Abstract base result builder class.
@@ -109,6 +116,40 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	}
 
 	/**
+	 * Get a view url for an article which is not bound to a layout or has a
+	 * default view page.
+	 * 
+	 * @return url string
+	 * @throws PortalException
+	 */
+	public String getNotLayoutBoundJournalArticleUrl(JournalArticle journalArticle)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
+			_portletRequest, _assetPublisherPageFriendlyURL);
+
+		String assetPublisherInstanceId =
+			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
+
+		StringBundler sb = new StringBundler();
+		sb.append(PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
+		sb.append("/-/asset_publisher/");
+		sb.append(assetPublisherInstanceId);
+		sb.append("/content/");
+		sb.append(journalArticle.getUrlTitle());
+		sb.append("?_");
+		sb.append(AssetPublisherPortletKeys.ASSET_PUBLISHER);
+		sb.append("_INSTANCE_");
+		sb.append(assetPublisherInstanceId);
+		sb.append("_groupId=");
+		sb.append(journalArticle.getGroupId());
+
+		return sb.toString();
+	}	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -168,6 +209,25 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		}
 
 		return _assetRenderer;
+	}
+	
+	/**
+	 * Get asset renderer for a class.
+	 * 
+	 * @param entryClassName
+	 * @param entryClassPK
+	 * @return
+	 * @throws NumberFormatException
+	 * @throws PortalException
+	 */
+	protected AssetRenderer<?> getAssetRenderer(String entryClassName, long entryClassPK)
+					throws PortalException {
+
+		AssetRendererFactory<?> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
+				entryClassName);
+		
+		return assetRendererFactory.getAssetRenderer(entryClassPK);
 	}
 
 	/**
