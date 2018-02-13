@@ -110,21 +110,32 @@ A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery trans
 Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter).
 
 # 6 Installation <a name="Installation"></a>
-If you find the instructions insufficient or need more information, please leave a ticket and I'll do my best. 
+
+__Quick Guide __
+
+This installs the basic functionality. If you're having problems or want to install all the features, see full instructions below.
+
+1) Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
+
+* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
+* fi.soveltia.liferay.gsearch.core-api-VERSION.jar
+* fi.soveltia.liferay.gsearch.core-api-VERSION.jar
+* fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
+* fi.soveltia.liferay.gsearch.query-VERSION.jar
+* fi.soveltia.liferay.gsearch.web-VERSION.jar
+
+2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) file and put it into osgi/configs.
+
+3) Do full reindex.
+
 
 __If you are updating the modules__:
 
 * Please remember to remove the older versions from osgi/modules and clean up osgi/state folder first.
 * Please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/) to the osgi/configs folder.
 
+
 ## Step 1 <a name="Installation_1"></a>
-
-### Overview
-
-1. Download and deploy relevant packages from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
-2. Put the default configuration from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) file in osgi/configs
-3. Check that STANDARD search works. This checks that the custom adapter has been installed properly. If not, restart portal.
-4. Do full reindex and test that everything works
 
 ### Option 1 (The Easy Way) 
 
@@ -161,7 +172,7 @@ This is not mandatory but if you want to have all the features and configurabili
 
 Download following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
-* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar)
+* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
 
 Please see again from Gogo shell that it's deployed properly. Please note that custom adapter should disable (stop) the default adapter.
 
