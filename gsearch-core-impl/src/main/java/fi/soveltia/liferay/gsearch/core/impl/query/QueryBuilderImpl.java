@@ -141,7 +141,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 			subQuery =  null;
 
 			String queryType = queryItem.getString("queryType");
-			String occurString = queryItem.getString("queryType");
+			String occurString = queryItem.getString("occur");
 
 			BooleanClauseOccur occur;
 			if ("MUST".equalsIgnoreCase(occurString)) {
