@@ -474,8 +474,9 @@ The example below defines three should (OR) queries. In the first, all the keywo
 
 # 10 Custom querySuggestion Mapping<a name="querySuggestion"></a>
 
-Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by:
+Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by running the curl script:
 
+```
 curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
 {
 	"dynamic_templates": [
