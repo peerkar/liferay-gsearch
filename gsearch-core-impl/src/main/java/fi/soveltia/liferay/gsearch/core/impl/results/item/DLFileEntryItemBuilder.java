@@ -120,16 +120,16 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 	 */
 	protected String translateMimetype(String mimeType) {
 
-		if (mimeType.equals(MIMETYPE_WORD)) {
-			return "DOCX";
-		} else if (mimeType.equals(MIMETYPE_EXCEL)) {
-			return "XLSX";
-		} else if (mimeType.equals(MIMETYPE_POWERPOINT)) {
-			return "PPTX";
-		} else if (mimeType.startsWith("image_")) {
-			return mimeType.split("image_")[1];
+		if (mimeTypes.containsKey(mimeType)) {
+			return mimeTypes.get(mimeType);
 		} else if (mimeType.startsWith("application_")) {
 			return mimeType.split("application_")[1];
+		} else if (mimeType.startsWith("image_")) {
+			return mimeType.split("image_")[1];
+		} else if (mimeType.startsWith("text_")) {
+			return mimeType.split("text_")[1];
+		} else if (mimeType.startsWith("video_")) {
+			return mimeType.split("video_")[1];
 		}
 		
 		return mimeType;
@@ -230,10 +230,24 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 		_dLAppService = dLAppService;
 	}	
 
-	protected final static String MIMETYPE_WORD = "application_vnd.openxmlformats-officedocument.wordprocessingml.document";
-	protected final static String MIMETYPE_EXCEL = "application_vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	protected final static String MIMETYPE_POWERPOINT = "application_vnd.openxmlformats-officedocument.presentationml.presentation";
+	protected static Map<String, String> mimeTypes;
+	
+	static {
+		mimeTypes = new HashMap<String, String>();
+		
+		mimeTypes.put("application_vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
+		mimeTypes.put("application_vnd.openxmlformats-officedocument.presentationml.presentation", "pptx");
+		mimeTypes.put("application_vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
 
+		mimeTypes.put("vnd.ms-excel", "xls");
+		mimeTypes.put("vnd.ms-powerpoint", "ppt");
+		mimeTypes.put("vnd.ms-word", "doc");
+
+		mimeTypes.put("vnd.oasis.opendocument.presentation", "odp");
+		mimeTypes.put("vnd.oasis.opendocument.spreadsheet", "ods");
+		mimeTypes.put("vnd.oasis.opendocument.text", "odt");
+	}
+	
 	protected static final long KBYTES = 1024;
 	protected static final long MBYTES = 1024 * 1024;
 	
