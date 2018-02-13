@@ -119,6 +119,13 @@ __If you are updating the modules__:
 
 ## Step 1 <a name="Installation_1"></a>
 
+### Overview
+
+1. Download and deploy relevant packages from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
+2. Put the default configuration from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) file in osgi/configs
+3. Check that STANDARD search works. This checks that the custom adapter has been installed properly. If not, restart portal.
+4. Do full reindex and test that everything works
+
 ### Option 1 (The Easy Way) 
 
 Download following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
