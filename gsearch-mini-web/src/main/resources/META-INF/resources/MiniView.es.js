@@ -73,6 +73,7 @@ class MiniView extends Component {
 			minChars: _self.queryMinLength,
 			noCache: false,
 		    onSelect: function (suggestion) {
+		    	_self.doSearch();
 		    },
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,
