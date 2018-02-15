@@ -264,7 +264,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				 
 				// Type
 
-				jsonObject.put("type", _resourceBundle.getString(resultItemBuilder.getType().toLowerCase()));
+				jsonObject.put("type", getLocalization(resultItemBuilder.getType().toLowerCase()));
 
 				// Link
 
@@ -450,6 +450,22 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 		return sortedList;
 	}	
+	
+	/**
+	 * Get item type localization.
+	 * Fall back to key if not found.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	private String getLocalization(String key) {
+		try {
+			return _resourceBundle.getString(key);
+		} catch (Exception e) {
+			_log.error(e, e);
+		}
+		return key;
+	}
 	
 	protected Hits _hits;
 

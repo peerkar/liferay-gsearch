@@ -54,6 +54,12 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		else if (WikiPage.class.getName().equals(entryClassName)) {
 			resultItemBuilder = new WikiPageItemBuilder();
 		}
+		
+		// Avoiding KB dependency in gradle.build
+		
+		else if ("com.liferay.knowledge.base.model.KBArticle".equals(entryClassName)) {
+			resultItemBuilder = new KBArticleItemBuilder();
+		}
 		else if ("non-liferay-type".equals(entryClassName)) {
 				resultItemBuilder = new NonLiferaySampleItemBuilder();
 
