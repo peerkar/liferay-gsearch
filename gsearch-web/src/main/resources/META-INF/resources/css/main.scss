@@ -228,8 +228,12 @@
 		.btn-link {
 			padding-left: 0px;
 		}
-		
-	    .btn-link,
+
+	    .btn-link:hover {
+	    	text-decoration: underline;
+	    }
+
+		.btn-link,	    		
 	    .btn-link:active,
 	    .btn-link:focus,
 	    .btn-link:hover {
