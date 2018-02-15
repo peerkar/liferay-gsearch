@@ -14,6 +14,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Enabling Audience Targeting support](#Audience_Targeting)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
+1. [Adding Support for Asset Types](#Asset_Support)
 1. [Custom querySuggestion Mapping](#querySuggestion)
 1. [Troubleshooting](#Troubleshooting)
 1. [Important Notes](#Important)
@@ -484,7 +485,17 @@ The example below defines three should (OR) queries. In the first, all the keywo
 ]
 ```
 
-# 11 Custom querySuggestion Mapping<a name="querySuggestion"></a>
+# 11 Custom querySuggestion Mapping<a name="Asset_Support"></a>
+
+The process for adding support for any asset type not implemented currently, including any custom, registered asset types:
+
+1. Implement a resultitembuilder class (see gsearch-core-impl/fi.soveltia.liferay.gsearch.core.impl.results.item)
+1. Add support for the new builder in gsearch-core-impl/fi.soveltia.liferay.gsearch.core.impl.results.item.ResultItemFactoryBuilderImpl
+1. Add asset type localizations (2) for selection menu and result view in gsearch-core-impl/resources/Language.properties
+1. Lastly add your new type to the asset type selection menu in the Configuration. See "Search types Sample Configuration" above in the doc.
+
+
+# 12 Custom querySuggestion Mapping<a name="querySuggestion"></a>
 
 Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by running the curl script:
 
@@ -539,7 +550,7 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 ```
 
 
-# 12 Troubleshooting <a name="Troubleshooting"></a>
+# 13 Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -551,14 +562,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 13 Important Notes <a name="Important"></a>
+# 14 Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 14 FAQ <a name="FAQ"></a>
+# 15 FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -639,18 +650,25 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 15 Project Roadmap <a name="Roadmap"></a>
+# 16 Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 16 Credits <a name="Credits"></a>
+# 17 Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 17 Disclaimer <a name="Disclaimer"></a>
+# 18 Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 18 Changelog <a name="Changelog"></a>
+# 19 Changelog <a name="Changelog"></a>
+
+## 2018-02-14
+* Added POC kind of support for Knowledge Base Articles
+
+## 2018-02-14
+* Scroll page to top on pagination event
+* Trigger search instantly on suggestion selection
 
 ## 2018-02-12
 
