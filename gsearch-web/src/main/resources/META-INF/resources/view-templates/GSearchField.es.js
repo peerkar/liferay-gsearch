@@ -99,7 +99,7 @@ class GSearchField extends Component {
 			minChars: _self.queryMinLength,
 			noCache: false,
 		    onSelect: function (suggestion) {
-		    	// Do search on button click only
+				_self.doSearch();
 		    },
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,

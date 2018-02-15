@@ -72,6 +72,15 @@ class GSearchPaging extends Component {
 				_self.setQueryParam('start', value);
 			}
 			
+			// Animate to top of the page
+
+			var body = $('html, body');
+			
+			body.stop().animate({
+				scrollTop:0
+			}, 500, 'swing', function() { 
+			});			
+			
 			event.preventDefault();
 		});			
 	}
