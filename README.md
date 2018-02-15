@@ -485,7 +485,7 @@ The example below defines three should (OR) queries. In the first, all the keywo
 ]
 ```
 
-# 11 Custom querySuggestion Mapping<a name="Asset_Support"></a>
+# 11 Adding Support for Asset Types<a name="Asset_Support"></a>
 
 The process for adding support for any asset type not implemented currently, including any custom, registered asset types:
 
