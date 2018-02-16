@@ -8,10 +8,10 @@
   "devDependencies": {
     "liferay-module-config-generator": "^1.2.1",
     "metal-ajax": "1.0.0",
+    "metal-cli": "^4.0.1",
     "metal-dropdown": "1.0.0",
-    "metal-multimap": "1.0.0",
-    "metal-cli": "^4.0.1"
+    "metal-multimap": "1.0.0"
   },
   "name": "gsearch-web",
-  "version": "2.0.0"
+  "version": "2.0.1"
 }

@@ -1,10 +1,9 @@
 Bundle-Name: Liferay GSearch Portlet
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.web
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.1
 Require-Capability:\
 	soy;\
 		filter:="(type=metal)"
-Include-Resource: \
-	package.json,\
-	META-INF/resources/js/mark.js = node_modules/mark.js/dist/mark.es6.js
+Include-Resource: package.json
 Web-ContextPath: /gsearch-web
+Liferay-JS-Config: /META-INF/resources/config.js

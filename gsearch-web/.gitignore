@@ -3,6 +3,7 @@
 .project
 .settings/
 package-lock.json
+classes/
 node_modules/
 bin/
 build/
