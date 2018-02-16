@@ -4,6 +4,8 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Field;
@@ -55,19 +57,21 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 
 		long classPK = GetterUtil.getLong(_document.get(Field.CLASS_PK));
 
-		if (PortalUtil.getClassName(classNameId).equals(
-			JournalArticle.class.getName())) {
-			return getJournalArticleCommentLink(classPK);
+		if (classNameId > 0) {
+
+			String className = PortalUtil.getClassName(classNameId);
+
+			if (JournalArticle.class.getName().equals(className)) {
+				return getJournalArticleCommentLink(classPK);
+			}
+			else if (WikiPage.class.getName().equals(className)) {
+				return getWikiPageCommentLink(classPK);
+			}
 		}
-		else if (PortalUtil.getClassName(classNameId).equals(
-			WikiPage.class.getName())) {
-			return getWikiPageCommentLink(classPK);
-		}
-		else {
-			return getAssetRenderer().getURLViewInContext(
-				(LiferayPortletRequest) _portletRequest,
-				(LiferayPortletResponse) _portletResponse, "");
-		}
+		
+		return getAssetRenderer().getURLViewInContext(
+			(LiferayPortletRequest) _portletRequest,
+			(LiferayPortletResponse) _portletResponse, "");
 	}
 
 	protected String getDLFileEntryCommentLink() {
@@ -127,4 +131,8 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 					"/o/gsearch-web/images/asset-types/discussion.png";
 
 	private static JournalArticleService _journalArticleService;
+	
+	private static final Log _log =
+					LogFactoryUtil.getLog(MBMessageItemBuilder.class);
+
 }
