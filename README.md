@@ -115,6 +115,8 @@ Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-ela
 
 This installs the basic functionality. If you're having problems or want to install all the features, see full instructions below.
 
+For choosing the right version of custom Elasticsearch adapter, com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar, please see [Step 2 - Install the Custom Elasticsearch Adapter](#Installation_2) below.
+
 1) Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
@@ -127,7 +129,6 @@ This installs the basic functionality. If you're having problems or want to inst
 2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) file and put it into osgi/configs.
 
 3) Do full reindex.
-
 
 # 7 Installation Guide <a name="Installation"></a>
 
@@ -175,6 +176,8 @@ This is not mandatory but if you want to have all the features and configurabili
 Download following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
+
+The VERSION depends on the fixpack or GA level you are running the Liferay on. Two versions are currently available: one basing on default Elasticsearch adapter version 2.1.13 and the other basing on 2.1.24. Fixpack 39 runs only on the newer one.
 
 Please see again from Gogo shell that it's deployed properly. Please note that custom adapter should disable (stop) the default adapter.
 
