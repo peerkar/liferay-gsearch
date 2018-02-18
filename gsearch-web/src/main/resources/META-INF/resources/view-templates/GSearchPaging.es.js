@@ -69,18 +69,18 @@ class GSearchPaging extends Component {
 			let value = $(this).attr('data-value');
 			
 			if (value != _self.getQueryParam('start')) {
-				_self.setQueryParam('start', value);
-			}
-			
-			// Animate to top of the page
 
-			var body = $('html, body');
+				// Scroll to the top
+
+				var body = $('html, body');
 			
-			body.stop().animate({
-				scrollTop:0
-			}, 500, 'swing', function() { 
-			});			
-			
+				body.stop().animate({
+					scrollTop: ($('.gsearch-portlet').offset().top)
+				}, 400, 'swing', function() { 
+					_self.setQueryParam('start', value);
+				});			
+			}
+
 			event.preventDefault();
 		});			
 	}
