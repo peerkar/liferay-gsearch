@@ -161,6 +161,10 @@ class View extends Component {
 	 */
 	executeQuery() {
 		
+		if (this.debug) {
+			console.log("Executing query.");
+		}
+
 		// Check that there's a query 
 		
 		if (typeof this.query.parameters['q'] == 'undefined' ||

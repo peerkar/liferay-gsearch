@@ -66,22 +66,37 @@ class GSearchPaging extends Component {
 		
 		element.find('span a').on('click', function(event) {
 
+			event.preventDefault();
+
 			let value = $(this).attr('data-value');
+			
+			if (this.debug) {
+				console.log("Going to page " + value);
+			}
 			
 			if (value != _self.getQueryParam('start')) {
 
-				// Scroll to the top
+				// Scroll to the top. Trying to find browser specific scroll top
+				// to avoid firing callback twice like with $('html, body');
+				
+				let scrollTo = $('.gsearch-portlet').offset().top;
+				
+			    if ($('html').scrollTop()) {
+			        $('html').animate({ 
+			        	scrollTop: scrollTo 
+			        }, 400, 'swing', function() { 
+						_self.setQueryParam('start', value);
+			        });
+			    }
 
-				var body = $('html, body');
-			
-				body.stop().animate({
-					scrollTop: ($('.gsearch-portlet').offset().top)
-				}, 400, 'swing', function() { 
-					_self.setQueryParam('start', value);
-				});			
+			    if ($('body').scrollTop()) {
+			        $('body').animate({
+			        	scrollTop: scrollTo 
+			        }, 400, 'swing', function() { 
+						_self.setQueryParam('start', value);
+			        });
+			    }
 			}
-
-			event.preventDefault();
 		});			
 	}
 }
