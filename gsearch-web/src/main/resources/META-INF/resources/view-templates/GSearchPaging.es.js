@@ -82,15 +82,13 @@ class GSearchPaging extends Component {
 				let scrollTo = $('.gsearch-portlet').offset().top;
 				
 			    if ($('html').scrollTop()) {
-			        $('html').animate({ 
+			        $('html').stop().animate({ 
 			        	scrollTop: scrollTo 
 			        }, 400, 'swing', function() { 
 						_self.setQueryParam('start', value);
 			        });
-			    }
-
-			    if ($('body').scrollTop()) {
-			        $('body').animate({
+			    } else if ($('body').scrollTop()) {
+			        $('body').stop().animate({
 			        	scrollTop: scrollTo 
 			        }, 400, 'swing', function() { 
 						_self.setQueryParam('start', value);
