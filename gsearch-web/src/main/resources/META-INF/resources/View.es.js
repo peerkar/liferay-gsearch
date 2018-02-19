@@ -103,6 +103,14 @@ class View extends Component {
 				this.query.parameters['resultsLayout'] = oldParameters['resultsLayout'];
 			}
 
+			if (typeof oldParameters['sortField'] !== 'undefined') {
+				this.query.parameters['sortField'] = oldParameters['sortField'];
+			}
+
+			if (typeof oldParameters['sortDirection'] !== 'undefined') {
+				this.query.parameters['sortDirection'] = oldParameters['sortDirection'];
+			}
+
 			// Persist current values
 			
 			this.query.type = oldParameters['type'];
