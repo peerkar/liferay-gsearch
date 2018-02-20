@@ -1,6 +1,6 @@
 Bundle-Name: Liferay GSearch Core API
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.core.api
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Export-package:\
 	 fi.soveltia.liferay.gsearch.core.api,\
 	 fi.soveltia.liferay.gsearch.core.api.configuration,\

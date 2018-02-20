@@ -18,6 +18,22 @@ public interface GSearchConfiguration {
 	public boolean jsDebuggingEnabled();
 
 	@Meta.AD(
+		deflt = "", 
+		description = "help-text-article-id-desc",
+	    name = "help-text-article-id-name",
+		required = false
+	)
+	public String helpTextArticleId();
+	
+	@Meta.AD(
+		deflt = "0", 
+		description = "help-text-group-id-desc",
+	    name = "help-text-group-id-name",
+		required = false
+	)
+	public long helpTextGroupId();
+	
+	@Meta.AD(
 		deflt = "3", 
 	    name = "keywords-min-length",
 		required = false
