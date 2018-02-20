@@ -32,17 +32,19 @@
 	}
 	
 	.modal-dialog {
+    	overflow-y: initial !important;
 		position: relative;
 		
 		@include media-query(null, $screen-xs-max) {
 			position: inherit;
 		}
-		
 	}
-	
+
 	.modal-body {
 		background: #fff;
+	    max-height: 75vh;
 		min-height: 70px;
+	    overflow-y: auto;
 		
 		h1 {
 			font-size: 1.8em;
@@ -55,12 +57,17 @@
 		}		
 		
 		h3 {
-			font-size: 1.2em;
+			font-size: 1em;
+			font-weight: 600;
 			margin: 15px 0 5px 0;
 		}
 		
 		p {
 			margin-bottom: 10px;
+		}
+		
+		.example {
+			color: #69b5b9;
 		}
 	}
 	
