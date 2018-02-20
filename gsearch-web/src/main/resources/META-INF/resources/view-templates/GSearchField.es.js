@@ -90,7 +90,7 @@ class GSearchField extends Component {
 	 * Init autocomplete / suggester.
 	 */
 	initAutocomplete() {
-
+		
 		let _self = this;
 		 
 		$('#' + this.portletNamespace + 'SearchField').devbridgeAutocomplete({
@@ -105,7 +105,7 @@ class GSearchField extends Component {
 			serviceUrl: _self.suggestionsURL,
 			transformResult: function(response) {
 
-				if (response) {
+				if (response && !_self.isSearching) {
 				    return {
 	    				suggestions: $.map(response, function(item) {
 				    		return {
@@ -115,6 +115,8 @@ class GSearchField extends Component {
 				        })
 				    };
     			} else {
+    		    	_self.isSearching = false;
+
     				return {
     					suggestions: []
     				}
@@ -129,6 +131,12 @@ class GSearchField extends Component {
 	 */
 	doSearch() {
 
+		// It can happen that search is triggered before autocompletion request has been finished.
+		// This flag prevents transforming autocomplete request after search is done.
+		// Effectively it prevents autocomplete suggestions box to open after search results appear.
+		
+		this.isSearching = true;
+		
 		let keywords = $('#' + this.portletNamespace + 'SearchField').val().trim();
 
 		// Validate keywords.
@@ -140,6 +148,8 @@ class GSearchField extends Component {
 	
 	/**
 	 * Get suggestions
+	 * 
+	 * @deprecated
 	 */
 	getSuggestions(keywords) {
 
@@ -237,6 +247,9 @@ class GSearchField extends Component {
  * @static
  */
 GSearchField.STATE = {
+	isSearching: {
+		value: false
+	},
 	getQueryParam: {
 		validator: core.isFunction
 	},
