@@ -57,6 +57,8 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
 			GSearchConfiguration.class, properties);
+		
+		_helpText = null;
 	}
 
 	@Override
@@ -85,10 +87,10 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 	 */
 	protected String getHelpText(ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
 
-		if (helpText != null) {
-			return helpText;
+		if (_helpText != null) {
+			return _helpText;
 		}
-
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
@@ -105,7 +107,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 				 _journalArticleService.getLatestArticle(groupId, articleId,
 				 WorkflowConstants.STATUS_APPROVED);
 				 
-				helpText  = _journalArticleService.getArticleContent(groupId, articleId, journalArticle.getVersion(), 
+				_helpText = _journalArticleService.getArticleContent(groupId, articleId, journalArticle.getVersion(), 
 						themeDisplay.getLanguageId(), new PortletRequestModel(resourceRequest, resourceResponse),
 						themeDisplay);
 			}
@@ -116,16 +118,16 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		// Fall back to default help text from
 
-		if (helpText == null) {
+		if (_helpText == null) {
 
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", resourceRequest.getLocale(),
 				GSearchPortlet.class);
 	
-			helpText = LanguageUtil.get(resourceBundle, "helptext");
+			_helpText = LanguageUtil.get(resourceBundle, "helptext");
 		}
 		
-		return helpText;
+		return _helpText;
 	}
 
 	@Reference(unbind = "-")
@@ -137,7 +139,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
 
-	private String helpText = null;
+	private String _helpText;
 
 	private JournalArticleService _journalArticleService;
 
