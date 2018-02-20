@@ -4,18 +4,19 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.model.WikiPage;
 
 import javax.portlet.WindowState;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -59,7 +60,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 
 		if (classNameId > 0) {
 
-			String className = PortalUtil.getClassName(classNameId);
+			String className = getClassName(classNameId);
 
 			if (JournalArticle.class.getName().equals(className)) {
 				return getJournalArticleCommentLink(classPK);
@@ -73,6 +74,40 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 			(LiferayPortletRequest) _portletRequest,
 			(LiferayPortletResponse) _portletResponse, "");
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getTitle()
+		throws NumberFormatException, PortalException {
+		
+		long classNameId =
+						GetterUtil.getLong(_document.get(Field.CLASS_NAME_ID));
+		
+		if (classNameId > 0) {
+
+			String className = getClassName(classNameId);
+
+			if (JournalArticle.class.getName().equals(className) || 
+						WikiPage.class.getName().equals(className)) {
+	
+				String title = _document.get(Field.CONTENT);
+				
+				if (title.length() > TITLE_MAXLENGTH) {
+					title = title.substring(0, TITLE_MAXLENGTH);
+				}
+	
+				// Using Apache commons as it works better than HTMLUtils
+				
+				title = StringEscapeUtils.unescapeHtml4(title);
+				title = HtmlUtil.stripHtml(title);
+	
+				return title;
+			}
+		}
+		return super.getTitle();
+	}	
 
 	protected String getDLFileEntryCommentLink() {
 
@@ -119,12 +154,20 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 		return assetRenderer.getURLView(
 			(LiferayPortletResponse) _portletResponse, WindowState.MAXIMIZED);
 	}
-
+	
 	@Reference(unbind = "-")
 	protected void setJournalArticleService(
 		JournalArticleService journalArticleService) {
 
 		_journalArticleService = journalArticleService;
+	}
+	
+	private String getClassName(long classNameId) {
+
+		if (className == null) {
+			className = PortalUtil.getClassName(classNameId); 
+		}
+		return className;
 	}
 
 	public static final String DEFAULT_IMAGE =
@@ -132,7 +175,8 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 
 	private static JournalArticleService _journalArticleService;
 	
-	private static final Log _log =
-					LogFactoryUtil.getLog(MBMessageItemBuilder.class);
-
+	private String className = null;
+	
+	private static final int TITLE_MAXLENGTH = 80;
+	
 }

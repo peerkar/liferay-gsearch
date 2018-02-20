@@ -149,6 +149,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return sb.toString();
 	}	
+	
 	/**
 	 * {@inheritDoc}
 	 */
