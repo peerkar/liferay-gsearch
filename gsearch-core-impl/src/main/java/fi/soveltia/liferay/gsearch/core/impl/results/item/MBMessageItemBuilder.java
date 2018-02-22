@@ -95,7 +95,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 				String title = _document.get(Field.CONTENT);
 				
 				if (title.length() > TITLE_MAXLENGTH) {
-					title = title.substring(0, TITLE_MAXLENGTH);
+					title = title.substring(0, TITLE_MAXLENGTH) + "...";
 				}
 	
 				// Using Apache commons as it works better than HTMLUtils
