@@ -114,8 +114,8 @@ class GSearchField extends Component {
 				    		};
 				        })
 				    };
-    			} else {
-    		    	_self.isSearching = false;
+				} else {
+					_self.isSearching = false;
 
     				return {
     					suggestions: []
@@ -133,7 +133,7 @@ class GSearchField extends Component {
 
 		// It can happen that search is triggered before autocompletion request has been finished.
 		// This flag prevents transforming autocomplete request after search is done.
-		// Effectively it prevents autocomplete suggestions box to open after search results appear.
+		// Effectively it prevents autocomplete suggestions box to open after search.
 		
 		this.isSearching = true;
 		

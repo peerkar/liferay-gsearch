@@ -279,8 +279,12 @@
 				margin-right: 15px;
 				border: 1px solid #1a0dab;
 				box-shadow: 4px 4px 1px -1px #b8bcc1;
+				
+				@include media-query(null, 467px) {
+					margin-right: 0;
+				}
 			}
-
+				
 			.selected a,
 			.a:hover {
 			    background: #a6dfd8;
@@ -341,13 +345,15 @@
 					 h1 {
 						display: inline-block;
 						font-size: 130%;
+						line-height: 1.5;
 						margin-bottom: 0;
 						margin-top: 0;
 					}
+
 					.type {
 						font-size: 77%;
 						margin-right: 10px;	
-						vertical-align: super;					
+						vertical-align: super;
 					}
 				}
 		
@@ -365,6 +371,10 @@
 		
 				.description {
 					color: #545454;
+					
+					@include media-query(null, $screen-xs-max) {
+						word-break: break-all;
+					}
 				}
 			}
 		}
