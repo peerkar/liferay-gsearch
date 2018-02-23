@@ -291,6 +291,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	/**
 	 * Set sort. Default sort field equals to score.
+	 * 
 	 * @throws JSONException 
 	 */
 	protected void setSortParam() throws JSONException {
@@ -301,8 +302,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String sortDirection =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.SORT_DIRECTION);
 
-		Sort sort1;
-		Sort sort2;
+		Sort sort1 = null;
+		Sort sort2 = null;
 
 		boolean reverse;
 
@@ -325,25 +326,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			
 			JSONObject item = configurationArray.getJSONObject(i);
 			
-			if (item.getBoolean("default")) {
-
-				defaultFieldName = item.getString("fieldName");
-
-				if (item.getString("fieldPrefix") != null) {
-					defaultFieldName = item.getString("fieldPrefix").concat(defaultFieldName);
-				}
-
-				if (item.getBoolean("localized")) {
-					defaultFieldName = defaultFieldName.concat("_").concat(_queryParams.getLocale().toString());
-				}
-				
-				if (item.getString("fieldSuffix") != null) {
-					defaultFieldName = defaultFieldName.concat(item.getString("fieldSuffix"));
-				}
-				
-				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
-			}
-			
 			if (item.getString("key").equals(sortField)) {
 
 				fieldName = item.getString("fieldName");
@@ -363,28 +345,47 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 				fieldType = Integer.valueOf(item.getString("fieldType"));
 
 				break;
+
+			} else if (item.getBoolean("default")) {
+
+				defaultFieldName = item.getString("fieldName");
+
+				if (item.getString("fieldPrefix") != null) {
+					defaultFieldName = item.getString("fieldPrefix").concat(defaultFieldName);
+				}
+
+				if (item.getBoolean("localized")) {
+					defaultFieldName = defaultFieldName.concat("_").concat(_queryParams.getLocale().toString());
+				}
+				
+				if (item.getString("fieldSuffix") != null) {
+					defaultFieldName = defaultFieldName.concat(item.getString("fieldSuffix"));
+				}
+				
+				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
 			}
 		}
-		
-		if (fieldName == null) {
+
+		if (fieldName == null || fieldType == null) {
+
 			fieldName = defaultFieldName;
 			fieldType = defaultFieldType;
 		}
 
-		if (fieldType == null) {
-			sort1 = new Sort(fieldName, reverse);		
-		} else {
-			sort1 = new Sort(fieldName, fieldType, reverse);		
-		}
+		sort1 = new Sort(fieldName, fieldType, reverse);		
 		
-		// Set secondary sort. Use score or modified.
+		// If primary sort is score, use modified as secondary
+		// Use score as secondary for other primary sorts
 
-		if (fieldName == null) {
+		if (Validator.isNull(fieldName) || "_score".equals(fieldName)) {
+
 			sort2 = new Sort(MODIFIED_SORT_FIELD, Sort.LONG_TYPE, reverse);
+			
 		} else {
+
 			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
 		}
-
+		
 		_queryParams.setSorts(new Sort[] {
 			sort1, sort2
 		});

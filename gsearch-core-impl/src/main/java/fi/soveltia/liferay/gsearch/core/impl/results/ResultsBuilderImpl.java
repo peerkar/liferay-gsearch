@@ -213,7 +213,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		if (_hits == null || docs.length == 0) {
 			return jsonArray;
 		}
-		
+
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
 
@@ -226,6 +226,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"##############################################");
+
+					_log.debug("Score: " + _hits.getScores()[i]);
 
 					for (Entry<String, Field> e : document.getFields().entrySet()) {
 						_log.debug(e.getKey() + ":" + e.getValue().getValue());
