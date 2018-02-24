@@ -2,6 +2,10 @@
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
@@ -27,8 +31,8 @@ import org.osgi.service.component.annotations.Reference;
 import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelperService;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 
 /**
  * View render command. Primary/default view.
@@ -129,7 +133,20 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		// Get/set parameters from url
 
 		setInitialParameters(renderRequest, template);
+		
+		// Set facet fields
+		
+		template.put(GSearchWebKeys.FACET_FIELDS, _facetFields);
+		
+		// Tags param name
+		
+		template.put(GSearchWebKeys.ASSET_TAG_PARAM, "assetTagNames");
 
+		// Show tags
+		
+		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _gSearchConfiguration.showTags());
+
+		
 		return "View";
 	}
 	
@@ -138,6 +155,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	protected void activate(Map<Object, Object> properties) {
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
 			GSearchConfiguration.class, properties);
+		
+		try {
+			setFacetFields();
+		}
+		catch (JSONException e) {
+			_log.error(e, e);
+		}
 	}
 	
 	/**
@@ -156,6 +180,28 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		return portletURL.toString();
 	}	
+		
+	/**
+	 * Get / set facet field configuration
+	 * 
+	 * @throws JSONException
+	 */
+	protected void setFacetFields() throws JSONException {
+
+		JSONArray configuration = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+
+		if (configuration.length() > 0) {
+
+			_facetFields = new String[configuration.length()];
+		
+			for (int i = 0; i < configuration.length(); i++) {
+
+				JSONObject item = configuration.getJSONObject(i);
+
+				_facetFields[i] = item.getString("fieldParam");
+			}
+		}
+	}
 	
 	/**
 	 * Set initial parameters for the templates.
@@ -170,18 +216,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		HttpServletRequest httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 		HttpServletRequest request = PortalUtil.getOriginalServletRequest(httpServletRequest);
 		
+		// Basic params
+		
 		String keywords = ParamUtil.getString(request, GSearchWebKeys.KEYWORDS);
 		
 		String scopeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_SCOPE);
 		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME);
 		String typeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TYPE);
-
-		String facetAssetCategoryTitles = ParamUtil.getString(request, GSearchWebKeys.FACET_CATEGORIES);
-		String facetAssetTagNames = ParamUtil.getString(request, GSearchWebKeys.FACET_TAGS);
-		String facetDocumentType = ParamUtil.getString(request, GSearchWebKeys.FACET_DOCUMENT_TYPE);
-		String facetExtension = ParamUtil.getString(request, GSearchWebKeys.FACET_EXTENSION);
-		String facetUsername = ParamUtil.getString(request, GSearchWebKeys.FACET_USERNAME);
-		String facetWebContentStructure = ParamUtil.getString(request, GSearchWebKeys.FACET_WEB_CONTENT_STRUCTURE);
 
 		String sortField = ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
 		String sortDirection = ParamUtil.getString(request, GSearchWebKeys.SORT_DIRECTION);
@@ -193,10 +234,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 				
 		if (Validator.isNotNull(keywords)) {
 			initialParameters.put(GSearchWebKeys.KEYWORDS, keywords);
-		}
-
-		if (Validator.isNotNull(facetWebContentStructure)) {
-			initialParameters.put(GSearchWebKeys.FACET_WEB_CONTENT_STRUCTURE, facetWebContentStructure);
 		}
 		
 		if (Validator.isNotNull(scopeFilter)) {
@@ -222,31 +259,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		if (Validator.isNotNull(start)) {
 			initialParameters.put(GSearchWebKeys.START, start);
 		}
-		
-		// Facets
-		
-		if (Validator.isNotNull(facetAssetCategoryTitles)) {
-			initialParameters.put(GSearchWebKeys.FACET_CATEGORIES, facetAssetCategoryTitles);
-		}
-
-		if (Validator.isNotNull(facetAssetTagNames)) {
-			initialParameters.put(GSearchWebKeys.FACET_TAGS, facetAssetTagNames);
-		}
-
-		if (Validator.isNotNull(facetDocumentType)) {
-			initialParameters.put(GSearchWebKeys.FACET_DOCUMENT_TYPE, facetDocumentType);
-		}
-		
-		if (Validator.isNotNull(facetExtension)) {
-			initialParameters.put(GSearchWebKeys.FACET_EXTENSION, facetExtension);
-		}
-
-		if (Validator.isNotNull(facetUsername)) {
-			initialParameters.put(GSearchWebKeys.FACET_USERNAME, facetUsername);
-		}
 
 		if (Validator.isNotNull(resultsLayout)) {
 			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, resultsLayout);
+		}
+
+		// Facets.
+		
+		if (_facetFields != null) {
+
+			for (String facetKey : _facetFields) {
+
+				String facetValue = ParamUtil.getString(request, facetKey);
+
+				if (Validator.isNotNull(facetValue)) {
+					initialParameters.put(facetKey, facetValue);
+				}
+			}
 		}
 		
 		template.put(GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
@@ -262,6 +291,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	protected JSONConfigurationHelperService _jsonConfigurationHelperService;
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
+
+	private static String[] _facetFields = null;
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewMVCRenderCommand.class);

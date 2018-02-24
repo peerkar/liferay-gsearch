@@ -1,5 +1,6 @@
 @import "mixins";
 @import "boostrap-xl";
+@import "grow";
 
 .gsearch-portlet {
 	
@@ -232,7 +233,10 @@
 	.gsearch-sort {
 	
 		float: left;
-		padding-left: 0;
+		
+		@include media-query(null, $screen-xs-max) {
+			padding-left: 0;
+		}
 	
 		.btn-link {
 			padding-left: 0px;
@@ -355,6 +359,11 @@
 						margin-right: 10px;	
 						vertical-align: super;
 					}
+					
+					.glyphicon-ok {
+						color: green;
+						margin-left: 10px;
+					}
 				}
 		
 				.link {
@@ -376,6 +385,21 @@
 						word-break: break-all;
 					}
 				}
+			}
+		}
+		
+		.tags {
+			
+			color: #aaa;
+			font-size: 0.9em;
+			margin-top: 4px;
+					
+			span {
+				margin-right: 10px;
+			}
+			
+			.tag:hover {
+				cursor: pointer;
 			}
 		}
 		

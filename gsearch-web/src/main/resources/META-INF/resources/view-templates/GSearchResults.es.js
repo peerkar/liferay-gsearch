@@ -1,5 +1,6 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
+import core from 'metal/src/core';
 
 import templates from './GSearchResults.soy';
 
@@ -19,19 +20,23 @@ class GSearchResults extends Component {
 		this.debug = opt_config.JSDebugEnabled;
 
 		this.portletNamespace = opt_config.portletNamespace;
+		
+		this.assetTagParam = opt_config.assetTagParam;
+
+		this.showAssetTags = opt_config.showAssetTags;
 	}
 	
 	/**
-	 * Highlight query terms in results
+	 * Highlight keywords in results
 	 * 
 	 */
-	doHighlight() {
+	doHighlightKeywords() {
 		
-		let self = this;
+		let _self = this;
 
 		Liferay.Loader.require('mark', function(Mark) {
-			if (self.results.items.length > 0 & self.results.meta.queryTerms.length > 0) {
-				new Mark($('#' + self.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(self.results.meta.queryTerms);
+			if (_self.results.items.length > 0 & _self.results.meta.queryTerms.length > 0) {
+				new Mark($('#' + _self.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(_self.results.meta.queryTerms);
 			}
 		});
 	}
@@ -46,10 +51,28 @@ class GSearchResults extends Component {
 			console.log("GSearchResults.rendered()");
 		}
 		
-		this.doHighlight();
+		this.doHighlightKeywords();
+		
+		// Set up tags (if present) links
+		
+		if (this.showAssetTags) {
+			this.setupTagLinks();
+		}
+	}
+	
+	/**
+	 * Set up asset tags links
+	 */
+	setupTagLinks() {
+
+		let _self = this;
+
+		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').on('click', function(event) {
+			_self.setQueryParam(_self.assetTagParam, $(this).html());
+		}); 
 	}
 }
-	
+
 /** 
  * State definition.
  * 
@@ -59,6 +82,12 @@ class GSearchResults extends Component {
 GSearchResults.STATE = {
 	results: {
 		value: null
+	},
+	setQueryParam: {
+		validator: core.isFunction
+	},
+	showAssetTags: {
+		value: false
 	}
 };
 

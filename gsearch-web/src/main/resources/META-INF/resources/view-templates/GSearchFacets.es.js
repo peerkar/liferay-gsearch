@@ -25,6 +25,8 @@ class GSearchFacets extends Component {
 		this.initialQueryParameters = opt_config.initialQueryParameters; 
 
 		this.portletNamespace = opt_config.portletNamespace;
+		
+		this.templateParameters = opt_config.facetFields;
 	}
 
 	/**
@@ -38,7 +40,8 @@ class GSearchFacets extends Component {
 		
 		// Set initial query parameters from calling url.
 
-		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
+		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, 
+				this.templateParameters, this.setQueryParam);		
 	}
 	
 	/**
@@ -62,7 +65,7 @@ class GSearchFacets extends Component {
 	shouldUpdate(changes, propsChanges) {
 
 		if (this.debug) {
-			console.log("GSearchFacets.willUpdate()");
+			console.log("GSearchFacets.shouldUpdate()");
 		}		
 
     	// Detach event listeners and facet element on rerender.
@@ -91,7 +94,7 @@ GSearchFacets.STATE = {
 		validator: core.isFunction
 	},
 	templateParameters: {
-		value: ["extension", "ddmStructureKey", "fileEntryTypeId", "userName", "assetCategoryName", "assetTagNames"]
+		value: null
 	}
 };
 

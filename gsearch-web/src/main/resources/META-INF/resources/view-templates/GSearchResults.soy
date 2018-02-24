@@ -103,11 +103,17 @@
 					<h1>
 						<a href="{$item.link}">{$item.title}</a>
 					</h1>
+					
+					// Mark highlighted item.
+					
+					{if $item.highlight}
+						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-ok"></span>
+					{/if}
 				</div>
 				<div class="link">
 					<a href="{$item.link}">{$item.link}</a>
 				</div>
-				
+
 				<div class="description ">
 					{if $item.date != ''}
 						<strong>{$item.date}</strong>
@@ -116,11 +122,16 @@
 						- <span class="highlightable">{$item.description}</span>
 					{/if}
 				</div>
+				
+				{if $item.tags}
+					<div class="tags">
+						<span>{msg desc=""}tags{/msg}:</span>
+						{foreach $tag in $item.tags}
+							<span class="tag">{$tag}</span>
+						{/foreach}
+					</div>							
+				{/if}
 			</div>
 		</div>
 	</div>
 {/template}
-
-
-
-	
