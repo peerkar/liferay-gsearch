@@ -8,7 +8,8 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.MultiValueFacet;
+import com.liferay.portal.kernel.search.facet.SimpleFacet;
+import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 
 import java.util.Map;
 
@@ -20,7 +21,8 @@ import fi.soveltia.liferay.gsearch.core.api.facet.FacetsBuilder;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 
 /**
- * Facets builder implementation.
+ * Facets builder implementation. This service sets the configured
+ * facets (aggregations) to searchcontext.
  * 
  * @author Petteri Karttunen
  */
@@ -46,9 +48,19 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 
 			String fieldName = item.getString("fieldName");
 			
-			Facet facet = new MultiValueFacet(searchContext);
-			facet.setFieldName(fieldName);
-			facet.setStatic(false);
+			Facet facet = new SimpleFacet(searchContext);
+			
+			FacetConfiguration facetConfiguration = new FacetConfiguration();
+
+			facetConfiguration.setFieldName(fieldName);
+			facetConfiguration.setStatic(false);
+
+			JSONObject dataObject = JSONFactoryUtil.createJSONObject();
+			dataObject.put("maxTerms", MAX_TERMS);
+
+			facetConfiguration.setDataJSONObject(dataObject);
+			
+			facet.setFacetConfiguration(facetConfiguration);
 
 			searchContext.addFacet(facet);
 		}
@@ -62,4 +74,6 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 	}	
 
 	private volatile GSearchConfiguration _gSearchConfiguration;
+	
+	private int MAX_TERMS = 20;
 }

@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,12 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 
 		for (TermCollector tc : termCollectors) {
 
+			// Check for empty term value!
+			
+			if (Validator.isNull(tc.getTerm())) {
+				continue;
+			}
+			
 			mappingFound = false;
 
 			for (int i = 0; i < aggregations.length(); i++) {
