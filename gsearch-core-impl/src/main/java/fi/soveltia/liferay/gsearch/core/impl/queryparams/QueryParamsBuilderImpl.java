@@ -161,6 +161,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		Map<String, String[]> facetParams = new HashMap<String, String[]>();
 
+		String fieldParam;
 		String fieldName;
 		String fieldValue;
 		
@@ -168,14 +169,16 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			
 			JSONObject facetConfiguration = configurationArray.getJSONObject(i);
 
+			fieldParam = facetConfiguration.getString("paramName");
+
 			fieldName = facetConfiguration.getString("fieldName");
-			
-			fieldValue = ParamUtil.getString(_portletRequest, fieldName);
+
+			fieldValue = ParamUtil.getString(_portletRequest, fieldParam);
 
 			if (Validator.isNotNull(fieldValue)) {
 
 				FacetTranslator translator = _facetTranslatorFactory.getTranslator(fieldName);
-
+				
 				if (translator != null) {
 					String[]values = translator.translateParams(fieldValue, facetConfiguration);
 					facetParams.put(fieldName, values);
@@ -270,7 +273,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
 
 		String extensionParam = ParamUtil.getString(
-			_portletRequest, GSearchWebKeys.FACET_EXTENSION);
+			_portletRequest, "extension");
 		
 		String type = ParamUtil.getString(
 			_portletRequest, GSearchWebKeys.FILTER_TYPE);

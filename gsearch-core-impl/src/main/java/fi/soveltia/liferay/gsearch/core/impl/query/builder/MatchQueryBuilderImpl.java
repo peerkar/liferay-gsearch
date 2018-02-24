@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.kernel.search.generic.MatchQuery.Operator;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -39,8 +40,16 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 			return null;
 		}
 
+		// If there's a predefined value in the configuration, use that
+
+		String value = configurationObject.getString("value");
+
+		if (Validator.isNull(value)) {
+			value = queryParams.getKeywords();
+		}
+		
 		MatchQuery matchQuery =
-			new MatchQuery(fieldName, queryParams.getKeywords());
+			new MatchQuery(fieldName, value);
 		
 		float boost =
 			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
@@ -78,9 +87,17 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 		if (fieldName == null || queryType == null) {
 			return null;
 		}
+		
+		// If there's a predefined value in the configuration, use that
+
+		String value = configurationObject.getString("value");
+
+		if (Validator.isNull(value)) {
+			value = queryParams.getKeywords();
+		}
 
 		MatchQuery matchQuery =
-			new MatchQuery(fieldName, queryParams.getKeywords());
+			new MatchQuery(fieldName, value);
 
 		// Boost
 		
@@ -117,7 +134,7 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 				configurationObject.getString("boostForLocalizedVersion"), 1f);
 
 		MatchQuery localizedQuery =
-				new MatchQuery(localizedFieldName, queryParams.getKeywords());
+				new MatchQuery(localizedFieldName, value);
 
 		localizedQuery.setBoost(localizedBoost);
 

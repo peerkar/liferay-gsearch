@@ -187,12 +187,13 @@ public class GSearchImpl implements GSearch {
 		_resultsBuilder = resultsBuilder;
 	}
 	
+
+	private FacetsBuilder _facetsBuilder;
+	
 	private IndexSearcherHelper _indexSearcherHelper;
 	
 	private QueryBuilder _queryBuilder;
 
-	private FacetsBuilder _facetsBuilder;
-	
 	private QueryIndexerProcessor _queryIndexerProcessor;
 
 	private QuerySuggestionsProcessor _querySuggestionsProcessor;

@@ -171,5 +171,4 @@ public class GSearchUtil {
 
 		return groupIds.stream().mapToLong(l -> l).toArray();
 	}	
-	
 }

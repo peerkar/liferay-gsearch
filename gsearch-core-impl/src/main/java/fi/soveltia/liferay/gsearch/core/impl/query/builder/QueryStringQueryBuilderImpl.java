@@ -4,6 +4,8 @@ package fi.soveltia.liferay.gsearch.core.impl.query.builder;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -37,7 +39,29 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 		float queryBoost =
 			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 
-		QueryStringQuery queryStringQuery = new QueryStringQuery(queryParams.getKeywords());
+		// If there's a predefined value in the configuration, use that
+
+		String value = configurationObject.getString("value");
+
+		if (Validator.isNull(value)) {
+
+			StringBundler sb = new StringBundler();
+			
+			String prefix = configurationObject.getString("valuePrefix");
+			if (Validator.isNotNull(prefix)) {
+				sb.append(prefix);
+			}
+
+			sb.append(queryParams.getKeywords());
+
+			String suffix = configurationObject.getString("valueSuffix");
+			if (Validator.isNotNull(suffix)) {
+				sb.append(suffix);
+			}			
+			value = sb.toString();
+		}
+		
+		QueryStringQuery queryStringQuery = new QueryStringQuery(value);
 
 		JSONArray fields = configurationObject.getJSONArray("fields");
 		
@@ -81,11 +105,11 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 		// Analyzer
 		
 		String analyzer = configurationObject.getString("analyzer");
-		
+		 
 		if (analyzer != null && analyzer != "") {
 			queryStringQuery.setAnalyzer(analyzer);
 		}
-
+		
 		return queryStringQuery;
 	}
 	

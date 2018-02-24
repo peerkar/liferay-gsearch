@@ -31,6 +31,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
@@ -39,6 +41,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactory;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemHighlighter;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
 
 /**
@@ -136,7 +139,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		List<Facet> facetsList = sortFacetList(ListUtil.fromCollection(facets.values()), configuration);
 		
 		for (Facet facet : facetsList) {
-			
+
 			if (facet.isStatic()) {
 				continue;
 			}
@@ -159,19 +162,19 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			// Process facets
 			
 			FacetTranslator translator = _facetTranslatorFactory.getTranslator(facet.getFieldName());
-
+			
 			if (translator != null) {
 				termArray = translator.translateValues(_queryParams, facetCollector, facetConfiguration);
 
 			} else {
-			
+				
 				List<TermCollector> termCollectors =
 					facetCollector.getTermCollectors();
 	
 				for (TermCollector tc : termCollectors) {
 	
 					JSONObject item = JSONFactoryUtil.createJSONObject();
-
+					
 					item.put("frequency", tc.getFrequency());
 					item.put("name", tc.getTerm());
 					item.put("term", tc.getTerm());
@@ -189,7 +192,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				
 				resultItem.put("anyOption", _resourceBundle.getString("any-" + 
 								facetCollector.getFieldName().toLowerCase()));
-				resultItem.put("fieldName", facetCollector.getFieldName());
+				resultItem.put("fieldName", facetConfiguration.get("paramName"));
 				resultItem.put("icon", facetConfiguration.get("icon"));
 				resultItem.put("values", termArray);
 				
@@ -213,6 +216,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		if (_hits == null || docs.length == 0) {
 			return jsonArray;
 		}
+		
+		boolean showTags = _gSearchConfiguration.showTags();
+		
+		boolean doItemHighlight = _resultItemHighlighter != null && _resultItemHighlighter.isEnabled();
 
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
@@ -269,9 +276,27 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				jsonObject.put("type", getLocalization(resultItemBuilder.getType().toLowerCase()));
 
 				// Link
-
+				
 				jsonObject.put("link", resultItemBuilder.getLink());
 
+				// Tags
+
+				if (showTags) {
+				
+					String[] tags = resultItemBuilder.getTags();
+					
+					if (tags != null && tags.length > 0 && tags[0].length() > 0) {
+					
+						jsonObject.put("tags", tags);
+					}
+				}
+					
+				// Item highlight
+				
+				if (doItemHighlight) {
+					jsonObject.put("highlight", _resultItemHighlighter.isHighlightedItem(document));
+				}
+				
 				// Additional metadata
 
 				jsonObject.put("metadata", resultItemBuilder.getMetadata());
@@ -428,6 +453,16 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		_resultsBuilderFactory = resultsBuilderFactory;
 	}
 
+	@Reference(
+		cardinality = ReferenceCardinality.OPTIONAL,
+		policyOption = ReferencePolicyOption.GREEDY,
+		unbind = "-"
+	)
+	protected void setResultItemHighlighter(ResultItemHighlighter resultItemHighlighter) {
+
+		_resultItemHighlighter = resultItemHighlighter;
+	}
+	
 	/**
 	 * Sort facet list. Use the order of configuration.
 	 * 
@@ -484,6 +519,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	private volatile GSearchConfiguration _gSearchConfiguration;
 
 	private ResultItemBuilderFactory _resultsBuilderFactory;	
+
+	private ResultItemHighlighter _resultItemHighlighter;	
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ResultsBuilderImpl.class);

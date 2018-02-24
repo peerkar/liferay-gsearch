@@ -62,9 +62,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 		
 		// Add Audience targeting query
 		
-		if (_gSearchConfiguration.enableAudienceTargeting()) {
-			addCTQuery(portletRequest, query);
-		}		
+		addCTQuery(portletRequest, query);
 		
 		// Add filters
 
@@ -96,17 +94,19 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 */
 	protected void addCTQuery(PortletRequest portletRequest, BooleanQuery query) throws Exception {
 
-		if (_ctQueryBuilder == null) {
-			_log.error("Audience targeting is enable but the gsearch-audience-targeting module " +
-				"seems not to be installed.");
-		} else {
-	
-			BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
-	
-			if (ctQuery != null) {
-				query.add(ctQuery, BooleanClauseOccur.SHOULD);
-			}
-		}				
+		if (_ctQueryBuilder == null || !_ctQueryBuilder.isEnabled()) {
+			return;
+		}
+
+		if(_log.isDebugEnabled()) {
+			_log.debug("Adding audience targeting query.");
+		}
+		
+		BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
+
+		if (ctQuery != null) {
+			query.add(ctQuery, BooleanClauseOccur.SHOULD);
+		}
 	}
 	
 	/**

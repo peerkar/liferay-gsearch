@@ -33,8 +33,16 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 	public WildcardQuery buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
+		
+		// If there's a predefined value in the configuration, use that
 
-		WildcardQuery wildcardQuery = buildClause(configurationObject, queryParams.getKeywords());
+		String value = configurationObject.getString("value");
+
+		if (Validator.isNull(value)) {
+			value = queryParams.getKeywords();
+		}
+
+		WildcardQuery wildcardQuery = buildClause(configurationObject, value);
 
 		float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 		wildcardQuery.setBoost(boost);
@@ -54,7 +62,15 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 		
 		String keywordSplitter = configurationObject.getString("keywordSplitter");
 
-		String [] keywords = queryParams.getKeywords().split(keywordSplitter);
+		// If there's a predefined value in the configuration, use that
+
+		String value = configurationObject.getString("value");
+
+		if (Validator.isNull(value)) {
+			value = queryParams.getKeywords();
+		}
+		
+		String [] keywords = value.split(keywordSplitter);
 			
 		for (String keyword : keywords) {
 			WildcardQuery q = buildClause(configurationObject, keyword);

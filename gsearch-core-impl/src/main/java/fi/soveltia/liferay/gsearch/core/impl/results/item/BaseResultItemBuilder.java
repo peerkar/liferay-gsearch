@@ -154,6 +154,17 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String[] getTags() {
+
+		String[] tags = _document.getValues(Field.ASSET_TAG_NAMES);
+
+		return tags;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getTitle()
 		throws NumberFormatException, PortalException {
 
