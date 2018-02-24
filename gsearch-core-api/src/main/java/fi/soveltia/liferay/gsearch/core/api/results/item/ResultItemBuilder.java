@@ -33,7 +33,6 @@ public interface ResultItemBuilder {
 	public String getDescription()
 		throws Exception;
 
-
 	/**
 	 * Get item image src i.e. src attribute for img tag.
 	 * 
@@ -58,6 +57,14 @@ public interface ResultItemBuilder {
 	 * @throws Exception
 	 */
 	public Map<String, String> getMetadata()
+		throws Exception;
+	
+	/**
+	 * Get item tags.
+	 * 
+	 * @return item tags
+	 */
+	public String[] getTags()
 		throws Exception;
 	
 	/**

@@ -13,21 +13,13 @@ public class GSearchWebKeys implements WebKeys {
 	
 	public static final String ASSET_TYPE_OPTIONS = "assetTypeOptions";
 
+	public static final String ASSET_TAG_PARAM = "assetTagParam";
+
 	public static final String AUTO_COMPLETE_ENABLED = "autoCompleteEnabled";
 
 	public static final String AUTO_COMPLETE_REQUEST_DELAY = "autoCompleteRequestDelay";
 
-	public static final String FACET_CATEGORIES = "assetCategoryTitles";
-
-	public static final String FACET_DOCUMENT_TYPE = "fileEntryTypeId";
-
-	public static final String FACET_EXTENSION = "extension";
-
-	public static final String FACET_TAGS = "assetTagNames";
-
-	public static final String FACET_USERNAME = "userName";
-	
-	public static final String FACET_WEB_CONTENT_STRUCTURE = "ddmStructureKey";
+	public static final String FACET_FIELDS = "facetFields";
 
 	public static final String FILTER_SCOPE = "scope";
 
@@ -60,6 +52,8 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String SEARCH_QUERY_TIME = "searchQueryTime";
 
 	public static final String SEARCH_RESULTS_URL = "searchResultsURL";
+	
+	public static final String SHOW_ASSET_TAGS = "showAssetTags";
 
 	public static final String SUGGESTIONS_URL = "suggestionsURL";
 	

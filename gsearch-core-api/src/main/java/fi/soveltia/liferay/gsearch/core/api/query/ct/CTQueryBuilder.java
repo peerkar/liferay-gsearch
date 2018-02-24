@@ -21,4 +21,11 @@ public interface CTQueryBuilder {
 	 */
 	public BooleanQuery buildCTQuery(PortletRequest portletRequest)
 		throws Exception;
+
+	/**
+	 * Is builder enabled
+	 * 
+	 * @return
+	 */
+	public boolean isEnabled();	
 }

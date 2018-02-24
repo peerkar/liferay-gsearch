@@ -55,6 +55,14 @@ public interface GSearchConfiguration {
 		required = false
 	)
 	public int requestTimeout();
+	
+	@Meta.AD(
+		deflt = "true", 
+	    description = "show-tags-desc",
+	    name = "show-tags-name",
+		required = false
+	)
+	public boolean showTags();
 
 	@Meta.AD(
 		deflt = "/search", 
@@ -126,23 +134,7 @@ public interface GSearchConfiguration {
 		required = false
 	)
 	public int queryIndexingThreshold();
-	
-	@Meta.AD(
-		deflt = "false", 
-	    description = "enable-audience-targeting-desc",
-	    name = "enable-audience-targeting-name",
-		required = false
-	)
-	public boolean enableAudienceTargeting();
-	
-	@Meta.AD(
-		deflt = "1.5f", 
-	    description = "audience-targeting-boost-desc",
-	    name= "audience-targeting-boost-name",
-		required = false
-	)
-	public float audienceTargetingBoost();
-	
+		
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
 		description = "type-configuration-desc",
