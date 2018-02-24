@@ -21,15 +21,15 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.query.ct.CTQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.ct.configuration.GSearchCTConfiguration;
 
 /**
- * CT (Audience Targeting aka Content Targeting aka CT) query builder implementation.
+ * Audience Targeting aka Content Targeting aka CT query builder implementation.
  * 
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.ct.GSearchCTConfiguration", 
 	immediate = true, 
 	service = CTQueryBuilder.class
 )
@@ -40,11 +40,11 @@ public class CTQueryBuilderImpl implements CTQueryBuilder {
 		PortletRequest portletRequest)
 		throws Exception {
 
-		if (portletRequest.getAttribute("userSegmentIds") == null) {
+		if (portletRequest.getAttribute(USER_SEGMENT_ID_PARAM) == null) {
 			return null;
 		}
 		
-		long[] userSegmentIds = (long[])portletRequest.getAttribute("userSegmentIds");
+		long[] userSegmentIds = (long[])portletRequest.getAttribute(USER_SEGMENT_ID_PARAM);
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Found " + userSegmentIds.length + " user segments.");
@@ -60,16 +60,22 @@ public class CTQueryBuilderImpl implements CTQueryBuilder {
 			query.add(condition, BooleanClauseOccur.SHOULD);
 		}
 				
-		query.setBoost(_gSearchConfiguration.audienceTargetingBoost());
+		query.setBoost(_gSearchCTConfiguration.audienceTargetingBoost());
 
 		return query;
 	}
 
+	@Override
+	public boolean isEnabled() {
+
+		return _gSearchCTConfiguration.enableAudienceTargeting();
+	}
+	
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_gSearchCTConfiguration = ConfigurableUtil.createConfigurable(
+			GSearchCTConfiguration.class, properties);
 	}	
 	
 	@Reference(unbind = "-")
@@ -78,13 +84,13 @@ public class CTQueryBuilderImpl implements CTQueryBuilder {
 		_userSegmentLocalService = userSegmentLocalService;
 	}
 	
-	protected volatile GSearchConfiguration _gSearchConfiguration;
+	protected static final String USER_SEGMENT_ID_PARAM = "userSegmentIds";
+	
+	protected volatile GSearchCTConfiguration _gSearchCTConfiguration;
 	
 	private UserSegmentLocalService _userSegmentLocalService;
 
-
 	private static final Log _log =
 					LogFactoryUtil.getLog(CTQueryBuilderImpl.class);
+
 }
-
-
