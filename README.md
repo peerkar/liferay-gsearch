@@ -4,14 +4,16 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 # Table of contents
 
+1. [Whats New](#Whats_New)
 1. [Background](#Background)
 1. [Features](#Features)
 1. [Screenshots](#Screenshots)
 1. [Requirements](#Requirements)
 1. [Project Modules](#Modules)
-1. [Quick Installation Guide](#Quick_Guide)
-1. [Installation Guide](#Installation)
+1. [Quick Installation Guide](#Quick_Installation_Guide)
+1. [Full Installation Guide](#Full_Installation_Guide)
 1. [Enabling Audience Targeting support](#Audience_Targeting)
+1. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
 1. [Adding Support for Asset Types](#Asset_Support)
@@ -25,8 +27,20 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Changelog](#Changelog)
 
 
+# What's New <a name="Whats_New"></a>
 
-# 1 Background <a name="Background"></a>
+## 2018-02-25
+
+* Added item highlighter API and implementation example. This service allows to highlight result items based on your criteria. Example implementation highlights result item if it matches configured tag.
+* Added configurable possibility to show result item tags
+* Improved facet configuration. Now UI and configuration are completely sync. UI customization is not more needed if new facets are added through JSON configuration.
+* Added possibility to use a journal article as the help text (in configuration).
+* Audience targeting module configuration moved to the module itself.
+* Added possibility to set query keywords directly in the query configuration. With this feature you can force the serach always to have for example certain tag etc.
+
+__Important__: Please update the configuration file when updating core modules! Please also note that there are new module versions now. Remove the old ones when updating.
+
+# Background <a name="Background"></a>
 
 This is the Google like search project for Liferay CE & DXP. The code is originally created for the blog series:
 
@@ -38,7 +52,7 @@ This is the Google like search project for Liferay CE & DXP. The code is origina
 
 This project served many purposes for me. I wanted to experiment with SOY & Metal.JS (which are a really great combination), practise writing OSGI compliant code but most importantly: I wanted to have a highly configurable, alternative search portlet for Liferay having support for Boolean operators and Lucene syntax and many other features currently missing in the standard search portlet, like autocompletion. I wanted to have a search portlet with better control over hits relevancy.
 
-# 2 Features <a name="Features"></a>
+# Features <a name="Features"></a>
 
 * Google like appearance and UX
 * Completely ajaxed interface (no page transitions)
@@ -48,17 +62,19 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 * Autocompletion using aggregate query suggestions (phrase and completion suggesters)
 * Automatic alternate search 
 * Support for Boolean operators and Lucene syntax
-* Completely configurable:
+* Configurable:
     * Asset types to search for
     * Facets to retrieve
     * Sort fields
     * Fields to search for and their boosting
     * Suggesters
-* Audience targeting support: configurable boosting for content matching user's user segments.
+    * etc.
+* Possibility to use Audience targeting for result item boosting.
+* Possibility to highlight result items based on your criteria.
 * Ability to include non-Liferay resources in the search results
 * Speed ; It's fast
 
-# 3 Screenshots <a name="Screenshots"></a>
+# Screenshots <a name="Screenshots"></a>
 
 ## Basic Usage
 ![Basic Usage](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/basic-usage.gif)
@@ -72,7 +88,7 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 ## Non-Liferay Assets in the Search Results
 ![Non Liferay Assets](https://github.com/peerkar/liferay-gsearch/blob/master/gsearch-doc/screenshots/non-liferay-asset.gif)
 
-# 4 Requirements <a name="Requirements"></a>
+# Requirements <a name="Requirements"></a>
 
 ## Mandatory <a name="Requirements_Mandatory"></a>
 
@@ -83,13 +99,13 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 Some of the features require the custom Elasticsearch adapter. If you plan to use that, please also install a standalone Elasticsearch server to be able to configure custom type mappings. Installing a standalone server is recommended anyways.
 
 
-# 5 Project Modules <a name="Modules"></a>
+# Project Modules <a name="Modules"></a>
 
 ## gsearch-core-api 
-API module for the backend logic.
+Core API module for the backend logic.
 
 ## gsearch-core-impl 
-Implementation module for the backend logic.
+Core Implementation module for the backend logic.
 
 ## gsearch-query-api 
 This module contains contains the extension for portal search API's StringQuery type, the QueryStringQuery query type.  
@@ -103,39 +119,43 @@ Miniportlet for adding a search field into a theme. Please see the gsearch-test-
 ## gsearch-test-theme
 A test theme embedding miniportlet into it.
 
+## gsearch-item-highlighter-tag 
+An item highlighter example module adding possibility to highlight items on the result list if they have certain tags.
+
 ## gsearch-audience-targeting <a name="Modules_Audience_Targeting"></a>
-Module enabling Audience Targeting support.
+Audience Targeting module enabling result items boosting if they match current user's segments.
 
 ## gsearch-elasticsearch-adapter <a name="Modules_Adapter"></a>
 A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery translator into Liferay portal search API. It has also index setting customizations: custom analyzers for keyword suggester and ascii folding filter for the title, description and content fields to better support non-ascii characters (for us non English speaking people).
 
 Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter).
 
-# 6 Quick Installation Guide <a name="Quick_Guide"></a>
+# Quick Installation Guide <a name="Quick_Installation_Guide"></a>
 
 This installs the basic functionality. If you're having problems or want to install all the features, see full instructions below.
 
 For choosing the right version of custom Elasticsearch adapter, com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar, please see [Step 2 - Install the Custom Elasticsearch Adapter](#Installation_2) below.
 
-1) Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest)
+There's no fixpack / CE GA -compatibility matrix currently available but initially try to use the newest module in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest). Older versions can be found in the [archive folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/archive)
+
+1) Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest)
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
-* fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
 * fi.soveltia.liferay.gsearch.query-VERSION.jar
 * fi.soveltia.liferay.gsearch.web-VERSION.jar
 
-2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) file and put it into osgi/configs.
+2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) file and put it into osgi/configs.
 
 3) Do full reindex.
 
-# 7 Installation Guide <a name="Installation"></a>
+# Full Installation Guide <a name="Full_Installation_Guide"></a>
 
 __If you are updating the modules__:
 
 * Please remember to remove the older versions from osgi/modules and clean up osgi/state folder first.
-* Please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/) to the osgi/configs folder.
+* Please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) to the osgi/configs folder.
 
 
 ## Step 1 <a name="Installation_1"></a>
@@ -173,7 +193,7 @@ If you need to build the Elasticsearch adapter please see [this repository](http
 
 This is not mandatory but if you want to have all the features and configurability there, then use this one and use a standalone Elasticsearch server. 
 
-Download following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
+Download following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
 
@@ -196,7 +216,7 @@ After succesfully deploying the modules portlet has to be configured. Otherwise 
 
 Portlet configuration can be found in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
-The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest/) and copy it to Liferay\_home\_folder/osgi/configs/
+The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) and copy it to Liferay\_home\_folder/osgi/configs/
 
 There's then just one more thing to do:
 
@@ -212,25 +232,37 @@ If you were transitioning from embedded Elasticsearch server to standalone serve
 
 To be sure that index type mappings have been refreshed please aldo restart the portal and Elasticsearch server and you are ready to go.
 
-# 8 Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
+# Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
 
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
 * fi.soveltia.liferay.gsearch.ct-VERSION.jar
 
-After the module has been installed, please enable that in the portlet configuration ontrol Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
+After the module has been installed, please enable that in the portlet configuration Control Panel -> Configuration -> System Settings -> Other -> GSearch CTConfiguration.
 
-With this feature you can boost relevancy for the contents falling into current user's user segments. You can adjust the boost factor in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
+With this feature you can boost results falling into current user's user segments. Boost factor can be adjusted in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
-# 9 Embedding Search Field into a Theme <a name="Search_Field"></a>
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) and deploy:
+# Enabling Result Item Highlighter <a name="Result_Item_Highlighter"></a>
+
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
+
+* fi.soveltia.liferay.gsearch.itemhighlighter.tag-VERSION.jar
+
+After the module has been installed, please See the configuration -> Configuration -> System Settings -> Other -> GSearch tag highlighter configuration.
+
+With this feature you can highlight items on the result list if they are match your criteria. This example implementation highlights items if they are having the configured tag.
+
+Please note that this feature is not the same as result text highlighter, highlighting the keywords from result description. That feature is there out of the box.
+
+# Embedding Search Field into a Theme <a name="Search_Field"></a>
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
 * fi.soveltia.liferay.gsearch.mini.web-VERSION.jar
 
 Please see the gsearch-test-theme templates folder for an example of how to embed that into a theme.
-There's also a theme binary in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/latest) if you want to test it.
+There's also a theme binary in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) if you want to test it.
 
-# 10 Sample Configurations <a name="Configurations"></a>
+# Sample Configurations <a name="Configurations"></a>
 
 Please see the portlet configuration in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
@@ -415,9 +447,9 @@ Sort fields. You can add there any indexed field. Translations need to be added 
 
 ### Sample Query Configuration
 
-This defines the main query. You can have there just a single query or construct it of many queries. The supported types ("queryType") at the moment are query_string, match and wildcard. Please see the gsearch-core-impl module QueryBuilders code for more information.
+This defines the main query. You can have there just a single query or construct it of many queries. The supported types ("queryType") at the moment are query_string, match, term and wildcard. Please see the gsearch-core-impl module QueryBuilders code for more information.
 
-The example below defines three should (OR) queries. In the first, all the keywords have to match (AND) and it gets a boost of 3. In the second, any of the keywords have to match and it gets only a boost of 1.5. The third brings a boost of 1 if any of the keywords match the userName field. In other words, following results can be expected from this query configuration: hits matching all the keywords get to the top of the search results, hits matching just some of the keywords are secondary and any keywords matching the username are tertiary.
+The example below defines two should (OR) queries and one must query. In the first, all the keywords have to match (AND) and it gets a boost of 3. In the second, any of the keywords can match and it gets only a boost of 1.5. Match to this query is the minimum requirement. The third query gives a boost of 1 if any of the keywords match the userName field. In other words, following results can be expected from this query configuration: documents matching all the keywords get to the top of the search results, documents matching just some of the keywords are secondary and any keywords matching the username are tertiary. 
 
 
 ```
@@ -451,7 +483,7 @@ The example below defines three should (OR) queries. In the first, all the keywo
 	},
 	{
 		"queryType": "query_string",
-		"occur": "should",
+		"occur": "must",
 		"operator": "or",
 		"fuzziness": "",
 		"boost": 1.5,
@@ -488,7 +520,7 @@ The example below defines three should (OR) queries. In the first, all the keywo
 ]
 ```
 
-# 11 Adding Support for Asset Types<a name="Asset_Support"></a>
+# Adding Support for Asset Types<a name="Asset_Support"></a>
 
 The process for adding support for any asset type not implemented currently, including any custom, registered asset types:
 
@@ -498,7 +530,7 @@ The process for adding support for any asset type not implemented currently, inc
 1. Lastly add your new type to the asset type selection menu in the Configuration. See "Search types Sample Configuration" above in the doc.
 
 
-# 12 Custom querySuggestion Mapping<a name="querySuggestion"></a>
+# Custom querySuggestion Mapping<a name="querySuggestion"></a>
 
 Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by running the curl script:
 
@@ -553,7 +585,7 @@ curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Co
 ```
 
 
-# 13 Troubleshooting <a name="Troubleshooting"></a>
+# Troubleshooting <a name="Troubleshooting"></a>
 
 ## Querysuggester Not Working
 
@@ -565,14 +597,14 @@ This might happen at least of two reasons:
 In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
 
 
-# 14 Important Notes <a name="Important"></a>
+# Important Notes <a name="Important"></a>
 
 ## Permissions
 Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
 
 This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
 
-# 15 FAQ <a name="FAQ"></a>
+# FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
@@ -653,18 +685,18 @@ ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and moni
 
 See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
 
-# 16 Project Roadmap <a name="Roadmap"></a>
+# Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
  * Integration tests
 
-# 17 Credits <a name="Credits"></a>
+# Credits <a name="Credits"></a>
 Thanks to Tony Tawk for the Arabic translation!
 
-# 18 Disclaimer <a name="Disclaimer"></a>
+# Disclaimer <a name="Disclaimer"></a>
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
-# 19 Changelog <a name="Changelog"></a>
+# Changelog <a name="Changelog"></a>
 
 ## 2018-02-14
 * Added POC kind of support for Knowledge Base Articles
@@ -703,4 +735,4 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 	* Switched to aggregate suggester by default now
 	* Added configuration for the completion type suggest field
 	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
-	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
+	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)＀
