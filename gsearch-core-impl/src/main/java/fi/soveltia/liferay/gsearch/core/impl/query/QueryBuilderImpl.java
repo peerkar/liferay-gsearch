@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 
@@ -30,6 +31,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.builder.MatchQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.builder.QueryStringQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.builder.TermQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.builder.WildcardQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.ct.CTQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
@@ -175,6 +177,9 @@ public class QueryBuilderImpl implements QueryBuilder {
 				
 			} else if ("QUERY_STRING".equalsIgnoreCase(queryType)) {
 				subQuery = (QueryStringQuery)_queryStringQueryBuilder.buildQuery(queryItem, queryParams);
+			
+			} else if ("TERM".equalsIgnoreCase(queryType)) {
+				subQuery = (TermQuery)_termQueryBuilder.buildQuery(queryItem, queryParams);
 			}
 			
 			if (subQuery != null) {
@@ -213,6 +218,12 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}
 
 	@Reference(unbind = "-")
+	protected void setTermQueryBuilder(TermQueryBuilder termQueryBuilder) {
+
+		_termQueryBuilder = termQueryBuilder;
+	}
+	
+	@Reference(unbind = "-")
 	protected void setWildcardQueryBuilder(WildcardQueryBuilder wildcardQueryBuilder) {
 
 		_wildcardQueryBuilder = wildcardQueryBuilder;
@@ -244,6 +255,8 @@ public class QueryBuilderImpl implements QueryBuilder {
 	
 	private QueryStringQueryBuilder _queryStringQueryBuilder;
 
+	private TermQueryBuilder _termQueryBuilder;
+	
 	private WildcardQueryBuilder _wildcardQueryBuilder;
 
 	private static final Log _log =
