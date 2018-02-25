@@ -31,12 +31,12 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 ## 2018-02-25
 
-* Added item highlighter API and implementation example. This service allows to highlight result items based on your criteria. Example implementation highlights result item if it matches configured tag.
-* Added configurable possibility to show result item tags
-* Improved facet configuration. Now UI and configuration are completely sync. UI customization is not more needed if new facets are added through JSON configuration.
+* Added result item highlighter API and implementation example. This service allows to highlight result items based on your criteria. Example implementation highlights result items matching a configured tag.
+* Added possibility to show result item tags
+* Improved facet configuration. Now UI and configuration are completely sync. UI customization is not more needed when new facets are added through JSON configuration.
 * Added possibility to use a journal article as the help text (in configuration).
 * Audience targeting module configuration moved to the module itself.
-* Added possibility to set query keywords directly in the query configuration. With this feature you can force the serach always to have for example certain tag etc.
+* Added possibility to set query keywords directly in the query configuration. With this feature you can for example configure a subquery to always try to match a certain tag and boost documents matching it.
 
 __Important__: Please update the configuration file when updating core modules! Please also note that there are new module versions now. Remove the old ones when updating.
 
