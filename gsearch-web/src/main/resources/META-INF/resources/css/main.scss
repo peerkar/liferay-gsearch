@@ -3,7 +3,6 @@
 /*
 @import "grow";
 */
-
 .gsearch-portlet {
 	
 	a { 
@@ -367,9 +366,10 @@
 						vertical-align: super;
 					}
 					
-					.glyphicon-ok {
+					.glyphicon {
 						color: green;
-						margin-left: 10px;
+						font-size: 1.2em;
+						margin-left: 15px;
 					}
 				}
 		
