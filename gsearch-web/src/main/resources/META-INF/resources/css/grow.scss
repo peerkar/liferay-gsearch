@@ -1,17 +1,11 @@
 .gsearch-portlet {
 
-	a {
-		color: initial !important;
-	}
-	
 	.scopemenu {
 		display: none !important;
 	}
 	
-	.gsearch-results {		
-
-		a {
-			color: #03a9f4;
-		}
+	.gsearch-paging .page a,
+	.gsearch-results a {
+			color: #03a9f4 !important;
 	}
 }
