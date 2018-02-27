@@ -1,8 +1,7 @@
 @import "mixins";
 @import "boostrap-xl";
-
 /*
-@ import "grow";
+@import "grow";
 */
 
 .gsearch-portlet {
@@ -355,6 +354,11 @@
 						line-height: 1.5;
 						margin-bottom: 0;
 						margin-top: 0;
+						max-width: 90%;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						vertical-align: bottom;						
+						white-space: nowrap;
 					}
 
 					.type {
