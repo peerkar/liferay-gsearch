@@ -2,7 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.api.query.builder;
 
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.generic.StringQuery;
+import com.liferay.portal.kernel.search.Query;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 
@@ -22,10 +22,10 @@ public interface QueryStringQueryBuilder {
 	 * 
 	 * @param configurationObject
 	 * @param queryParams
-	 * @return StringQuery object
+	 * @return Query object
 	 * @throws Exception
 	 */
-	public StringQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception;
 }

@@ -2,8 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.api.query.builder;
 
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.generic.MatchQuery;
+import com.liferay.portal.kernel.search.Query;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 
@@ -18,26 +17,14 @@ import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 public interface MatchQueryBuilder {
 
 	/**
-	 * Build localized matchquery.
-	 * 
-	 * @param configurationObject
-	 * @param queryParams
-	 * @return BooleanQuery object
-	 * @throws Exception
-	 */
-	public BooleanQuery buildLocalizedQuery(
-		JSONObject configurationObject, QueryParams queryParams)
-		throws Exception;
-
-	/**
 	 * Build matchquery.
 	 * 
 	 * @param configurationObject
 	 * @param queryParams
-	 * @return MatchQuery object
+	 * @return Query object
 	 * @throws Exception
 	 */
-	public MatchQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception;
 }

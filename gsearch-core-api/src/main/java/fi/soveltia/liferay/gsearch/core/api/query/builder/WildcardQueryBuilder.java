@@ -2,8 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.api.query.builder;
 
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.WildcardQuery;
+import com.liferay.portal.kernel.search.Query;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 
@@ -22,26 +21,10 @@ public interface WildcardQueryBuilder {
 	 * 
 	 * @param configurationObject
 	 * @param queryParams
-	 * @return WildcardQuery object
+	 * @return Query object
 	 * @throws Exception
 	 */
-	public WildcardQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception;
-
-	/**
-	 * Build splitted wildcard query.
-	 * 
-	 * This splits searchphrase to invidual terms and build a query for each.
-	 * User for userName field, for example.
-	 * 
-	 * @param configurationObject
-	 * @param queryParams
-	 * @return BooleanQuery object
-	 * @throws Exception
-	 */
-	public BooleanQuery buildSplittedQuery(
-		JSONObject configurationObject, QueryParams queryParams)
-		throws Exception;
-
 }

@@ -1,7 +1,7 @@
 package fi.soveltia.liferay.gsearch.core.api.query.builder;
 
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.TermQuery;
+import com.liferay.portal.kernel.search.Query;
 
 import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 
@@ -20,10 +20,10 @@ public interface TermQueryBuilder {
 	 * 
 	 * @param configurationObject
 	 * @param queryParams
-	 * @return TermQuery object
+	 * @return Query object
 	 * @throws Exception
 	 */
-	public TermQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception;
 }
