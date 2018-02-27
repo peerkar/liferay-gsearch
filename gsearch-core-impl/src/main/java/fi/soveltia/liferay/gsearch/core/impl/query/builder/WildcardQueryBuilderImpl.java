@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.core.impl.query.builder;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.WildcardQuery;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.WildcardQueryImpl;
@@ -30,7 +31,7 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public WildcardQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 		
@@ -42,45 +43,40 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 			value = queryParams.getKeywords();
 		}
 
-		WildcardQuery wildcardQuery = buildClause(configurationObject, value);
-
-		float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-		wildcardQuery.setBoost(boost);
-		
-		return wildcardQuery;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public BooleanQuery buildSplittedQuery(
-		JSONObject configurationObject, QueryParams queryParams)
-		throws Exception {
-
-		BooleanQuery query = new BooleanQueryImpl();
+		// Splitter?
 		
 		String keywordSplitter = configurationObject.getString("keywordSplitter");
 
-		// If there's a predefined value in the configuration, use that
+		if (keywordSplitter != null && keywordSplitter.length() > 0) {
 
-		String value = configurationObject.getString("value");
-
-		if (Validator.isNull(value)) {
-			value = queryParams.getKeywords();
-		}
-		
-		String [] keywords = value.split(keywordSplitter);
+			BooleanQuery query = new BooleanQueryImpl();
+					
+			String [] keywords = value.split(keywordSplitter);
+				
+			for (String keyword : keywords) {
+				WildcardQuery q = buildClause(configurationObject, keyword);
+				query.add(q, BooleanClauseOccur.SHOULD);
+			}
 			
-		for (String keyword : keywords) {
-			WildcardQuery q = buildClause(configurationObject, keyword);
-			query.add(q, BooleanClauseOccur.SHOULD);
+			// Boost
+			
+			float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+			query.setBoost(boost);
+			
+			return query;
+		
+		} else {
+
+			WildcardQuery wildcardQuery = buildClause(configurationObject, value);
+
+			// Boost
+
+			float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+			wildcardQuery.setBoost(boost);
+			
+			return wildcardQuery;
+			
 		}
-		
-		float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-		query.setBoost(boost);
-		
-		return query;
 	}
 
 	/**

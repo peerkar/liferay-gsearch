@@ -1,6 +1,7 @@
 package fi.soveltia.liferay.gsearch.core.impl.query.builder;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -26,7 +27,7 @@ public class TermQueryBuilderImpl implements TermQueryBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public TermQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 
@@ -46,6 +47,8 @@ public class TermQueryBuilderImpl implements TermQueryBuilder {
 		
 		TermQuery termQuery =
 			new TermQueryImpl(fieldName, value);
+		
+		// Boost
 		
 		float boost =
 			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);

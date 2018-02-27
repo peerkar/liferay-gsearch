@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.core.impl.query.builder;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -29,15 +30,9 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public QueryStringQuery buildQuery(
+	public Query buildQuery(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
-
-		String operator =
-			GetterUtil.getString(configurationObject.get("operator"), "and");
-
-		float queryBoost =
-			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 
 		// If there's a predefined value in the configuration, use that
 
@@ -60,7 +55,7 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 			}			
 			value = sb.toString();
 		}
-		
+				
 		QueryStringQuery queryStringQuery = new QueryStringQuery(value);
 
 		JSONArray fields = configurationObject.getJSONArray("fields");
@@ -89,28 +84,40 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 			}			
 		}
 
-		// Set operator
+		// Operator
 		
+		String operator =
+						GetterUtil.getString(configurationObject.get("operator"), "and");
+
 		if (operator.equals("or")) {
 			queryStringQuery.setDefaultOperator(Operator.OR);
 		}
 		else {
 			queryStringQuery.setDefaultOperator(Operator.AND);
 		}
+
+		// Fuzziness
+
+		if (Validator.isNotNull(configurationObject.get("fuzziness"))) {
+			float fuzziness =
+				GetterUtil.getFloat(configurationObject.get("fuzziness"), 0.0f);
+			queryStringQuery.setFuzziness(fuzziness);
+		}
 		
-		// Query boost
+		// Boost
 		
-		queryStringQuery.setBoost(queryBoost);
+		float boost =
+						GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+		queryStringQuery.setBoost(boost);
 
 		// Analyzer
 		
 		String analyzer = configurationObject.getString("analyzer");
 		 
-		if (analyzer != null && analyzer != "") {
+		if (Validator.isNotNull(analyzer)) {
 			queryStringQuery.setAnalyzer(analyzer);
 		}
 		
 		return queryStringQuery;
 	}
-	
 }

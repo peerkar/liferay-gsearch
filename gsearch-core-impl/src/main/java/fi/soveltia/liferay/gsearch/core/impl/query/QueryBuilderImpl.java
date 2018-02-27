@@ -10,7 +10,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 
@@ -36,7 +35,6 @@ import fi.soveltia.liferay.gsearch.core.api.query.builder.WildcardQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.ct.CTQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
 import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
-import fi.soveltia.liferay.gsearch.query.QueryStringQuery;
 
 /**
  * Query builder implementation.
@@ -156,30 +154,19 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 		
 			if ("MATCH".equalsIgnoreCase(queryType)) {
 
-				boolean isLocalized = queryItem.getBoolean("localized");
-
-				if (isLocalized) {
-					subQuery = _matchQueryBuilder.buildLocalizedQuery(queryItem, queryParams);
-				} else {
-					subQuery =  _matchQueryBuilder.buildQuery(queryItem, queryParams);
-				}
-			} else if ("WILDCARD".equalsIgnoreCase(queryType)) {
+				subQuery =  _matchQueryBuilder.buildQuery(queryItem, queryParams);
 				
-				String keywordSplitter = queryItem.getString("keywordSplitter");
-
-				if (keywordSplitter != null && keywordSplitter.length() > 0) {
-
-					subQuery = _wildcardQueryBuilder.buildSplittedQuery(queryItem, queryParams);
-				} else {
-					
-					subQuery = _wildcardQueryBuilder.buildQuery(queryItem, queryParams);
-				}
+			} else if ("WILDCARD".equalsIgnoreCase(queryType)) { 
+				
+				subQuery = _wildcardQueryBuilder.buildQuery(queryItem, queryParams);
 				
 			} else if ("QUERY_STRING".equalsIgnoreCase(queryType)) {
-				subQuery = (QueryStringQuery)_queryStringQueryBuilder.buildQuery(queryItem, queryParams);
+				
+				subQuery = _queryStringQueryBuilder.buildQuery(queryItem, queryParams);
 			
 			} else if ("TERM".equalsIgnoreCase(queryType)) {
-				subQuery = (TermQuery)_termQueryBuilder.buildQuery(queryItem, queryParams);
+
+				subQuery = _termQueryBuilder.buildQuery(queryItem, queryParams);
 			}
 			
 			if (subQuery != null) {
