@@ -76,7 +76,6 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 			return booleanQuery;
 		}
 		
-		System.out.println(matchQuery);
 		return matchQuery;
 	}
 
