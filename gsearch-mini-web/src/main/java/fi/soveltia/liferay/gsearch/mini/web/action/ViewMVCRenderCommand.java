@@ -19,7 +19,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
@@ -31,7 +31,7 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
  */
 
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration",
+	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchMiniportlet",
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
@@ -51,7 +51,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			
 		// Hide portlet if we are on the search page
 
-		if (getCurrentFriendlyURL(renderRequest).equals(_gSearchConfiguration.searchPortletPage())) {
+		if (getCurrentFriendlyURL(renderRequest).equals(_moduleConfiguration.searchPortletPage())) {
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 		}
 		
@@ -67,38 +67,31 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		template.put(
 			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED, 
-			_gSearchConfiguration.enableAutoComplete());
+			_moduleConfiguration.enableAutoComplete());
 
 		// Autocomplete request delay.
 		
 		template.put(
 			GSearchMiniWebKeys.AUTO_COMPLETE_REQUEST_DELAY, 
-			_gSearchConfiguration.autoCompleteRequestDelay());
-		
+			_moduleConfiguration.autoCompleteRequestDelay());
 		
 		// Set request timeout.
 		
 		template.put(
 			GSearchMiniWebKeys.REQUEST_TIMEOUT,
-			_gSearchConfiguration.requestTimeout());
+			_moduleConfiguration.requestTimeout());
 		
 		// Set query min length.
 		
 		template.put(
 			GSearchMiniWebKeys.QUERY_MIN_LENGTH,
-			_gSearchConfiguration.queryMinLength());
+			_moduleConfiguration.queryMinLength());
 				
-		// Enable / disable JS console logging messages.
-		
-		template.put(
-			GSearchMiniWebKeys.JS_DEBUG_ENABLED,
-			_gSearchConfiguration.jsDebuggingEnabled());
-
 		// Set search page url.
 
 		template.put(
 			GSearchMiniWebKeys.SEARCHPAGE_URL, _portal.getPortalURL(renderRequest) +
-			  _gSearchConfiguration.searchPortletPage());
+			  _moduleConfiguration.searchPortletPage());
 				
 		// Set autocomplete/suggestions resource url.
 
@@ -112,8 +105,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	@Activate
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}
 	
 	/**
@@ -148,7 +141,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		_portal = portal;
 	}
 	
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private Portal _portal;
 	

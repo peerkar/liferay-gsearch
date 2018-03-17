@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.mini.web.portlet;
 
 import com.liferay.portal.portlet.bridge.soy.SoyPortlet;
@@ -43,5 +44,4 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 )
 public class GSearchMiniPortlet extends SoyPortlet {
 
-} 
-
+}
