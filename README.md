@@ -12,13 +12,14 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Project Modules](#Modules)
 1. [Quick Installation Guide](#Quick_Installation_Guide)
 1. [Full Installation Guide](#Full_Installation_Guide)
-1. [Enabling Audience Targeting support](#Audience_Targeting)
+1. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
 1. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
-1. [Adding Support for Asset Types](#Asset_Support)
+1. [Adding Support for Asset Types](#Adding_Asset_Type_Support)
+1. [Adding a New Query Contributor, in Google terms "signal"](#Adding_Query_Contributor)
+1. [Adding a Result Item Processor](#Adding_Result_Item_Processor)
 1. [Custom querySuggestion Mapping](#querySuggestion)
-1. [Troubleshooting](#Troubleshooting)
 1. [Important Notes](#Important)
 1. [FAQ](#FAQ)
 1. [Project Roadmap](#Roadmap)
@@ -29,16 +30,22 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 # What's New <a name="Whats_New"></a>
 
-## 2018-02-25
+## 2018-03-17
 
-* Added result item highlighter API and implementation example. This service allows to highlight result items based on your criteria. Example implementation highlights result items matching a configured tag.
-* Added possibility to show result item tags
-* Improved facet configuration. Now UI and configuration are completely sync. UI customization is not more needed when new facets are added through JSON configuration.
-* Added possibility to use a journal article as the help text (in configuration).
-* Audience targeting module configuration moved to the module itself.
-* Added possibility to set query keywords directly in the query configuration. With this feature you can for example configure a subquery to always try to match a certain tag and boost documents matching it.
+__Major API changes and streamlining__. Added new interfaces to significantly ease extending and customizing this solution to your needs.
 
-__Important__: Please update the configuration file when updating core modules! Please also note that there are new module versions now. Remove the old ones when updating.
+* Added __QueryContributor__ service interface. With the new service interface you can easily add any custom clauses to the main query to improve relevancy. Audience Targeting module is using this as of now.
+* Added __ResultItemProcessor__ service interface. With this you can process result items before they are sent to the user interface.  See the gsearch-hightlight-item-by-tag sample.
+* Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
+* Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
+* Added __ClauseBuilder__ service interface. With this you can create implementations for not out of the box supported query types or override the existing ones.
+
+See more instructions for these new interfaces below in this document.
+
+__Important__
+
+* Notice that the main configuration file name has been changed. Deploy the new one and remove the old one to avoid confusion.
+* New module versions. Remove the old ones from osgi/modules before deployin the new ones.
 
 # Background <a name="Background"></a>
 
@@ -72,6 +79,7 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
 * Possibility to use Audience targeting for result item boosting.
 * Possibility to highlight result items based on your criteria.
 * Ability to include non-Liferay resources in the search results
+* Easy and fast extendability
 * Speed ; It's fast
 
 # Screenshots <a name="Screenshots"></a>
@@ -119,13 +127,13 @@ Miniportlet for adding a search field into a theme. Please see the gsearch-test-
 ## gsearch-test-theme
 A test theme embedding miniportlet into it.
 
-## gsearch-item-highlighter-tag 
-An item highlighter example module adding possibility to highlight items on the result list if they have certain tags.
+## gsearch-highligh-result-item-by-tag 
+An item highlighter example module adding possibility to highlight items on the result list if they have certain tags. This module is utilizing the GSearch  ResultItemProcessor API. 
 
-## gsearch-audience-targeting <a name="Modules_Audience_Targeting"></a>
-Audience Targeting module enabling result items boosting if they match current user's segments.
+## gsearch-query-contributor-audience-targeting
+Audience Targeting module enabling result items boosting if they match current user's segments. This module is using the GSearch QueryContributor API
 
-## gsearch-elasticsearch-adapter <a name="Modules_Adapter"></a>
+## gsearch-elasticsearch-adapter
 A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery translator into Liferay portal search API. It has also index setting customizations: custom analyzers for keyword suggester and ascii folding filter for the title, description and content fields to better support non-ascii characters (for us non English speaking people).
 
 Please see the adapter in its' [own repo](https://github.com/peerkar/gsearch-elasticsearch-adapter).
@@ -136,7 +144,9 @@ This installs the basic functionality. If you're having problems or want to inst
 
 For choosing the right version of custom Elasticsearch adapter, com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar, please see [Step 2 - Install the Custom Elasticsearch Adapter](#Installation_2) below.
 
-There's no fixpack / CE GA -compatibility matrix currently available but initially try to use the newest module in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest). Older versions can be found in the [archive folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/archive)
+There's no fixpack / CE GA -compatibility matrix currently available but initially try to use the newest module in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest). Older versions can be found in the [archive folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/archive).
+
+When updating, please remove the old modules before deploying the new ones.
 
 1) Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest)
 
@@ -146,7 +156,7 @@ There's no fixpack / CE GA -compatibility matrix currently available but initial
 * fi.soveltia.liferay.gsearch.query-VERSION.jar
 * fi.soveltia.liferay.gsearch.web-VERSION.jar
 
-2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) file and put it into osgi/configs.
+2) Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) file and put it into osgi/configs.
 
 3) Do full reindex.
 
@@ -173,7 +183,7 @@ After installing the easiest way to check that modules have been properly instal
 
 ```
 > telnet localhost 11311
-> lb -s gsear
+> lb -s gsearh
 
 ```
 
@@ -216,39 +226,40 @@ After succesfully deploying the modules portlet has to be configured. Otherwise 
 
 Portlet configuration can be found in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
 
-The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) and copy it to Liferay\_home\_folder/osgi/configs/
+The easy and fast way to get this to work is to download the default configuration file **fi.soveltia.liferay.gsearch.core.configuration.GSearchCoreconfig** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) and copy it to Liferay\_home\_folder/osgi/configs/
 
-There's then just one more thing to do:
+There's then just a couple more thing to do:
 
 1. Create a page and put there an Asset Publisher portlet to show any contents that are not bound to any layout (page). By default this pages' friendlyUrl should be "/viewasset". Typically, you would configure this page to be hidden from navigation menu.
-2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+1. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Core, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+1. Configure the portlet in Control Panel -> Configuration -> System Settings -> Other -> GSearch  Portlet.
+
 
 You can find the sample configurations in the end of this documentation. 
 
-
-## Step 5 - Reindex <a name="Installation_6"></a>
+## Step 5 - Reindex
 
 If you were transitioning from embedded Elasticsearch server to standalone server, please reindex search indexes from Control panel -> Server Administration. 
 
 To be sure that index type mappings have been refreshed please aldo restart the portal and Elasticsearch server and you are ready to go.
 
-# Enabling Audience Targeting Support <a name="Audience_Targeting"></a>
+# Enabling Audience Targeting Query Contributor <a name="Audience_Targeting_Contributor"></a>
 
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
-* fi.soveltia.liferay.gsearch.ct-VERSION.jar
+* fi.soveltia.liferay.gsearch.query.contributor.audience.targeting-VERSION.jar
 
-After the module has been installed, please enable that in the portlet configuration Control Panel -> Configuration -> System Settings -> Other -> GSearch CTConfiguration.
+After the module has been installed, please enable that in the portlet configuration Control Panel -> Configuration -> System Settings -> Other -> GSearch Audience Targeting Contributor.
 
 With this feature you can boost results falling into current user's user segments. Boost factor can be adjusted in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
 
-# Enabling Result Item Highlighter <a name="Result_Item_Highlighter"></a>
+# Enabling Highlighting Result Items by Tag <a name="Result_Item_Highlighter"></a>
 
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
-* fi.soveltia.liferay.gsearch.itemhighlighter.tag-VERSION.jar
+* fi.soveltia.liferay.gsearch.highlightresultitembytag-VERSION.jar
 
-After the module has been installed, please See the configuration -> Configuration -> System Settings -> Other -> GSearch tag highlighter configuration.
+After the module has been installed, please See the configuration -> Configuration -> System Settings -> Other -> GSearch Highlight Result Item by Tag.
 
 With this feature you can highlight items on the result list if they are match your criteria. This example implementation highlights items if they are having the configured tag.
 
@@ -261,6 +272,8 @@ Download the following jar from [latest folder](https://github.com/peerkar/lifer
 
 Please see the gsearch-test-theme templates folder for an example of how to embed that into a theme.
 There's also a theme binary in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) if you want to test it.
+
+After the module has been installed, please See the configuration -> Configuration -> System Settings -> Other -> GSearch Mini Portlet.
 
 # Sample Configurations <a name="Configurations"></a>
 
@@ -325,30 +338,30 @@ This configuration defines the asset types to search for.
 
 ```
 [
-	{
-		"key": "web-content",
-		"entryClassName": "com.liferay.journal.model.JournalArticle"
-	},
-	{
-		"key": "file",
-		"entryClassName": "com.liferay.document.library.kernel.model.DLFileEntry"
-	},
-	{
-		"key": "discussion",
-		"entryClassName": "com.liferay.message.boards.kernel.model.MBMessage"
-	},
-	{
-		"key": "blog",
-		"entryClassName": "com.liferay.blogs.kernel.model.BlogsEntry"
-	},
-	{
-		"key": "wikipage",
-		"entryClassName": "com.liferay.wiki.model.WikiPage"
-	},
-	{
-		"key": "non-liferay-type-example",
-		"entryClassName": "non-liferay-type"
-	}
+    {
+        "key": "web-content",
+        "entryClassName": "com.liferay.journal.model.JournalArticle"
+    },
+    {
+        "key": "file",
+        "entryClassName": "com.liferay.document.library.kernel.model.DLFileEntry"
+    },
+    {
+        "key": "discussion",
+        "entryClassName": "com.liferay.message.boards.kernel.model.MBMessage"
+    },
+    {
+        "key": "blog",
+        "entryClassName": "com.liferay.blogs.kernel.model.BlogsEntry"
+    },
+    {
+        "key": "wikipage",
+        "entryClassName": "com.liferay.wiki.model.WikiPage"
+    },
+    {
+        "key": "non-liferay-type-example",
+        "entryClassName": "non-liferay-type"
+    }
 ]
 ```
 
@@ -359,18 +372,22 @@ This configuration defines the available facets in the secondary filter menu. Yo
 ```
 [
 	{
+		"paramName": "entryClassName",
 		"fieldName": "entryClassName",
 		"icon": "icons/icon-ddm-structure.png"
 	},
 	{
+		"paramName": "ddmStructureKey",
 		"fieldName": "ddmStructureKey",
 		"icon": "icons/icon-ddm-structure.png"
 	},
 	{
+		"paramName": "fileEntryTypeId",
 		"fieldName": "fileEntryTypeId",
 		"icon": "icons/icon-file-entry-type.png"
 	},
 	{
+		"paramName": "extension",
 		"fieldName": "extension",
 		"icon": "icons/icon-file-extension.png",
 		"aggregations": [
@@ -401,15 +418,18 @@ This configuration defines the available facets in the secondary filter menu. Yo
 		]
 	}, 
 	{
+		"paramName": "userName",
 		"fieldName": "userName",
 		"icon": "icons/icon-user.png"
 	},
 	{
+		"paramName": "assetCategoryTitles",
 		"fieldName": "assetCategoryTitles",
 		"icon": "icons/icon-category.png"
 	},
 	{
-		"fieldName": "assetTagNames",
+		"paramName": "assetTagNames",
+		"fieldName": "assetTagNames.raw",
 		"icon": "icons/icon-tag.png"
 	}
 ]
@@ -459,60 +479,60 @@ The example below defines two should (OR) queries and one must query. In the fir
 		"occur": "should",
 		"operator": "and",
 		"fuzziness": "",
-		"boost": 3,
+		"boost": 2,
 		"fields": [
 			{
 				"fieldName": "title",
 				"localized": true,
-				"boost": 2,
-				"boostForLocalizedVersion": 3
+				"boost": 1.1,
+				"boostForLocalizedVersion": 1.2
 			},
 			{
 				"fieldName": "description",
 				"localized": true,
 				"boost": 1,
-				"boostForLocalizedVersion": 1.5
+				"boostForLocalizedVersion": 1.1
 			},
 			{
 				"fieldName": "content",
 				"localized": true,
 				"boost": 1,
-				"boostForLocalizedVersion": 1.5
+				"boostForLocalizedVersion": 1.1
 			}
 		]
 	},
 	{
 		"queryType": "query_string",
-		"occur": "must",
+		"occur": "should",
 		"operator": "or",
 		"fuzziness": "",
-		"boost": 1.5,
+		"boost": 1,
 		"fields": [
 			{
 				"fieldName": "title",
 				"localized": true,
-				"boost": 2,
-				"boostForLocalizedVersion": 3
+				"boost": 1.1,
+				"boostForLocalizedVersion": 1.1
 			},
 			{
 				"fieldName": "description",
 				"localized": true,
 				"boost": 1,
-				"boostForLocalizedVersion": 1.5
+				"boostForLocalizedVersion": 1.1
 			},
 			{
 				"fieldName": "content",
 				"localized": true,
 				"boost": 1,
-				"boostForLocalizedVersion": 1.5
+				"boostForLocalizedVersion": 1.1
 			}
 		]
-	},	
+	},
 	{
 		"queryType": "wildcard",
-		"occur": "should",
+		"occur": "must",
 		"fieldName": "userName",
-		"boost": "1",
+		"boost": "0.5",
 		"keywordSplitter":  " ",
 		"valuePrefix":  "*",
 		"valueSuffix":  "*"
@@ -520,82 +540,31 @@ The example below defines two should (OR) queries and one must query. In the fir
 ]
 ```
 
-# Adding Support for Asset Types<a name="Asset_Support"></a>
+# Adding Support for Asset Types<a name="Adding_Asset_Type_Support"></a>
 
-The process for adding support for any asset type not implemented currently, including any custom, registered asset types:
+The process for adding support for asset types not implemented currently, including any custom, registered asset types:
 
-1. Implement a resultitembuilder class (see gsearch-core-impl/fi.soveltia.liferay.gsearch.core.impl.results.item)
-1. Add support for the new builder in gsearch-core-impl/fi.soveltia.liferay.gsearch.core.impl.results.item.ResultItemFactoryBuilderImpl
+1. Create a new module
+1. Create a service component implementing ResultItemBuilder interface (see samples in core-impl)
 1. Add asset type localizations (2) for selection menu and result view in gsearch-core-impl/resources/Language.properties
 1. Lastly add your new type to the asset type selection menu in the Configuration. See "Search types Sample Configuration" above in the doc.
+1. Deploy the module and refresh the core-impl bundle in case of problems
 
+# Adding a New Query Contributor, in Google terms "signal"<a name="Adding_Query_Contributor"></a>
 
-# Custom querySuggestion Mapping<a name="querySuggestion"></a>
+With this interface you can add your custom clauses to the query to improve relevancy.
 
-Installing custom Elasticsearch adapter customizes querySuggestion mapping on reindex. The mapping can also be created by running the curl script:
+1. Create a new module
+1. Create a service component implementing QueryContributor interface. See the gsearch-query-contributor-audience-targeting module for example.
+1. Deploy the module and refresh the core-impl bundle in case of problems
 
-```
-curl -XPUT 'localhost:9200/liferay-20116/_mapping/querySuggestion?pretty' -H 'Content-Type: application/json' -d'
-{
-	"dynamic_templates": [
-	{
-		"template_keywordSearch": {
-			"mapping": {
-				"type": "string",
-				"fields": {
-					"ngram": {
-						"type": "string",
-					        "search_analyzer": "standard",
-						"analyzer": "gsearch_shingle_analyzer"
-					},
-					"suggest" : {
-						"type" : "completion",
-						"analyzer" : "simple",
-						"search_analyzer" : "simple"
-					}
-				}
-			},
-			"match": "keywordSearch_*",
-			"match_mapping_type": "string"
-		}
-	}
-	],
-	"properties": {
-		"companyId": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		},
-		"groupId": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		},
-		"priority": {
-			"index": "not_analyzed",
-			"type": "float"
-		},
-		"uid": {
-			"index": "not_analyzed",
-			"store": "yes",
-			"type": "string"
-		}
-	}
-}'
-```
+# Adding a Result Item Processor<a name="Adding_Result_Item_Processor"></a>
 
+With this interface it's possible to manipulate the result item to be sent to the user interface. It can be used for example for setting new properties to the result items.
 
-# Troubleshooting <a name="Troubleshooting"></a>
-
-## Querysuggester Not Working
-
-This might happen at least of two reasons:
-
- 1. You are not using the custom Elasticsearch adapter but are using the query suggester configuration for the custom adapter. Please check the configuration samples below in this document.
- 2. querySuggestion type mapping has not been refreshed, probably because there was an existing one already. Please reindex and immediately after reindexing, run the CURL command from Step 5. 
-
-In any case, if you are having problems, please check both Liferay logs and Elasticsearch logs. Elasticsearch log would be by default ELASTICSEARCH_SERVER_PATH/logs/LiferayElasticsearchCluster.log
-
+1. Create a new module
+1. Create a service component implementing ResultItemProcessor interface. See the gsearch-hightlight-result-item-by-tag module for example.
+1. Deploy the module and refresh the core-impl bundle in case of problems
 
 # Important Notes <a name="Important"></a>
 
@@ -608,18 +577,10 @@ This is how Liferay works at least currently. This issue will be revisited later
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
 
-That's right. By default this portlet targets the search only to title, description and content fields (with localization support) and not for example username, tags, categories etc. which I thought, are generally better suitable for secondary facet filtering. For example, if I want to find documents where my name is mentioned in the content, I don't want to get all the documents where I'm a document author (username field). In the portlet configuration however, you can configure the target fields and their boost factors without any restrictions to your likings.
-
-## Does This Work on CE?
-
-It's not tested but basically there is one thing preventing this to work on CE: new version of Soy bridge. You can however remove this barrier fairly easy:
-
-* Downgrade the Soy bridge dependency in the web module's build.gradle, rebuild  and see if it works. Other way around, you can also try to upgrade the bridge to the portal instance. 
-
-If you need help with creating a CE compatible version, please create a ticket.
+That's right. To improve relevancy the query in this portlet is constructed much differently from the standard portlet. Also, by default it targets the search only to title, description and content fields (with localization support) and not for example username, tags, categories etc. which I think, are generally better suitable for secondary facet filtering. For example, if I want to find documents where my name is mentioned in the content, I don't want to get all the documents where I'm a document author (username field). In the portlet configuration however, you can configure the target fields and their boost factors without any restrictions to your likings.
 
 ## Do I Have to Use the Custom Search Adapter?
-No you don't but then you loose the possibility to fine tune search field configuration and their boosts as well as a much better autocompletion / keyword suggester functionality.
+No you don't but then you loose pretty much all the good stuff improving the relevancy and also the possibility for autocompletion / keyword suggester functionality.
 
 ## How Does the Suggester Work?
 The suggester works by storing succesfull search keywords/phrases and offering them as autocompletion options. That's the way Google works, too.
@@ -681,10 +642,6 @@ Installation instructions are [here](https://dev.liferay.com/discover/deployment
 
 ElasticHQ is an excellent lightweight Elasticsearch plugin for managing and monitoring indexes and Elastic cluster. Installation instructions [here](http://www.elastichq.org/support_plugin.html). After installation point your browser (by default) to http://localhost:9200/_plugin/hq/
 
-## There's Audience Targeting Integration Now. How Could I Add Something Like GeoDistance There?
-
-See 'fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl'. That's where the Audience Targeting condition gets added and the place where any other logic like that should be added. If you want to improve relevancy by a field, please remember, that it has to be in the query, not in the filter.
-
 # Project Roadmap <a name="Roadmap"></a>
 Upcoming:
 
@@ -697,6 +654,15 @@ Thanks to Tony Tawk for the Arabic translation!
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
 # Changelog <a name="Changelog"></a>
+
+## 2018-02-25
+
+* Added result item highlighter API and implementation example. This service allows to highlight result items based on your criteria. Example implementation highlights result items matching a configured tag.
+* Added possibility to show result item tags
+* Improved facet configuration. Now UI and configuration are completely sync. UI customization is not more needed when new facets are added through JSON configuration.
+* Added possibility to use a journal article as the help text (in configuration).
+* Audience targeting module configuration moved to the module itself.
+* Added possibility to set query keywords directly in the query configuration. With this feature you can for example configure a subquery to always try to match a certain tag and boost documents matching it.
 
 ## 2018-02-14
 * Added POC kind of support for Knowledge Base Articles
@@ -735,4 +701,4 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 	* Switched to aggregate suggester by default now
 	* Added configuration for the completion type suggest field
 	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
-	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)＀
+	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
