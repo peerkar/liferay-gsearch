@@ -1,4 +1,4 @@
-package fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.query;
+package fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting;
 
 import com.liferay.content.targeting.service.UserSegmentLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -33,7 +33,7 @@ import fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configurat
 	immediate = true, 
 	service = QueryContributor.class
 )
-public class AudienceTargetingQueryBuilder implements QueryContributor {
+public class AudienceTargetingQueryContributor implements QueryContributor {
 
 	@Override
 	public BooleanQuery buildQuery(
@@ -96,6 +96,6 @@ public class AudienceTargetingQueryBuilder implements QueryContributor {
 	private UserSegmentLocalService _userSegmentLocalService;
 
 	private static final Log _log =
-					LogFactoryUtil.getLog(AudienceTargetingQueryBuilder.class);
+					LogFactoryUtil.getLog(AudienceTargetingQueryContributor.class);
 
 }
