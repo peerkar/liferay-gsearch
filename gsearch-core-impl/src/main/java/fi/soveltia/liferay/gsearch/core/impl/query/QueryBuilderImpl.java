@@ -56,24 +56,24 @@ public class QueryBuilderImpl implements QueryBuilder {
 	public BooleanQuery buildQuery(
 		PortletRequest portletRequest, QueryParams queryParams)
 		throws Exception {
-		
+
 		// Build query
 
 		BooleanQuery query = constructQuery(portletRequest, queryParams);
-		
+
 		// Add query contributors
-		
+
 		processQueryContributors(portletRequest, query);
-		
+
 		// Add filters
 
 		BooleanFilter preBooleanFilter =
 			_queryFilterBuilder.buildQueryFilter(portletRequest, queryParams);
-		
+
 		query.setPreBooleanFilter(preBooleanFilter);
 
 		// Set query config
-		
+
 		setQueryConfig(query);
 
 		return query;
@@ -82,29 +82,32 @@ public class QueryBuilderImpl implements QueryBuilder {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
+	}
 
 	/**
 	 * Add query contributor to the list.
 	 * 
 	 * @param queryContributor
 	 */
-    protected void addQueryContributor(QueryContributor queryContributor) {
-        if (_queryContributors == null) {
-        	_queryContributors = new ArrayList<QueryContributor>();
-        }
-        _queryContributors.add(queryContributor);
-    }	
-    
-    /**
+	protected void addQueryContributor(QueryContributor queryContributor) {
+
+		if (_queryContributors == null) {
+			_queryContributors = new ArrayList<QueryContributor>();
+		}
+		_queryContributors.add(queryContributor);
+	}
+
+	/**
 	 * Process registered query contributors.
-     * 
-     * @param portletRequest
-     * @param query
-     */
-    protected void processQueryContributors(PortletRequest portletRequest, BooleanQuery query) {
+	 * 
+	 * @param portletRequest
+	 * @param query
+	 */
+	protected void processQueryContributors(
+		PortletRequest portletRequest, BooleanQuery query) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Processing query contributors.");
@@ -113,74 +116,80 @@ public class QueryBuilderImpl implements QueryBuilder {
 		if (_queryContributors == null) {
 			return;
 		}
-		
-        for (QueryContributor queryContributor : _queryContributors) {
 
-    		if (_log.isDebugEnabled()) {
-    			_log.debug("Processing " + queryContributor.getClass().getName());
-    		}
+		for (QueryContributor queryContributor : _queryContributors) {
 
-    		if (!queryContributor.isEnabled()) {
-        		if (_log.isDebugEnabled()) {
-        			_log.debug(queryContributor.getClass().getName() + " is disabled.");
-        		}
-    			continue;
-    		}
-    		
-        	try {
-        		Query contributorQuery = queryContributor.buildQuery(portletRequest);
-        		
-        		if (contributorQuery != null) {
-        			query.add(contributorQuery, queryContributor.getOccur());
-        		}
-        		
-        	} catch(Exception e) {
-        		_log.error(e, e);
-        	}
-        }
-	}	
-    
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Processing " + queryContributor.getClass().getName());
+			}
+
+			if (!queryContributor.isEnabled()) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						queryContributor.getClass().getName() +
+							" is disabled.");
+				}
+				continue;
+			}
+
+			try {
+				Query contributorQuery =
+					queryContributor.buildQuery(portletRequest);
+
+				if (contributorQuery != null) {
+					query.add(contributorQuery, queryContributor.getOccur());
+				}
+
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+	}
+
 	/**
-	 * Construct query.
-	 * 
-	 * Please note that QueryStringQuery type is an
-	 * extension of Liferay StringQuery. Thus, if you don't want to use
-	 * the custom search adapter, this falls silently to the default StringQuery.
-	 * Remember however that with standard adapter you loose the possibility to
-	 * define target fields or boosts (configuration) - or, they just don't get applied.
+	 * Construct query. Please note that QueryStringQuery type is an extension
+	 * of Liferay StringQuery. Thus, if you don't want to use the custom search
+	 * adapter, this falls silently to the default StringQuery. Remember however
+	 * that with standard adapter you loose the possibility to define target
+	 * fields or boosts (configuration) - or, they just don't get applied.
 	 * 
 	 * @param portletRequest
 	 * @param queryParams
 	 * @return
 	 * @throws Exception
 	 */
-	protected BooleanQuery constructQuery(PortletRequest portletRequest, QueryParams queryParams) throws Exception {
-		
+	protected BooleanQuery constructQuery(
+		PortletRequest portletRequest, QueryParams queryParams)
+		throws Exception {
+
 		BooleanQuery query = new BooleanQueryImpl();
-		
+
 		// Build query
-		
+
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.searchFieldConfiguration());
-		
+
 		ClauseBuilder clauseBuilder;
 
 		Query clause;
-		
+
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject queryItem = configurationArray.getJSONObject(i);
 
 			String queryType = queryItem.getString("queryType");
-			
+
 			if (Validator.isNull(queryType)) {
 				continue;
-			} else {
+			}
+			else {
 				queryType = queryType.toLowerCase();
 			}
-			
+
 			String occurString = queryItem.getString("occur");
-			
+
 			if (Validator.isNotNull(occurString)) {
 				occurString = occurString.toLowerCase();
 			}
@@ -188,20 +197,22 @@ public class QueryBuilderImpl implements QueryBuilder {
 			BooleanClauseOccur occur;
 			if ("must".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST;
-			} else if ("must_not".equalsIgnoreCase(occurString)) {
+			}
+			else if ("must_not".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST_NOT;
-			} else {
+			}
+			else {
 				occur = BooleanClauseOccur.SHOULD;
 			}
-			
+
 			// Try to get a clause builder for the query type
-			
+
 			clauseBuilder = _clauseBuilderFactory.getClauseBuilder(queryType);
 
 			if (clauseBuilder != null) {
 
 				clause = clauseBuilder.buildClause(queryItem, queryParams);
-				
+
 				if (clause != null) {
 					query.add(clause, occur);
 				}
@@ -209,25 +220,28 @@ public class QueryBuilderImpl implements QueryBuilder {
 		}
 
 		return query;
-	}	
+	}
 
 	@Reference(unbind = "-")
-	protected void setClauseBuilderFactory(ClauseBuilderFactory clauseBuilderFactory) {
+	protected void setClauseBuilderFactory(
+		ClauseBuilderFactory clauseBuilderFactory) {
 
 		_clauseBuilderFactory = clauseBuilderFactory;
 	}
-	
-    /**
-     * Remove a query contributor from list.
-     * 
-     * @param clauseBuilder
-     */
-    protected void removeQueryContributor(QueryContributor queryContributor) {
-    	_queryContributors.remove(queryContributor);
-    }    
-    
+
+	/**
+	 * Remove a query contributor from list.
+	 * 
+	 * @param clauseBuilder
+	 */
+	protected void removeQueryContributor(QueryContributor queryContributor) {
+
+		_queryContributors.remove(queryContributor);
+	}
+
 	@Reference(unbind = "-")
-	protected void setQueryFilterBuilder(QueryFilterBuilder queryFilterBuilder) {
+	protected void setQueryFilterBuilder(
+		QueryFilterBuilder queryFilterBuilder) {
 
 		_queryFilterBuilder = queryFilterBuilder;
 	}
@@ -245,23 +259,17 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}
 
 	public static final DateFormat INDEX_DATE_FORMAT =
-					new SimpleDateFormat("yyyyMMddHHmmss");
+		new SimpleDateFormat("yyyyMMddHHmmss");
 
 	protected volatile ModuleConfiguration _moduleConfiguration;
 
 	private ClauseBuilderFactory _clauseBuilderFactory;
-	
+
 	private QueryFilterBuilder _queryFilterBuilder;
 
-    @Reference(
-    	bind = "addQueryContributor",
-    	cardinality = ReferenceCardinality.MULTIPLE, 
-    	policy = ReferencePolicy.DYNAMIC,
-    	service = QueryContributor.class,
-    	unbind = "removeQueryContributor"
-    )
-    private List<QueryContributor> _queryContributors = null;	
-	
+	@Reference(bind = "addQueryContributor", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = QueryContributor.class, unbind = "removeQueryContributor")
+	private List<QueryContributor> _queryContributors = null;
+
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryBuilderImpl.class);
 }
