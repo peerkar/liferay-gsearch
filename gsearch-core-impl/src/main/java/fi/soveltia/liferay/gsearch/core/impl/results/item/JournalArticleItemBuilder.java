@@ -12,6 +12,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
  * JournalArticle item type result builder.
@@ -19,10 +20,16 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class JournalArticleItemBuilder extends BaseResultItemBuilder {
+public class JournalArticleItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
 
+	@Override
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * @throws Exception 
@@ -63,10 +70,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 	 */
 	protected JournalArticle getJournalArticle() throws PortalException {
 
-		if (_journalArticle == null) {
-			_journalArticle = _journalArticleService.getLatestArticle(_entryClassPK);
-		}
-		return _journalArticle;
+		return _journalArticleService.getLatestArticle(_entryClassPK);
 	}
 
 	@Reference(unbind = "-")
@@ -76,7 +80,9 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder {
 		_journalArticleService = journalArticleService;
 	}
 
-	protected JournalArticle _journalArticle;
-	
 	private static JournalArticleService _journalArticleService;
+	
+	private static final String NAME = JournalArticle.class.getName();
+
+	
 }

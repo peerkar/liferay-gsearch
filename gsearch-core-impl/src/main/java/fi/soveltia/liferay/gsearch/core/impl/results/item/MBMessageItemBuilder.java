@@ -4,13 +4,14 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
+import com.liferay.message.boards.kernel.model.MBMessage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.model.WikiPage;
 
@@ -20,27 +21,22 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+
 /**
  * MB message result item builder.
  * 
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class MBMessageItemBuilder extends BaseResultItemBuilder {
+public class MBMessageItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder{
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws Exception
-	 */
 	@Override
-	public String getImageSrc()
-		throws Exception {
-
-		// return _portletRequest.getContextPath() + DEFAULT_IMAGE;
-		return null;
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
 	}
 
 	/**
@@ -60,7 +56,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 
 		if (classNameId > 0) {
 
-			String className = getClassName(classNameId);
+			String className = _portal.getClassName(classNameId);
 
 			if (JournalArticle.class.getName().equals(className)) {
 				return getJournalArticleCommentLink(classPK);
@@ -87,7 +83,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 		
 		if (classNameId > 0) {
 
-			String className = getClassName(classNameId);
+			String className = _portal.getClassName(classNameId);
 
 			if (JournalArticle.class.getName().equals(className) || 
 						WikiPage.class.getName().equals(className)) {
@@ -161,22 +157,19 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder {
 
 		_journalArticleService = journalArticleService;
 	}
-	
-	private String getClassName(long classNameId) {
 
-		if (className == null) {
-			className = PortalUtil.getClassName(classNameId); 
-		}
-		return className;
+	@Reference(unbind = "-")
+	protected void setPortal(
+		Portal portal) {
+
+		_portal = portal;
 	}
-
-	public static final String DEFAULT_IMAGE =
-					"/o/gsearch-web/images/asset-types/discussion.png";
 
 	private static JournalArticleService _journalArticleService;
 	
-	private String className = null;
-	
+	private static final String NAME = MBMessage.class.getName();
+
 	private static final int TITLE_MAXLENGTH = 80;
-	
+
+	private Portal _portal;
 }

@@ -1,7 +1,11 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
+import com.liferay.wiki.model.WikiPage;
+
 import org.osgi.service.component.annotations.Component;
+
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
  * Wiki page result item builder.
@@ -9,21 +13,15 @@ import org.osgi.service.component.annotations.Component;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class WikiPageItemBuilder extends BaseResultItemBuilder {
+public class WikiPageItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
 
-	/**
-	 * {@inheritDoc}
-	 * @throws Exception 
-	 */
 	@Override
-	public String getImageSrc() throws Exception {
-		
-		// return _portletRequest.getContextPath() + DEFAULT_IMAGE;
-
-		return null;
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
 	}
 	
-	public static final String DEFAULT_IMAGE = "/o/gsearch-web/images/asset-types/wiki.png";
+	private static final String NAME = WikiPage.class.getName();
 }

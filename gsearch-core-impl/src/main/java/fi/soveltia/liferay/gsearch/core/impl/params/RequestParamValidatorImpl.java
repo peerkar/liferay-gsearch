@@ -1,10 +1,10 @@
-package fi.soveltia.liferay.gsearch.core.impl.queryparams;
+package fi.soveltia.liferay.gsearch.core.impl.params;
 
 import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.queryparams.RequestParamValidator;
+import fi.soveltia.liferay.gsearch.core.api.params.RequestParamValidator;
 
 /**
  * Request parameter validator class.

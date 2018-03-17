@@ -17,7 +17,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
  * Facet translator implementation for document type. 

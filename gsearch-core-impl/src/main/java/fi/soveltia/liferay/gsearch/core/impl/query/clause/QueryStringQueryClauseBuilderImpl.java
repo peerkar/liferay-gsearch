@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.query.builder;
+package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -10,27 +10,27 @@ import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.QueryStringQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 import fi.soveltia.liferay.gsearch.query.Operator;
 import fi.soveltia.liferay.gsearch.query.QueryStringQuery;
 
 /**
- * QueryStringQuery builder service implementation.
+ * QueryStringQuery clause builder service implementation.
  * 
  * @author Petteri Karttunen
  */
 @Component(
 	immediate = true, 
-	service = QueryStringQueryBuilder.class
+	service = ClauseBuilder.class
 )
-public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
+public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Query buildQuery(
+	public Query buildClause(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 
@@ -120,4 +120,15 @@ public class QueryStringQueryBuilderImpl implements QueryStringQueryBuilder {
 		
 		return queryStringQuery;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canBuild(String querytype) {
+		return (querytype.equals(QUERY_TYPE));
+	}
+	
+	private static final String QUERY_TYPE = "query_string";
+
 }

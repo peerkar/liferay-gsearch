@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.queryparams;
+package fi.soveltia.liferay.gsearch.core.impl.params;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -31,10 +31,10 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.queryparams.QueryParamsBuilder;
-import fi.soveltia.liferay.gsearch.core.api.queryparams.RequestParamValidator;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.RequestParamValidator;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
 
 /**
@@ -43,7 +43,7 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
 	service = QueryParamsBuilder.class
 )
@@ -52,8 +52,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}	
 
 	/**
@@ -98,7 +98,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 */
 	protected String parseAssetClass(String key) throws JSONException, ClassNotFoundException {
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.typeConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.typeConfiguration());
 		
 		String className = null;
 
@@ -125,7 +125,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	protected List<String> parseDefaultAssetClasses()
 		throws ClassNotFoundException, JSONException {
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.typeConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.typeConfiguration());
 		
 		List<String> classNames = new ArrayList<String>();
 
@@ -157,7 +157,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 */
 	protected void setFacetParams() throws JSONException {
 		
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.facetConfiguration());
 
 		Map<String, String[]> facetParams = new HashMap<String, String[]>();
 
@@ -254,7 +254,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 */
 	protected void setPageSizeParam() {
 
-		_queryParams.setPageSize(_gSearchConfiguration.pageSize());
+		_queryParams.setPageSize(_moduleConfiguration.pageSize());
 	}
 
 	@Reference(unbind = "-")
@@ -323,7 +323,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String fieldName = null;
 		Integer fieldType = null;
 		
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.sortFieldConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.sortFieldConfiguration());
 
 		for (int i = 0; i < configurationArray.length(); i++) {
 			
@@ -402,7 +402,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		int start =
 			ParamUtil.getInteger(_portletRequest, GSearchWebKeys.START, 0);
 		_queryParams.setStart(start);
-		_queryParams.setEnd(start + _gSearchConfiguration.pageSize());
+		_queryParams.setEnd(start + _moduleConfiguration.pageSize());
 	}
 
 	/**
@@ -500,7 +500,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	private FacetTranslatorFactory _facetTranslatorFactory;	
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 	
 	private PortletRequest _portletRequest;
 

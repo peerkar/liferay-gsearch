@@ -32,17 +32,17 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactory;
-import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemHighlighter;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * Results builder implementation.
@@ -53,7 +53,7 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
 	service = ResultsBuilder.class
 )
@@ -113,10 +113,22 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}	
-		
+	
+	/**
+	 * Add result item processor to the list.
+	 * 
+	 * @param resultItemProcessor
+	 */
+    protected void addResultItemProcessor(ResultItemProcessor resultItemProcessor) {
+        if (_resultItemProcessors == null) {
+        	_resultItemProcessors = new ArrayList<ResultItemProcessor>();
+        }
+        _resultItemProcessors.add(resultItemProcessor);
+    }
+	
 	/**
 	 * Create facets array for the results.
 	 * 
@@ -128,7 +140,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		// Get facets configuration
 		
-		JSONArray configuration = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+		JSONArray configuration = JSONFactoryUtil.createJSONArray(_moduleConfiguration.facetConfiguration());
 
 		// Get facets.
 
@@ -217,10 +229,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			return jsonArray;
 		}
 		
-		boolean showTags = _gSearchConfiguration.showTags();
-		
-		boolean doItemHighlight = _resultItemHighlighter != null && _resultItemHighlighter.isEnabled();
-
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
 
@@ -248,7 +256,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				ResultItemBuilder resultItemBuilder =
 					_resultsBuilderFactory.getResultBuilder(
 						_portletRequest, _portletResponse, document,
-						_gSearchConfiguration.assetPublisherPage());
+						_moduleConfiguration.assetPublisherPage());
 
 				// Title
 
@@ -280,27 +288,22 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				jsonObject.put("link", resultItemBuilder.getLink());
 
 				// Tags
-
-				if (showTags) {
 				
-					String[] tags = resultItemBuilder.getTags();
-					
-					if (tags != null && tags.length > 0 && tags[0].length() > 0) {
-					
-						jsonObject.put("tags", tags);
-					}
+				String[] tags = resultItemBuilder.getTags();
+				
+				if (tags != null && tags.length > 0 && tags[0].length() > 0) {
+				
+					jsonObject.put("tags", tags);
 				}
 					
-				// Item highlight
-				
-				if (doItemHighlight) {
-					jsonObject.put("highlight", _resultItemHighlighter.isHighlightedItem(document));
-				}
-				
 				// Additional metadata
 
 				jsonObject.put("metadata", resultItemBuilder.getMetadata());
+
+				// Execute result item processors
 				
+				executeResultItemProcessors(document, jsonObject);
+
 				// Put single item to result array
 
 				jsonArray.put(jsonObject);
@@ -441,6 +444,50 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return pagingObject;
 	}
 	
+	/**
+	 * Execute result item processors.
+	 * 
+	 * @param document
+	 * @param resultItem
+	 */
+	protected void executeResultItemProcessors(Document document, JSONObject resultItem) {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Executing result item processors.");
+		}
+
+		if (_resultItemProcessors == null) {
+			return;
+		}
+		
+        for (ResultItemProcessor r : _resultItemProcessors) {
+
+    		if (r.isEnabled()) {
+    			
+    			try {
+					r.process(document, resultItem);
+				}
+				catch (Exception e) {
+					_log.error(e, e);
+				}
+    		} else {
+    			
+        		if (_log.isDebugEnabled()) {
+        			_log.debug("Processor " + r.getClass().getName() + " is disabled");
+        		}
+    		}
+        }
+	}	
+	
+    /**
+     * Remove a result item processor from list.
+     * 
+     * @param resultItemProcessor
+     */
+    protected void removeResultItemProcessor(ResultItemProcessor resultItemProcessor) {
+    	_resultItemProcessors.remove(resultItemProcessor);
+    }    
+	
 	@Reference(unbind = "-")
 	protected void setFacetTranslatorFactory(FacetTranslatorFactory facetTranslatorFactory) {
 
@@ -453,16 +500,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		_resultsBuilderFactory = resultsBuilderFactory;
 	}
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policyOption = ReferencePolicyOption.GREEDY,
-		unbind = "-"
-	)
-	protected void setResultItemHighlighter(ResultItemHighlighter resultItemHighlighter) {
-
-		_resultItemHighlighter = resultItemHighlighter;
-	}
-	
 	/**
 	 * Sort facet list. Use the order of configuration.
 	 * 
@@ -516,12 +553,20 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	private FacetTranslatorFactory _facetTranslatorFactory;	
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private ResultItemBuilderFactory _resultsBuilderFactory;	
 
-	private ResultItemHighlighter _resultItemHighlighter;	
-
+    @Reference(
+    	bind = "addResultItemProcessor",
+    	cardinality = ReferenceCardinality.MULTIPLE, 
+    	policy = ReferencePolicy.DYNAMIC,
+    	service = ResultItemProcessor.class,
+    	unbind = "removeResultItemProcessor"
+    )
+    private List<ResultItemProcessor> _resultItemProcessors;
+	
 	private static final Log _log =
-		LogFactoryUtil.getLog(ResultsBuilderImpl.class);
+					LogFactoryUtil.getLog(ResultsBuilderImpl.class);
+				
 }

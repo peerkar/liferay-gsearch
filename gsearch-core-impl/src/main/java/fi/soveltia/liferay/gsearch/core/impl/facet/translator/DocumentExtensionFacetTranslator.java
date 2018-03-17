@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
  * Facet translator for document extension.

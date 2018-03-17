@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -22,6 +23,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
  * DLFileEntry item type result builder.
@@ -29,9 +31,15 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
+public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+
+	@Override
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -256,4 +264,6 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder {
 	private static DDMStructureLocalService _ddmStructureLocalService;
 	
 	private static DLAppService _dLAppService;
+	
+	private static final String NAME = DLFileEntry.class.getName();
 }

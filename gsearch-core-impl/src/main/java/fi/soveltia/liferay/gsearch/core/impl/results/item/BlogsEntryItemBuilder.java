@@ -7,15 +7,23 @@ import com.liferay.blogs.kernel.service.BlogsEntryService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+
 /**
  * Blogs entry result item builder.
  * 
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class BlogsEntryItemBuilder extends BaseResultItemBuilder {
+public class BlogsEntryItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+
+	@Override
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -37,4 +45,6 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder {
 	}
 
 	private static BlogsEntryService _blogsEntryService;
+	
+	private static final String NAME = BlogsEntry.class.getName();
 }

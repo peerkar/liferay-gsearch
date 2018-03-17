@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.exception;
 
 import com.liferay.portal.kernel.exception.PortalException;

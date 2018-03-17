@@ -5,25 +5,24 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+
 /**
  * KBArticle result item builder.
  * 
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = ResultItemBuilder.class
 )
-public class KBArticleItemBuilder extends BaseResultItemBuilder {
+public class KBArticleItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
 
 	@Override
-	public String getImageSrc()
-		throws Exception {
-		
-		// No small image.
-		
-		return null;
+	public boolean canBuild(String name) {
+		return NAME.equals(name);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -35,4 +34,8 @@ public class KBArticleItemBuilder extends BaseResultItemBuilder {
 			(LiferayPortletRequest) _portletRequest,
 			(LiferayPortletResponse) _portletResponse, null);
 	}
+	
+	// Avoiding KB dependency in gradle.build
+		
+	private static final String NAME = "com.liferay.knowledge.base.model.KBArticle";
 }

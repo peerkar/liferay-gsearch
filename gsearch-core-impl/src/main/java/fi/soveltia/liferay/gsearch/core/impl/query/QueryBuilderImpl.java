@@ -12,9 +12,12 @@ import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
@@ -24,17 +27,15 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.osgi.service.component.annotations.ReferencePolicy;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.MatchQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.QueryStringQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.TermQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.WildcardQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.ct.CTQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilderFactory;
+import fi.soveltia.liferay.gsearch.core.api.query.contributor.QueryContributor;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * Query builder implementation.
@@ -42,7 +43,7 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
 	service = QueryBuilder.class
 )
@@ -60,9 +61,9 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 		BooleanQuery query = constructQuery(portletRequest, queryParams);
 		
-		// Add Audience targeting query
+		// Add query contributors
 		
-		addCTQuery(portletRequest, query);
+		processQueryContributors(portletRequest, query);
 		
 		// Add filters
 
@@ -81,34 +82,64 @@ public class QueryBuilderImpl implements QueryBuilder {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}	
-		
-	/**
-	 * Add Audience targeting query.
-	 * 
-	 * @param portletRequest
-	 * @param query
-	 * @throws Exception
-	 */
-	protected void addCTQuery(PortletRequest portletRequest, BooleanQuery query) throws Exception {
 
-		if (_ctQueryBuilder == null || !_ctQueryBuilder.isEnabled()) {
+	/**
+	 * Add query contributor to the list.
+	 * 
+	 * @param queryContributor
+	 */
+    protected void addQueryContributor(QueryContributor queryContributor) {
+        if (_queryContributors == null) {
+        	_queryContributors = new ArrayList<QueryContributor>();
+        }
+        _queryContributors.add(queryContributor);
+    }	
+    
+    /**
+	 * Process registered query contributors.
+     * 
+     * @param portletRequest
+     * @param query
+     */
+    protected void processQueryContributors(PortletRequest portletRequest, BooleanQuery query) {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Processing query contributors.");
+		}
+
+		if (_queryContributors == null) {
 			return;
 		}
-
-		if(_log.isDebugEnabled()) {
-			_log.debug("Adding audience targeting query.");
-		}
 		
-		BooleanQuery ctQuery = _ctQueryBuilder.buildCTQuery(portletRequest);
+        for (QueryContributor queryContributor : _queryContributors) {
 
-		if (ctQuery != null) {
-			query.add(ctQuery, BooleanClauseOccur.SHOULD);
-		}
-	}
-	
+    		if (_log.isDebugEnabled()) {
+    			_log.debug("Processing " + queryContributor.getClass().getName());
+    		}
+
+    		if (!queryContributor.isEnabled()) {
+        		if (_log.isDebugEnabled()) {
+        			_log.debug(queryContributor.getClass().getName() + " is disabled.");
+        		}
+    			continue;
+    		}
+    		
+        	try {
+        		Query contributorQuery = queryContributor.buildQuery(portletRequest);
+        		
+        		if (contributorQuery != null) {
+        			query.add(contributorQuery, queryContributor.getOccur());
+        		}
+        		
+        	} catch(Exception e) {
+        		_log.error(e, e);
+        	}
+        }
+	}	
+    
 	/**
 	 * Construct query.
 	 * 
@@ -130,90 +161,75 @@ public class QueryBuilderImpl implements QueryBuilder {
 		// Build query
 		
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_gSearchConfiguration.searchFieldConfiguration());
+			_moduleConfiguration.searchFieldConfiguration());
 		
-		Query subQuery;
+		ClauseBuilder clauseBuilder;
 
+		Query clause;
+		
 		for (int i = 0; i < configurationArray.length(); i++) {
 			
 			JSONObject queryItem = configurationArray.getJSONObject(i);
 
-			subQuery =  null;
-
 			String queryType = queryItem.getString("queryType");
+			
+			if (Validator.isNull(queryType)) {
+				continue;
+			} else {
+				queryType = queryType.toLowerCase();
+			}
+			
 			String occurString = queryItem.getString("occur");
+			
+			if (Validator.isNotNull(occurString)) {
+				occurString = occurString.toLowerCase();
+			}
 
 			BooleanClauseOccur occur;
-			if ("MUST".equalsIgnoreCase(occurString)) {
+			if ("must".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST;
-			} else if ("MUST_NOT".equalsIgnoreCase(occurString)) {
+			} else if ("must_not".equalsIgnoreCase(occurString)) {
 				occur = BooleanClauseOccur.MUST_NOT;
 			} else {
 				occur = BooleanClauseOccur.SHOULD;
 			}
-	 		
-			if ("MATCH".equalsIgnoreCase(queryType)) {
-
-				subQuery =  _matchQueryBuilder.buildQuery(queryItem, queryParams);
-				
-			} else if ("WILDCARD".equalsIgnoreCase(queryType)) { 
-				
-				subQuery = _wildcardQueryBuilder.buildQuery(queryItem, queryParams);
-				
-			} else if ("QUERY_STRING".equalsIgnoreCase(queryType)) {
-				
-				subQuery = _queryStringQueryBuilder.buildQuery(queryItem, queryParams);
 			
-			} else if ("TERM".equalsIgnoreCase(queryType)) {
-
-				subQuery = _termQueryBuilder.buildQuery(queryItem, queryParams);
-			}
+			// Try to get a clause builder for the query type
 			
-			if (subQuery != null) {
-				query.add(subQuery,occur);
+			clauseBuilder = _clauseBuilderFactory.getClauseBuilder(queryType);
+
+			if (clauseBuilder != null) {
+
+				clause = clauseBuilder.buildClause(queryItem, queryParams);
+				
+				if (clause != null) {
+					query.add(clause, occur);
+				}
 			}
 		}
+
 		return query;
 	}	
 
-	@Reference(
-		cardinality = ReferenceCardinality.OPTIONAL,
-		policyOption = ReferencePolicyOption.GREEDY,
-		unbind = "-"
-	)
-	protected void setCTQueryBuilder(CTQueryBuilder ctQueryBuilder) {
-
-		_ctQueryBuilder = ctQueryBuilder;
-	}
-
 	@Reference(unbind = "-")
-	protected void setMatchQueryBuilder(MatchQueryBuilder matchQueryBuilder) {
+	protected void setClauseBuilderFactory(ClauseBuilderFactory clauseBuilderFactory) {
 
-		_matchQueryBuilder = matchQueryBuilder;
+		_clauseBuilderFactory = clauseBuilderFactory;
 	}
-
+	
+    /**
+     * Remove a query contributor from list.
+     * 
+     * @param clauseBuilder
+     */
+    protected void removeQueryContributor(QueryContributor queryContributor) {
+    	_queryContributors.remove(queryContributor);
+    }    
+    
 	@Reference(unbind = "-")
 	protected void setQueryFilterBuilder(QueryFilterBuilder queryFilterBuilder) {
 
 		_queryFilterBuilder = queryFilterBuilder;
-	}
-
-	@Reference(unbind = "-")
-	protected void setQueryStringQueryBuilder(QueryStringQueryBuilder queryStringQueryBuilder) {
-
-		_queryStringQueryBuilder = queryStringQueryBuilder;
-	}
-
-	@Reference(unbind = "-")
-	protected void setTermQueryBuilder(TermQueryBuilder termQueryBuilder) {
-
-		_termQueryBuilder = termQueryBuilder;
-	}
-	
-	@Reference(unbind = "-")
-	protected void setWildcardQueryBuilder(WildcardQueryBuilder wildcardQueryBuilder) {
-
-		_wildcardQueryBuilder = wildcardQueryBuilder;
 	}
 
 	/**
@@ -232,20 +248,21 @@ public class QueryBuilderImpl implements QueryBuilder {
 	public static final DateFormat INDEX_DATE_FORMAT =
 					new SimpleDateFormat("yyyyMMddHHmmss");
 
-	protected volatile GSearchConfiguration _gSearchConfiguration;
+	protected volatile ModuleConfiguration _moduleConfiguration;
 
-	private CTQueryBuilder _ctQueryBuilder;
-
-	private MatchQueryBuilder _matchQueryBuilder;
-
+	private ClauseBuilderFactory _clauseBuilderFactory;
+	
 	private QueryFilterBuilder _queryFilterBuilder;
-	
-	private QueryStringQueryBuilder _queryStringQueryBuilder;
 
-	private TermQueryBuilder _termQueryBuilder;
+    @Reference(
+    	bind = "addQueryContributor",
+    	cardinality = ReferenceCardinality.MULTIPLE, 
+    	policy = ReferencePolicy.DYNAMIC,
+    	service = QueryContributor.class,
+    	unbind = "removeQueryContributor"
+    )
+    private List<QueryContributor> _queryContributors = null;	
 	
-	private WildcardQueryBuilder _wildcardQueryBuilder;
-
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryBuilderImpl.class);
 }

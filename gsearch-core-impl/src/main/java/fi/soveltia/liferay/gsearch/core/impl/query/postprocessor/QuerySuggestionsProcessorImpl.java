@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.query.processor;
+package fi.soveltia.liferay.gsearch.core.impl.query.postprocessor;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -22,11 +22,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.processor.QuerySuggestionsProcessor;
+import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * This class populates hits object with query suggestions and does an
@@ -39,20 +39,13 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
-	service = QuerySuggestionsProcessor.class
+	service = QueryPostProcessor.class
 )
 public class QuerySuggestionsProcessorImpl
-	implements QuerySuggestionsProcessor {
+	implements QueryPostProcessor {
 
-	@Activate 
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
-	}	
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean process(
@@ -64,7 +57,7 @@ public class QuerySuggestionsProcessorImpl
 			_log.debug("Processing QuerySuggestions");
 		}
 		
-		if (!_gSearchConfiguration.enableQuerySuggestions()) {
+		if (!_moduleConfiguration.enableQuerySuggestions()) {
 			return true;
 		}
 
@@ -72,7 +65,7 @@ public class QuerySuggestionsProcessorImpl
 			_log.debug("QuerySuggestions are enabled.");
 		}
 			
-		if (hits.getLength() >= _gSearchConfiguration.querySuggestionsHitsThreshold()) {
+		if (hits.getLength() >= _moduleConfiguration.querySuggestionsHitsThreshold()) {
 			
 			if (_log.isDebugEnabled()) {
 				_log.debug("Hits threshold was exceeded. Returning.");
@@ -142,6 +135,13 @@ public class QuerySuggestionsProcessorImpl
 		return true;
 	}
 
+	@Activate 
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
+	}	
+	
 	@Reference(unbind = "-")
 	protected void setGSearchKeywordSuggester(
 		GSearchKeywordSuggester gSearchSuggester) {
@@ -163,7 +163,7 @@ public class QuerySuggestionsProcessorImpl
 		_queryBuilder = queryBuilder;
 	}
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private GSearchKeywordSuggester _gSearchSuggester;
 	

@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.query.processor;
+package fi.soveltia.liferay.gsearch.core.impl.query.postprocessor;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -13,14 +13,16 @@ import com.liferay.portal.kernel.search.suggest.SuggestionConstants;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.portlet.PortletRequest;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.processor.QueryIndexerProcessor;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /** 
  * Query indexer processor. 
@@ -32,21 +34,21 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
-	service = QueryIndexerProcessor.class
+	service = QueryPostProcessor.class
 )
-public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
+public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 
 	@Activate 
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}	
 	
 	@Override
-	public boolean process(
+	public boolean process(PortletRequest portletRequest,
 		SearchContext searchContext,
 		QueryParams queryParams, Hits hits)
 		throws Exception {
@@ -55,8 +57,7 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 			_log.debug("Processing QueryIndexer");
 		}
 
-		if (!_gSearchConfiguration.enableQuerySuggestions() &&
-			!_gSearchConfiguration.enableAutoComplete()) {
+		if (!_moduleConfiguration.enableQuerySuggestions()) {
 			return true;
 		}
 
@@ -64,7 +65,7 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 			_log.debug("QueryIndexer is enabled");
 		}
 		
-		if (hits.getLength() >= _gSearchConfiguration.queryIndexingThreshold()) {
+		if (hits.getLength() >= _moduleConfiguration.queryIndexingThreshold()) {
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("QueryIndexing threshold exceeded. Indexing keywords: " + queryParams.getKeywords());
@@ -96,7 +97,7 @@ public class QueryIndexerProcessorImpl implements QueryIndexerProcessor {
 
 	private IndexWriterHelper _indexWriterHelper;
 	
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static final Log _log =
 					LogFactoryUtil.getLog(QueryIndexerProcessorImpl.class);

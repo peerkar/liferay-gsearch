@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.query.builder;
+package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -14,22 +14,25 @@ import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.MatchQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
  * MatchQuery builder service implementation.
  * 
  * @author Petteri Karttunen
  */
-@Component(immediate = true, service = MatchQueryBuilder.class)
-public class MatchQueryBuilderImpl implements MatchQueryBuilder {
+@Component(
+	immediate = true, 
+	service = ClauseBuilder.class
+)
+public class MatchQueryBuilderImpl implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Query buildQuery(
+	public Query buildClause(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 
@@ -47,7 +50,7 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 			value = queryParams.getKeywords();
 		}		
 	
-		MatchQuery matchQuery = buildQuery(configurationObject, queryParams, fieldName, value);
+		MatchQuery matchQuery = buildClause(configurationObject, queryParams, fieldName, value);
 		
 		// Is localized
 
@@ -57,7 +60,7 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 			String localizedFieldName =
 							fieldName + "_" + queryParams.getLocale().toString();
 
-			MatchQuery localizedQuery = buildQuery(configurationObject, queryParams, localizedFieldName, value);
+			MatchQuery localizedQuery = buildClause(configurationObject, queryParams, localizedFieldName, value);
 
 			// Boost for localized
 			
@@ -78,8 +81,8 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 		
 		return matchQuery;
 	}
-
-	protected MatchQuery buildQuery(
+	
+	protected MatchQuery buildClause(
 		JSONObject configurationObject, QueryParams queryParams,
 		String fieldName, String value)
 		throws Exception {
@@ -157,4 +160,14 @@ public class MatchQueryBuilderImpl implements MatchQueryBuilder {
 				
 		return matchQuery;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canBuild(String querytype) {
+		return (querytype.equals(QUERY_TYPE));
+	}
+	
+	private static final String QUERY_TYPE = "match";
 }

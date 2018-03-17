@@ -1,4 +1,4 @@
-package fi.soveltia.liferay.gsearch.core.impl.query.builder;
+package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -13,25 +13,25 @@ import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.WildcardQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
- * WildcardQuery builder service implementation.
+ * WildcardQuery clause builder service implementation.
  * 
  * @author Petteri Karttunen
  */
 @Component(
 	immediate = true, 
-	service = WildcardQueryBuilder.class
+	service = ClauseBuilder.class
 )
-public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
+public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Query buildQuery(
+	public Query buildClause(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 		
@@ -75,7 +75,6 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 			wildcardQuery.setBoost(boost);
 			
 			return wildcardQuery;
-			
 		}
 	}
 
@@ -113,4 +112,14 @@ public class WildcardQueryBuilderImpl implements WildcardQueryBuilder {
 		
 		return wildcardQuery;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canBuild(String querytype) {
+		return (querytype.equals(QUERY_TYPE));
+	}
+	
+	private static final String QUERY_TYPE = "wildcard";
 }

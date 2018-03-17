@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * GSearch keywords suggester implementation.
@@ -46,7 +46,7 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
 	service = GSearchKeywordSuggester.class
 )
@@ -94,7 +94,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		AggregateSuggester aggregateSuggester =
 						new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.suggestConfiguration());
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.suggestConfiguration());
 		
 		for (int i = 0; i < configurationArray.length(); i++) {
 			
@@ -155,8 +155,8 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}		
 	
 	/**
@@ -217,8 +217,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		
 		PhraseSuggester suggester = new PhraseSuggester(
 			configuration.getString("suggesterName"), sb.toString(), keywords);
-	
-		
+			
 		int size = GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
 		suggester.setSize(size);
 		
@@ -245,7 +244,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 	public static final String GSEARCH_SUGGESTION_NAME = "gsearchSuggestion";
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private QuerySuggester _querySuggester;
 

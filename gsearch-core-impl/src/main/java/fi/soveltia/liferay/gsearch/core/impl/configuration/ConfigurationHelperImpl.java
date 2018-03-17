@@ -17,8 +17,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
-import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelperService;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 
 /**
  * JSON configuration helper service implementation.
@@ -27,17 +26,17 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  *
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true,
-	service = JSONConfigurationHelperService.class
+	service = ConfigurationHelper.class
 )
-public class JSONConfigurationHelperServiceImpl implements JSONConfigurationHelperService {
+public class ConfigurationHelperImpl implements ConfigurationHelper {
 
 	@Activate 
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+			ModuleConfiguration.class, properties);
 	}	
 
 	/**
@@ -62,7 +61,16 @@ public class JSONConfigurationHelperServiceImpl implements JSONConfigurationHelp
 		}
 		return translatedOptions;
 	}	
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JSONArray getFacetConfiguration() throws JSONException {
+
+		return JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+	}
+			
 	/**
 	 * {@inheritDoc}
 	 */
@@ -90,7 +98,7 @@ public class JSONConfigurationHelperServiceImpl implements JSONConfigurationHelp
 	private String getLocalization(String key, Locale locale) {
 		if (_resourceBundle == null) {
 			_resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", locale, JSONConfigurationHelperServiceImpl.class);
+				"content.Language", locale, ConfigurationHelperImpl.class);
 		}
 		try {
 			return _resourceBundle.getString(key);
@@ -100,9 +108,9 @@ public class JSONConfigurationHelperServiceImpl implements JSONConfigurationHelp
 		return key;
 	}
 	
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _gSearchConfiguration;
 
 	private ResourceBundle _resourceBundle;
 	
-	private static final Log _log = LogFactoryUtil.getLog(JSONConfigurationHelperServiceImpl.class);
+	private static final Log _log = LogFactoryUtil.getLog(ConfigurationHelperImpl.class);
 }

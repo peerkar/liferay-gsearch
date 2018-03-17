@@ -18,7 +18,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 import fi.soveltia.liferay.gsearch.core.api.facet.FacetsBuilder;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * Facets builder implementation. This service sets the configured
@@ -27,7 +27,7 @@ import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
 	immediate = true, 
 	service = FacetsBuilder.class
 )
@@ -70,10 +70,10 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+			ModuleConfiguration.class, properties);
 	}	
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _gSearchConfiguration;
 	
 	private int MAX_TERMS = 20;
 }

@@ -35,7 +35,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
 
 /**

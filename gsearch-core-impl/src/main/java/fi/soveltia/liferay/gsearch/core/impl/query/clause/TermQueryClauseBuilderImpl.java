@@ -1,4 +1,4 @@
-package fi.soveltia.liferay.gsearch.core.impl.query.builder;
+package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Query;
@@ -9,25 +9,25 @@ import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.query.builder.TermQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
- * MatchQuery builder service implementation.
+ * MatchQuery clause builder service implementation.
  * 
  * @author Petteri Karttunen
  */
 @Component(
 	immediate = true, 
-	service = TermQueryBuilder.class
+	service = ClauseBuilder.class
 )
-public class TermQueryBuilderImpl implements TermQueryBuilder {
+public class TermQueryClauseBuilderImpl implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Query buildQuery(
+	public Query buildClause(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
 
@@ -56,4 +56,14 @@ public class TermQueryBuilderImpl implements TermQueryBuilder {
 		
 		return termQuery;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean canBuild(String querytype) {
+		return (querytype.equals(QUERY_TYPE));
+	}
+	
+	private static final String QUERY_TYPE = "term";
 }
