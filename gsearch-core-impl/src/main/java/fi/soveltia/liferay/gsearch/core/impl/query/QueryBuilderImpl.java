@@ -240,7 +240,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 	protected void setQueryConfig(BooleanQuery query) {
 
 		// Create Queryconfig.
-
 		// QueryConfig queryConfig = new QueryConfig();
 		// query.setQueryConfig(queryConfig);
 	}
