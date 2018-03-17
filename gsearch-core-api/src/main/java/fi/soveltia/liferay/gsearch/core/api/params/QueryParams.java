@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.api.query;
+package fi.soveltia.liferay.gsearch.core.api.params;
 
 import com.liferay.portal.kernel.search.Sort;
 

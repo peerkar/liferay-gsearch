@@ -7,15 +7,14 @@ import com.liferay.portal.kernel.json.JSONException;
 import java.util.Locale;
 
 /**
- * This service is a temporary helper service for localizing configuration values
- * because of https://issues.liferay.com/browse/LPS-75141
+ * A configuration helper interface.
  * 
  * @author Petteri Karttunen
  */
-public interface JSONConfigurationHelperService {
+public interface ConfigurationHelper {
 
 	/**
-	 * Get asset type options localized Should be deprecated when
+	 * Get asset type options localized. Should be deprecated when
 	 * https://issues.liferay.com/browse/LPS-75141 is solved.
 	 *
 	 * @param locale
@@ -26,7 +25,15 @@ public interface JSONConfigurationHelperService {
 		throws JSONException;
 	
 	/**
-	 * Get sort options localized Should be deprecated when
+	 * Get facets configuration
+	 * 
+	 * @return JSONArray
+	 * @throws Exception
+	 */
+	public JSONArray getFacetConfiguration() throws JSONException;
+	
+	/**
+	 * Get sort options localized. Should be deprecated when
 	 * https://issues.liferay.com/browse/LPS-75141 is solved.
 	 * 
 	 * @param locale

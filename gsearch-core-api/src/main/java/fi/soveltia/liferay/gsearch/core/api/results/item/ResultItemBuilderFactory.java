@@ -7,7 +7,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 /**
- * Asset type specific result item builder factory.
+ * Result item builder factory interface. Implementations of this service
+ * returns an asset type specific result item builder.
  * 
  * @author Petteri Karttunen
  */
@@ -18,7 +19,7 @@ public interface ResultItemBuilderFactory {
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
-	 * @param document search result document
+	 * @param document Searchresult document
 	 * @param assetPublisherPageFriendlyURL
 	 * @return ResultItemBuilder
 	 */

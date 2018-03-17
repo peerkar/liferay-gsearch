@@ -1,11 +1,9 @@
 
-package fi.soveltia.liferay.gsearch.core.api.queryparams;
+package fi.soveltia.liferay.gsearch.core.api.params;
 
 import com.liferay.portal.kernel.exception.PortalException;
 
 import javax.portlet.PortletRequest;
-
-import fi.soveltia.liferay.gsearch.core.api.query.QueryParams;
 
 /**
  * Query parameters builder. This service builds query params object from

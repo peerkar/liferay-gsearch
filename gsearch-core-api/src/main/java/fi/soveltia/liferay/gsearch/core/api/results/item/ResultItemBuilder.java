@@ -9,13 +9,18 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
 /**
- * Asset type specific result item builder. Implementations of this class build a single result
- * item.
+ * Asset type specific result item builder. Implementations of this class build
+ * a single result item.
  * 
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
 
+	/**
+	 * Check if this builder can build the requested type.
+	 */
+	public boolean canBuild(String name);
+	
 	/**
 	 * Get item hit date.
 	 * 
@@ -58,7 +63,7 @@ public interface ResultItemBuilder {
 	 */
 	public Map<String, String> getMetadata()
 		throws Exception;
-	
+
 	/**
 	 * Get item tags.
 	 * 
@@ -66,7 +71,7 @@ public interface ResultItemBuilder {
 	 */
 	public String[] getTags()
 		throws Exception;
-	
+
 	/**
 	 * Get item title.
 	 * 

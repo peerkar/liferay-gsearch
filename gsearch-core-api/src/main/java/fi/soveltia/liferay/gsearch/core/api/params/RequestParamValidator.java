@@ -1,4 +1,4 @@
-package fi.soveltia.liferay.gsearch.core.api.queryparams;
+package fi.soveltia.liferay.gsearch.core.api.params;
 
 /**
  * Request parameter validation service.
