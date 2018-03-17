@@ -8,7 +8,7 @@ With this feature you can boost documents falling into current user's user segme
 
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
-* fi.soveltia.liferay.gsearch.fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting-[VERSION].jar
+* fi.soveltia.liferay.gsearch.query.contributor.audiencetargeting-[VERSION].jar
 
 ## Configuration
 
