@@ -8,7 +8,7 @@ This feature allows to add a property called "highlight" to the UI result item, 
 
 Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
 
-* fi.soveltia.liferay.gsearch.fi.soveltia.liferay.gsearch.highlightresultitembytag-[VERSION].jar
+* fi.soveltia.liferay.gsearch.highlightresultitembytag-[VERSION].jar
 
 ## Configuration
 
