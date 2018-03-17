@@ -34,7 +34,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 __Major API changes and streamlining__. Added new interfaces to significantly ease extending and customizing this solution to your needs.
 
-* Added __QueryContributor__ service interface. With the new service interface you can easily add any custom clauses to the main query to improve relevancy. Audience Targeting module is using this as of now.
+* Added __QueryContributor__ service interface. With the new service interface you can easily add any custom clauses, or in Google terms "signals" to the main query to improve relevancy. Audience Targeting module is using this as of now.
 * Added __ResultItemProcessor__ service interface. With this you can process result items before they are sent to the user interface.  See the gsearch-hightlight-item-by-tag sample.
 * Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
 * Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
