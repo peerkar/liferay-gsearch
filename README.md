@@ -39,6 +39,7 @@ __Major API changes and streamlining__. Added new interfaces to significantly ea
 * Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
 * Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
 * Added __ClauseBuilder__ service interface. With this you can create implementations for not out of the box supported query types or override the existing ones.
+* Splitted the bloated core configuration to the relevant module configurations
 
 See more instructions for these new interfaces below in this document.
 
