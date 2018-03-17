@@ -24,10 +24,9 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
-/** 
- * Query indexer processor. 
- * 
- * Originally com.liferay.portal.search.internal.hits.QueryIndexingHitsProcessor
+/**
+ * Query indexer processor. Originally
+ * com.liferay.portal.search.internal.hits.QueryIndexingHitsProcessor
  * 
  * @author Michael C. Han
  * @author Josef Sustacek
@@ -40,16 +39,17 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 )
 public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 
-	@Activate 
+	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
-	
+	}
+
 	@Override
-	public boolean process(PortletRequest portletRequest,
-		SearchContext searchContext,
+	public boolean process(
+		PortletRequest portletRequest, SearchContext searchContext,
 		QueryParams queryParams, Hits hits)
 		throws Exception {
 
@@ -64,19 +64,23 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 		if (_log.isDebugEnabled()) {
 			_log.debug("QueryIndexer is enabled");
 		}
-		
+
 		if (hits.getLength() >= _moduleConfiguration.queryIndexingThreshold()) {
 
 			if (_log.isDebugEnabled()) {
-				_log.debug("QueryIndexing threshold exceeded. Indexing keywords: " + queryParams.getKeywords());
+				_log.debug(
+					"QueryIndexing threshold exceeded. Indexing keywords: " +
+						queryParams.getKeywords());
 			}
 
 			addDocument(
 				queryParams.getCompanyId(), queryParams.getKeywords(),
 				queryParams.getLocale());
-		} else {
+		}
+		else {
 			if (_log.isDebugEnabled()) {
-				_log.debug("QueryIndexing threshold wasn't exceeded. Not indexing keywords.");
+				_log.debug(
+					"QueryIndexing threshold wasn't exceeded. Not indexing keywords.");
 			}
 		}
 		return true;
@@ -86,7 +90,8 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 		throws SearchException {
 
 		_indexWriterHelper.indexKeyword(
-			companyId, keywords, 0, SuggestionConstants.TYPE_QUERY_SUGGESTION, locale);
+			companyId, keywords, 0, SuggestionConstants.TYPE_QUERY_SUGGESTION,
+			locale);
 	}
 
 	@Reference(unbind = "-")
@@ -96,10 +101,10 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 	}
 
 	private IndexWriterHelper _indexWriterHelper;
-	
+
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static final Log _log =
-					LogFactoryUtil.getLog(QueryIndexerProcessorImpl.class);
-	
+		LogFactoryUtil.getLog(QueryIndexerProcessorImpl.class);
+
 }

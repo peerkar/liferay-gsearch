@@ -41,47 +41,49 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 		if (fieldName == null) {
 			return null;
 		}
-		
+
 		// If there's a predefined value in the configuration, use that
 
 		String value = configurationObject.getString("value");
 
 		if (Validator.isNull(value)) {
 			value = queryParams.getKeywords();
-		}		
-	
-		MatchQuery matchQuery = buildClause(configurationObject, queryParams, fieldName, value);
-		
+		}
+
+		MatchQuery matchQuery =
+			buildClause(configurationObject, queryParams, fieldName, value);
+
 		// Is localized
 
 		boolean isLocalized = configurationObject.getBoolean("localized");
 
 		if (isLocalized) {
 			String localizedFieldName =
-							fieldName + "_" + queryParams.getLocale().toString();
+				fieldName + "_" + queryParams.getLocale().toString();
 
-			MatchQuery localizedQuery = buildClause(configurationObject, queryParams, localizedFieldName, value);
+			MatchQuery localizedQuery = buildClause(
+				configurationObject, queryParams, localizedFieldName, value);
 
 			// Boost for localized
-			
+
 			float localizedBoost = GetterUtil.getFloat(
 				configurationObject.getString("boostForLocalizedVersion"), 1f);
-			
+
 			localizedQuery.setBoost(localizedBoost);
 
 			// Add subqueries to the query
-	
+
 			BooleanQuery booleanQuery = new BooleanQueryImpl();
-	
+
 			booleanQuery.add(matchQuery, BooleanClauseOccur.SHOULD);
 			booleanQuery.add(localizedQuery, BooleanClauseOccur.SHOULD);
-	
+
 			return booleanQuery;
 		}
-		
+
 		return matchQuery;
 	}
-	
+
 	protected MatchQuery buildClause(
 		JSONObject configurationObject, QueryParams queryParams,
 		String fieldName, String value)
@@ -148,16 +150,16 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 				GetterUtil.getFloat(configurationObject.get("fuzziness"), 0.0f);
 			matchQuery.setFuzziness(fuzziness);
 		}
-		
+
 		// Minimum should match
 
 		String minShouldMatch =
-						GetterUtil.getString(configurationObject.get("minShouldMatch"));
+			GetterUtil.getString(configurationObject.get("minShouldMatch"));
 
 		if (Validator.isNotNull(minShouldMatch)) {
 			matchQuery.setMinShouldMatch(minShouldMatch);
 		}
-				
+
 		return matchQuery;
 	}
 
@@ -166,8 +168,9 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public boolean canBuild(String querytype) {
+
 		return (querytype.equals(QUERY_TYPE));
 	}
-	
+
 	private static final String QUERY_TYPE = "match";
 }

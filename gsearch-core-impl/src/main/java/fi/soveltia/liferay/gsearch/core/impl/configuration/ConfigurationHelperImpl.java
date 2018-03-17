@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.configuration;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -23,7 +24,6 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
  * JSON configuration helper service implementation.
  * 
  * @author Petteri
- *
  */
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
@@ -32,85 +32,99 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 )
 public class ConfigurationHelperImpl implements ConfigurationHelper {
 
-	@Activate 
+	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray getAssetTypeOptions(Locale locale) throws JSONException {
+	public JSONArray getAssetTypeOptions(Locale locale)
+		throws JSONException {
 
 		String configuration = _gSearchConfiguration.typeConfiguration();
 
 		JSONArray translatedOptions = JSONFactoryUtil.createJSONArray();
-		
+
 		JSONArray options = JSONFactoryUtil.createJSONArray(configuration);
 
 		for (int i = 0; i < options.length(); i++) {
 
 			JSONObject item = options.getJSONObject(i);
-			
-			item.put("localization", getLocalization("type." + item.getString("entryClassName").toLowerCase(), locale));
+
+			item.put(
+				"localization",
+				getLocalization(
+					"type." + item.getString("entryClassName").toLowerCase(),
+					locale));
 			translatedOptions.put(item);
-			
+
 		}
 		return translatedOptions;
-	}	
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JSONArray getFacetConfiguration() throws JSONException {
-
-		return JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
 	}
-			
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray getSortOptions(Locale locale) throws JSONException {
-		
+	public JSONArray getFacetConfiguration()
+		throws JSONException {
+
+		return JSONFactoryUtil.createJSONArray(
+			_gSearchConfiguration.facetConfiguration());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JSONArray getSortOptions(Locale locale)
+		throws JSONException {
+
 		String configuration = _gSearchConfiguration.sortFieldConfiguration();
 
 		JSONArray translatedOptions = JSONFactoryUtil.createJSONArray();
-			
+
 		JSONArray options = JSONFactoryUtil.createJSONArray(configuration);
-			
+
 		for (int i = 0; i < options.length(); i++) {
 
 			JSONObject item = options.getJSONObject(i);
 
-			item.put("localization", getLocalization("sort-by-" + item.getString("key").toLowerCase(), locale));
+			item.put(
+				"localization", getLocalization(
+					"sort-by-" + item.getString("key").toLowerCase(), locale));
 
 			translatedOptions.put(item);
-			
+
 		}
 		return translatedOptions;
 	}
 
 	private String getLocalization(String key, Locale locale) {
+
 		if (_resourceBundle == null) {
 			_resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", locale, ConfigurationHelperImpl.class);
 		}
 		try {
 			return _resourceBundle.getString(key);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			_log.error(e, e);
 		}
 		return key;
 	}
-	
+
 	private volatile ModuleConfiguration _gSearchConfiguration;
 
 	private ResourceBundle _resourceBundle;
-	
-	private static final Log _log = LogFactoryUtil.getLog(ConfigurationHelperImpl.class);
+
+	private static final Log _log =
+		LogFactoryUtil.getLog(ConfigurationHelperImpl.class);
 }

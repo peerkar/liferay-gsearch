@@ -21,8 +21,8 @@ import fi.soveltia.liferay.gsearch.core.api.facet.FacetsBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
- * Facets builder implementation. This service sets the configured
- * facets (aggregations) to searchcontext.
+ * Facets builder implementation. This service sets the configured facets
+ * (aggregations) to searchcontext.
  * 
  * @author Petteri Karttunen
  */
@@ -39,17 +39,18 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 	@Override
 	public void setFacets(SearchContext searchContext)
 		throws JSONException {
-		
-		JSONArray configuration = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+
+		JSONArray configuration = JSONFactoryUtil.createJSONArray(
+			_gSearchConfiguration.facetConfiguration());
 
 		for (int i = 0; i < configuration.length(); i++) {
 
 			JSONObject item = configuration.getJSONObject(i);
 
 			String fieldName = item.getString("fieldName");
-			
+
 			Facet facet = new SimpleFacet(searchContext);
-			
+
 			FacetConfiguration facetConfiguration = new FacetConfiguration();
 
 			facetConfiguration.setFieldName(fieldName);
@@ -59,21 +60,22 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 			dataObject.put("maxTerms", MAX_TERMS);
 
 			facetConfiguration.setDataJSONObject(dataObject);
-			
+
 			facet.setFacetConfiguration(facetConfiguration);
 
 			searchContext.addFacet(facet);
 		}
 	}
-	
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
+	}
 
 	private volatile ModuleConfiguration _gSearchConfiguration;
-	
+
 	private int MAX_TERMS = 20;
 }

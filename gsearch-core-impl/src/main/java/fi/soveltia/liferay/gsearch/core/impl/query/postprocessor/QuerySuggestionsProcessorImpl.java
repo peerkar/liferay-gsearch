@@ -30,9 +30,8 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * This class populates hits object with query suggestions and does an
- * alternative search, depending on the configuration.
- * 
- * Original com.liferay.portal.search.internal.hits.QuerySuggestionHitsProcessor
+ * alternative search, depending on the configuration. Original
+ * com.liferay.portal.search.internal.hits.QuerySuggestionHitsProcessor
  *
  * @author Michael C. Han
  * @author Josef Sustacek
@@ -43,8 +42,7 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 	immediate = true, 
 	service = QueryPostProcessor.class
 )
-public class QuerySuggestionsProcessorImpl
-	implements QueryPostProcessor {
+public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -56,7 +54,7 @@ public class QuerySuggestionsProcessorImpl
 		if (_log.isDebugEnabled()) {
 			_log.debug("Processing QuerySuggestions");
 		}
-		
+
 		if (!_moduleConfiguration.enableQuerySuggestions()) {
 			return true;
 		}
@@ -64,9 +62,9 @@ public class QuerySuggestionsProcessorImpl
 		if (_log.isDebugEnabled()) {
 			_log.debug("QuerySuggestions are enabled.");
 		}
-			
+
 		if (hits.getLength() >= _moduleConfiguration.querySuggestionsHitsThreshold()) {
-			
+
 			if (_log.isDebugEnabled()) {
 				_log.debug("Hits threshold was exceeded. Returning.");
 			}
@@ -77,7 +75,7 @@ public class QuerySuggestionsProcessorImpl
 		if (_log.isDebugEnabled()) {
 			_log.debug("Below threshold. Getting suggestions.");
 		}
-		
+
 		// Have to put keywords here to searchcontext because
 		// suggestKeywordQueries() expects them to be there
 
@@ -86,10 +84,11 @@ public class QuerySuggestionsProcessorImpl
 		if (_log.isDebugEnabled()) {
 			_log.debug("Original keywords: " + queryParams.getKeywords());
 		}
-		
+
 		// Get suggestions
-		
-		String[] querySuggestions = _gSearchSuggester.getSuggestionsAsStringArray(portletRequest);
+
+		String[] querySuggestions =
+			_gSearchSuggester.getSuggestionsAsStringArray(portletRequest);
 
 		querySuggestions =
 			ArrayUtil.remove(querySuggestions, searchContext.getKeywords());
@@ -97,15 +96,15 @@ public class QuerySuggestionsProcessorImpl
 		if (_log.isDebugEnabled()) {
 			_log.debug("Query suggestions size: " + querySuggestions.length);
 		}
-		
+
 		// Do alternative search based on suggestions (if found)
-		
+
 		if (ArrayUtil.isNotEmpty(querySuggestions)) {
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Suggestions found.");
 			}
-			
+
 			// New keywords is plainly the first in the list.
 
 			queryParams.setOriginalKeywords(queryParams.getKeywords());
@@ -113,9 +112,9 @@ public class QuerySuggestionsProcessorImpl
 			if (_log.isDebugEnabled()) {
 				_log.debug("Using querySuggestions[0] for alternative search.");
 			}
-	
+
 			queryParams.setKeywords(querySuggestions[0]);
-			
+
 			Query query = _queryBuilder.buildQuery(portletRequest, queryParams);
 
 			BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
@@ -135,13 +134,14 @@ public class QuerySuggestionsProcessorImpl
 		return true;
 	}
 
-	@Activate 
+	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
-	
+	}
+
 	@Reference(unbind = "-")
 	protected void setGSearchKeywordSuggester(
 		GSearchKeywordSuggester gSearchSuggester) {
@@ -157,8 +157,7 @@ public class QuerySuggestionsProcessorImpl
 	}
 
 	@Reference(unbind = "-")
-	protected void setQueryBuilder(
-		QueryBuilder queryBuilder) {
+	protected void setQueryBuilder(QueryBuilder queryBuilder) {
 
 		_queryBuilder = queryBuilder;
 	}
@@ -166,11 +165,11 @@ public class QuerySuggestionsProcessorImpl
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private GSearchKeywordSuggester _gSearchSuggester;
-	
+
 	private IndexSearcherHelper _indexSearcherHelper;
 
 	private QueryBuilder _queryBuilder;
 
 	private static final Log _log =
-					LogFactoryUtil.getLog(QuerySuggestionsProcessorImpl.class);
+		LogFactoryUtil.getLog(QuerySuggestionsProcessorImpl.class);
 }

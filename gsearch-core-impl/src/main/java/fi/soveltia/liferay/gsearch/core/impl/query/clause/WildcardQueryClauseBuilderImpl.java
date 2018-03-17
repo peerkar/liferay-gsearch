@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
@@ -34,7 +35,7 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 	public Query buildClause(
 		JSONObject configurationObject, QueryParams queryParams)
 		throws Exception {
-		
+
 		// If there's a predefined value in the configuration, use that
 
 		String value = configurationObject.getString("value");
@@ -44,36 +45,41 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 		}
 
 		// Splitter?
-		
-		String keywordSplitter = configurationObject.getString("keywordSplitter");
+
+		String keywordSplitter =
+			configurationObject.getString("keywordSplitter");
 
 		if (keywordSplitter != null && keywordSplitter.length() > 0) {
 
 			BooleanQuery query = new BooleanQueryImpl();
-					
-			String [] keywords = value.split(keywordSplitter);
-				
+
+			String[] keywords = value.split(keywordSplitter);
+
 			for (String keyword : keywords) {
 				WildcardQuery q = buildClause(configurationObject, keyword);
 				query.add(q, BooleanClauseOccur.SHOULD);
 			}
-			
+
 			// Boost
-			
-			float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+
+			float boost =
+				GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 			query.setBoost(boost);
-			
-			return query;
-		
-		} else {
 
-			WildcardQuery wildcardQuery = buildClause(configurationObject, value);
+			return query;
+
+		}
+		else {
+
+			WildcardQuery wildcardQuery =
+				buildClause(configurationObject, value);
 
 			// Boost
 
-			float boost = GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+			float boost =
+				GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 			wildcardQuery.setBoost(boost);
-			
+
 			return wildcardQuery;
 		}
 	}
@@ -85,8 +91,9 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 	 * @param keywords
 	 * @return
 	 */
-	protected WildcardQuery buildClause(JSONObject configurationObject, String keyword) {
-		
+	protected WildcardQuery buildClause(
+		JSONObject configurationObject, String keyword) {
+
 		String fieldName = configurationObject.getString("fieldName");
 
 		if (fieldName == null) {
@@ -94,7 +101,7 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 		}
 
 		StringBundler sb = new StringBundler();
-		
+
 		String prefix = configurationObject.getString("valuePrefix");
 		if (Validator.isNotNull(prefix)) {
 			sb.append(prefix);
@@ -109,17 +116,18 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 
 		WildcardQuery wildcardQuery =
 			new WildcardQueryImpl(fieldName, sb.toString());
-		
+
 		return wildcardQuery;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean canBuild(String querytype) {
+
 		return (querytype.equals(QUERY_TYPE));
 	}
-	
+
 	private static final String QUERY_TYPE = "wildcard";
 }

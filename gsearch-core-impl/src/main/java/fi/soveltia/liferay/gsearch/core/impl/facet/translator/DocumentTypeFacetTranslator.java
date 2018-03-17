@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.facet.translator;
 
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -20,12 +21,9 @@ import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Facet translator implementation for document type. 
- * 
- * {@see FacetTranslator}
+ * Facet translator implementation for document type. {@see FacetTranslator}
  * 
  * @author Petteri Karttunen
- *
  */
 @Component(
 	immediate = true
@@ -56,8 +54,9 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 
 		for (TermCollector tc : termCollectors) {
 
-			JSONObject item = parseDocumentTypeData(tc, queryParams.getLocale());
-			
+			JSONObject item =
+				parseDocumentTypeData(tc, queryParams.getLocale());
+
 			if (item != null) {
 				facetArray.put(item);
 			}
@@ -72,34 +71,39 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 	@Override
 	public String[] translateParams(String value, JSONObject configuration) {
 
-		return new String[]{value};
-	}	
-	
+		return new String[] {
+			value
+		};
+	}
+
 	/**
 	 * Parse document type data.
 	 * 
 	 * @param fileEntryTypeId
 	 * @return JSON object
-	 * @throws PortalException 
+	 * @throws PortalException
 	 */
-	protected  JSONObject parseDocumentTypeData(TermCollector tc, Locale locale) throws PortalException {
+	protected JSONObject parseDocumentTypeData(TermCollector tc, Locale locale)
+		throws PortalException {
 
 		long fileEntryTypeId = Long.valueOf(tc.getTerm());
-		
+
 		if (fileEntryTypeId == 0) {
 			return null;
 		}
 
-		DLFileEntryType type = _dLFileEntryTypeService.getFileEntryType(fileEntryTypeId);
-		
+		DLFileEntryType type =
+			_dLFileEntryTypeService.getFileEntryType(fileEntryTypeId);
+
 		JSONObject item = JSONFactoryUtil.createJSONObject();
 
 		item.put("frequency", tc.getFrequency());
-		item.put("groupName", _groupLocalService.getGroup(type.getGroupId()).getName(
-					locale, true));
+		item.put(
+			"groupName", _groupLocalService.getGroup(type.getGroupId()).getName(
+				locale, true));
 		item.put("name", type.getName(locale, true));
 		item.put("term", fileEntryTypeId);
-		
+
 		return item;
 	}
 

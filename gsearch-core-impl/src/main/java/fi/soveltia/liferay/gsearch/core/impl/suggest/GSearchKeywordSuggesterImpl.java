@@ -56,12 +56,11 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray getSuggestions(
-		PortletRequest portletRequest)
+	public JSONArray getSuggestions(PortletRequest portletRequest)
 		throws Exception {
 
 		String[] suggestions = getSuggestionsAsStringArray(portletRequest);
-		
+
 		// Build results JSON object.
 
 		JSONArray resultsArray = JSONFactoryUtil.createJSONArray();
@@ -74,39 +73,40 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		}
 		return resultsArray;
 	}
-		
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getSuggestionsAsStringArray(
-		PortletRequest portletRequest)
+	public String[] getSuggestionsAsStringArray(PortletRequest portletRequest)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		Locale locale = themeDisplay.getLocale();
-		
+
 		String keywords =
-						ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
 
 		AggregateSuggester aggregateSuggester =
-						new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
+			new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.suggestConfiguration());
-		
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_moduleConfiguration.suggestConfiguration());
+
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject item = configurationArray.getJSONObject(i);
-		
+
 			String suggesterType = item.getString("suggesterType");
 
 			Suggester suggester = null;
 			if ("phrase".equals(suggesterType)) {
 				suggester = getPhraseSuggester(item, locale, keywords);
-				
-			} else if ("completion".equals(suggesterType)) {
+
+			}
+			else if ("completion".equals(suggesterType)) {
 				suggester = getCompletionSuggester(item, locale, keywords);
 			}
 
@@ -114,7 +114,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 				aggregateSuggester.addSuggester(suggester);
 			}
 		}
-		
+
 		// Create searchcontext.
 
 		SearchContext searchContext = new SearchContext();
@@ -122,26 +122,26 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 		// Build results JSON object.
 
-		List<String>suggestions = new ArrayList<String>();
-				
+		List<String> suggestions = new ArrayList<String>();
+
 		SuggesterResults suggesters =
 			_querySuggester.suggest(searchContext, aggregateSuggester);
 
 		Collection<SuggesterResult> suggesterResults =
-						suggesters.getSuggesterResults();
+			suggesters.getSuggesterResults();
 
 		if (suggesterResults != null) {
 
 			for (SuggesterResult suggesterResult : suggesterResults) {
 
 				for (Entry entry : suggesterResult.getEntries()) {
-	
+
 					for (Option option : entry.getOptions()) {
 
 						if (_log.isDebugEnabled()) {
 							_log.debug("Adding suggestion:" + option.getText());
 						}
-	
+
 						if (!suggestions.contains(option.getText())) {
 							suggestions.add(option.getText());
 						}
@@ -155,10 +155,11 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}		
-	
+	}
+
 	/**
 	 * Get completion suggester
 	 * 
@@ -169,7 +170,8 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	 * @throws Exception
 	 */
 	protected Suggester getCompletionSuggester(
-		JSONObject configuration, Locale locale, String keywords) throws Exception {
+		JSONObject configuration, Locale locale, String keywords)
+		throws Exception {
 
 		StringBundler sb = new StringBundler();
 
@@ -179,12 +181,12 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 			sb.append(locale.toString());
 		}
 		sb.append(configuration.getString("fieldSuffix"));
-		
+
 		CompletionSuggester suggester = new CompletionSuggester(
 			configuration.getString("suggesterName"), sb.toString(), keywords);
-		
+
 		suggester.setSize(configuration.getInt("numberOfSuggestions"));
-		
+
 		String analyzer = configuration.getString("analyzer");
 
 		if (analyzer != null) {
@@ -193,7 +195,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 		return suggester;
 	}
-	
+
 	/**
 	 * Get phrase suggester.
 	 * 
@@ -204,8 +206,9 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	 * @throws Exception
 	 */
 	protected Suggester getPhraseSuggester(
-		JSONObject configuration, Locale locale, String keywords) throws Exception {
-		
+		JSONObject configuration, Locale locale, String keywords)
+		throws Exception {
+
 		StringBundler sb = new StringBundler();
 
 		sb.append(configuration.getString("fieldPrefix"));
@@ -214,23 +217,27 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 			sb.append(locale.toString());
 		}
 		sb.append(configuration.getString("fieldSuffix"));
-		
+
 		PhraseSuggester suggester = new PhraseSuggester(
 			configuration.getString("suggesterName"), sb.toString(), keywords);
-			
-		int size = GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
+
+		int size =
+			GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
 		suggester.setSize(size);
-		
-		float confidence = GetterUtil.getFloat(configuration.get("confidence"), 0.1f);
+
+		float confidence =
+			GetterUtil.getFloat(configuration.get("confidence"), 0.1f);
 		suggester.setConfidence(confidence);
 
 		int gramSize = GetterUtil.getInteger(configuration.get("gramSize"), 2);
 		suggester.setGramSize(gramSize);
 
-		float maxErrors = GetterUtil.getFloat(configuration.get("maxErrors"), 2.0f);
+		float maxErrors =
+			GetterUtil.getFloat(configuration.get("maxErrors"), 2.0f);
 		suggester.setMaxErrors(maxErrors);
 
-		float realWordErrorLikelihood = GetterUtil.getFloat(configuration.get("realWordErrorLikelihood"), 0.95f);
+		float realWordErrorLikelihood = GetterUtil.getFloat(
+			configuration.get("realWordErrorLikelihood"), 0.95f);
 		suggester.setRealWordErrorLikelihood(realWordErrorLikelihood);
 
 		return suggester;

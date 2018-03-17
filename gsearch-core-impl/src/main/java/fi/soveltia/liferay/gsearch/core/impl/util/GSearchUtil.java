@@ -28,7 +28,6 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
  * GSearch utility class.
  * 
  * @author Petteri Karttunen
- *
  */
 public class GSearchUtil {
 
@@ -65,7 +64,8 @@ public class GSearchUtil {
 	 * 
 	 * @param resourceRequest
 	 * @return layout
-	 * @throws PortalException if layout is not found
+	 * @throws PortalException
+	 *             if layout is not found
 	 */
 	public static Layout getLayoutByFriendlyURL(
 		PortletRequest portletRequest, String layoutFriendlyURL)
@@ -91,7 +91,8 @@ public class GSearchUtil {
 	 * @return String friendly URL for the current layout
 	 * @throws PortalException
 	 */
-	public static String getCurrentLayoutFriendlyURL(PortletRequest portletRequest)
+	public static String getCurrentLayoutFriendlyURL(
+		PortletRequest portletRequest)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
@@ -101,7 +102,7 @@ public class GSearchUtil {
 			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
 		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
 	}
-	
+
 	/**
 	 * Get redirect url.
 	 * 
@@ -132,7 +133,7 @@ public class GSearchUtil {
 
 		return HtmlUtil.escapeURL(sb.toString());
 	}
-	
+
 	/**
 	 * Get group ids available for current user.
 	 * 
@@ -140,7 +141,8 @@ public class GSearchUtil {
 	 * @return array of possible groupIds for a user
 	 * @throws PortalException
 	 */
-	public static long[] getUserAccessibleSiteGroupIds(ThemeDisplay themeDisplay)
+	public static long[] getUserAccessibleSiteGroupIds(
+		ThemeDisplay themeDisplay)
 		throws PortalException {
 
 		List<Long> groupIds = new ArrayList<Long>();
@@ -170,5 +172,5 @@ public class GSearchUtil {
 		}
 
 		return groupIds.stream().mapToLong(l -> l).toArray();
-	}	
+	}
 }

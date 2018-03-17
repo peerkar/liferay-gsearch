@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
 import com.liferay.portal.kernel.util.Validator;
@@ -30,6 +31,6 @@ public class RequestParamValidatorImpl implements RequestParamValidator {
 	}
 
 	// Maximum length of keywords. Could be put in the configuration.
-	
+
 	public static final int KEYWORDS_MAX_LENGTH = 100;
 }

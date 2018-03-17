@@ -52,16 +52,16 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}	
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public QueryParams buildQueryParams(
-		PortletRequest portletRequest)
+	public QueryParams buildQueryParams(PortletRequest portletRequest)
 		throws Exception {
 
 		_portletRequest = portletRequest;
@@ -71,13 +71,13 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setGroupsParam();
 		setLocaleParam();
 		setUserParam();
-		
+
 		setKeywordsParam();
 		setTimeParam();
 		setTypeParam();
 
 		setFacetParams();
-		
+
 		setResultsLayoutParam();
 
 		setStartEndParams();
@@ -94,20 +94,22 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * @param key
 	 *            search key
 	 * @return corresponding class name.
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
-	protected String parseAssetClass(String key) throws JSONException, ClassNotFoundException {
+	protected String parseAssetClass(String key)
+		throws JSONException, ClassNotFoundException {
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.typeConfiguration());
-		
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_moduleConfiguration.typeConfiguration());
+
 		String className = null;
 
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject item = configurationArray.getJSONObject(i);
 
 			if (key.equals(item.getString("key"))) {
-			
+
 				className = item.getString("entryClassName");
 				break;
 			}
@@ -120,19 +122,20 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * Parse default set of asset class names to search for.
 	 * 
 	 * @return list of class names
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
 	protected List<String> parseDefaultAssetClasses()
 		throws ClassNotFoundException, JSONException {
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.typeConfiguration());
-		
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_moduleConfiguration.typeConfiguration());
+
 		List<String> classNames = new ArrayList<String>();
 
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject item = configurationArray.getJSONObject(i);
-		
+
 			classNames.add(item.getString("entryClassName"));
 		}
 
@@ -155,18 +158,20 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * 
 	 * @throws JSONException
 	 */
-	protected void setFacetParams() throws JSONException {
-		
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.facetConfiguration());
+	protected void setFacetParams()
+		throws JSONException {
+
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_moduleConfiguration.facetConfiguration());
 
 		Map<String, String[]> facetParams = new HashMap<String, String[]>();
 
 		String fieldParam;
 		String fieldName;
 		String fieldValue;
-		
+
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject facetConfiguration = configurationArray.getJSONObject(i);
 
 			fieldParam = facetConfiguration.getString("paramName");
@@ -177,13 +182,18 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 			if (Validator.isNotNull(fieldValue)) {
 
-				FacetTranslator translator = _facetTranslatorFactory.getTranslator(fieldName);
-				
+				FacetTranslator translator =
+					_facetTranslatorFactory.getTranslator(fieldName);
+
 				if (translator != null) {
-					String[]values = translator.translateParams(fieldValue, facetConfiguration);
+					String[] values = translator.translateParams(
+						fieldValue, facetConfiguration);
 					facetParams.put(fieldName, values);
-				} else {
-					facetParams.put(fieldName, new String[]{fieldValue});
+				}
+				else {
+					facetParams.put(fieldName, new String[] {
+						fieldValue
+					});
 				}
 			}
 		}
@@ -191,11 +201,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	@Reference(unbind = "-")
-	protected void setFacetTranslatorFactory(FacetTranslatorFactory facetTranslatorFactory) {
+	protected void setFacetTranslatorFactory(
+		FacetTranslatorFactory facetTranslatorFactory) {
 
 		_facetTranslatorFactory = facetTranslatorFactory;
 	}
-	
+
 	/**
 	 * Set groups parameter.
 	 */
@@ -219,7 +230,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 		_queryParams.setGroupIds(groupIds);
 	}
-	
+
 	/**
 	 * Set keywords parameter.
 	 * 
@@ -258,11 +269,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	@Reference(unbind = "-")
-	protected void setRequestParamValidator(RequestParamValidator requestParamValidator) {
+	protected void setRequestParamValidator(
+		RequestParamValidator requestParamValidator) {
 
 		_requestParamValidator = requestParamValidator;
 	}
-	
+
 	/**
 	 * Set search type (normal / image search). Search type is determined from
 	 * typefilter value
@@ -272,13 +284,14 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String resultsLayoutParam =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
 
-		String extensionParam = ParamUtil.getString(
-			_portletRequest, "extension");
-		
-		String type = ParamUtil.getString(
-			_portletRequest, GSearchWebKeys.FILTER_TYPE);
+		String extensionParam =
+			ParamUtil.getString(_portletRequest, "extension");
 
-		boolean imageLayoutAvailable = "file".equals(type) || "Image".equals(extensionParam);
+		String type =
+			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE);
+
+		boolean imageLayoutAvailable =
+			"file".equals(type) || "Image".equals(extensionParam);
 
 		if (GSearchResultsLayouts.THUMBNAIL_LIST.equals(resultsLayoutParam)) {
 			_queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
@@ -295,9 +308,10 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set sort. Default sort field equals to score.
 	 * 
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
-	protected void setSortParam() throws JSONException {
+	protected void setSortParam()
+		throws JSONException {
 
 		String sortField =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.SORT_FIELD);
@@ -316,31 +330,33 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		else {
 			reverse = false;
 		}
-		
+
 		String defaultFieldName = null;
 		Integer defaultFieldType = 0;
-		
+
 		String fieldName = null;
 		Integer fieldType = null;
-		
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(_moduleConfiguration.sortFieldConfiguration());
+
+		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
+			_moduleConfiguration.sortFieldConfiguration());
 
 		for (int i = 0; i < configurationArray.length(); i++) {
-			
+
 			JSONObject item = configurationArray.getJSONObject(i);
-			
+
 			if (item.getString("key").equals(sortField)) {
 
 				fieldName = item.getString("fieldName");
-				
+
 				if (item.getString("fieldPrefix") != null) {
 					fieldName = item.getString("fieldPrefix").concat(fieldName);
 				}
-				
+
 				if (item.getBoolean("localized")) {
-					fieldName = fieldName.concat("_").concat(_queryParams.getLocale().toString());
+					fieldName = fieldName.concat("_").concat(
+						_queryParams.getLocale().toString());
 				}
-				
+
 				if (item.getString("fieldSuffix") != null) {
 					fieldName = fieldName.concat(item.getString("fieldSuffix"));
 				}
@@ -349,22 +365,26 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 				break;
 
-			} else if (item.getBoolean("default")) {
+			}
+			else if (item.getBoolean("default")) {
 
 				defaultFieldName = item.getString("fieldName");
 
 				if (item.getString("fieldPrefix") != null) {
-					defaultFieldName = item.getString("fieldPrefix").concat(defaultFieldName);
+					defaultFieldName =
+						item.getString("fieldPrefix").concat(defaultFieldName);
 				}
 
 				if (item.getBoolean("localized")) {
-					defaultFieldName = defaultFieldName.concat("_").concat(_queryParams.getLocale().toString());
+					defaultFieldName = defaultFieldName.concat("_").concat(
+						_queryParams.getLocale().toString());
 				}
-				
+
 				if (item.getString("fieldSuffix") != null) {
-					defaultFieldName = defaultFieldName.concat(item.getString("fieldSuffix"));
+					defaultFieldName =
+						defaultFieldName.concat(item.getString("fieldSuffix"));
 				}
-				
+
 				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
 			}
 		}
@@ -375,20 +395,21 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			fieldType = defaultFieldType;
 		}
 
-		sort1 = new Sort(fieldName, fieldType, reverse);		
-		
+		sort1 = new Sort(fieldName, fieldType, reverse);
+
 		// If primary sort is score, use modified as secondary
 		// Use score as secondary for other primary sorts
 
 		if (Validator.isNull(fieldName) || "_score".equals(fieldName)) {
 
 			sort2 = new Sort(MODIFIED_SORT_FIELD, Sort.LONG_TYPE, reverse);
-			
-		} else {
+
+		}
+		else {
 
 			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
 		}
-		
+
 		_queryParams.setSorts(new Sort[] {
 			sort1, sort2
 		});
@@ -461,7 +482,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * 
 	 * @throws ClassNotFoundException
 	 * @throws PatternSyntaxException
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
 	protected void setTypeParam()
 		throws PatternSyntaxException, ClassNotFoundException, JSONException {
@@ -498,13 +519,13 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	private static final String MODIFIED_SORT_FIELD = "modified_sortable";
 
-	private FacetTranslatorFactory _facetTranslatorFactory;	
+	private FacetTranslatorFactory _facetTranslatorFactory;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
-	
+
 	private PortletRequest _portletRequest;
 
 	private QueryParams _queryParams;
-	
+
 	private RequestParamValidator _requestParamValidator;
 }

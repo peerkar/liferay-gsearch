@@ -39,11 +39,9 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
 
 /**
- * QueryFilterBuilder implementation.
- * 
- * Notice that if you use BooleanQuery type for filter conditions, they get
- * translated to 3 subqueries: match, phrase, and phrase_prefix = use TermQuery 
- * for filtering.
+ * QueryFilterBuilder implementation. Notice that if you use BooleanQuery type
+ * for filter conditions, they get translated to 3 subqueries: match, phrase,
+ * and phrase_prefix = use TermQuery for filtering.
  * 
  * @author Petteri Karttunen
  */
@@ -65,7 +63,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		_portletRequest = portletRequest;
 
 		_filter = new BooleanFilter();
-		
+
 		buildClassesCondition();
 
 		buildCompanyCondition();
@@ -79,12 +77,12 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		buildStatusCondition();
 
 		buildFacetConditions();
-		
+
 		buildViewPermissionCondition();
 
 		return _filter;
-	}	
-	
+	}
+
 	/**
 	 * Add DLFileEntry class condition
 	 * 
@@ -92,25 +90,29 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 * @param dedicatedTypeQuery
 	 * @throws ParseException
 	 */
-	protected void addDLFileEntryClassCondition(BooleanQuery query) throws ParseException {
+	protected void addDLFileEntryClassCondition(BooleanQuery query)
+		throws ParseException {
 
-		TermQuery condition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName()); 
+		TermQuery condition = new TermQueryImpl(
+			Field.ENTRY_CLASS_NAME, DLFileEntry.class.getName());
 		query.add(condition, BooleanClauseOccur.SHOULD);
 	}
-	
+
 	/**
 	 * Add journal article class condition.
 	 * 
 	 * @param query
 	 * @throws ParseException
 	 */
-	protected void addJournalArticleClassCondition(BooleanQuery query) throws ParseException {
-		
+	protected void addJournalArticleClassCondition(BooleanQuery query)
+		throws ParseException {
+
 		BooleanQuery journalArticleQuery = new BooleanQueryImpl();
 
 		// Classname condition.
-		
-		TermQuery classNamecondition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, JournalArticle.class.getName()); 
+
+		TermQuery classNamecondition = new TermQueryImpl(
+			Field.ENTRY_CLASS_NAME, JournalArticle.class.getName());
 		journalArticleQuery.add(classNamecondition, BooleanClauseOccur.MUST);
 
 		// Add display date limitation.
@@ -124,13 +126,14 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			"expirationDate_sortable", now.getTime(), Long.MAX_VALUE);
 
 		// Add version limitation.
-		
-		TermQuery versionQuery = new TermQueryImpl("head", Boolean.TRUE.toString());
+
+		TermQuery versionQuery =
+			new TermQueryImpl("head", Boolean.TRUE.toString());
 		journalArticleQuery.add(versionQuery, BooleanClauseOccur.MUST);
-		
-		query.add(journalArticleQuery, BooleanClauseOccur.SHOULD);		
+
+		query.add(journalArticleQuery, BooleanClauseOccur.SHOULD);
 	}
-	
+
 	/**
 	 * Add classes condition.
 	 * 
@@ -151,14 +154,15 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 				addJournalArticleClassCondition(query);
 			}
 			else {
-				
-				TermQuery condition = new TermQueryImpl(Field.ENTRY_CLASS_NAME, className); 
+
+				TermQuery condition =
+					new TermQueryImpl(Field.ENTRY_CLASS_NAME, className);
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
 		}
 		addAsQueryFilter(query);
 	}
-	
+
 	/**
 	 * Add company condition.
 	 */
@@ -166,8 +170,9 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		_filter.addRequiredTerm(Field.COMPANY_ID, _queryParams.getCompanyId());
 	}
-	
+
 	protected void buildFacetConditions() {
+
 		Map<String, String[]> facetParams = _queryParams.getFacets();
 
 		if (facetParams == null) {
@@ -176,24 +181,24 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		BooleanQueryImpl facetQuery = new BooleanQueryImpl();
 
-		for (Entry<String, String[]>entry : facetParams.entrySet()) {
+		for (Entry<String, String[]> entry : facetParams.entrySet()) {
 
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (String value : entry.getValue()) {
 
 				TermQuery condition;
-				condition = new TermQueryImpl(entry.getKey(), value); 
+				condition = new TermQueryImpl(entry.getKey(), value);
 
 				query.add(condition, BooleanClauseOccur.SHOULD);
-				
+
 			}
-			
+
 			facetQuery.add(query, BooleanClauseOccur.MUST);
 		}
 		addAsQueryFilter(facetQuery);
 	}
-	
+
 	/**
 	 * Add groups condition.
 	 * 
@@ -209,7 +214,8 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (long l : groupIds) {
-				TermQuery condition = new TermQueryImpl(Field.SCOPE_GROUP_ID, String.valueOf(l)); 
+				TermQuery condition =
+					new TermQueryImpl(Field.SCOPE_GROUP_ID, String.valueOf(l));
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
 			addAsQueryFilter(query);
@@ -248,7 +254,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			addAsQueryFilter(query);
 		}
 	}
-	
+
 	/**
 	 * Add (no) staging group condition.
 	 */
@@ -256,7 +262,6 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		_filter.addRequiredTerm(Field.STAGING_GROUP, false);
 	}
-
 
 	/**
 	 * Add status condition.
@@ -269,7 +274,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		_filter.addRequiredTerm(Field.STATUS, status);
 	}
-	
+
 	/**
 	 * Add view permissions condition.
 	 * 
@@ -342,8 +347,9 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Group " + g.getName(_queryParams.getLocale()) + ": Role " +
-							r.getName() + "(" + r.getRoleId() + ")");
+						"Group " + g.getName(_queryParams.getLocale()) +
+							": Role " + r.getName() + "(" + r.getRoleId() +
+							")");
 				}
 			}
 		}
@@ -368,14 +374,14 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		_roleLocalService = roleLocalService;
 	}
-	
+
 	/**
 	 * Add Query object to filters as a QueryFilter.
 	 * 
 	 * @param query
 	 */
 	private void addAsQueryFilter(Query query) {
-		
+
 		QueryFilter queryFilter = new QueryFilter(query);
 
 		_filter.add(queryFilter, BooleanClauseOccur.MUST);

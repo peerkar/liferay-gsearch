@@ -34,27 +34,32 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+public class DLFileEntryItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc() throws Exception {
+	public String getImageSrc()
+		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
-		
+		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+			GSearchWebKeys.THEME_DISPLAY);
+
 		FileEntry fileEntry = _dLAppService.getFileEntry(_entryClassPK);
-		
+
 		return DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -72,28 +77,30 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 
 		return sb.toString();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public Map<String, String> getMetadata() throws Exception {
+	public Map<String, String> getMetadata()
+		throws Exception {
 
-		Map<String, String>metaData = new HashMap<String, String>();
+		Map<String, String> metaData = new HashMap<String, String>();
 
-		String mimeType =  _document.get("mimeType");
-		
+		String mimeType = _document.get("mimeType");
+
 		// Format
 
 		metaData.put("format", translateMimetype(mimeType));
-		
+
 		// Size
 
 		metaData.put("size", getSize());
 
 		// Image metadata
-		
+
 		if (mimeType.startsWith("image_")) {
 			setImageMetadata(metaData);
 		}
@@ -107,17 +114,18 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 	 * @param metaData
 	 * @throws Exception
 	 */
-	protected  void setImageMetadata(Map<String, String> metaData) throws Exception {
-				
-		 // Dimensions
-		
-		 StringBundler sb = new StringBundler();
-		 sb.append(_document.get(getTikaRawMetadataField("WIDTH")));
-		 sb.append(" x ");
-		 sb.append(_document.get(getTikaRawMetadataField("LENGTH")));
-		 sb.append(" px");
-		
-		 metaData.put("dimensions", sb.toString());		 
+	protected void setImageMetadata(Map<String, String> metaData)
+		throws Exception {
+
+		// Dimensions
+
+		StringBundler sb = new StringBundler();
+		sb.append(_document.get(getTikaRawMetadataField("WIDTH")));
+		sb.append(" x ");
+		sb.append(_document.get(getTikaRawMetadataField("LENGTH")));
+		sb.append(" px");
+
+		metaData.put("dimensions", sb.toString());
 	}
 
 	/**
@@ -130,16 +138,20 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 
 		if (mimeTypes.containsKey(mimeType)) {
 			return mimeTypes.get(mimeType);
-		} else if (mimeType.startsWith("application_")) {
+		}
+		else if (mimeType.startsWith("application_")) {
 			return mimeType.split("application_")[1];
-		} else if (mimeType.startsWith("image_")) {
+		}
+		else if (mimeType.startsWith("image_")) {
 			return mimeType.split("image_")[1];
-		} else if (mimeType.startsWith("text_")) {
+		}
+		else if (mimeType.startsWith("text_")) {
 			return mimeType.split("text_")[1];
-		} else if (mimeType.startsWith("video_")) {
+		}
+		else if (mimeType.startsWith("video_")) {
 			return mimeType.split("video_")[1];
 		}
-		
+
 		return mimeType;
 	}
 
@@ -151,22 +163,24 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 	 * @return
 	 */
 	protected String getSize() {
-		
+
 		long size = Long.valueOf(_document.get("size"));
-		
+
 		StringBundler sb = new StringBundler();
-		
+
 		if (size >= MBYTES) {
 			sb.append(Math.round(size / (float) MBYTES)).append(" MB");
 
-		} else if (size >= KBYTES) {
+		}
+		else if (size >= KBYTES) {
 			sb.append(Math.round(size / (float) KBYTES)).append(" KB");
-		} else { 
+		}
+		else {
 			sb.append(1).append(" KB");
 		}
 		return sb.toString();
-	}	
-	
+	}
+
 	/**
 	 * Get index translated field name for a Tikaraw metadata field.
 	 * 
@@ -174,10 +188,11 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 	 * @return
 	 * @throws Exception
 	 */
-	protected String getTikaRawMetadataField(String key) throws Exception {
+	protected String getTikaRawMetadataField(String key)
+		throws Exception {
 
 		StringBundler sb = new StringBundler();
-		
+
 		sb.append("ddm__text__");
 		sb.append(String.valueOf(getTikaRawStructureId()));
 		sb.append("__TIFF_IMAGE_");
@@ -187,65 +202,73 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 
 		return sb.toString();
 	}
-	
+
 	/**
-	 * Get the id for structure holding image metadata ("TIKARAWMETADATA")
-	 * 
-	 * Using static map here to reduce DB queries.
+	 * Get the id for structure holding image metadata ("TIKARAWMETADATA") Using
+	 * static map here to reduce DB queries.
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	protected long getTikaRawStructureId() throws Exception{
+	protected long getTikaRawStructureId()
+		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+			GSearchWebKeys.THEME_DISPLAY);
 
 		long companyId = themeDisplay.getCompanyId();
-		
-		if (TIKARAW_STRUCTURE_ID_MAP == null || TIKARAW_STRUCTURE_ID_MAP.get(companyId) == null) {
 
-			DynamicQuery structureQuery = _ddmStructureLocalService.dynamicQuery();
+		if (TIKARAW_STRUCTURE_ID_MAP == null ||
+			TIKARAW_STRUCTURE_ID_MAP.get(companyId) == null) {
+
+			DynamicQuery structureQuery =
+				_ddmStructureLocalService.dynamicQuery();
 			structureQuery.add(
 				RestrictionsFactoryUtil.eq("structureKey", "TIKARAWMETADATA"));
 			structureQuery.add(
 				RestrictionsFactoryUtil.eq("companyId", companyId));
 
 			List<DDMStructure> structures =
-							DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
-						
-			DDMStructure structure =  structures.get(0);
+				DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
+
+			DDMStructure structure = structures.get(0);
 
 			TIKARAW_STRUCTURE_ID_MAP = new HashMap<Long, Long>();
 
 			TIKARAW_STRUCTURE_ID_MAP.put(companyId, structure.getStructureId());
 
 		}
-		
+
 		return TIKARAW_STRUCTURE_ID_MAP.get(companyId);
 	}
-	
+
 	@Reference(unbind = "-")
 	protected void setDDMStructureLocalService(
 		DDMStructureLocalService ddmStructureLocalService) {
 
 		_ddmStructureLocalService = ddmStructureLocalService;
 	}
-	
+
 	@Reference(unbind = "-")
-	protected void setDLAppService(
-		DLAppService dLAppService) {
+	protected void setDLAppService(DLAppService dLAppService) {
 
 		_dLAppService = dLAppService;
-	}	
+	}
 
 	protected static Map<String, String> mimeTypes;
-	
+
 	static {
 		mimeTypes = new HashMap<String, String>();
-		
-		mimeTypes.put("application_vnd.openxmlformats-officedocument.wordprocessingml.document", "docx");
-		mimeTypes.put("application_vnd.openxmlformats-officedocument.presentationml.presentation", "pptx");
-		mimeTypes.put("application_vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx");
+
+		mimeTypes.put(
+			"application_vnd.openxmlformats-officedocument.wordprocessingml.document",
+			"docx");
+		mimeTypes.put(
+			"application_vnd.openxmlformats-officedocument.presentationml.presentation",
+			"pptx");
+		mimeTypes.put(
+			"application_vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			"xlsx");
 
 		mimeTypes.put("application_vnd.ms-excel", "xls");
 		mimeTypes.put("application_vnd.ms-powerpoint", "ppt");
@@ -255,15 +278,15 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder implements Res
 		mimeTypes.put("application_vnd.oasis.opendocument.spreadsheet", "ods");
 		mimeTypes.put("application_vnd.oasis.opendocument.text", "odt");
 	}
-	
+
 	protected static final long KBYTES = 1024;
 	protected static final long MBYTES = 1024 * 1024;
-	
+
 	protected Map<Long, Long> TIKARAW_STRUCTURE_ID_MAP = null;
 
 	private static DDMStructureLocalService _ddmStructureLocalService;
-	
+
 	private static DLAppService _dLAppService;
-	
+
 	private static final String NAME = DLFileEntry.class.getName();
 }

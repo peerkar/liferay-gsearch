@@ -24,10 +24,8 @@ import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Facet translator for web content structures.
+ * Facet translator for web content structures. {@see FacetTranslator}
  * 
- * {@see FacetTranslator}
- *  
  * @author Petteri Karttunen
  */
 @Component(
@@ -65,27 +63,28 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 
 		return facetArray;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String[] translateParams(String value, JSONObject configuration) {
 
-		return new String[]{value};
+		return new String[] {
+			value
+		};
 	}
-	
+
 	/**
-	 * Set structure data.
-	 * 
-	 * There's no method for fetching
-	 * structure by key so we are using DynamicQuery here.
+	 * Set structure data. There's no method for fetching structure by key so we
+	 * are using DynamicQuery here.
 	 * 
 	 * @param structureKey
 	 * @return
-	 * @throws PortalException 
+	 * @throws PortalException
 	 */
-	protected JSONObject parseStructureData(TermCollector tc, Locale locale) throws PortalException {
+	protected JSONObject parseStructureData(TermCollector tc, Locale locale)
+		throws PortalException {
 
 		DynamicQuery structureQuery = _ddmStructureLocalService.dynamicQuery();
 		structureQuery.add(
@@ -93,17 +92,19 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 
 		List<DDMStructure> structures =
 			DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
-		
-		DDMStructure structure =  structures.get(0);
+
+		DDMStructure structure = structures.get(0);
 
 		JSONObject item = JSONFactoryUtil.createJSONObject();
 
 		item.put("frequency", tc.getFrequency());
-		item.put("groupName", _groupLocalService.getGroup(structure.getGroupId()).getName(
-					locale, true));
+		item.put(
+			"groupName",
+			_groupLocalService.getGroup(structure.getGroupId()).getName(
+				locale, true));
 		item.put("name", structure.getName(locale, true));
 		item.put("term", tc.getTerm());
-		
+
 		return item;
 	}
 
@@ -124,5 +125,5 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 
 	private static DDMStructureLocalService _ddmStructureLocalService;
 
-	private static GroupLocalService _groupLocalService;	
+	private static GroupLocalService _groupLocalService;
 }

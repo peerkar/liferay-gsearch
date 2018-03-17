@@ -41,7 +41,7 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 		if (Validator.isNull(value)) {
 
 			StringBundler sb = new StringBundler();
-			
+
 			String prefix = configurationObject.getString("valuePrefix");
 			if (Validator.isNotNull(prefix)) {
 				sb.append(prefix);
@@ -52,42 +52,45 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 			String suffix = configurationObject.getString("valueSuffix");
 			if (Validator.isNotNull(suffix)) {
 				sb.append(suffix);
-			}			
+			}
 			value = sb.toString();
 		}
-				
+
 		QueryStringQuery queryStringQuery = new QueryStringQuery(value);
 
 		JSONArray fields = configurationObject.getJSONArray("fields");
-		
+
 		for (int i = 0; i < fields.length(); i++) {
 
 			JSONObject item = fields.getJSONObject(i);
 
 			// Add non translated version
-			
+
 			String fieldName = item.getString("fieldName");
-			float boost =  GetterUtil.getFloat(item.getString("boost"), 1f);
-			
+			float boost = GetterUtil.getFloat(item.getString("boost"), 1f);
+
 			queryStringQuery.addField(fieldName, boost);
-			
+
 			// Add translated version
-			
-			boolean isLocalized = GetterUtil.getBoolean(item.get("localized"), false);
-			
+
+			boolean isLocalized =
+				GetterUtil.getBoolean(item.get("localized"), false);
+
 			if (isLocalized) {
-				
-				String localizedFieldName = fieldName + "_" + queryParams.getLocale().toString();
-				float localizedBoost =  GetterUtil.getFloat(item.getString("boostForLocalizedVersion"), 1f);
+
+				String localizedFieldName =
+					fieldName + "_" + queryParams.getLocale().toString();
+				float localizedBoost = GetterUtil.getFloat(
+					item.getString("boostForLocalizedVersion"), 1f);
 
 				queryStringQuery.addField(localizedFieldName, localizedBoost);
-			}			
+			}
 		}
 
 		// Operator
-		
+
 		String operator =
-						GetterUtil.getString(configurationObject.get("operator"), "and");
+			GetterUtil.getString(configurationObject.get("operator"), "and");
 
 		if (operator.equals("or")) {
 			queryStringQuery.setDefaultOperator(Operator.OR);
@@ -103,21 +106,21 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 				GetterUtil.getFloat(configurationObject.get("fuzziness"), 0.0f);
 			queryStringQuery.setFuzziness(fuzziness);
 		}
-		
+
 		// Boost
-		
+
 		float boost =
-						GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
+			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 		queryStringQuery.setBoost(boost);
 
 		// Analyzer
-		
+
 		String analyzer = configurationObject.getString("analyzer");
-		 
+
 		if (Validator.isNotNull(analyzer)) {
 			queryStringQuery.setAnalyzer(analyzer);
 		}
-		
+
 		return queryStringQuery;
 	}
 
@@ -126,9 +129,10 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public boolean canBuild(String querytype) {
+
 		return (querytype.equals(QUERY_TYPE));
 	}
-	
+
 	private static final String QUERY_TYPE = "query_string";
 
 }

@@ -41,54 +41,52 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
 
 		ResultItemBuilder resultItemBuilder = null;
-		
-        for (ResultItemBuilder r : _resultItemBuilders) {
-            if (r.canBuild(entryClassName)) {
-                resultItemBuilder = r;
-                break;
-            }
-        }
 
-        if (resultItemBuilder == null) {
+		for (ResultItemBuilder r : _resultItemBuilders) {
+			if (r.canBuild(entryClassName)) {
+				resultItemBuilder = r;
+				break;
+			}
+		}
+
+		if (resultItemBuilder == null) {
 			_log.info("No result item builder found for " + entryClassName);
 		}
-	        
+
 		resultItemBuilder.setProperties(
 			portletRequest, portletResponse, document,
 			assetPublisherPageFriendlyURL);
 
 		return resultItemBuilder;
 	}
-	
+
 	/**
 	 * Add result item builder to the list.
 	 * 
 	 * @param clauseBuilder
 	 */
-    protected void addResultItemBuilder(ResultItemBuilder resultItemBuilder) {
-        if (_resultItemBuilders == null) {
-        	_resultItemBuilders = new ArrayList<ResultItemBuilder>();
-        }
-        _resultItemBuilders.add(resultItemBuilder);
-    }
-	
-    /**
-     * Remove a clause builder from list.
-     * 
-     * @param clauseBuilder
-     */
-    protected void removeResultItemBuilder(ResultItemBuilder resultItemBuilder) {
-    	_resultItemBuilders.remove(resultItemBuilder);
-    }    
+	protected void addResultItemBuilder(ResultItemBuilder resultItemBuilder) {
 
-    @Reference(
-    	bind = "addResultItemBuilder",
-    	cardinality = ReferenceCardinality.MULTIPLE, 
-    	policy = ReferencePolicy.DYNAMIC,
-    	service = ResultItemBuilder.class,
-    	unbind = "removeResultItemBuilder"
-    )
-    private List<ResultItemBuilder> _resultItemBuilders;
-    
-	private static final Log _log = LogFactoryUtil.getLog(ResultItemBuilderFactoryImpl.class);
+		if (_resultItemBuilders == null) {
+			_resultItemBuilders = new ArrayList<ResultItemBuilder>();
+		}
+		_resultItemBuilders.add(resultItemBuilder);
+	}
+
+	/**
+	 * Remove a clause builder from list.
+	 * 
+	 * @param clauseBuilder
+	 */
+	protected void removeResultItemBuilder(
+		ResultItemBuilder resultItemBuilder) {
+
+		_resultItemBuilders.remove(resultItemBuilder);
+	}
+
+	@Reference(bind = "addResultItemBuilder", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ResultItemBuilder.class, unbind = "removeResultItemBuilder")
+	private List<ResultItemBuilder> _resultItemBuilders;
+
+	private static final Log _log =
+		LogFactoryUtil.getLog(ResultItemBuilderFactoryImpl.class);
 }

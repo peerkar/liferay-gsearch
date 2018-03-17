@@ -58,18 +58,20 @@ public class GSearchImpl implements GSearch {
 
 		return getResults();
 	}
-	
+
 	/**
 	 * Add query post processor to the list.
 	 * 
 	 * @param clauseBuilder
 	 */
-    protected void addQueryPostProcessor(QueryPostProcessor queryPostProcessor) {
-        if (_queryPostProcessors == null) {
-        	_queryPostProcessors = new ArrayList<QueryPostProcessor>();
-        }
-        _queryPostProcessors.add(queryPostProcessor);
-    }
+	protected void addQueryPostProcessor(
+		QueryPostProcessor queryPostProcessor) {
+
+		if (_queryPostProcessors == null) {
+			_queryPostProcessors = new ArrayList<QueryPostProcessor>();
+		}
+		_queryPostProcessors.add(queryPostProcessor);
+	}
 
 	/**
 	 * Execute search.
@@ -86,10 +88,10 @@ public class GSearchImpl implements GSearch {
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing search with query: " + query.toString());
 		}
-		
+
 		BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 			query, BooleanClauseOccur.MUST.getName());
-		
+
 		searchContext.setBooleanClauses(new BooleanClause[] {
 			booleanClause
 		});
@@ -106,14 +108,15 @@ public class GSearchImpl implements GSearch {
 		}
 		return hits;
 	}
-	
+
 	/**
 	 * Execute registered query post processors.
 	 * 
 	 * @param searchContext
 	 * @param hits
 	 */
-	protected void executeQueryPostProcessors(SearchContext searchContext, Hits hits) {
+	protected void executeQueryPostProcessors(
+		SearchContext searchContext, Hits hits) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing query post processors.");
@@ -122,20 +125,23 @@ public class GSearchImpl implements GSearch {
 		if (_queryPostProcessors == null) {
 			return;
 		}
-		
-        for (QueryPostProcessor queryPostProcessor : _queryPostProcessors) {
 
-    		if (_log.isDebugEnabled()) {
-    			_log.debug("Executing " + queryPostProcessor.getClass().getName());
-    		}
-    		
-        	try {
-        		queryPostProcessor.process(_portletRequest, searchContext, _queryParams, hits);
-        	} catch(Exception e) {
-        		_log.error(e, e);
-        	}
-        }
-	}	
+		for (QueryPostProcessor queryPostProcessor : _queryPostProcessors) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Executing " + queryPostProcessor.getClass().getName());
+			}
+
+			try {
+				queryPostProcessor.process(
+					_portletRequest, searchContext, _queryParams, hits);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+			}
+		}
+	}
 
 	/**
 	 * Get results object.
@@ -147,7 +153,7 @@ public class GSearchImpl implements GSearch {
 		throws Exception {
 
 		Query query = _queryBuilder.buildQuery(_portletRequest, _queryParams);
-	
+
 		// Create SearchContext.
 
 		SearchContext searchContext = getSearchContext();
@@ -155,26 +161,28 @@ public class GSearchImpl implements GSearch {
 		// Execute search.
 
 		Hits hits = execute(searchContext, query);
-		
+
 		// Executre query post processors.
-		
+
 		executeQueryPostProcessors(searchContext, hits);
-		
+
 		// Build results JSON object.
 
 		JSONObject resultsObject = _resultsBuilder.buildResults(
-			_portletRequest, _portletResponse, _queryParams, searchContext, hits);
+			_portletRequest, _portletResponse, _queryParams, searchContext,
+			hits);
 
 		return resultsObject;
-	}	
-	
+	}
+
 	/**
 	 * Get searchcontext.
 	 * 
 	 * @return searchcontext object
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	protected SearchContext getSearchContext() throws Exception {
+	protected SearchContext getSearchContext()
+		throws Exception {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -192,24 +200,26 @@ public class GSearchImpl implements GSearch {
 		return searchContext;
 	}
 
-    /**
-     * Remove a query post processor from list.
-     * 
-     * @param clauseBuilder
-     */
-    protected void removeQueryPostProcessor(QueryPostProcessor queryPostProcessor) {
-    	_queryPostProcessors.remove(queryPostProcessor);
-    }    
-	
+	/**
+	 * Remove a query post processor from list.
+	 * 
+	 * @param clauseBuilder
+	 */
+	protected void removeQueryPostProcessor(
+		QueryPostProcessor queryPostProcessor) {
+
+		_queryPostProcessors.remove(queryPostProcessor);
+	}
+
 	@Reference(unbind = "-")
 	protected void setFacetsBuilder(FacetsBuilder facetsBuilder) {
 
 		_facetsBuilder = facetsBuilder;
 	}
 
-	
 	@Reference(unbind = "-")
-	protected void setIndexSearchHelper(IndexSearcherHelper indexSearcherHelper) {
+	protected void setIndexSearchHelper(
+		IndexSearcherHelper indexSearcherHelper) {
 
 		_indexSearcherHelper = indexSearcherHelper;
 	}
@@ -227,9 +237,9 @@ public class GSearchImpl implements GSearch {
 	}
 
 	private FacetsBuilder _facetsBuilder;
-	
+
 	private IndexSearcherHelper _indexSearcherHelper;
-	
+
 	private QueryBuilder _queryBuilder;
 
 	private PortletRequest _portletRequest;
@@ -240,14 +250,8 @@ public class GSearchImpl implements GSearch {
 
 	private QueryParams _queryParams;
 
-    @Reference(
-    	bind = "addQueryPostProcessor",
-    	cardinality = ReferenceCardinality.MULTIPLE, 
-    	policy = ReferencePolicy.DYNAMIC,
-    	service = QueryPostProcessor.class,
-    	unbind = "removeQueryPostProcessor"
-    )
-    private List<QueryPostProcessor> _queryPostProcessors = null;	
+	@Reference(bind = "addQueryPostProcessor", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = QueryPostProcessor.class, unbind = "removeQueryPostProcessor")
+	private List<QueryPostProcessor> _queryPostProcessors = null;
 
 	private static final Log _log = LogFactoryUtil.getLog(GSearchImpl.class);
 }

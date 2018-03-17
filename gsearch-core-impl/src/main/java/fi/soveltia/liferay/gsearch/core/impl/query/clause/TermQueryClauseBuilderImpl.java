@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
@@ -44,26 +45,26 @@ public class TermQueryClauseBuilderImpl implements ClauseBuilder {
 		if (Validator.isNull(value)) {
 			value = queryParams.getKeywords();
 		}
-		
-		TermQuery termQuery =
-			new TermQueryImpl(fieldName, value);
-		
+
+		TermQuery termQuery = new TermQueryImpl(fieldName, value);
+
 		// Boost
-		
+
 		float boost =
 			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
 		termQuery.setBoost(boost);
-		
+
 		return termQuery;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean canBuild(String querytype) {
+
 		return (querytype.equals(QUERY_TYPE));
 	}
-	
+
 	private static final String QUERY_TYPE = "term";
 }

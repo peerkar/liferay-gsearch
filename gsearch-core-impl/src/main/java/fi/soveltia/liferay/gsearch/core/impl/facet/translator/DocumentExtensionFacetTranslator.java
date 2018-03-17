@@ -19,10 +19,8 @@ import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Facet translator for document extension.
- *
- * {@see FacetTranslator}
- *  
+ * Facet translator for document extension. {@see FacetTranslator}
+ * 
  * @author Petteri Karttunen
  */
 @Component(
@@ -61,11 +59,11 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 		for (TermCollector tc : termCollectors) {
 
 			// Check for empty term value!
-			
+
 			if (Validator.isNull(tc.getTerm())) {
 				continue;
 			}
-			
+
 			mappingFound = false;
 
 			for (int i = 0; i < aggregations.length(); i++) {
@@ -118,13 +116,13 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 	 */
 	@Override
 	public String[] translateParams(String value, JSONObject configuration) {
-		
+
 		String[] values = null;
-		
+
 		JSONArray aggregations = configuration.getJSONArray("aggregations");
 
 		for (int i = 0; i < aggregations.length(); i++) {
-			
+
 			JSONObject aggregation = aggregations.getJSONObject(i);
 
 			if (aggregation.getString("key").equals(value)) {
@@ -134,11 +132,13 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 		}
 
 		if (values == null) {
-			values = new String[]{value};
+			values = new String[] {
+				value
+			};
 		}
 
 		return values;
 	}
-	
+
 	protected String _facetName;
 }

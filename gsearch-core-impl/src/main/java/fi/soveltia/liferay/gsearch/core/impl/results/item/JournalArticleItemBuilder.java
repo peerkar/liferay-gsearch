@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
 import com.liferay.journal.model.JournalArticle;
@@ -23,21 +24,26 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class JournalArticleItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+public class JournalArticleItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc() throws Exception {
+	public String getImageSrc()
+		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+			GSearchWebKeys.THEME_DISPLAY);
 
 		return getJournalArticle().getArticleImageURL(themeDisplay);
 	}
@@ -66,9 +72,10 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder implements 
 	 * Get journal article.
 	 * 
 	 * @return
-	 * @throws PortalException 
+	 * @throws PortalException
 	 */
-	protected JournalArticle getJournalArticle() throws PortalException {
+	protected JournalArticle getJournalArticle()
+		throws PortalException {
 
 		return _journalArticleService.getLatestArticle(_entryClassPK);
 	}
@@ -81,8 +88,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder implements 
 	}
 
 	private static JournalArticleService _journalArticleService;
-	
+
 	private static final String NAME = JournalArticle.class.getName();
 
-	
 }

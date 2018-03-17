@@ -18,33 +18,36 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class BlogsEntryItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+public class BlogsEntryItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc() throws Exception {
-		
-		BlogsEntry blogsEntry =  _blogsEntryService.getEntry(_entryClassPK);
+	public String getImageSrc()
+		throws Exception {
+
+		BlogsEntry blogsEntry = _blogsEntryService.getEntry(_entryClassPK);
 
 		return blogsEntry.getSmallImageURL();
 	}
-	
+
 	@Reference(unbind = "-")
-	protected void setBlogsEntryService(
-		BlogsEntryService blogsEntryService) {
+	protected void setBlogsEntryService(BlogsEntryService blogsEntryService) {
 
 		_blogsEntryService = blogsEntryService;
 	}
 
 	private static BlogsEntryService _blogsEntryService;
-	
+
 	private static final String NAME = BlogsEntry.class.getName();
 }

@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
@@ -16,10 +17,12 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class KBArticleItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+public class KBArticleItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
 
@@ -34,8 +37,9 @@ public class KBArticleItemBuilder extends BaseResultItemBuilder implements Resul
 			(LiferayPortletRequest) _portletRequest,
 			(LiferayPortletResponse) _portletResponse, null);
 	}
-	
+
 	// Avoiding KB dependency in gradle.build
-		
-	private static final String NAME = "com.liferay.knowledge.base.model.KBArticle";
+
+	private static final String NAME =
+		"com.liferay.knowledge.base.model.KBArticle";
 }

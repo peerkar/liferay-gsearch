@@ -32,17 +32,18 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class MBMessageItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder{
+public class MBMessageItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
 
 	/**
 	 * This currently handles links for following MBMessage types (by message
-	 * classNameId field) 
-	 * com.liferay.wiki.model.WikiPage
+	 * classNameId field) com.liferay.wiki.model.WikiPage
 	 * com.liferay.journal.model.JournalArticle
 	 */
 	@Override
@@ -65,45 +66,45 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder implements Resul
 				return getWikiPageCommentLink(classPK);
 			}
 		}
-		
+
 		return getAssetRenderer().getURLViewInContext(
 			(LiferayPortletRequest) _portletRequest,
 			(LiferayPortletResponse) _portletResponse, "");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String getTitle()
 		throws NumberFormatException, PortalException {
-		
+
 		long classNameId =
-						GetterUtil.getLong(_document.get(Field.CLASS_NAME_ID));
-		
+			GetterUtil.getLong(_document.get(Field.CLASS_NAME_ID));
+
 		if (classNameId > 0) {
 
 			String className = _portal.getClassName(classNameId);
 
-			if (JournalArticle.class.getName().equals(className) || 
-						WikiPage.class.getName().equals(className)) {
-	
+			if (JournalArticle.class.getName().equals(className) ||
+				WikiPage.class.getName().equals(className)) {
+
 				String title = _document.get(Field.CONTENT);
-				
+
 				if (title.length() > TITLE_MAXLENGTH) {
 					title = title.substring(0, TITLE_MAXLENGTH) + "...";
 				}
-	
+
 				// Using Apache commons as it works better than HTMLUtils
-				
+
 				title = StringEscapeUtils.unescapeHtml4(title);
 				title = HtmlUtil.stripHtml(title);
-	
+
 				return title;
 			}
 		}
 		return super.getTitle();
-	}	
+	}
 
 	protected String getDLFileEntryCommentLink() {
 
@@ -117,21 +118,23 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder implements Resul
 	 * @return
 	 * @throws Exception
 	 */
-	protected String getJournalArticleCommentLink(long classPK) throws Exception {
+	protected String getJournalArticleCommentLink(long classPK)
+		throws Exception {
 
-		AssetRenderer<?> assetRenderer = 
-						getAssetRenderer(JournalArticle.class.getName(), classPK);
-		
+		AssetRenderer<?> assetRenderer =
+			getAssetRenderer(JournalArticle.class.getName(), classPK);
+
 		String link = assetRenderer.getURLViewInContext(
 			(LiferayPortletRequest) _portletRequest,
 			(LiferayPortletResponse) _portletResponse, null);
 
 		if (Validator.isNull(link)) {
-			
-			JournalArticle journalArticle = _journalArticleService.getLatestArticle(classPK);
+
+			JournalArticle journalArticle =
+				_journalArticleService.getLatestArticle(classPK);
 			link = getNotLayoutBoundJournalArticleUrl(journalArticle);
 		}
-		
+
 		return link;
 	}
 
@@ -150,7 +153,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder implements Resul
 		return assetRenderer.getURLView(
 			(LiferayPortletResponse) _portletResponse, WindowState.MAXIMIZED);
 	}
-	
+
 	@Reference(unbind = "-")
 	protected void setJournalArticleService(
 		JournalArticleService journalArticleService) {
@@ -159,14 +162,13 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder implements Resul
 	}
 
 	@Reference(unbind = "-")
-	protected void setPortal(
-		Portal portal) {
+	protected void setPortal(Portal portal) {
 
 		_portal = portal;
 	}
 
 	private static JournalArticleService _journalArticleService;
-	
+
 	private static final String NAME = MBMessage.class.getName();
 
 	private static final int TITLE_MAXLENGTH = 80;

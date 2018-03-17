@@ -16,12 +16,14 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 	immediate = true,
 	service = ResultItemBuilder.class
 )
-public class WikiPageItemBuilder extends BaseResultItemBuilder implements ResultItemBuilder {
+public class WikiPageItemBuilder extends BaseResultItemBuilder
+	implements ResultItemBuilder {
 
 	@Override
 	public boolean canBuild(String name) {
+
 		return NAME.equals(name);
 	}
-	
+
 	private static final String NAME = WikiPage.class.getName();
 }

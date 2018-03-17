@@ -85,14 +85,16 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * {@inheritDoc}
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc() throws Exception {
-		
+	public String getImageSrc()
+		throws Exception {
+
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -115,7 +117,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	@Override
 	public Map<String, String> getMetadata()
 		throws Exception {
-		
+
 		return null;
 	}
 
@@ -126,7 +128,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @return url string
 	 * @throws PortalException
 	 */
-	public String getNotLayoutBoundJournalArticleUrl(JournalArticle journalArticle)
+	public String getNotLayoutBoundJournalArticleUrl(
+		JournalArticle journalArticle)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
@@ -152,8 +155,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		sb.append(journalArticle.getGroupId());
 
 		return sb.toString();
-	}	
-	
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -164,7 +167,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return tags;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -185,6 +188,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 */
 	@Override
 	public String getType() {
+
 		return _entryClassName;
 	}
 
@@ -226,7 +230,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return _assetRenderer;
 	}
-	
+
 	/**
 	 * Get asset renderer for a class.
 	 * 
@@ -236,13 +240,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @throws NumberFormatException
 	 * @throws PortalException
 	 */
-	protected AssetRenderer<?> getAssetRenderer(String entryClassName, long entryClassPK)
-					throws PortalException {
+	protected AssetRenderer<?> getAssetRenderer(
+		String entryClassName, long entryClassPK)
+		throws PortalException {
 
 		AssetRendererFactory<?> assetRendererFactory =
 			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
 				entryClassName);
-		
+
 		return assetRendererFactory.getAssetRenderer(entryClassPK);
 	}
 

@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.log.Log;
@@ -34,17 +35,17 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		if (_clauseBuilders == null) {
 			return null;
 		}
-		
-        for (ClauseBuilder clauseBuilder : _clauseBuilders) {
-            if (clauseBuilder.canBuild(queryType)) {
-                return clauseBuilder;
-            }
-        }
+
+		for (ClauseBuilder clauseBuilder : _clauseBuilders) {
+			if (clauseBuilder.canBuild(queryType)) {
+				return clauseBuilder;
+			}
+		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("No clause builder found for " + queryType);
 		}
-        
+
 		return null;
 	}
 
@@ -53,30 +54,27 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 	 * 
 	 * @param clauseBuilder
 	 */
-    protected void addClauseBuilder(ClauseBuilder clauseBuilder) {
-        if (_clauseBuilders == null) {
-        	_clauseBuilders = new ArrayList<ClauseBuilder>();
-        }
-        _clauseBuilders.add(clauseBuilder);
-    }
+	protected void addClauseBuilder(ClauseBuilder clauseBuilder) {
 
-    /**
-     * Remove a clause builder from list.
-     * 
-     * @param clauseBuilder
-     */
-    protected void removeClauseBuilder(ClauseBuilder clauseBuilder) {
-    	_clauseBuilders.remove(clauseBuilder);
-    }    
+		if (_clauseBuilders == null) {
+			_clauseBuilders = new ArrayList<ClauseBuilder>();
+		}
+		_clauseBuilders.add(clauseBuilder);
+	}
 
-    @Reference(
-    	bind = "addClauseBuilder",
-    	cardinality = ReferenceCardinality.MULTIPLE, 
-    	policy = ReferencePolicy.DYNAMIC,
-    	service = ClauseBuilder.class,
-    	unbind = "removeClauseBuilder"
-    )
-    private List<ClauseBuilder> _clauseBuilders;
-    
-	private static final Log _log = LogFactoryUtil.getLog(ClauseBuilderFactoryImpl.class);
+	/**
+	 * Remove a clause builder from list.
+	 * 
+	 * @param clauseBuilder
+	 */
+	protected void removeClauseBuilder(ClauseBuilder clauseBuilder) {
+
+		_clauseBuilders.remove(clauseBuilder);
+	}
+
+	@Reference(bind = "addClauseBuilder", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ClauseBuilder.class, unbind = "removeClauseBuilder")
+	private List<ClauseBuilder> _clauseBuilders;
+
+	private static final Log _log =
+		LogFactoryUtil.getLog(ClauseBuilderFactoryImpl.class);
 }
