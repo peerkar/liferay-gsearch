@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
 import com.liferay.portal.kernel.json.JSONArray;
@@ -40,12 +41,11 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		if (_log.isDebugEnabled()) {
 			_log.debug("GetSuggestionsMVCResourceCommand.doServeResource()");
 		}
-		
+
 		JSONArray response = null;
 
 		try {
-			response = _gSearchSuggester.getSuggestions(
-				resourceRequest);
+			response = _gSearchSuggester.getSuggestions(resourceRequest);
 		}
 		catch (Exception e) {
 
@@ -58,18 +58,18 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, response);
-	}	
-	
+	}
+
 	@Reference(unbind = "-")
-	protected void setGSearchKeywordSuggester(GSearchKeywordSuggester gSearchSuggester) {
+	protected void setGSearchKeywordSuggester(
+		GSearchKeywordSuggester gSearchSuggester) {
 
 		_gSearchSuggester = gSearchSuggester;
 	}
-	
+
 	@Reference
 	protected GSearchKeywordSuggester _gSearchSuggester;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(GetSuggestionsMVCResourceCommand.class);
 }
-

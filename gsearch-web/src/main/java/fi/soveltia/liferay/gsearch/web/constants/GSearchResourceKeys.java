@@ -1,10 +1,10 @@
+
 package fi.soveltia.liferay.gsearch.web.constants;
 
 /**
  * Resource request ids.
  * 
  * @author Petteri Karttunen
- *
  */
 public class GSearchResourceKeys {
 

@@ -4,7 +4,6 @@ package fi.soveltia.liferay.gsearch.web.portlet.action;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,9 +27,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.configuration.JSONConfigurationHelperService;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 
@@ -40,7 +39,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration",
+	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet",
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
@@ -70,13 +69,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		template.put(
 			GSearchWebKeys.AUTO_COMPLETE_ENABLED, 
-			_gSearchConfiguration.enableAutoComplete());
+			_moduleConfiguration.enableAutoComplete());
 
 		// Autocomplete request delay.
 		
 		template.put(
 			GSearchWebKeys.AUTO_COMPLETE_REQUEST_DELAY, 
-			_gSearchConfiguration.autoCompleteRequestDelay());
+			_moduleConfiguration.autoCompleteRequestDelay());
 		
 		// Set help text resource url.
 		
@@ -102,11 +101,11 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			
 			template.put(
 				GSearchWebKeys.ASSET_TYPE_OPTIONS,
-				_jsonConfigurationHelperService.getAssetTypeOptions(renderRequest.getLocale()));
+				_configurationHelperService.getAssetTypeOptions(renderRequest.getLocale()));
 
 			template.put(
 				GSearchWebKeys.SORT_OPTIONS,
-				_jsonConfigurationHelperService.getSortOptions(renderRequest.getLocale()));
+				_configurationHelperService.getSortOptions(renderRequest.getLocale()));
 			
 		} catch (Exception e) {
 			_log.error(e, e);
@@ -116,19 +115,19 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		template.put(
 			GSearchWebKeys.REQUEST_TIMEOUT,
-			_gSearchConfiguration.requestTimeout());
+			_moduleConfiguration.requestTimeout());
 		
 		// Set query min length.
 		
 		template.put(
 			GSearchWebKeys.QUERY_MIN_LENGTH,
-			_gSearchConfiguration.queryMinLength());
+			_moduleConfiguration.queryMinLength());
 				
 		// Enable / disable JS console logging messages.
 		
 		template.put(
 			GSearchWebKeys.JS_DEBUG_ENABLED,
-			_gSearchConfiguration.jsDebuggingEnabled());
+			_moduleConfiguration.jsDebuggingEnabled());
 		
 		// Get/set parameters from url
 
@@ -144,8 +143,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		// Show tags
 		
-		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _gSearchConfiguration.showTags());
-
+		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _moduleConfiguration.showTags());
 		
 		return "View";
 	}
@@ -153,8 +151,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	@Activate
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 		
 		try {
 			setFacetFields();
@@ -188,7 +186,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	 */
 	protected void setFacetFields() throws JSONException {
 
-		JSONArray configuration = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.facetConfiguration());
+		JSONArray configuration = _configurationHelperService.getFacetConfiguration();
 
 		if (configuration.length() > 0) {
 
@@ -282,15 +280,15 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	}
 
 	@Reference(unbind = "-")
-	protected void setJSONConfigurationHelperService(JSONConfigurationHelperService jsonConfigurationHelperService) {
+	protected void setJSONConfigurationHelperService(ConfigurationHelper configurationHelperService) {
 
-		_jsonConfigurationHelperService = jsonConfigurationHelperService;
+		_configurationHelperService = configurationHelperService;
 	}
 	
 	@Reference
-	protected JSONConfigurationHelperService _jsonConfigurationHelperService;
+	protected ConfigurationHelper _configurationHelperService;
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static String[] _facetFields = null;
 

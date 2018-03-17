@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration;
+import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.portlet.GSearchPortlet;
@@ -41,7 +41,7 @@ import fi.soveltia.liferay.gsearch.web.portlet.GSearchPortlet;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
@@ -55,8 +55,8 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
 
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			GSearchConfiguration.class, properties);
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 		
 		_helpText = null;
 	}
@@ -94,10 +94,10 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
-		String articleId = _gSearchConfiguration.helpTextArticleId();
+		String articleId = _moduleConfiguration.helpTextArticleId();
 
 		long groupId =
-			GetterUtil.getLong(_gSearchConfiguration.helpTextGroupId());
+			GetterUtil.getLong(_moduleConfiguration.helpTextGroupId());
 
 		if (articleId != null && groupId > 0) {
 
@@ -137,7 +137,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 		_journalArticleService = journalArticleService;
 	}
 
-	private volatile GSearchConfiguration _gSearchConfiguration;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private String _helpText;
 

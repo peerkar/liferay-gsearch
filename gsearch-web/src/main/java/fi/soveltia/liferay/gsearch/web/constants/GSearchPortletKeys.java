@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.web.constants;
 
 /**
