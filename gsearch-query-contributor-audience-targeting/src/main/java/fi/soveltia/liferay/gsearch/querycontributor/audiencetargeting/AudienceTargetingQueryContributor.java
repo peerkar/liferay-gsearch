@@ -40,6 +40,10 @@ public class AudienceTargetingQueryContributor implements QueryContributor {
 		PortletRequest portletRequest)
 		throws Exception {
 
+		if (!isEnabled()) {
+			return null;
+		}
+		
 		if (portletRequest.getAttribute(USER_SEGMENT_ID_PARAM) == null) {
 			return null;
 		}

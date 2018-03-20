@@ -11,7 +11,7 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration.GSearchAudienceTargeting",
 	localization = "content/Language",
-	name = "GSearch Audience Targeting Contributor"
+	name = "GSearch Audience Targeting Query Contributor"
 )
 public interface ModuleConfiguration {
 	
