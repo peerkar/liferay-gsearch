@@ -13,6 +13,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 1. [Quick Installation Guide](#Quick_Installation_Guide)
 1. [Full Installation Guide](#Full_Installation_Guide)
 1. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
+1. [Enabling Geolocation Contributor](#Geolocation_Contributor)
 1. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
 1. [Embedding Search Field into a Theme](#Search_Field)
 1. [Sample Configurations](#Configurations)
@@ -30,11 +31,15 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 # What's New <a name="Whats_New"></a>
 
+## 2018-03-20
+
+* Added Geolocation query contributor and indexer post processor for that. With these modules you can increase the relevancy for document geographically closer to you. 
+
 ## 2018-03-17
 
 __Major API changes and streamlining__. Added new interfaces to significantly ease extending and customizing this solution to your needs.
 
-* Added __QueryContributor__ service interface. With the new service interface you can easily add any custom clauses, or in Google terms "signals" to the main query to improve relevancy. Audience Targeting module is using this as of now.
+* Added __QueryContributor__ service interface. With this service you can easily add any custom clauses, or in Google terms "signals" to the main query to improve relevancy. Audience Targeting module is using this as of now.
 * Added __ResultItemProcessor__ service interface. With this you can process result items before they are sent to the user interface.  See the gsearch-hightlight-item-by-tag sample.
 * Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
 * Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
@@ -77,7 +82,9 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
     * Fields to search for and their boosting
     * Suggesters
     * etc.
-* Possibility to use Audience targeting for result item boosting.
+* Possibility to use contextual information to improve relevancy. Current modules:
+	*  Audience targeting
+	*  Geolocation
 * Possibility to highlight result items based on your criteria.
 * Ability to include non-Liferay resources in the search results
 * Easy and fast extendability
@@ -119,6 +126,9 @@ Core Implementation module for the backend logic.
 ## gsearch-query-api 
 This module contains contains the extension for portal search API's StringQuery type, the QueryStringQuery query type.  
 
+## gsearch-indexer-postprocessor
+Indexer post processor for the Liferay GSearch
+
 ## gsearch-web 
 UI module written using SOY & Metal.js.
 
@@ -133,6 +143,9 @@ An item highlighter example module adding possibility to highlight items on the 
 
 ## gsearch-query-contributor-audience-targeting
 Audience Targeting module enabling result items boosting if they match current user's segments. This module is using the GSearch QueryContributor API
+
+## gsearch-query-contributor-geolocation
+This module helps to improve relevancy for contents geographically closer to you. This module is using the GSearch QueryContributor API
 
 ## gsearch-elasticsearch-adapter
 A custom Elasticsearch adapter implementing Elasticsearch QueryStringQuery translator into Liferay portal search API. It has also index setting customizations: custom analyzers for keyword suggester and ascii folding filter for the title, description and content fields to better support non-ascii characters (for us non English speaking people).
@@ -250,9 +263,22 @@ Download the following jar from [latest folder](https://github.com/peerkar/lifer
 
 * fi.soveltia.liferay.gsearch.query.contributor.audience.targeting-VERSION.jar
 
-After the module has been installed, please enable that in the portlet configuration Control Panel -> Configuration -> System Settings -> Other -> GSearch Audience Targeting Contributor.
+After the module has been installed, please enable that in the portlet configuration Control Panel -> Configuration -> System Settings -> Other -> GSearch Audience Targeting Query Contributor.
 
 With this feature you can boost results falling into current user's user segments. Boost factor can be adjusted in the configuration. Create test segments and contents having those segments and play with the boost to see, how it affects hits relevancy.
+
+# Enabling Geolocation Query Contributor <a name="Geolocation_Contributor"></a>
+
+Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
+
+* fi.soveltia.liferay.gsearch.query.contributor.geolocation-VERSION.jar
+* fi.soveltia.liferay.gsearch.indexer.postprocessor-VERSION.jar
+
+After the module has been installed, please enable and tune modules in Control Panel -> Configuration -> System Settings -> Other -> GSearch Geolocation Query Contributor and Control Panel -> Configuration -> System Settings -> Other -> GSearch Indexer Post Processor
+
+With this feature you can boost results geographically closer to you. 
+
+Note that to make this really work to you, you should reindex all with some geodata. The indexer postprocessor allows setting a static IP for that. 
 
 # Enabling Highlighting Result Items by Tag <a name="Result_Item_Highlighter"></a>
 
