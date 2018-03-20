@@ -55,7 +55,15 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public DecayFunction functionType();
-	
+
+	@Meta.AD(
+		deflt = "2", 
+	    description = "geolocation-boost-desc",
+	    name= "geolocation-boost-name",
+		required = false
+	)
+	public float boost();
+
 	@Meta.AD(
 		deflt = "2", 
 	    description = "geolocation-score-weight-desc",

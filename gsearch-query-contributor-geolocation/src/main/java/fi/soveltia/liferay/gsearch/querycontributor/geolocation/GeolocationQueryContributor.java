@@ -62,10 +62,6 @@ public class GeolocationQueryContributor implements QueryContributor {
 			_log.debug("Longitude " + longitude);
 		}
 
-		_log.info("Current user's ip: " + ipAddress);
-		_log.info("Latitude " + latitude);
-		_log.info("Longitude " + longitude);
-
 		// Please see fi.soveltia.liferay.gsearch.query.DecayFunctionScoreQuery
 
 		DecayFunctionScoreQuery query = new DecayFunctionScoreQuery(null);
@@ -74,7 +70,7 @@ public class GeolocationQueryContributor implements QueryContributor {
 		query.setFunctionType(_moduleConfiguration.functionType().name());
 		query.setDecay(new Double(_moduleConfiguration.decay()));
 		query.setWeight(_moduleConfiguration.weight()); 
-		query.setBoost(2.0f);
+		query.setBoost(_moduleConfiguration.boost());
 
 		// Origin
 
