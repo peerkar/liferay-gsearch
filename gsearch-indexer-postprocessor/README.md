@@ -1,8 +1,8 @@
 # Liferay GSearch Indexer Postprocessor
 
-This is the GSearch Indexer Postprocessor. It adds the following fields to the searchindex:
+This is the GSearch indexer post processor. It adds the following fields to the searchindex:
 
-* gSearchGeoLocation (geolocation data for the indexed asset)
+* Geolocation data for the indexed asset
 
 ## Installation
 
