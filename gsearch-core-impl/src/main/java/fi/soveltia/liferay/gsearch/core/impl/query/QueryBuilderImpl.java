@@ -122,15 +122,12 @@ public class QueryBuilderImpl implements QueryBuilder {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Processing " + queryContributor.getClass().getName());
-			}
 
-			if (!queryContributor.isEnabled()) {
-				if (_log.isDebugEnabled()) {
+				if (!queryContributor.isEnabled()) {
 					_log.debug(
 						queryContributor.getClass().getName() +
 							" is disabled.");
 				}
-				continue;
 			}
 
 			try {
