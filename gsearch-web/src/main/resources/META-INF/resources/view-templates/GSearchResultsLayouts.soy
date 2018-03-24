@@ -10,9 +10,9 @@
 
 	{if $results and $results.items and length($results.items) > 0}
 
-		<div class="row" id="{$portletNamespace}ResultsLayout">
+		<div class="row" id="{$portletNamespace}ResultsLayout" data-ismultivalued="false">
 			<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-paramname="resultsLayout">
-				<li class="list-layout selected">
+				<li class="list-layout selected default">
 					<a data-value="list" href="#" title="{msg desc=""}list-layout{/msg}">
 						<img src="/o/gsearch-web/images/result-layouts/icon-list.png"/>
 					</a>

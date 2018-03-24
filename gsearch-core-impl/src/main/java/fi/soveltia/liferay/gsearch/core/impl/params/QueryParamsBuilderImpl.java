@@ -6,8 +6,10 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -27,10 +29,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
+import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
 import fi.soveltia.liferay.gsearch.core.api.params.RequestParamValidator;
@@ -48,14 +52,6 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
 	service = QueryParamsBuilder.class
 )
 public class QueryParamsBuilderImpl implements QueryParamsBuilder {
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -86,6 +82,14 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setSortParam();
 
 		return _queryParams;
+	}
+
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
 	}
 
 	/**
@@ -164,40 +168,75 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.facetConfiguration());
 
-		Map<String, String[]> facetParams = new HashMap<String, String[]>();
+		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<FacetParam, BooleanClauseOccur>();
 
 		String fieldParam;
 		String fieldName;
-		String fieldValue;
+		String[] fieldValues;
+		boolean isMultiValued;
 
 		for (int i = 0; i < configurationArray.length(); i++) {
 
 			JSONObject facetConfiguration = configurationArray.getJSONObject(i);
 
+			isMultiValued = GetterUtil.getBoolean(
+				facetConfiguration.getString("isMultiValued"), false);
+
 			fieldParam = facetConfiguration.getString("paramName");
 
 			fieldName = facetConfiguration.getString("fieldName");
 
-			fieldValue = ParamUtil.getString(_portletRequest, fieldParam);
+			fieldValues =
+				ParamUtil.getStringValues(_portletRequest, fieldParam);
 
-			if (Validator.isNotNull(fieldValue)) {
+			if (Validator.isNotNull(fieldValues) && fieldValues.length > 0) {
 
 				FacetTranslator translator =
 					_facetTranslatorFactory.getTranslator(fieldName);
 
 				if (translator != null) {
-					String[] values = translator.translateParams(
-						fieldValue, facetConfiguration);
-					facetParams.put(fieldName, values);
+
+					if (isMultiValued) {
+						for (String fieldValue : fieldValues) {
+
+							String[] values = translator.translateParams(
+								fieldValue, facetConfiguration);
+
+							FacetParam facetParam = new FacetParam(
+								fieldName, values, BooleanClauseOccur.SHOULD);
+							facetParams.put(facetParam, BooleanClauseOccur.MUST);
+						}
+					}
+					else {
+						String[] values = translator.translateParams(
+							fieldValues[0], facetConfiguration);
+
+						FacetParam facetParam = new FacetParam(
+							fieldName, values, BooleanClauseOccur.SHOULD);
+						facetParams.put(facetParam, BooleanClauseOccur.MUST);
+					}
 				}
 				else {
-					facetParams.put(fieldName, new String[] {
-						fieldValue
-					});
+
+					if (isMultiValued) {
+						
+						FacetParam facetParam = new FacetParam(
+							fieldName, fieldValues, BooleanClauseOccur.MUST);
+						facetParams.put(facetParam, BooleanClauseOccur.MUST);
+
+					}
+					else {
+
+						FacetParam facetParam =
+							new FacetParam(fieldName, new String[] {
+								fieldValues[0]
+							}, BooleanClauseOccur.MUST);
+						facetParams.put(facetParam, BooleanClauseOccur.MUST);
+					}
 				}
 			}
 		}
-		_queryParams.setFacets(facetParams);
+		_queryParams.setFacetsParams(facetParams);
 	}
 
 	@Reference(unbind = "-")
@@ -346,20 +385,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 			if (item.getString("key").equals(sortField)) {
 
-				fieldName = item.getString("fieldName");
-
-				if (item.getString("fieldPrefix") != null) {
-					fieldName = item.getString("fieldPrefix").concat(fieldName);
-				}
-
-				if (item.getBoolean("localized")) {
-					fieldName = fieldName.concat("_").concat(
-						_queryParams.getLocale().toString());
-				}
-
-				if (item.getString("fieldSuffix") != null) {
-					fieldName = fieldName.concat(item.getString("fieldSuffix"));
-				}
+				fieldName = _configurationHelper.parseConfigurationKey(
+					_portletRequest, item.getString("fieldName"));
 
 				fieldType = Integer.valueOf(item.getString("fieldType"));
 
@@ -368,22 +395,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			}
 			else if (item.getBoolean("default")) {
 
-				defaultFieldName = item.getString("fieldName");
-
-				if (item.getString("fieldPrefix") != null) {
-					defaultFieldName =
-						item.getString("fieldPrefix").concat(defaultFieldName);
-				}
-
-				if (item.getBoolean("localized")) {
-					defaultFieldName = defaultFieldName.concat("_").concat(
-						_queryParams.getLocale().toString());
-				}
-
-				if (item.getString("fieldSuffix") != null) {
-					defaultFieldName =
-						defaultFieldName.concat(item.getString("fieldSuffix"));
-				}
+				defaultFieldName = _configurationHelper.parseConfigurationKey(
+					_portletRequest, item.getString("fieldName"));
 
 				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
 			}
@@ -516,6 +529,9 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	// Modification date field name in the index.
+
+	@Reference
+	protected ConfigurationHelper _configurationHelper;
 
 	private static final String MODIFIED_SORT_FIELD = "modified_sortable";
 

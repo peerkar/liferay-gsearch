@@ -31,7 +31,7 @@ class GSearchUtils {
 
 		$('#' + menuWrapperElementId + ' .' + menuClass + ' li a').each(function() {	
 			$(this).unbind();
-		});			
+		});		
 	}
 	
 	/**
@@ -49,14 +49,20 @@ class GSearchUtils {
 
 			let options = $(this).find('.dropdown-menu').attr('id');
 			let trigger = $(this).find('button').attr('id');
-			let paramName = $(this).attr('data-paramname')
+			let paramName = $(this).attr('data-paramname');
+			let isMultiValued = $(this).attr('data-ismultivalued');
 			
+			// Convert to boolean
+			
+			let isMulti = (isMultiValued == 'true');
+					
 			GSearchUtils.setupOptionList(
 				options, 
 				trigger, 
 				queryParamGetter, 
 				queryParamSetter, 
-				paramName
+				paramName,
+				isMulti
 			);
 		});			
 	}
@@ -68,23 +74,22 @@ class GSearchUtils {
 	 * @param {Object} queryParamSetter
 	 * 
 	 */
-	static setInitialQueryParameters(valueArray, keyArray, queryParamSetter) {
+	static setInitialQueryParameters(initialValues, keyArray, queryParamSetter) {
 
-		if (!(valueArray && keyArray)) {
+		if (!(initialValues && keyArray)) {
 			return;
 		}
-		
+
 		for (let field of keyArray) {
 
-			let value = valueArray[field];
+			let values = initialValues[field];
 
-			if (value) {
+			if (!values) {
+				continue
+			}
+			
+			for (let value of values) {
 				queryParamSetter(field, value, false);
-			} else {
-				
-				// Reset possibly cached state
-				
-				queryParamSetter(field, '', false);
 			}
 		}
 	}	
@@ -99,21 +104,26 @@ class GSearchUtils {
 	 * @param {String} queryParam
 	 * @param {String} initialValue
 	 */
-	static setupOptionList(optionElementId, triggerElementId, queryParamGetter, queryParamSetter, queryParam) {
+	static setupOptionList(optionElementId, triggerElementId, queryParamGetter, 
+			queryParamSetter, queryParam, isMultiValued = false) {
+
+		let values = queryParamGetter(queryParam);
 
 		// Set initially selected item
 		
-		let initialValue = queryParamGetter(queryParam);
+		let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId, 
+				triggerElementId, values, isMultiValued);
 
-		let selectedItem = GSearchUtils.setOptionListSelectedItem(optionElementId, 
-				triggerElementId, initialValue);
-
-		if (selectedItem) {
-			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItem);
+		// Set text
+		
+		if (selectedItems.length > 0) {
+			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
 		}
 		
+		// Set click events
+		
 		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId, 
-				queryParamGetter, queryParamSetter, queryParam) 
+				queryParamGetter, queryParamSetter, queryParam, isMultiValued) 
 	}
 	
 	/**
@@ -121,28 +131,37 @@ class GSearchUtils {
 	 *
 	 * @param {String} optionElementId
 	 * @param {String} triggerElementId
-	 * @param {String} queryParamGetter
-	 * @param {String} queryParamSetter
+	 * @param {Object} queryParamGetter
+	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
-	 * @param {String} initialValue
+	 * @param {Boolean} isMultiValued
 	 */
-	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter, queryParamSetter, queryParam, initialValue) {
+	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter, 
+			queryParamSetter, queryParam, isMultiValued) {
 		
-		// Set click events
+		let currentValues = queryParamGetter(queryParam);
 		
 		$('#' + optionElementId + ' li a').on('click', function(event) {
 
 			let value = $(this).attr('data-value');
 			
-			if (value != queryParamGetter(queryParam)) {
+			if (currentValues.indexOf(value) < 0) {
 
-				queryParamSetter(queryParam, value);
+				queryParamSetter(queryParam, value, true, isMultiValued);
 
-				let selectedItem = GSearchUtils.setOptionListSelectedItem(optionElementId, triggerElementId, value);
+				let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId, 
+						triggerElementId, value, isMultiValued);
 				
-				if (selectedItem) {
-					GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItem);
+				if (selectedItems.length > 0) {
+					
+					GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
 				}
+				
+			} else {
+
+				queryParamSetter(queryParam, null, true, isMultiValued, value);
+
+				GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
 			}
 			event.preventDefault();
 		});			
@@ -154,28 +173,55 @@ class GSearchUtils {
 	 * @param {String} optionElementId
 	 * @param {String} value
 	 */
-	static setOptionListSelectedItem(optionElementId, triggerElementId, value) {
+	static setOptionListSelectedItems(optionElementId, triggerElementId, values, isMultiValued) {
 
-		let selectedItem = null;
+		let selectedItems = [];
 
+		let defaultItem = $('#' + optionElementId + ' li.default a');
+		
+		let valueFound = false;
+		
 		$('#' + optionElementId + ' li a').each(function() {
 
-			// Try to find a default selected item
-			
-			if ($(this).parent().hasClass('selected')) {
-				selectedItem = this;
-			}
-			
-			if ($(this).attr('data-value') == value) {
-				
-				$('#' + optionElementId + ' li').removeClass('selected');
-				$(this).parent().addClass('selected');
-				
-				selectedItem = this;
+			if (!isMultiValued) {
+
+				if ($(this).attr('data-value') == values[0]) {
+					
+					valueFound = true;
+
+					$('#' + optionElementId + ' li').removeClass('selected');
+					
+					$(this).parent().addClass('selected');
+					
+					selectedItems.push(this);
+					
+					return false;
+				}
+
+			} else {
+
+				for (let value of values) {
+									
+					if ($(this).attr('data-value') == value) {
+						
+						valueFound = true;
+						
+						$(defaultItem).parent().removeClass('selected');
+
+						$(this).parent().addClass('selected');
+						
+						selectedItems.push(this);
+					}
+				}
 			}
 		});
+			
+		if (!valueFound && defaultItem.length > 0) {
 
-		return selectedItem;
+			selectedItems.push(defaultItem);
+		}
+
+		return selectedItems;
 	}
 	
 	/**
@@ -187,19 +233,59 @@ class GSearchUtils {
 	 * @param {String} triggerElementId
 	 * @param {Object} selectedItem
 	 */
-	static setOptionListTriggerElementText(triggerElementId, selectedItem) {
+	static setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam) {
 		
-		let textElement = $(selectedItem).find('.text');
+		if (selectedItems.length > 1) {
+
+			let html = $('#' + triggerElementId ).parent().attr('data-multipleoption');
+
+			// Fallback translation. See ResultItemBuilder.
+			
+			if (!html) {
+				html = "multiple " + queryParam.toLowerCase();
+			}
+			
+			$('#' + triggerElementId + ' .selection').html('[<i> ' + html + ' </i>]');
+			
+			return;
+		}
+			
+		let textElement = $(selectedItems[0]).find('.text');
 		
 		let text = null;
 		
 		if (textElement.length > 0) {
 			text = $(textElement).html();
 		} else {
-			text = $(selectedItem).html();
+			text = $(selectedItems[0]).html();
 		}
 		
 		$('#' + triggerElementId + ' .selection').html(text);
+	}
+	
+	/**
+	 * Unset selected option item.
+	 * 
+	 * @param {String} optionElementId
+	 * @param {String} value
+	 */
+	static unsetOptionListSelectedItem(optionElementId, value) {
+		
+		$('#' + optionElementId + ' li a').each(function() {
+
+			if ($(this).attr('data-value') == value) {
+				
+				$(this).parent().removeClass('selected');
+				
+				return false;
+			}
+		});
+
+		// If there are no more selections mark the default item ("any") as selected.
+		
+		if ($('#' + optionElementId + ' li.selected').length === 0) {
+			$('#' + optionElementId + ' li.default').addClass('selected');
+		}
 	}
 
 	/**
@@ -210,17 +296,21 @@ class GSearchUtils {
  	 * @param {String} name
 	 */
 	static getURLParameters() {
+
 		let urlParams;
-	    let match,
+	   
+		let match,
 	        pl     = /\+/g,  
 	        search = /([^&=]+)=?([^&]*)/g,
 	        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
 	        query  = window.location.search.substring(1);
 
 	    urlParams = {};
+	    
 	    while (match = search.exec(query)) {
 	       urlParams[decode(match[1])] = decode(match[2]);
 	    }
+	    
 	    return urlParams;
 	}
 }

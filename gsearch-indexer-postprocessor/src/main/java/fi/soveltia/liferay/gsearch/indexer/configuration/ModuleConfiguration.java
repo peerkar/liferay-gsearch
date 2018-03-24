@@ -25,7 +25,7 @@ public interface ModuleConfiguration {
 	public String fieldName();
 
 	@Meta.AD(
-		deflt = "", 
+		deflt = "193.166.186.254", 
 		description = "test-ip-desc",
 	    name = "test-ip-name",
 		required = false

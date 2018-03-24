@@ -6,6 +6,8 @@ import com.liferay.portal.kernel.json.JSONException;
 
 import java.util.Locale;
 
+import javax.portlet.PortletRequest;
+
 /**
  * A configuration helper interface.
  * 
@@ -42,5 +44,14 @@ public interface ConfigurationHelper {
 	 */
 	public JSONArray getSortOptions(Locale locale)
 		throws JSONException;
+	
+	/**
+	 * Parse configuration field name which might have variables in it.
+	 * 
+	 * @param portletRequest
+	 * @param fieldName
+	 * @return
+	 */
+	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName);
 
 }

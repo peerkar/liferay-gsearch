@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.portlet.PortletRequest;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -106,6 +108,17 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		return translatedOptions;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName) {
+		
+		fieldName = fieldName.replace("$language_id", portletRequest.getLocale().toString());		
+		
+		return fieldName;
+	}	
+	
 	private String getLocalization(String key, Locale locale) {
 
 		if (_resourceBundle == null) {
@@ -121,6 +134,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		return key;
 	}
 
+	
 	private volatile ModuleConfiguration _gSearchConfiguration;
 
 	private ResourceBundle _resourceBundle;

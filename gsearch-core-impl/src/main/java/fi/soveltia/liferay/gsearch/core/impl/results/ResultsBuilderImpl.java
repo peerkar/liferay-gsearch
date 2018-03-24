@@ -213,12 +213,16 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				// see class comments.
 
 				resultItem.put(
-					"anyOption", _resourceBundle.getString(
+					"anyOption", getLocalization(
 						"any-" + facetCollector.getFieldName().toLowerCase()));
 				resultItem.put(
-					"fieldName", facetConfiguration.get("paramName"));
+						"multipleOption", getLocalization(
+							"multiple-" + facetCollector.getFieldName().toLowerCase()));
+				resultItem.put(
+					"paramName", facetConfiguration.get("paramName"));
 				resultItem.put("icon", facetConfiguration.get("icon"));
 				resultItem.put("values", termArray);
+				resultItem.put("isMultiValued", facetConfiguration.get("isMultiValued"));
 
 				resultArray.put(resultItem);
 			}
@@ -564,7 +568,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			return _resourceBundle.getString(key);
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+			_log.error("Localization value for " + key + " not found.");
 		}
 		return key;
 	}
@@ -585,8 +589,14 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	private ResultItemBuilderFactory _resultsBuilderFactory;
 
-	@Reference(bind = "addResultItemProcessor", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ResultItemProcessor.class, unbind = "removeResultItemProcessor")
-	private List<ResultItemProcessor> _resultItemProcessors;
+	@Reference(
+		bind = "addResultItemProcessor", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = ResultItemProcessor.class, 
+		unbind = "removeResultItemProcessor"
+	)
+	private volatile List<ResultItemProcessor> _resultItemProcessors;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ResultsBuilderImpl.class);

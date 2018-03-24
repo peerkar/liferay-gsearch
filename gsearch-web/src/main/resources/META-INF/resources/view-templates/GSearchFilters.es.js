@@ -41,6 +41,7 @@ class GSearchFilters extends Component {
 		// Set initial query parameters from calling url.
 
 		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
+		
 	}
 	
 	/**
@@ -51,12 +52,12 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.rendered()");
 		}
-		
+
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'BasicFilters', 'optionmenu', 
 				this.getQueryParam, this.setQueryParam);
-
+		
 		// Update asset type facet counts.
 		
 		this.updateAssetTypeFacetCounts();
@@ -75,7 +76,7 @@ class GSearchFilters extends Component {
 
 			for (let i = 0; i < length; i++) {
 
-				if(this.results.facets[i].fieldName == 'entryClassName') {
+				if(this.results.facets[i].paramName == 'entryClassName') {
 					entryClassNameFacets = this.results.facets[i].values;
 					break;
 				}
@@ -107,13 +108,13 @@ class GSearchFilters extends Component {
 	shouldUpdate(changes, propsChanges) {
 
 		if (this.debug) {
-			console.log("GSearchFilters.willUpdate()");
+			console.log("GSearchFilters.shouldUpdate()");
 		}		
 
     	// Detach event listeners and facet element on rerender.
 
 		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'BasicFilters', 'optionmenu');
-
+		
 		return true;
     }	
 }

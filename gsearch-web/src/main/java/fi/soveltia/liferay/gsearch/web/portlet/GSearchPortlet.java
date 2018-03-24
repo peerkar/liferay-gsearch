@@ -19,7 +19,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 	property = {
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.application-type=widget",
-        "com.liferay.portlet.css-class-wrapper=gsearch-portlet",
+		"com.liferay.portlet.css-class-wrapper=gsearch-portlet",
 		"com.liferay.portlet.display-category=category.gsearch",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
 		"com.liferay.portlet.layout-cacheable=false",

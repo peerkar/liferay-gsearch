@@ -55,6 +55,24 @@ class GSearchSort extends Component {
 		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'Sort', 'optionmenu', 
 			this.getQueryParam, this.setQueryParam);
 	}
+	
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
+
+		if (this.debug) {
+			console.log("GSearchSort.shouldUpdate()");
+		}		
+
+    	// Detach event listeners and facet element on rerender.
+
+		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'Sort', 'optionmenu');
+
+		$('#' + this.portletNamespace + 'Sort').remove();
+
+		return true;
+    }	
 }
 
 /** 

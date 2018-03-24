@@ -75,13 +75,19 @@ class GSearchField extends Component {
 	 */
 	checkInitialQueryParameters() {
 		
-		if (this.initialQueryParameters['q']) {
-
-			let keywords = this.initialQueryParameters['q'].trim();
+		let keywords = null;
+		
+		let q = this.initialQueryParameters['q'];
+		
+		if (q) {
+			keywords = q[0];
+		}
+		
+		if (keywords) {
 
 			if (this.validateKeywords(keywords)) {
 				$('#' + this.portletNamespace + 'SearchField').val(keywords);
-				this.setQueryParam("q", keywords, false);
+				this.setQueryParam('q', keywords, false, false);
 			}
 		}
 	}
@@ -142,7 +148,7 @@ class GSearchField extends Component {
 		// Validate keywords.
 		
 		if (this.validateKeywords(keywords)) {
-			this.setQueryParam("q", keywords, true);
+			this.setQueryParam('q', keywords, true, false);
 		}
 	}
 	

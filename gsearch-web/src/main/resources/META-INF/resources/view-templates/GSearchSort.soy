@@ -15,7 +15,7 @@
 		
 			// Sort field
 			
-			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortField">
+			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortField" data-ismultivalued="false">
 			
 				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
 					data-toggle="dropdown" id="{$portletNamespace}SortField" type="button">
@@ -32,7 +32,7 @@
 			
 			// Sort direction
 			
-			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortDirection">
+			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortDirection" data-ismultivalued="false">
 			
 				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
 					data-toggle="dropdown" id="{$portletNamespace}SortDirection" type="button">
@@ -41,7 +41,7 @@
 				</button>
 				
 				<ul aria-labelledby="{$portletNamespace}SortDirection" class="dropdown-menu" id="{$portletNamespace}SortDirectionOptions">
-					<li class="selected">
+					<li class="selected default">
 						<a data-value="asc" href="#">{msg desc=""}sort-asc{/msg}</a>
 					</li>
 					<li>
@@ -64,7 +64,7 @@
 
 	{foreach $item in $sortOptions}
 		
-		{let $itemClass: $item.default ? 'selected' : ''/}
+		{let $itemClass: $item.default ? 'selected default' : ''/}
 		
 		<li class="{$itemClass}">
 			<a data-value="{$item.key}" href="#">

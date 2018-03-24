@@ -40,7 +40,9 @@ class View extends Component {
 		// If this was linked call i.e. if keyword parameter was present in the calling url, 
 		// then execute search. Notice that nested templates are processed before parent.
 		
-		if (this.initialQueryParameters['q']) {
+		let q = this.initialQueryParameters['q'];
+
+		if (q && q.length > 0) {
 
 			this.executeQuery();
 			
@@ -48,7 +50,8 @@ class View extends Component {
 
 			// Reset possibly cached state
 			
-			this.query.parameters = new Object();
+			this.query.oldParameters = [];
+			this.query.parameters = [];
 			
 		}
 	}
@@ -60,65 +63,6 @@ class View extends Component {
 		
 		if (this.debug) {
 			console.log("View.attached()");
-		}
-	}
-	
-	/**
-	 * Check parameters.
-	 *
-     * As asset type is here separated from other facet selections  
-     * we check here selections not to get into deadlock kind of user 
-     * experience.
-	 *  
-	 */
-	checkParameters() {
-
-		// Clear facet selections if asset type changes.
-				
-		let typeSelectionChanged = this.query.type != '' && 
-				typeof this.query.parameters['type'] !== 'undefined' && 
-					this.query.type != this.query.parameters['type']
-		
-		// Facet selection have to be invalidated also on keywords change. 
-		
-		let keywordsChanged = this.query.q != this.query.parameters['q']
-			
-		if (typeSelectionChanged || keywordsChanged) {
-
-			let oldParameters = this.query.parameters;
-			
-			this.query.parameters = new Object();
-			this.query.parameters['q'] = oldParameters['q'];
-			this.query.parameters['type'] = oldParameters['type'];
-			
-			if (typeof oldParameters['scope'] !== 'undefined') {
-				this.query.parameters['scope'] = oldParameters['scope'];
-			}
-
-			if (typeof oldParameters['time'] !== 'undefined') {
-				this.query.parameters['time'] = oldParameters['time'];
-			}
-
-			if (typeof oldParameters['resultsLayout'] !== 'undefined') {
-				this.query.parameters['resultsLayout'] = oldParameters['resultsLayout'];
-			}
-
-			if (typeof oldParameters['sortField'] !== 'undefined') {
-				this.query.parameters['sortField'] = oldParameters['sortField'];
-			}
-
-			if (typeof oldParameters['sortDirection'] !== 'undefined') {
-				this.query.parameters['sortDirection'] = oldParameters['sortDirection'];
-			}
-
-			// Persist current values
-			
-			this.query.type = oldParameters['type'];
-			this.query.q = oldParameters['q'];
-
-		} else if (typeof this.query.parameters['type'] !== 'undefined'){
-
-			this.query.type = this.query.parameters['type'];
 		}
 	}
 	
@@ -143,9 +87,16 @@ class View extends Component {
 	 * Get query param
 	 * 
 	 * @param {String} key
+	 * @param {Boolean} singleValue
+	 * 
 	 */
-	getQueryParam(key) {
-		return this.query.parameters[key];
+	getQueryParam(key, singleValue) {
+		
+		if (singleValue) {
+			return this.query.getParameterValue(key);
+		} else {
+			return this.query.getParameterValues(key);
+		}
 	}
 
 	/**
@@ -153,12 +104,21 @@ class View extends Component {
 	 * 
 	 * @param {String} key
 	 * @param {String} value
-	 * @param {boolean} refresh Refresh results
+	 * @param {Boolean} refresh
+	 * @param {Boolean} isMultiValued 
+	 * @param {String} previousValue 
 	 */
-	setQueryParam(key, value, refresh=true) {
+	setQueryParam(key, value, refresh=true, isMultiValued=true, previousValue=null) {
 
-		this.query.parameters[key] = value;
-		
+		if (!isMultiValued) {
+
+			this.query.setParameter(key, value);
+
+		} else {
+
+			this.query.setMultiValueParameter(key, value, previousValue);
+		}
+				
 		if (refresh) {
 			this.executeQuery();
 		}
@@ -175,8 +135,9 @@ class View extends Component {
 
 		// Check that there's a query 
 		
-		if (typeof this.query.parameters['q'] == 'undefined' ||
-			this.query.parameters['q'].length < this.queryMinLength) {		
+		let q = this.query.getParameterValue('q');
+		
+		if (!q || q.length < this.queryMinLength) {		
 			
 			return;
 		}
@@ -185,9 +146,9 @@ class View extends Component {
 
 		this.setLoading(true);
 
-		// Check parameters
+		// Clean filter parameters.
 		
-		this.checkParameters();
+		this.query.cleanFilterParameters();
 		
 		// Build params.
 		
@@ -215,6 +176,7 @@ class View extends Component {
 				// Update browser address bar.
 
 				this.updateAddressBar(this.query.buildAddressBarURL());
+				
 			} else {
 				
 				// Assume here simply that there was an error if response was empty.
@@ -261,7 +223,7 @@ class View extends Component {
 	 */
 	updateAddressBar(address) {
 		if (window.history.pushState) {
-			window.history.pushState(null, this.query.parameters['q'] + '-' + Liferay.Language.get('search'), address);
+			window.history.pushState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
 		} else {
 			document.location.hash = address;
 		}		

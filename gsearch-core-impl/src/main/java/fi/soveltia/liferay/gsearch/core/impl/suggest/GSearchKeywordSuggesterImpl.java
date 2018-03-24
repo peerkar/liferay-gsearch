@@ -20,14 +20,13 @@ import com.liferay.portal.kernel.search.suggest.SuggesterResults;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import javax.portlet.PortletRequest;
 
@@ -36,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
@@ -58,7 +58,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	@Override
 	public JSONArray getSuggestions(PortletRequest portletRequest)
 		throws Exception {
-
+		
 		String[] suggestions = getSuggestionsAsStringArray(portletRequest);
 
 		// Build results JSON object.
@@ -84,14 +84,12 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		Locale locale = themeDisplay.getLocale();
-
 		String keywords =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
 
 		AggregateSuggester aggregateSuggester =
 			new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
-
+		
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.suggestConfiguration());
 
@@ -103,11 +101,12 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 			Suggester suggester = null;
 			if ("phrase".equals(suggesterType)) {
-				suggester = getPhraseSuggester(item, locale, keywords);
+				suggester = getPhraseSuggester(item, portletRequest, keywords);
 
 			}
 			else if ("completion".equals(suggesterType)) {
-				suggester = getCompletionSuggester(item, locale, keywords);
+				suggester =
+					getCompletionSuggester(item, portletRequest, keywords);
 			}
 
 			if (suggester != null) {
@@ -170,20 +169,15 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	 * @throws Exception
 	 */
 	protected Suggester getCompletionSuggester(
-		JSONObject configuration, Locale locale, String keywords)
+		JSONObject configuration, PortletRequest portletRequest,
+		String keywords)
 		throws Exception {
 
-		StringBundler sb = new StringBundler();
-
-		sb.append(configuration.getString("fieldPrefix"));
-
-		if (configuration.getBoolean(("isLocalized"))) {
-			sb.append(locale.toString());
-		}
-		sb.append(configuration.getString("fieldSuffix"));
-
-		CompletionSuggester suggester = new CompletionSuggester(
-			configuration.getString("suggesterName"), sb.toString(), keywords);
+		String fieldName = _configurationHelper.parseConfigurationKey(
+			portletRequest, configuration.getString("fieldName"));
+		
+		CompletionSuggester suggester =
+			new CompletionSuggester(getSuggesterName(), fieldName, keywords);
 
 		suggester.setSize(configuration.getInt("numberOfSuggestions"));
 
@@ -206,20 +200,15 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 	 * @throws Exception
 	 */
 	protected Suggester getPhraseSuggester(
-		JSONObject configuration, Locale locale, String keywords)
+		JSONObject configuration, PortletRequest portletRequest,
+		String keywords)
 		throws Exception {
 
-		StringBundler sb = new StringBundler();
+		String fieldName = _configurationHelper.parseConfigurationKey(
+			portletRequest, configuration.getString("fieldName"));
 
-		sb.append(configuration.getString("fieldPrefix"));
-
-		if (configuration.getBoolean(("isLocalized"))) {
-			sb.append(locale.toString());
-		}
-		sb.append(configuration.getString("fieldSuffix"));
-
-		PhraseSuggester suggester = new PhraseSuggester(
-			configuration.getString("suggesterName"), sb.toString(), keywords);
+		PhraseSuggester suggester =
+			new PhraseSuggester(getSuggesterName(), fieldName, keywords);
 
 		int size =
 			GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
@@ -243,13 +232,32 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		return suggester;
 	}
 
+	/**
+	 * Get internal suggester name.
+	 * 
+	 * @return
+	 */
+	protected String getSuggesterName() {
+		
+		if (random == null) {
+			random = new Random();
+		}
+
+		return "suggester" + random.nextInt(1000);
+	}
+
 	@Reference(unbind = "-")
 	protected void setQuerySuggester(QuerySuggester querySuggester) {
 
 		_querySuggester = querySuggester;
 	}
+	
+	public static Random random;
 
 	public static final String GSEARCH_SUGGESTION_NAME = "gsearchSuggestion";
+
+	@Reference
+	protected ConfigurationHelper _configurationHelper;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
 

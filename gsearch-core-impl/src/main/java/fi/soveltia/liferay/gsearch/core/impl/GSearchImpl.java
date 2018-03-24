@@ -250,8 +250,14 @@ public class GSearchImpl implements GSearch {
 
 	private QueryParams _queryParams;
 
-	@Reference(bind = "addQueryPostProcessor", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = QueryPostProcessor.class, unbind = "removeQueryPostProcessor")
-	private List<QueryPostProcessor> _queryPostProcessors = null;
+	@Reference(
+		bind = "addQueryPostProcessor", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = QueryPostProcessor.class,
+		unbind = "removeQueryPostProcessor"
+	)
+	private volatile List<QueryPostProcessor> _queryPostProcessors = null;
 
 	private static final Log _log = LogFactoryUtil.getLog(GSearchImpl.class);
 }

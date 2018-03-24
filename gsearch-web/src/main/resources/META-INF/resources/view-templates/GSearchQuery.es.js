@@ -13,24 +13,22 @@ class GSearchQuery extends State {
 	 * Build url string for the browser address bar.
 	 */
 	buildAddressBarURL() {
-		
+
 		let url = [location.protocol, '//', location.host, location.pathname, '?'].join('');		
 
-		let _self = this;
-		
 		let params = '';
 		
-		Object.keys(this.parameters).forEach(function(key,index) {
-
-			if (_self.parameters[key] != '' && typeof _self.parameters[key] !== 'undefined') {
+		for (let parameter of this.parameters) {
+			
+			if (this.isValueNotNull(parameter.value)) {
 
 				if (params.length > 0) {
 					params = params.concat('&');
 				}
-
-				params = params.concat(key).concat('=').concat(_self.parameters[key]);
+			
+				params = params.concat(parameter.key).concat('=').concat(parameter.value);
 			}
-		});
+		}
 		
 		url = url.concat(params);
 		
@@ -38,24 +36,282 @@ class GSearchQuery extends State {
 	}
 	
 	/**
-	 * Build query params
+	 * Build query parameters.
 	 */
 	buildQueryParams() {
 
 		let params = new MultiMap();
 
-		let _self = this;
-
-		Object.keys(this.parameters).forEach(function(key,index) {
+		for (let parameter of this.parameters) {
 			
-			if (_self.parameters[key] != '' && typeof _self.parameters[key] !== 'undefined') {
-				params.add(key, _self.parameters[key]);
+			if (this.isValueNotNull(parameter.value)) {
+				
+				params.add(parameter.key, parameter.value);
 			}
-		});
-		
+		}
 		return params;
 	}
+	
+	/**
+	 * Clean facet filter parameters 
+	 *
+     * Check selections to not to get into deadlock.
+	 *  
+	 */
+	cleanFilterParameters() {
 
+		// Clear facet selections if asset type changes.
+		
+		let typeSelectionChanged = this.getOldParameterValue('type') &&
+			this.getOldParameterValue('type') != this.getParameterValue('type') && 
+			this.isParameterNotNull('type');
+		
+		// Facet selection have to be invalidated also on keywords change. 
+		
+		let keywordsChanged = this.getOldParameterValue('q') && 
+			this.getOldParameterValue('q') != this.getParameterValue('q');
+			
+		if (typeSelectionChanged || keywordsChanged) {
+
+			let oldParameters = this.parameters;
+						
+			this.parameters = [];
+			
+			// These parameters should be copied always
+			
+			let parametersToCopy = ['q', 'type', 'scope', 'time', 'resultsLayout', 'sortField', 'sortDirection'];
+			
+			for (let parameter of oldParameters) {
+				
+				if (parametersToCopy.indexOf(parameter.key) > -1 && typeof parameter.value !== 'undefined') {
+					this.setParameter(parameter.key, parameter.value);
+				}
+			}
+				
+			// Persist current values
+			
+			this.setOldParameter('q', this.getParameterValue('q'));
+			this.setOldParameter('type', this.getParameterValue('type'));
+
+		} else if (this.isParameterNotNull('type')) {
+
+			this.setOldParameter('type', this.getParameterValue('type'));
+		}
+	}		
+
+	/**
+	 * Get old parameter value.
+	 *
+ 	 * @param {String} key
+	 */
+	getOldParameterValue(key) {
+		return this.getValue(key, this.oldParameters);
+	}
+	
+	/**
+	 * Get old parameter value array.
+	 *
+ 	 * @param {String} key
+	 */
+	getOldParameterValues(key) {
+		return this.getValues(key, this.oldParameters);
+	}
+	
+	/**
+	 * Get parameter value
+	 *
+ 	 * @param {String} key
+	 */
+	getParameterValue(key) {
+		return this.getValue(key, this.parameters);
+	}
+
+	/**
+	 * Get parameter values array.
+	 *
+ 	 * @param {String} key
+	 */
+	getParameterValues(key) {
+		return this.getValues(key, this.parameters);
+	}
+	
+	/**
+	 * Get single parameter value
+	 * 
+ 	 * @param {String} key
+	 */
+	getValue(key, valueArray) {
+		
+		let values = this.getValues(key, valueArray);
+		
+		if (values.length > 0) {
+			return values[0];
+		} 
+		
+		return null;
+	}
+	
+	/**
+	 * Get parameter values.
+	 * 
+ 	 * @param {String} key
+	 */
+	getValues(key, valueArray) {
+		
+		// Check if this key value pair is set already.
+		
+		let values = [];
+		
+		for (let parameter of valueArray) {
+
+			if (parameter.key == key) {
+				values.push(parameter.value);
+			}
+		}
+		
+		return values;
+	}
+	
+	/**
+	 * Check if parameter is not null;
+	 * 
+ 	 * @param {String} key
+	 */
+	isParameterNotNull(key) {
+
+		for (let parameter of this.parameters) {
+
+			if (parameter.key == key) {
+				return this.isValueNotNull(parameter.value);
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Is value not null
+	 * 
+	 * @param{String} value
+	 */
+	isValueNotNull(value) {
+		return value && typeof value !== 'undefined' && value.length > 0;
+	}	
+	
+	/**
+	 * Remove parameter.
+	 *  
+ 	 * @param {String} key
+ 	 * @param {String} value
+	 */
+	removeParameter(key, value) {
+		this.filters = this.filters.filter(item => (item.key == key && item.value == value));
+	}
+
+	/**
+	 * Set old parameter value.
+	 * 
+ 	 * @param {String} key
+ 	 * @param {String} value
+	 * 
+	 */
+	setOldParameter(key, value) {
+		this.setValue(key, value, this.oldParameters)
+	}
+
+	/**
+	 * Set single valued parameter.
+	 * 
+ 	 * @param {String} key
+ 	 * @param {String} value
+	 * 
+	 */
+	setParameter(key, value) {
+		
+		this.setValue(key, value, this.parameters)
+	}
+
+	/**
+	 * Set multi valued parameter.
+	 * 
+ 	 * @param {String} key
+ 	 * @param {String} value
+ 	 * @param {String} previousValue
+	 * 
+	 */
+	setMultiValueParameter(key, value, previousValue) {
+
+		let newValues = [];
+
+		for (let parameter of this.parameters) {
+
+			// Add other parameters
+			
+			if (parameter.key != key && this.isValueNotNull(parameter.value)) {
+
+				newValues.push(parameter)
+				
+			} else 	if (parameter.key == key && this.isValueNotNull(value) && parameter.value != value) {
+
+				// Add other values for the same parameter
+				
+				newValues.push(parameter)
+
+
+			} else 	if (parameter.key == key && !this.isValueNotNull(value) && this.isValueNotNull(previousValue) && 
+					parameter.value != previousValue) {
+
+				// Add other values for the same parameter
+				
+				newValues.push(parameter)
+
+			}
+		}
+
+		// Add new values for for the same parameter
+		
+		if (this.isValueNotNull(value)) {
+		
+			var param = new Object();
+			
+			param.key = key;
+			param.value = value;
+		
+			newValues.push(param)
+		}
+		
+		this.parameters = newValues;
+	}	
+	
+	/**
+	 * Set single valued parameters
+	 * 
+ 	 * @param {String} key
+ 	 * @param {String} value
+	 */
+	setValue(key, value, valueArray) {
+		
+		for (let parameter of valueArray) {
+
+			if (parameter.key == key) {
+
+				parameter.value = value;
+
+				return;
+			}	
+		}
+		
+		// Set new value
+		
+		var param = new Object();
+		param.key = key;
+		param.value = value;
+		
+		valueArray.push(param);
+	}
+	
+	/**
+	 * To string
+	 */
 	toString() {
 		return JSON.stringify(this.values);
 	}
@@ -68,17 +324,12 @@ class GSearchQuery extends State {
  * @static
  */
 GSearchQuery.STATE = {
-		
+	oldParameters: {
+		value: [],
+	},
 	parameters: {
-		value: Object,
-	},
-	q: {
-		value: ''
-	},
-	type: {
-		value: ''
+		value: [],
 	}
-	
 }
 
 export default GSearchQuery;

@@ -84,8 +84,14 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		_resultItemBuilders.remove(resultItemBuilder);
 	}
 
-	@Reference(bind = "addResultItemBuilder", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ResultItemBuilder.class, unbind = "removeResultItemBuilder")
-	private List<ResultItemBuilder> _resultItemBuilders;
+	@Reference(
+		bind = "addResultItemBuilder", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = ResultItemBuilder.class,
+		unbind = "removeResultItemBuilder"
+	)
+	private volatile List<ResultItemBuilder> _resultItemBuilders;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ResultItemBuilderFactoryImpl.class);

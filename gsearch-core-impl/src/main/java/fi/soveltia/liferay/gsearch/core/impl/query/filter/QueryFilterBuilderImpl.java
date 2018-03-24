@@ -35,6 +35,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
 
@@ -173,7 +174,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	protected void buildFacetConditions() {
 
-		Map<String, String[]> facetParams = _queryParams.getFacets();
+		Map<FacetParam, BooleanClauseOccur> facetParams = _queryParams.getFacetParams();
 
 		if (facetParams == null) {
 			return;
@@ -181,20 +182,26 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		BooleanQueryImpl facetQuery = new BooleanQueryImpl();
 
-		for (Entry<String, String[]> entry : facetParams.entrySet()) {
+		for (Entry<FacetParam, BooleanClauseOccur>facetParam : facetParams.entrySet()) {
 
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
-			for (String value : entry.getValue()) {
-
+			for (int i = 0; i < facetParam.getKey().getValues().length; i++) {
+			
+				// Limit max values just in case.
+				
+				if (i > MAX_FACET_VALUES) {
+					break;
+				}
+				
 				TermQuery condition;
-				condition = new TermQueryImpl(entry.getKey(), value);
+				
+				condition = new TermQueryImpl(facetParam.getKey().getFieldName(), facetParam.getKey().getValues()[i]);
 
-				query.add(condition, BooleanClauseOccur.SHOULD);
-
+				query.add(condition, facetParam.getKey().getOccur());
 			}
 
-			facetQuery.add(query, BooleanClauseOccur.MUST);
+			facetQuery.add(query, facetParam.getValue());
 		}
 		addAsQueryFilter(facetQuery);
 	}
@@ -387,6 +394,8 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		_filter.add(queryFilter, BooleanClauseOccur.MUST);
 	}
 
+	private static final int MAX_FACET_VALUES = 20;
+	
 	private BooleanFilter _filter;
 
 	private Portal _portal;

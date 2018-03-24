@@ -16,7 +16,7 @@
 	
 					// Don't render entryClassName (is main menu)
 	
-					{if $item.fieldName != 'entryClassName'}
+					{if $item.paramName != 'entryClassName'}
 					
 						{call .dropdown}
 							{param portletNamespace: $portletNamespace /}
@@ -35,21 +35,23 @@
  * @param facet
  */
 {template .dropdown}
-	
-	<div class="dropdown gsearch-dropdown optionmenu facet" data-paramname="{$facet.fieldName}">
+
+	{let $multiValued: $facet.isMultiValued  ? 'true' : 'false' /}
+
+	<div class="dropdown gsearch-dropdown optionmenu facet" data-paramname="{$facet.paramName}" data-ismultivalued="{$multiValued}" data-multipleoption="{$facet.multipleOption}">
 	
 		<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-			data-toggle="dropdown" id="{$portletNamespace}{$facet.fieldName}" type="button">
+			data-toggle="dropdown" id="{$portletNamespace}{$facet.paramName}" type="button">
 			<span class="selection"></span>
 			<span class="caret"></span>
 		</button>
 
-		<ul aria-labelledby="{$portletNamespace}{$facet.fieldName}" class="dropdown-menu" 
-				id="{$portletNamespace}{$facet.fieldName}Options">
+		<ul aria-labelledby="{$portletNamespace}{$facet.paramName}" class="dropdown-menu" 
+				id="{$portletNamespace}{$facet.paramName}Options">
 
-			<li class="selected"><a data-value="" href="#">{$facet.anyOption}</a></li>
+			<li class="selected default"><a data-value="" href="#">{$facet.anyOption}</a></li>
 			{call .options}
-				{param facetName: $facet.fieldName /}
+				{param facetName: $facet.paramName /}
 				{param options: $facet.values /}
 			{/call}
 		</ul>

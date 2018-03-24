@@ -8,13 +8,13 @@
 	<theme id="gsearch-test-theme" name="GSearch Test Theme">
 		<template-extension>ftl</template-extension>
 		<portlet-decorator id="barebone" name="Barebone">
+			<default-portlet-decorator>true</default-portlet-decorator>
 			<portlet-decorator-css-class>portlet-barebone</portlet-decorator-css-class>
 		</portlet-decorator>
 		<portlet-decorator id="borderless" name="Borderless">
 			<portlet-decorator-css-class>portlet-borderless</portlet-decorator-css-class>
 		</portlet-decorator>
 		<portlet-decorator id="decorate" name="Decorate">
-			<default-portlet-decorator>true</default-portlet-decorator>
 			<portlet-decorator-css-class>portlet-decorate</portlet-decorator-css-class>
 		</portlet-decorator>
 	</theme>

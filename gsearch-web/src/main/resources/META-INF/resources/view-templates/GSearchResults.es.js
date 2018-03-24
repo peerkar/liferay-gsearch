@@ -1,6 +1,7 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
+import Mark from '../js/mark.es';
 
 import templates from './GSearchResults.soy';
 
@@ -32,13 +33,9 @@ class GSearchResults extends Component {
 	 */
 	doHighlightKeywords() {
 		
-		let _self = this;
-
-		Liferay.Loader.require('mark', function(Mark) {
-			if (_self.results.items.length > 0 & _self.results.meta.queryTerms.length > 0) {
-				new Mark($('#' + _self.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(_self.results.meta.queryTerms);
-			}
-		});
+		if (this.results.items.length > 0 & this.results.meta.queryTerms.length > 0) {
+			new Mark($('#' + this.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(this.results.meta.queryTerms);
+		}
 	}
 	
 	/**
@@ -68,9 +65,25 @@ class GSearchResults extends Component {
 		let _self = this;
 
 		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').on('click', function(event) {
-			_self.setQueryParam(_self.assetTagParam, $(this).html());
+			_self.setQueryParam(_self.assetTagParam, $(this).html(), true, true);
 		}); 
 	}
+	
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
+
+		if (this.debug) {
+			console.log("GSearchResults.shouldUpdate()");
+		}		
+
+		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').each(function() {	
+			$(this).unbind();
+		});
+
+		return true;
+    }
 }
 
 /** 

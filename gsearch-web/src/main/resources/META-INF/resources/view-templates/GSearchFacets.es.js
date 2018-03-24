@@ -39,7 +39,7 @@ class GSearchFacets extends Component {
 		}
 		
 		// Set initial query parameters from calling url.
-
+		
 		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, 
 				this.templateParameters, this.setQueryParam);		
 	}

@@ -1,35 +1,54 @@
+
+
 # Liferay GSearch
+
 The Google like search for Liferay 7 CE and Liferay DXP.
 
 
 # Table of contents
 
 1. [Whats New](#Whats_New)
-1. [Background](#Background)
-1. [Features](#Features)
-1. [Screenshots](#Screenshots)
-1. [Requirements](#Requirements)
-1. [Project Modules](#Modules)
-1. [Quick Installation Guide](#Quick_Installation_Guide)
-1. [Full Installation Guide](#Full_Installation_Guide)
-1. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
-1. [Enabling Geolocation Contributor](#Geolocation_Contributor)
-1. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
-1. [Embedding Search Field into a Theme](#Search_Field)
-1. [Sample Configurations](#Configurations)
-1. [Adding Support for Asset Types](#Adding_Asset_Type_Support)
-1. [Adding a New Query Contributor, in Google terms "signal"](#Adding_Query_Contributor)
-1. [Adding a Result Item Processor](#Adding_Result_Item_Processor)
-1. [Custom querySuggestion Mapping](#querySuggestion)
-1. [Important Notes](#Important)
-1. [FAQ](#FAQ)
-1. [Project Roadmap](#Roadmap)
-1. [Credits](#Credits)
-1. [Disclaimer](#Disclaimer)
-1. [Changelog](#Changelog)
+2. [Background](#Project_Background)
+3. [Features](#Features)
+4. [Screenshots](#Screenshots)
+5. [Requirements](#Requirements)
+6. [Project Modules](#Modules)
+7. [Quick Installation Guide](#Quick_Installation_Guide)
+8. [Full Installation Guide](#Full_Installation_Guide)
+9. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
+10. [Enabling Geolocation Contributor](#Geolocation_Contributor)
+11. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
+12. [Embedding Search Field into a Theme](#Search_Field)
+13. [Configuration](#Configuration)
+14. [Adding Support for Asset Types](#Adding_Asset_Type_Support)
+15. [Adding a New Query Contributor, in Google terms "signal"](#Adding_Query_Contributor)
+16. [Adding a Result Item Processor](#Adding_Result_Item_Processor)
+17. [Custom querySuggestion Mapping](#querySuggestion)
+18. [Important Notes](#Important)
+19. [FAQ](#FAQ)
+20. [Project Roadmap](#Roadmap)
+21. [Credits](#Credits)
+22. [Disclaimer](#Disclaimer)
+23. [Changelog](#Changelog)
 
 
 # What's New <a name="Whats_New"></a>
+
+##General  Note
+
+Whenever upgrading the modules, please __remove the old ones  before deploying the new ones__. API is still evolving so there might be compatibility issues with using the old ones with the new ones.
+
+The binaries in the binaries/latest folder should always be compatible with each other.
+
+##2018-03-24, Version 2.1.0
+
+* Configuration syntax changes and documentation improvements (see below "Configuration")
+* Support to filter with multiple values on the same facet
+* Minor CSS fixes 
+
+### Important notes 
+
+Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below__.
 
 ## 2018-03-20
 
@@ -48,12 +67,11 @@ __Major API changes and streamlining__. Added new interfaces to significantly ea
 
 See more instructions for these new interfaces below in this document.
 
-__Important__
+### Important notes
 
 * Notice that the main configuration file name has been changed. Deploy the new one and remove the old one to avoid confusion.
-* New module versions. Remove the old ones from osgi/modules before deployin the new ones.
 
-# Background <a name="Background"></a>
+# Project Background <a name="Project_Background"></a>
 
 This is the Google like search project for Liferay CE & DXP. The code is originally created for the blog series:
 
@@ -83,8 +101,8 @@ This project served many purposes for me. I wanted to experiment with SOY & Meta
     * Suggesters
     * etc.
 * Possibility to use contextual information to improve relevancy. Current modules:
-	*  Audience targeting
-	*  Geolocation
+  *  Audience targeting
+  *  Geolocation
 * Possibility to highlight result items based on your criteria.
 * Ability to include non-Liferay resources in the search results
 * Easy and fast extendability
@@ -232,7 +250,7 @@ Please see again from Gogo shell that it's deployed properly. Please note that c
 ```
 
  If you get errors in log and search doesn't work, please restart portal so that new adapter loads correctly.
- 
+
 
 ## Step 3 - Configuration <a name="Installation_3"></a>
 
@@ -245,8 +263,8 @@ The easy and fast way to get this to work is to download the default configurati
 There's then just a couple more thing to do:
 
 1. Create a page and put there an Asset Publisher portlet to show any contents that are not bound to any layout (page). By default this pages' friendlyUrl should be "/viewasset". Typically, you would configure this page to be hidden from navigation menu.
-1. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Core, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
-1. Configure the portlet in Control Panel -> Configuration -> System Settings -> Other -> GSearch  Portlet.
+2. In the portlet configuration, in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Core, point "Asset Publisher page friendly URL" to the friendly of of the page you just created.
+3. Configure the portlet in Control Panel -> Configuration -> System Settings -> Other -> GSearch  Portlet.
 
 
 You can find the sample configurations in the end of this documentation. 
@@ -302,17 +320,45 @@ There's also a theme binary in the [latest folder](https://github.com/peerkar/li
 
 After the module has been installed, please See the configuration -> Configuration -> System Settings -> Other -> GSearch Mini Portlet.
 
-# Sample Configurations <a name="Configurations"></a>
+# Configuration <a name="Configuration"></a>
 
-Please see the portlet configuration in Control Panel -> Configuration -> System Settings -> Other -> Gsearch Configuration.
+Every Liferay GSearch module has its' own configuration which can be found in Control Panel -> Configuration -> System Settings -> Other.
 
-Documentation about the configuration values is sparse at the moment but I'll try to improve it with time. If you want to know what all those fields are about, the best source of information is Elasticsearch documentation and code of this application. 
+There's some information below but the ultimate source of information is the source code of this application and Elasticsearch documentation. 
 
-If you are having problems with configuration (portlet stops working) it's usually because of malformed JSON. Please see Tomcat log first, if you're having problems.  
+If you are having problems with configuration (portlet stops working) it's usually because of malformed JSON. Please see the Tomcat log first, if you're having problems.  
 
-### Suggester Sample Configuration
+The most important one is the GSearch Core configuration as the application doesn't work at all it that's not done. An easy way to start is to copy the default configuration file from the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) to LIFERAY_HOME/osgi/configs. Below are some instructions how to configure the core.
 
-If you don't want to use the custom Elasticsearch adapter (loosing much of the suggester functionalities), please use the settings below:
+Note that field names and values are __case sensitive__. Configuration syntax is JSON.
+
+## Available Variables
+
+ Depending on the configuration, following variables can be used:
+
+* __$language_id__ (Current user's language id, for example 'fi_FI'
+
+
+## Suggester Configuration
+
+This is the comfiguration for keywords suggester i.e. "autocompletion".
+
+It's possible to use either a single suggester or an aggregated one. In either case, if you customize the sample settings below, there has to be a corresponding Elasticsearch configuration in place. Please see the custom Elasticsearch adapter JSON configuration files for examples.
+
+__About fields and values:__
+
+| Key                     |  Supported values   |                                                  Explanation |
+| ----------------------- | :-----------------: | -----------------------------------------------------------: |
+| suggesterType           | *phrase,completion* | Suggester type. [See ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-suggesters.html). |
+| fieldName               |          *          |                            The name of the suggestion field. |
+| numberOfSuggestions     |          *          |                        Maximum number of suggestion to show. |
+| confidence              |          *          | Applies only to phrase type. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-suggesters-phrase.html). |
+| gramSize                |          *          | Applies only to phrase type. Please see [ES docs.](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-suggesters-phrase.html) |
+| maxErrors               |          *          | Applies only to phrase type. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-suggesters-phrase.html). |
+| realWordErrorLikelihood |          *          | Applies only to phrase type. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.2/search-suggesters-phrase.html). |
+| analyzer                |          *          | Applies only to completion type. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/search-suggesters-completion.html). |
+
+If you don't want to use the custom Elasticsearch adapter (loosing much of the suggester functionalities), please use the configuration below. This uses the standard suggestion mapping.
 
 
 ```
@@ -320,9 +366,7 @@ If you don't want to use the custom Elasticsearch adapter (loosing much of the s
 	{
 		"suggesterName": "phrase",
 		"suggesterType": "phrase",
-		"fieldPrefix": "keywordSearch_",
-		"fieldSuffix": "",
-		"isLocalized": true,
+		"fieldName": "keywordSearch_$language_id",
 		"numberOfSuggestions":  5,
 		"confidence": "0.1f",
 		"gramSize": "2",
@@ -332,16 +376,14 @@ If you don't want to use the custom Elasticsearch adapter (loosing much of the s
 ]	
 ```
 
-If you want to use the custom Elasticsearch adapter, please use this one:
+If you are using the custom Elasticsearch adapter, please use this one with an improved mapping and analysis:
 
 ```
 [
 	{
 		"suggesterName": "phrase",
 		"suggesterType": "phrase",
-		"fieldPrefix": "keywordSearch_",
-		"fieldSuffix": ".ngram",
-		"isLocalized": true,
+		"fieldName": "keywordSearch_$language_id.ngram",
 		"numberOfSuggestions":  5,
 		"confidence": "0.1f",
 		"gramSize": "2",
@@ -351,17 +393,26 @@ If you want to use the custom Elasticsearch adapter, please use this one:
 	{
 		"suggesterName": "completion",
 		"suggesterType": "completion",
-		"fieldPrefix": "keywordSearch_",
-		"fieldSuffix": ".suggest",
-		"isLocalized": true,
+		"fieldPrefix": "keywordSearch_$language_id.suggest",
 		"numberOfSuggestions":  5
 	}
 ]	
 ```
 
-### Search types Sample Configuration
+
+
+### Search Types  Configuration
 
 This configuration defines the asset types to search for.
+
+__Fields and values:__
+
+| Key            | Supported values |                                            Explanation |
+| -------------- | :--------------: | -----------------------------------------------------: |
+| key            |        *         | This is used as a parameter key (what you see in URL). |
+| entryClassName |        *         | The class name to search for in "entryClassName" field |
+
+The default configuration:
 
 ```
 [
@@ -392,30 +443,47 @@ This configuration defines the asset types to search for.
 ]
 ```
 
-### Facets Sample configuration
 
-This configuration defines the available facets in the secondary filter menu. You can add there any indexed field.
+## Facets Configuration
+
+This configuration defines the facets in the secondary filter menu on the UI. You can add there any indexed field.
+
+__Fields and values:__
+
+| Key           | Supported values |                                                  Explanation |
+| ------------- | :--------------: | -----------------------------------------------------------: |
+| paramName     |        *         |                         Parameter key (what you see in URL). |
+| fieldName     |        *         |                                      The indexed field name. |
+| icon          |        *         |                    Path to icon (not currently implemented). |
+| aggregations  |                  | Here you can aggregate values into a single type shown in the UI. See the default configuration as an example how you can aggregate multiple image formats to just one visible facet value "Image" |
+| isMultiValued |  *true, false*   |                             Allow selecting multiple values. |
+
+Default configuration:
 
 ```
 [
 	{
 		"paramName": "entryClassName",
 		"fieldName": "entryClassName",
+		"isMultiValued": false,
 		"icon": "icons/icon-ddm-structure.png"
 	},
 	{
 		"paramName": "ddmStructureKey",
 		"fieldName": "ddmStructureKey",
+		"isMultiValued": true,
 		"icon": "icons/icon-ddm-structure.png"
 	},
 	{
 		"paramName": "fileEntryTypeId",
 		"fieldName": "fileEntryTypeId",
+		"isMultiValued": true,
 		"icon": "icons/icon-file-entry-type.png"
 	},
 	{
 		"paramName": "extension",
 		"fieldName": "extension",
+		"isMultiValued": true,
 		"icon": "icons/icon-file-extension.png",
 		"aggregations": [
 			{
@@ -447,56 +515,77 @@ This configuration defines the available facets in the secondary filter menu. Yo
 	{
 		"paramName": "userName",
 		"fieldName": "userName",
+		"isMultiValued": true,
 		"icon": "icons/icon-user.png"
 	},
 	{
 		"paramName": "assetCategoryTitles",
 		"fieldName": "assetCategoryTitles",
+		"isMultiValued": true,
 		"icon": "icons/icon-category.png"
 	},
 	{
 		"paramName": "assetTagNames",
 		"fieldName": "assetTagNames.raw",
+		"isMultiValued": true,
 		"icon": "icons/icon-tag.png"
 	}
 ]
 ```
 
-### Sortfields Sample Configuration
+## Sortfields Sample Configuration
 
-Sort fields. You can add there any indexed field. Translations need to be added to gsearch-core-api module localization file. Please see [Sort.java](https://github.com/liferay/liferay-portal/blob/master/portal-kernel/src/com/liferay/portal/kernel/search/Sort.java) for the available values for "fieldType".
+Sort fields. You can add there any indexed and sortable field. Translations need to be added to gsearch-core-api module localization file.
+
+__About fields and values:__
+
+| Key       | Supported values |                                                  Explanation |
+| --------- | :--------------: | -----------------------------------------------------------: |
+| key       |                  | Parameter key (what you see in URL). Used also for translation. |
+| fieldName |        *         |                            The name of the suggestion field. |
+| fieldType |       0-10       | Sort field type. Please see [Sort.java](https://github.com/liferay/liferay-portal/blob/master/portal-kernel/src/com/liferay/portal/kernel/search/Sort.java) for the available values. |
+| default   |   true, false    |                               Is this the default sort field |
 
 ```
 [
 	{
-		"key": "score",
+		"key": "_score",
 		"fieldType":  0,
-		"default": true,
-		"localized": false
+		"default": true
 	},
 	{
 		"key": "title",
-		"fieldName": "title",
-		"fieldPrefix": "localized_",
-		"fieldSuffix": "_sortable",
+		"fieldName": "localized_title_$language_id_sortable",
 		"fieldType":  3,
-		"localized": true
 	},
 	{
 		"key": "modified",
-		"fieldName": "modified",
-		"fieldSuffix": "_sortable",
+		"fieldName": "modified_sortable",
 		"fieldType":  6,
-		"localized": false
 	}
 ]	
 ```
 
-### Sample Query Configuration
+## Sample Query Configuration
 
 This defines the main query. You can have there just a single query or construct it of many queries. The supported types ("queryType") at the moment are query_string, match, term and wildcard. Please see the gsearch-core-impl module QueryBuilders code for more information.
 
-The example below defines two should (OR) queries and one must query. In the first, all the keywords have to match (AND) and it gets a boost of 3. In the second, any of the keywords can match and it gets only a boost of 1.5. Match to this query is the minimum requirement. The third query gives a boost of 1 if any of the keywords match the userName field. In other words, following results can be expected from this query configuration: documents matching all the keywords get to the top of the search results, documents matching just some of the keywords are secondary and any keywords matching the username are tertiary. 
+__About fields and values:__
+
+| Key             |            Supported values            |                                                  Explanation |
+| --------------- | :------------------------------------: | -----------------------------------------------------------: |
+| queryType       | *query_string,  match, term, wildcard* | Query type. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/reference/2.4/query-dsl.html) |
+| occur           |          *must, should, not*           | Whether this clause must occur, should occur or should not occur |
+| operator        |               *and, or*                |                                                     Operator |
+| boost           |             [float value]              |                                     Boost value. Default 1.0 |
+| fuzziness       |                                        | Fuzziness. Please see [ES docs](https://www.elastic.co/guide/en/elasticsearch/guide/current/fuzziness.html) |
+| fields          |                                        |                             An array of fields to search for |
+| keywordSplitter |                                        |                                     For wildcard query only. |
+| valuePrefix     |                                        |                                     For wildcard query only. |
+| valueSuffix     |                                        |                                     For wildcard query only. |
+
+
+The default configuration  below defines two should (OR) queries and one must query. In the first, all the keywords have to match (AND) and it gets a boost of 3. In the second, any of the keywords can match and it gets only a boost of 1.5. Match to this query is the minimum requirement. The third query gives a boost of 1 if any of the keywords match the userName field. In other words, following results can be expected from this query configuration: documents matching all the keywords get to the top of the search results, documents matching just some of the keywords are secondary and any keywords matching the username are tertiary. 
 
 
 ```
@@ -572,26 +661,26 @@ The example below defines two should (OR) queries and one must query. In the fir
 The process for adding support for asset types not implemented currently, including any custom, registered asset types:
 
 1. Create a new module
-1. Create a service component implementing ResultItemBuilder interface (see samples in core-impl)
-1. Add asset type localizations (2) for selection menu and result view in gsearch-core-impl/resources/Language.properties
-1. Lastly add your new type to the asset type selection menu in the Configuration. See "Search types Sample Configuration" above in the doc.
-1. Deploy the module and refresh the core-impl bundle in case of problems
+2. Create a service component implementing ResultItemBuilder interface (see samples in core-impl)
+3. Add asset type localizations (2) for selection menu and result view in gsearch-core-impl/resources/Language.properties
+4. Lastly add your new type to the asset type selection menu in the Configuration. See "Search types Sample Configuration" above in the doc.
+5. Deploy the module and refresh the core-impl bundle in case of problems
 
 # Adding a New Query Contributor, in Google terms "signal"<a name="Adding_Query_Contributor"></a>
 
 With this interface you can add your custom clauses to the query to improve relevancy.
 
 1. Create a new module
-1. Create a service component implementing QueryContributor interface. See the gsearch-query-contributor-audience-targeting module for example.
-1. Deploy the module and refresh the core-impl bundle in case of problems
+2. Create a service component implementing QueryContributor interface. See the gsearch-query-contributor-audience-targeting module for example.
+3. Deploy the module and refresh the core-impl bundle in case of problems
 
 # Adding a Result Item Processor<a name="Adding_Result_Item_Processor"></a>
 
 With this interface it's possible to manipulate the result item to be sent to the user interface. It can be used for example for setting new properties to the result items.
 
 1. Create a new module
-1. Create a service component implementing ResultItemProcessor interface. See the gsearch-hightlight-result-item-by-tag module for example.
-1. Deploy the module and refresh the core-impl bundle in case of problems
+2. Create a service component implementing ResultItemProcessor interface. See the gsearch-hightlight-result-item-by-tag module for example.
+3. Deploy the module and refresh the core-impl bundle in case of problems
 
 # Important Notes <a name="Important"></a>
 
@@ -723,9 +812,9 @@ This portlet hasn't been thoroughly tested and is provided as is. You can freely
 ## 2017-12-4
 
 * Keywords suggester / autocomplete refactoring:
-	* UI component changed from Metal.js to Devbridge Autocomplete
-	* Suggester configuration changed to a JSON string
-	* Switched to aggregate suggester by default now
-	* Added configuration for the completion type suggest field
-	* Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
-	* As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)
+  * UI component changed from Metal.js to Devbridge Autocomplete
+  * Suggester configuration changed to a JSON string
+  * Switched to aggregate suggester by default now
+  * Added configuration for the completion type suggest field
+  * Added custom analyzers and filters for the query suggesters in the index-settings.json (see custom Elasticsearch Adapter project)
+  * As index field mapping for title, description and content doesn't use asciifolding filter and doesn't recognize accent characters, modified analyzers for these fields to use asciifolding filter in liferay-type-mappings.json (see custom Elasticsearch Adapter project)

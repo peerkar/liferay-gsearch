@@ -72,8 +72,14 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		_clauseBuilders.remove(clauseBuilder);
 	}
 
-	@Reference(bind = "addClauseBuilder", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ClauseBuilder.class, unbind = "removeClauseBuilder")
-	private List<ClauseBuilder> _clauseBuilders;
+	@Reference(
+		bind = "addClauseBuilder", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = ClauseBuilder.class, 
+		unbind = "removeClauseBuilder"
+	)
+	private volatile List<ClauseBuilder> _clauseBuilders;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ClauseBuilderFactoryImpl.class);

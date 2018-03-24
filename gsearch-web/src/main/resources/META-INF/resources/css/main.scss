@@ -353,7 +353,7 @@
 						line-height: 1.5;
 						margin-bottom: 0;
 						margin-top: 0;
-						max-width: 90%;
+						max-width: 93%;
 						overflow: hidden;
 						text-overflow: ellipsis;
 						vertical-align: bottom;						
@@ -403,6 +403,10 @@
 					
 			span {
 				margin-right: 10px;
+			}
+			
+			.tag {
+				word-break: break-word;
 			}
 			
 			.tag:hover {

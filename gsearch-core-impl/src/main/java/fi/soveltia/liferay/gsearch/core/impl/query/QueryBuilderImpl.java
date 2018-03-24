@@ -264,8 +264,14 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	private QueryFilterBuilder _queryFilterBuilder;
 
-	@Reference(bind = "addQueryContributor", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = QueryContributor.class, unbind = "removeQueryContributor")
-	private List<QueryContributor> _queryContributors = null;
+	@Reference(
+		bind = "addQueryContributor", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = QueryContributor.class, 
+		unbind = "removeQueryContributor"
+	)
+	private volatile List<QueryContributor> _queryContributors = null;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryBuilderImpl.class);

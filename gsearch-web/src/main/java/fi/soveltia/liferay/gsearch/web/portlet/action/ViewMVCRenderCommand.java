@@ -196,7 +196,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 				JSONObject item = configuration.getJSONObject(i);
 
-				_facetFields[i] = item.getString("fieldParam");
+				_facetFields[i] = item.getString("paramName");
 			}
 		}
 	}
@@ -228,38 +228,38 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		String resultsLayout = ParamUtil.getString(request, GSearchWebKeys.RESULTS_LAYOUT);
 		
-		Map<String, String>initialParameters = new HashMap<String, String>();
+		Map<String, String[]>initialParameters = new HashMap<String, String[]>();
 				
 		if (Validator.isNotNull(keywords)) {
-			initialParameters.put(GSearchWebKeys.KEYWORDS, keywords);
+			initialParameters.put(GSearchWebKeys.KEYWORDS, new String[]{keywords});
 		}
 		
 		if (Validator.isNotNull(scopeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_SCOPE, scopeFilter);
+			initialParameters.put(GSearchWebKeys.FILTER_SCOPE, new String[]{scopeFilter});
 		}
 
 		if (Validator.isNotNull(timeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TIME, timeFilter);
+			initialParameters.put(GSearchWebKeys.FILTER_TIME, new String[]{timeFilter});
 		}
 
 		if (Validator.isNotNull(typeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TYPE, typeFilter);
+			initialParameters.put(GSearchWebKeys.FILTER_TYPE, new String[]{typeFilter});
 		}
 		
 		if (Validator.isNotNull(sortDirection)) {
-			initialParameters.put(GSearchWebKeys.SORT_DIRECTION, sortDirection);
+			initialParameters.put(GSearchWebKeys.SORT_DIRECTION, new String[]{sortDirection});
 		}
 
 		if (Validator.isNotNull(sortField)) {
-			initialParameters.put(GSearchWebKeys.SORT_FIELD, sortField);
+			initialParameters.put(GSearchWebKeys.SORT_FIELD, new String[]{sortField});
 		}
 
 		if (Validator.isNotNull(start)) {
-			initialParameters.put(GSearchWebKeys.START, start);
+			initialParameters.put(GSearchWebKeys.START, new String[]{start});
 		}
 
 		if (Validator.isNotNull(resultsLayout)) {
-			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, resultsLayout);
+			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, new String[]{resultsLayout});
 		}
 
 		// Facets.
@@ -268,7 +268,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 			for (String facetKey : _facetFields) {
 
-				String facetValue = ParamUtil.getString(request, facetKey);
+				String[] facetValue = ParamUtil.getStringValues(request, facetKey);
 
 				if (Validator.isNotNull(facetValue)) {
 					initialParameters.put(facetKey, facetValue);

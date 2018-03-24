@@ -34,10 +34,10 @@ class GSearchPaging extends Component {
 		
 		// Set initial query parameters.
 		
-		let paramValue = this.initialQueryParameters['start'];
+		let start = this.initialQueryParameters['start'];
 		
-		if (paramValue) {
-			this.setQueryParam('start', paramValue, false);
+		if (start && start.length > 0) {
+			this.setQueryParam('start', start[0], false, false);
 		}
 	}
 		
@@ -74,7 +74,7 @@ class GSearchPaging extends Component {
 				console.log("Going to page " + value);
 			}
 			
-			if (value != _self.getQueryParam('start')) {
+			if (value != _self.getQueryParam('start' , true)) {
 
 				// Scroll to the top. Trying to find browser specific scroll top
 				// to avoid firing callback twice like with $('html, body');
@@ -85,18 +85,36 @@ class GSearchPaging extends Component {
 			        $('html').stop().animate({ 
 			        	scrollTop: scrollTo 
 			        }, 400, 'swing', function() { 
-						_self.setQueryParam('start', value);
+						_self.setQueryParam('start', value, true, false);
 			        });
 			    } else if ($('body').scrollTop()) {
 			        $('body').stop().animate({
 			        	scrollTop: scrollTo 
 			        }, 400, 'swing', function() { 
-						_self.setQueryParam('start', value);
+						_self.setQueryParam('start', value, true, false);
 			        });
 			    }
 			}
 		});			
 	}
+	
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
+
+		if (this.debug) {
+			console.log("GSearchPaging.shouldUpdate()");
+		}		
+		
+		$('#' + this.portletNamespace + 'Paging span a').each(function() {	
+			$(this).unbind();
+		});
+
+		$('#' + this.portletNamespace + 'Paging').remove();
+
+		return true;
+    }		
 }
 
 /** 

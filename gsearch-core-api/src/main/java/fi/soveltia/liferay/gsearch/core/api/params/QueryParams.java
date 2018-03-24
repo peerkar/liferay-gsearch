@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.api.params;
 
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Sort;
 
 import java.util.Date;
@@ -21,7 +22,7 @@ public class QueryParams {
 	long userId;
 
 	private List<String> classNames;
-	private Map<String, String[]> facets;
+	private Map<FacetParam, BooleanClauseOccur> facetParams;
 	private String keywords;
 	private String originalKeywords;
 	private String resultsLayout;
@@ -83,14 +84,14 @@ public class QueryParams {
 		this.classNames = classNames;
 	}
 	
-	public Map<String, String[]> getFacets() {
+	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
 	
-		return facets;
+		return facetParams;
 	}
 	
-	public void setFacets(Map<String, String[]> facets) {
+	public void setFacetsParams(Map<FacetParam, BooleanClauseOccur> facetParams) {
 	
-		this.facets = facets;
+		this.facetParams = facetParams;
 	}
 
 	public String getKeywords() {
