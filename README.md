@@ -34,21 +34,24 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 # What's New <a name="Whats_New"></a>
 
-##General  Note
+## General Installation Note
 
-Whenever upgrading the modules, please __remove the old ones  before deploying the new ones__. API is still evolving so there might be compatibility issues with using the old ones with the new ones.
+Whenever upgrading the modules, please __remove the old ones  before deploying the new ones__. API is evolving so there might be compatibility issues with using the old ones with the new ones.
 
 The binaries in the binaries/latest folder should always be compatible with each other.
 
-##2018-03-24, Version 2.1.0
+## 2018-03-24, Version 2.1.0
 
+* Major update
 * Configuration syntax changes and documentation improvements (see below "Configuration")
 * Support to filter with multiple values on the same facet
 * Minor CSS fixes 
 
-### Important notes 
+### Important installation notes 
 
-Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below__.
+Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below.
+
+This version is tested to work with DXP SP7.
 
 ## 2018-03-20
 
