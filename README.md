@@ -51,7 +51,7 @@ The binaries in the binaries/latest folder should always be compatible with each
 
 Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below.
 
-This version is tested to work with DXP SP7.
+This version is tested to work with DXP, Service Packs 6 and 7. This __doesn't work on CE GA5__ because of the kernel version requirement.
 
 ## 2018-03-20
 
