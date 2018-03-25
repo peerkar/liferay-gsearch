@@ -207,6 +207,9 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		_locale = _portletRequest.getLocale();
 		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
 		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
+		_assetRenderer = null;
+		_indexerRegistry = null;
+		_summary = null;
 	}
 
 	/**
