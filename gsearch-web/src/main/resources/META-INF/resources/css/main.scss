@@ -409,6 +409,10 @@
 				word-break: break-word;
 			}
 			
+			.tag.active {
+				color: #222;
+			}
+
 			.tag:hover {
 				cursor: pointer;
 			}

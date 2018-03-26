@@ -64,8 +64,25 @@ class GSearchResults extends Component {
 
 		let _self = this;
 
-		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').on('click', function(event) {
-			_self.setQueryParam(_self.assetTagParam, $(this).html(), true, true);
+		let tagsValues = _self.getQueryParam('assetTagNames');
+
+		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').each(function() {
+
+			if (tagsValues && tagsValues.indexOf($(this).html()) > -1) {
+				$(this).addClass('active');
+			}
+			
+			$(this).on('click', function(event) {
+				
+				// If this is not active set the param, if not then unset.
+				
+				if ($(this).hasClass('active')) {
+					_self.setQueryParam(_self.assetTagParam, null, true, true, $(this).html());
+					$(this).removeClass('active');
+				} else {
+					_self.setQueryParam(_self.assetTagParam, $(this).html(), true, true);
+				}
+			}); 
 		}); 
 	}
 	
@@ -95,6 +112,9 @@ class GSearchResults extends Component {
 GSearchResults.STATE = {
 	results: {
 		value: null
+	},
+	getQueryParam: {
+		validator: core.isFunction
 	},
 	setQueryParam: {
 		validator: core.isFunction
