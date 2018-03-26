@@ -14,7 +14,6 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistry;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
@@ -208,7 +207,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
 		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
 		_assetRenderer = null;
-		_indexerRegistry = null;
 		_summary = null;
 	}
 
@@ -263,10 +261,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 */
 	protected Indexer<Object> getIndexer(String className) {
 
-		if (_indexerRegistry != null) {
-			return _indexerRegistry.getIndexer(className);
-		}
-
 		return IndexerRegistryUtil.getIndexer(className);
 	}
 
@@ -287,12 +281,12 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			if (indexer != null) {
 				String snippet = _document.get(Field.SNIPPET);
 
-				Summary summary = indexer.getSummary(
+				_summary = indexer.getSummary(
 					_document, snippet, _portletRequest, _portletResponse);
 
-				summary.setHighlight(true);
+				_summary.setHighlight(true);
 
-				return summary;
+				return _summary;
 			}
 		}
 
@@ -303,7 +297,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	protected Document _document;
 	protected String _entryClassName;
 	protected long _entryClassPK;
-	protected IndexerRegistry _indexerRegistry;
 	protected Locale _locale;
 	protected PortletRequest _portletRequest;
 	protected PortletResponse _portletResponse;
