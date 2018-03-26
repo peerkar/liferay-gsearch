@@ -88,16 +88,12 @@ class GSearchQuery extends State {
 					this.setParameter(oldParameter.key, oldParameter.value);
 				}
 			}
-				
-			// Persist current values
-			
-			for (let param of this.queryClearingParameters) {
-				this.setOldParameter(param, this.getParameterValue(param));
-			}
+		}
 
-		} else if (this.isParameterNotNull('type')) {
-
-			this.setOldParameter('type', this.getParameterValue('type'));
+		// Persist current values
+		
+		for (let param of this.queryClearingParameters) {
+			this.setOldParameter(param, this.getParameterValue(param));
 		}
 
 		// Should we reset paging
