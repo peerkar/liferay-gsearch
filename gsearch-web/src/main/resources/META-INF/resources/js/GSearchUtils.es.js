@@ -89,7 +89,16 @@ class GSearchUtils {
 			}
 			
 			for (let value of values) {
-				queryParamSetter(field, value, false);
+
+				if (value) {
+					queryParamSetter(field, value, false);
+
+				} else {
+					
+					// Reset possibly cached state
+					
+					queryParamSetter(field, '', false);
+				}				
 			}
 		}
 	}	
@@ -139,18 +148,18 @@ class GSearchUtils {
 	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter, 
 			queryParamSetter, queryParam, isMultiValued) {
 		
-		let currentValues = queryParamGetter(queryParam);
-		
 		$('#' + optionElementId + ' li a').on('click', function(event) {
 
+			let currentValues = queryParamGetter(queryParam);
+			
 			let value = $(this).attr('data-value');
 			
 			if (currentValues.indexOf(value) < 0) {
-
+				
 				queryParamSetter(queryParam, value, true, isMultiValued);
 
 				let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId, 
-						triggerElementId, value, isMultiValued);
+						triggerElementId, [value], isMultiValued);
 				
 				if (selectedItems.length > 0) {
 					
