@@ -60,43 +60,54 @@ class GSearchQuery extends State {
 	 */
 	cleanFilterParameters() {
 
-		// Clear facet selections if asset type changes.
+		// Clear filters if clearing parameters are changed
 		
-		let typeSelectionChanged = this.getOldParameterValue('type') &&
-			this.getOldParameterValue('type') != this.getParameterValue('type') && 
-			this.isParameterNotNull('type');
+		let clear = false;
 		
-		// Facet selection have to be invalidated also on keywords change. 
-		
-		let keywordsChanged = this.getOldParameterValue('q') && 
-			this.getOldParameterValue('q') != this.getParameterValue('q');
+		for (let param of this.queryClearingParameters) {
 			
-		if (typeSelectionChanged || keywordsChanged) {
+			if (this.getOldParameterValue(param) &&
+					this.getOldParameterValue(param) != this.getParameterValue(param) && 
+					this.isParameterNotNull(param)) {
+				
+				clear = true;
+			}
+		}
+			
+		if (clear) {
 
 			let oldParameters = this.parameters;
 						
 			this.parameters = [];
 			
-			// These parameters should be copied always
+			// Copy old parameters 
 			
-			let parametersToCopy = ['q', 'type', 'scope', 'time', 'resultsLayout', 'sortField', 'sortDirection'];
-			
-			for (let parameter of oldParameters) {
+			for (let oldParameter of oldParameters) {
 				
-				if (parametersToCopy.indexOf(parameter.key) > -1 && typeof parameter.value !== 'undefined') {
-					this.setParameter(parameter.key, parameter.value);
+				if (this.basicParameters.indexOf(oldParameter.key) > -1 && typeof oldParameter.value !== 'undefined') {
+					this.setParameter(oldParameter.key, oldParameter.value);
 				}
 			}
 				
 			// Persist current values
 			
-			this.setOldParameter('q', this.getParameterValue('q'));
-			this.setOldParameter('type', this.getParameterValue('type'));
+			for (let param of this.queryClearingParameters) {
+				this.setOldParameter(param, this.getParameterValue(param));
+			}
 
 		} else if (this.isParameterNotNull('type')) {
 
 			this.setOldParameter('type', this.getParameterValue('type'));
 		}
+
+		// Should we reset paging
+		
+		if (this.clearPaging) {
+			
+			this.setParameter('start', '0');
+			this.clearPaging = false;
+		}
+		
 	}		
 
 	/**
@@ -279,6 +290,12 @@ class GSearchQuery extends State {
 			newValues.push(param)
 		}
 		
+		// Do we have to clear the paging parameter
+		
+		if (this.transparentParameters.indexOf(key) < 0) {
+			this.clearPaging = true;
+		}
+		
 		this.parameters = newValues;
 	}	
 	
@@ -307,6 +324,12 @@ class GSearchQuery extends State {
 		param.value = value;
 		
 		valueArray.push(param);
+		
+		// Do we have to clear the paging parameter
+		
+		if (this.transparentParameters.indexOf(key) < 0) {
+			this.clearPaging = true;
+		}
 	}
 	
 	/**
@@ -325,10 +348,22 @@ class GSearchQuery extends State {
  */
 GSearchQuery.STATE = {
 	oldParameters: {
-		value: [],
+		value: []
 	},
 	parameters: {
-		value: [],
+		value: []
+	},
+	queryClearingParameters: {
+		value: ['q', 'type']
+	},
+	basicParameters: {
+		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
+	},
+	transparentParameters: {
+		value: ['resultsLayout', 'sortField', 'sortDirection']
+	},
+	clearPaging: {
+		value: false
 	}
 }
 
