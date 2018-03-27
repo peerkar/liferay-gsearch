@@ -62,7 +62,25 @@ class GSearchFilters extends Component {
 		
 		this.updateAssetTypeFacetCounts();
 	}
+	
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
+
+		if (this.debug) {
+			console.log("GSearchFilters.shouldUpdate()");
+		}		
+
+    	// Detach event listeners and facet element on rerender.
+
+		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'BasicFilters', 'optionmenu');
+
+		$('#' + this.portletNamespace + 'BasicFilters').remove();
 		
+		return true;
+    }	
+	
 	/**
 	 * Update asset type facet counts. 
 	 */
@@ -101,22 +119,6 @@ class GSearchFilters extends Component {
 			}
 		}			
 	}
-	
-	/**
-	 * @inheritDoc 
-	 */
-	shouldUpdate(changes, propsChanges) {
-
-		if (this.debug) {
-			console.log("GSearchFilters.shouldUpdate()");
-		}		
-
-    	// Detach event listeners and facet element on rerender.
-
-		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'BasicFilters', 'optionmenu');
-		
-		return true;
-    }	
 }
 
 /**
