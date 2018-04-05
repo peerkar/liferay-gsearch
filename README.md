@@ -40,6 +40,10 @@ Whenever upgrading the modules, please __remove the old ones  before deploying t
 
 The binaries in the binaries/latest folder should always be compatible with each other.
 
+## 2018-04-05
+
+* Optimized search results rendering.
+
 ## 2018-03-24, Version 2.1.0
 
 * Major update
