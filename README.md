@@ -8,7 +8,7 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 # Table of contents
 
 1. [Whats New](#Whats_New)
-2. [Background](#Project_Background)
+2. [About](#Project_Background)
 3. [Features](#Features)
 4. [Screenshots](#Screenshots)
 5. [Requirements](#Requirements)
@@ -34,51 +34,10 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 
 # What's New <a name="Whats_New"></a>
 
-## General Installation Note
+Please see the [Changelog](#Changelog)
 
-Whenever upgrading the modules, please __remove the old ones  before deploying the new ones__. API is evolving so there might be compatibility issues with using the old ones with the new ones.
 
-The binaries in the binaries/latest folder should always be compatible with each other.
-
-## 2018-04-05
-
-* Optimized search results rendering.
-
-## 2018-03-24, Version 2.1.0
-
-* Major update
-* Configuration syntax changes and documentation improvements (see below "Configuration")
-* Support to filter with multiple values on the same facet
-* Minor CSS fixes 
-
-### Important installation notes 
-
-Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below.
-
-This version is tested to work with DXP, Service Packs 6 and 7. This __doesn't work on CE GA5__ because of the kernel version requirement.
-
-## 2018-03-20
-
-* Added Geolocation query contributor and indexer post processor for that. With these modules you can increase the relevancy for document geographically closer to you. 
-
-## 2018-03-17
-
-__Major API changes and streamlining__. Added new interfaces to significantly ease extending and customizing this solution to your needs.
-
-* Added __QueryContributor__ service interface. With this service you can easily add any custom clauses, or in Google terms "signals" to the main query to improve relevancy. Audience Targeting module is using this as of now.
-* Added __ResultItemProcessor__ service interface. With this you can process result items before they are sent to the user interface.  See the gsearch-hightlight-item-by-tag sample.
-* Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
-* Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
-* Added __ClauseBuilder__ service interface. With this you can create implementations for not out of the box supported query types or override the existing ones.
-* Splitted the bloated core configuration to the relevant module configurations
-
-See more instructions for these new interfaces below in this document.
-
-### Important notes
-
-* Notice that the main configuration file name has been changed. Deploy the new one and remove the old one to avoid confusion.
-
-# Project Background <a name="Project_Background"></a>
+# About <a name="Project_Background"></a>
 
 This is the Google like search project for Liferay CE & DXP. The code is originally created for the blog series:
 
@@ -201,10 +160,13 @@ When updating, please remove the old modules before deploying the new ones.
 
 # Full Installation Guide <a name="Full_Installation_Guide"></a>
 
-__If you are updating the modules__:
+## Updating Note
 
-* Please remember to remove the older versions from osgi/modules and clean up osgi/state folder first.
-* Please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) to the osgi/configs folder.
+Whenever updating the modules, please __remove the old ones  before deploying the new ones__. API is evolving so there might be compatibility issues with using the old ones with the new ones.
+
+The binaries in the binaries/latest folder should always be compatible with each other.
+
+Also, please check the configuration file for changes. Preferably put the sample configuration file in the [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/) to the osgi/configs folder.
 
 
 ## Step 1 <a name="Installation_1"></a>
@@ -777,6 +739,46 @@ Thanks to Tony Tawk for the Arabic translation!
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good ideas and would like me to implement those, please leave ticket or ping me. Also many thanks in advance for any bug findings.
 	
 # Changelog <a name="Changelog"></a>
+
+
+## 2018-04-05
+
+* Optimized search results rendering.
+
+## 2018-03-24, Version 2.1.0
+
+* Major update
+* Configuration syntax changes and documentation improvements (see below "Configuration")
+* Support to filter with multiple values on the same facet
+* Minor CSS fixes 
+
+### Important installation notes 
+
+Because of the configuration syntax you __have to update__ the configuration file or check the changes detail in the documentation below.
+
+This version is tested to work with DXP, Service Packs 6 and 7. This __doesn't work on CE GA5__ because of the kernel version requirement.
+
+## 2018-03-20
+
+* Added Geolocation query contributor and indexer post processor for that. With these modules you can increase the relevancy for document geographically closer to you. 
+
+## 2018-03-17
+
+__Major API changes and streamlining__. Added new interfaces to significantly ease extending and customizing this solution to your needs.
+
+* Added __QueryContributor__ service interface. With this service you can easily add any custom clauses, or in Google terms "signals" to the main query to improve relevancy. Audience Targeting module is using this as of now.
+* Added __ResultItemProcessor__ service interface. With this you can process result items before they are sent to the user interface.  See the gsearch-hightlight-item-by-tag sample.
+* Created new __QueryPostProcessor__ service interface. QueryIndexer and QuerySuggester processors are there by default but you can add your custom processors by creating a new module and creating a service component for the interface.
+* Added __ResultItemBuilder__ service interface if you need to create result item parsers for not out of the box supported asset types (or override the existing ones).
+* Added __ClauseBuilder__ service interface. With this you can create implementations for not out of the box supported query types or override the existing ones.
+* Splitted the bloated core configuration to the relevant module configurations
+
+See more instructions for these new interfaces below in this document.
+
+### Important notes
+
+* Notice that the main configuration file name has been changed. Deploy the new one and remove the old one to avoid confusion.
+
 
 ## 2018-02-25
 
