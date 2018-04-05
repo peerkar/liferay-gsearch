@@ -35,10 +35,27 @@ class GSearchSort extends Component {
 		if (this.debug) {
 			console.log("GSearchSort.attached()");
 		}
+
+		// Setup options.
+		
+		this.setupSortFieldOptions();
 		
 		// Set initial query parameters from calling url.
 
-		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
+		GSearchUtils.setInitialQueryParameters(
+			this.initialQueryParameters, 
+			this.templateParameters, 
+			this.setQueryParam
+		);		
+
+		// Setup options lists.
+		
+		GSearchUtils.bulkSetupOptionLists(
+			this.portletNamespace + 'Sort', 
+			'optionmenu', 
+			this.getQueryParam, 
+			this.setQueryParam
+		);
 	}
 	
 	/**
@@ -49,30 +66,27 @@ class GSearchSort extends Component {
 		if (this.debug) {
 			console.log("GSearchSort.rendered()");
 		}
-
-		// Setup options lists.
-		
-		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'Sort', 'optionmenu', 
-			this.getQueryParam, this.setQueryParam);
-	}
+	}	
 	
 	/**
-	 * @inheritDoc 
+	 * Setup sortfield options.
 	 */
-	shouldUpdate(changes, propsChanges) {
+	setupSortFieldOptions() {
+			
+		let html = '';
 
-		if (this.debug) {
-			console.log("GSearchSort.shouldUpdate()");
-		}		
+		for (let item of this.sortOptions) {
+			
+			let itemClass = item.default ? 'selected default' : '';
+				
+			html += '<li class="' + itemClass + '">';
+			html += '<a data-value="' + item.key + '" href="#">';
+			html += '<span class="text">' + item.localization + '</span>';
+			html += '</a></li>';
+		}
 
-    	// Detach event listeners and facet element on rerender.
-
-		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'Sort', 'optionmenu');
-
-		$('#' + this.portletNamespace + 'Sort').remove();
-
-		return true;
-    }	
+		$('#' + this.portletNamespace + 'SortFieldOptions').html(html);			
+	}
 }
 
 /** 
@@ -87,6 +101,9 @@ GSearchSort.STATE = {
 	},
 	setQueryParam: {
 		validator: core.isFunction
+	},
+	sortOptions: {
+		value: null
 	},
 	templateParameters: {
 		value: ['sortField','sortDirection']

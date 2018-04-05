@@ -64,7 +64,11 @@ class GSearchUtils {
 				paramName,
 				isMulti
 			);
-			
+		
+			/*
+			 
+			// Dropdown animation  
+			 
 			$(this).on('show.bs.dropdown', function() {
 				$(this).find('.dropdown-menu').first().stop(true, true).slideDown(250);
 			});
@@ -72,6 +76,8 @@ class GSearchUtils {
 			$(this).on('hide.bs.dropdown', function() {
 				$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
 			});
+			
+			*/
 		});			
 	}
 	

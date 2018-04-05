@@ -85,22 +85,6 @@ class GSearchResults extends Component {
 			}); 
 		}); 
 	}
-	
-	/**
-	 * @inheritDoc 
-	 */
-	shouldUpdate(changes, propsChanges) {
-
-		if (this.debug) {
-			console.log("GSearchResults.shouldUpdate()");
-		}		
-
-		$('#' + this.portletNamespace + 'SearchResults .item .tags .tag').each(function() {	
-			$(this).unbind();
-		});
-
-		return true;
-    }
 }
 
 /** 

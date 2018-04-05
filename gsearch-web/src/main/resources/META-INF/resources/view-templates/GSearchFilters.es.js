@@ -38,10 +38,30 @@ class GSearchFilters extends Component {
 			console.log("GSearchFilters.attached()");
 		}
 		
+		// Setup asset type options
+		
+		this.setupAssetTypeOptions()
+		
 		// Set initial query parameters from calling url.
 
-		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, this.templateParameters, this.setQueryParam);		
+		GSearchUtils.setInitialQueryParameters(
+			this.initialQueryParameters, 
+			this.templateParameters, 
+			this.setQueryParam
+		);	
 		
+		// Setup options lists.
+
+		GSearchUtils.bulkSetupOptionLists(
+			this.portletNamespace + 'BasicFilters', 
+			'optionmenu', 
+			this.getQueryParam, 
+			this.setQueryParam
+		);
+		
+		// Add results callback
+		
+		this.addResultsCallback(this.updateAssetTypeFacetCounts);
 	}
 	
 	/**
@@ -52,50 +72,44 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.rendered()");
 		}
-
-		// Setup options lists.
-
-		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'BasicFilters', 'optionmenu', 
-				this.getQueryParam, this.setQueryParam);
-		
-		// Update asset type facet counts.
-		
-		this.updateAssetTypeFacetCounts();
 	}
 	
 	/**
-	 * @inheritDoc 
+	 * Setup asset type options
 	 */
-	shouldUpdate(changes, propsChanges) {
-
-		if (this.debug) {
-			console.log("GSearchFilters.shouldUpdate()");
-		}		
-
-    	// Detach event listeners and facet element on rerender.
-
-		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'BasicFilters', 'optionmenu');
-
-		$('#' + this.portletNamespace + 'BasicFilters').remove();
+	setupAssetTypeOptions() {
 		
-		return true;
-    }	
+		let html = '';
+
+		for (let item of this.assetTypeOptions) {
+			
+			html += '<li><a data-facet="' + item.entryClassName + '" data-value="' + item.key + '" href="#">';
+			html += '<span class="text">' + item.localization + '</span>';
+			html += '<span class="count"></span>';
+			html += '</a></li>';
+		}
+		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
+	}
 	
 	/**
 	 * Update asset type facet counts. 
 	 */
-	updateAssetTypeFacetCounts() {		
+	updateAssetTypeFacetCounts(portletNamespace, results) {		
+
+		// Clear current values
 		
-		if (this.results && this.results.facets) {
+		$('#' + portletNamespace + 'TypeFilterOptions li .count').html('');
+		
+		if (results && results.facets) {
 			
 			let entryClassNameFacets = null;
 			
-			let length = this.results.facets.length;
+			let length = results.facets.length;
 
 			for (let i = 0; i < length; i++) {
 
-				if(this.results.facets[i].paramName == 'entryClassName') {
-					entryClassNameFacets = this.results.facets[i].values;
+				if(results.facets[i].paramName == 'entryClassName') {
+					entryClassNameFacets = results.facets[i].values;
 					break;
 				}
 			}
@@ -108,14 +122,12 @@ class GSearchFilters extends Component {
 
 					let term =  entryClassNameFacets[i].term;
 					let frequency =  entryClassNameFacets[i].frequency;
-					let element = $('#' + this.portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
+					let element = $('#' + portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
 				
 					if (element) {
 						$(element).find('.count').html('(' + frequency + ')');
 					}
 				}
-			} else {
-				$('#' + this.portletNamespace + 'TypeFilterOptions li .count').html('');
 			}
 		}			
 	}
@@ -127,12 +139,12 @@ class GSearchFilters extends Component {
  * @static
  */
 GSearchFilters.STATE = {
+	addResultsCallback: {
+		validator: core.isFunction
+	},
 	getQueryParam: {
 		validator: core.isFunction
 	},
-	results: {
-		value: null
-	},	
 	setQueryParam: {
 		validator: core.isFunction
 	},

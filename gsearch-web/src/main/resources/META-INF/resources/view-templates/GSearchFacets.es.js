@@ -40,8 +40,11 @@ class GSearchFacets extends Component {
 		
 		// Set initial query parameters from calling url.
 		
-		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, 
-				this.templateParameters, this.setQueryParam);		
+		GSearchUtils.setInitialQueryParameters(
+			this.initialQueryParameters, 
+			this.templateParameters, 
+			this.setQueryParam
+		);		
 	}
 	
 	/**
@@ -55,10 +58,14 @@ class GSearchFacets extends Component {
 		
 		// Setup options lists.
 
-		GSearchUtils.bulkSetupOptionLists(this.portletNamespace + 'Facets', 'optionmenu', 
-				this.getQueryParam, this.setQueryParam);
+		GSearchUtils.bulkSetupOptionLists(
+			this.portletNamespace + 'Facets', 
+			'optionmenu', 
+			this.getQueryParam, 
+			this.setQueryParam
+		);
 	}
-
+	
 	/**
 	 * @inheritDoc 
 	 */
@@ -68,14 +75,11 @@ class GSearchFacets extends Component {
 			console.log("GSearchFacets.shouldUpdate()");
 		}		
 
-    	// Detach event listeners and facet element on rerender.
-
-		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'Facets', 'optionmenu');
-
 		$('#' + this.portletNamespace + 'Facets').remove();
 
 		return true;
     }	
+	
 }
 
 /**

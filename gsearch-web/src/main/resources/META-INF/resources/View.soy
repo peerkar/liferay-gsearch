@@ -6,11 +6,16 @@
  * @param id
  * @param portletNamespace
  * @param? getQueryParam
- * @param? setQueryParam
  * @param? results
+ * @param? setQueryParam
+ * @param? addResultsCallback
  *
  */
 {template .render}
+
+	// Show / hide 
+
+	{let $displayClass: ($results and $results.items and length($results.items) > 0) ? '' : 'hide' /}
 
 	<div class="container-fluid gsearch-container" id="{$id}">
 	
@@ -43,7 +48,7 @@
 			{call GSearchFilters.render}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
-				{param results: $results /}
+				{param addResultsCallback: $addResultsCallback /}
 			{/call}
 		</div>
 
@@ -67,9 +72,8 @@
 				</div>
 			</div>  			
 		{/if}
-
 			
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered">
+		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered {$displayClass}">
 
 			<div class="row">
 
@@ -79,7 +83,6 @@
 					{call GSearchSort.render}
 						{param getQueryParam: $getQueryParam /}
 						{param setQueryParam: $setQueryParam /}
-						{param results: $results /}
 					{/call}				
 				</div>
 				
@@ -89,7 +92,6 @@
 					{call GSearchResultsLayouts.render}
 						{param getQueryParam: $getQueryParam /}
 						{param setQueryParam: $setQueryParam /}
-						{param results: $results /}
 					{/call}
 				</div>
 			</div>  			

@@ -37,33 +37,12 @@ class GSearchResultsLayouts extends Component {
 
 		// Set initial query parameters from calling url.
 		
-		GSearchUtils.setInitialQueryParameters(this.initialQueryParameters, 
-				this.templateParameters, this.setQueryParam);		
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	rendered() {
+		GSearchUtils.setInitialQueryParameters(
+			this.initialQueryParameters, 
+			this.templateParameters, 
+			this.setQueryParam
+		);		
 		
-		if (this.debug) {
-			console.log("GSearchResultsLayout.rendered()");
-		}
-
-		// Show image layout option if type filter is "file" or extension is "image".
-		
-		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
-		} else {
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
-		}
-		
-		// We might have a forced layout from results
-		
-		if (this.results) {
-			this.setQueryParam('resultsLayout', this.results.meta.resultsLayout, false, false);
-		}
-	
 		// Setup options lists.
 
 		GSearchUtils.setupOptionList(
@@ -75,24 +54,16 @@ class GSearchResultsLayouts extends Component {
 			false
 		);
 	}
-	
+
 	/**
-	 * @inheritDoc 
+	 * @inheritDoc
 	 */
-	shouldUpdate(changes, propsChanges) {
-
+	rendered() {
+		
 		if (this.debug) {
-			console.log("GSearchResultsLayout.shouldUpdate()");
-		}		
-
-    	// Detach event listeners and facet element on rerender.
-
-		GSearchUtils.bulkCleanUpOptionListEvents(this.portletNamespace + 'LayoutOptions', 'optionmenu');
-
-		$('#' + this.portletNamespace + 'LayoutOptions').remove();
-
-		return true;
-    }	
+			console.log("GSearchResultsLayout.rendered()");
+		}
+	}
 }
 	
 /** 
@@ -104,9 +75,6 @@ class GSearchResultsLayouts extends Component {
 GSearchResultsLayouts.STATE = {
 	getQueryParam: {
 		validator: core.isFunction
-	},
-	results: {
-		value: null
 	},
 	templateParameters: {
 		value: ['resultsLayout']

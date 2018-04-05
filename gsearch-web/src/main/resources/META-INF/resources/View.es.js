@@ -65,6 +65,14 @@ class View extends Component {
 			console.log("View.attached()");
 		}
 	}
+
+	/**
+	 * Add a callback function to be called after results
+	 * retrieval.
+	 */
+	addResultsCallback(func) {
+		this.resultsCallbacks.push(func);
+	}
 	
 	/**
 	 * @inheritDoc
@@ -177,6 +185,17 @@ class View extends Component {
 
 				this.updateAddressBar(this.query.buildAddressBarURL());
 				
+				// Set result layout options
+				
+				this.setResultLayoutOptions();
+
+				// Run callbacks
+				
+				for (let f of this.resultsCallbacks) {
+					
+					f(this.portletNamespace, this.results);
+				}
+				
 			} else {
 				
 				// Assume here simply that there was an error if response was empty.
@@ -217,6 +236,28 @@ class View extends Component {
 	}
 	
 	/**
+	 * @inheritDoc
+	 */
+	setResultLayoutOptions() {
+		
+		// Show image layout option if type filter is "file" or extension is "image".
+		
+		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
+			
+			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
+		} else {
+
+			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
+		}
+		
+		// We might have a forced layout from results
+		
+		if (this.results) {
+			this.setQueryParam('resultsLayout', this.results.meta.resultsLayout, false, false);
+		}
+	}
+	
+	/**
 	 * Update address bar.
 	 * 
 	 * @param {address} key
@@ -239,6 +280,9 @@ class View extends Component {
 View.STATE = {
 	query: {
 		value: null
+	},
+	resultsCallbacks: {
+		value: [] 
 	}
 };
 

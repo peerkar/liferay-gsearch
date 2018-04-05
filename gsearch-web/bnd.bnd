@@ -1,6 +1,6 @@
 Bundle-Name: Liferay GSearch Portlet
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.web
-Bundle-Version: 2.1.0
+Bundle-Version: 2.1.1
 Require-Capability:\
 	soy;\
 		filter:="(type=metal)"

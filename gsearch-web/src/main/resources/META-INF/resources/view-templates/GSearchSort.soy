@@ -4,74 +4,46 @@
  * Print sort controls.
  *
  * @param? portletNamespace
- * @param? sortOptions
- * @param? results
  */
 {template .render}
 
-	{if $results and $results.items and length($results.items) > 0}
-
-		<div class="row" id="{$portletNamespace}Sort">
-		
-			// Sort field
-			
-			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortField" data-ismultivalued="false">
-			
-				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-					data-toggle="dropdown" id="{$portletNamespace}SortField" type="button">
-					{msg desc=""}sort-by{/msg} : <span class="selection"></span>
-					<span class="caret"></span>
-				</button>
+	<div class="row" id="{$portletNamespace}Sort">
 	
-				<ul aria-labelledby="{$portletNamespace}SortField" class="dropdown-menu" id="{$portletNamespace}SortFieldOptions">
-					{call .sortoptions}
-						{param sortOptions: $sortOptions /}
-					{/call}
-				</ul>
-			</div>
-			
-			// Sort direction
-			
-			<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortDirection" data-ismultivalued="false">
-			
-				<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-					data-toggle="dropdown" id="{$portletNamespace}SortDirection" type="button">
-					{msg desc=""}sort-direction{/msg}: <span class="selection"></span>
-					<span class="caret"></span>
-				</button>
-				
-				<ul aria-labelledby="{$portletNamespace}SortDirection" class="dropdown-menu" id="{$portletNamespace}SortDirectionOptions">
-					<li class="selected default">
-						<a data-value="asc" href="#">{msg desc=""}sort-asc{/msg}</a>
-					</li>
-					<li>
-						<a data-value="desc" href="#">{msg desc=""}sort-desc{/msg}</a>
-					</li>
-				</ul>
-			</div>
+		// Sort field
+		
+		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortField" data-ismultivalued="false">
+		
+			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+				data-toggle="dropdown" id="{$portletNamespace}SortField" type="button">
+				{msg desc=""}sort-by{/msg} : <span class="selection"></span>
+				<span class="caret"></span>
+			</button>
+
+			<ul aria-labelledby="{$portletNamespace}SortField" class="dropdown-menu" id="{$portletNamespace}SortFieldOptions">
+			</ul>
 		</div>
-	{/if}
+		
+		// Sort direction
+		
+		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortDirection" data-ismultivalued="false">
+		
+			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+				data-toggle="dropdown" id="{$portletNamespace}SortDirection" type="button">
+				{msg desc=""}sort-direction{/msg}: <span class="selection"></span>
+				<span class="caret"></span>
+			</button>
+			
+			<ul aria-labelledby="{$portletNamespace}SortDirection" class="dropdown-menu" id="{$portletNamespace}SortDirectionOptions">
+				<li class="selected default">
+					<a data-value="asc" href="#">{msg desc=""}sort-asc{/msg}</a>
+				</li>
+				<li>
+					<a data-value="desc" href="#">{msg desc=""}sort-desc{/msg}</a>
+				</li>
+			</ul>
+		</div>
+	</div>
 {/template}
 
-/**
- * Print single sort option.
- *
- * Value localization not here because of localization https://issues.liferay.com/browse/LPS-75141
- *
- * @param sortOptions
- */
-{template .sortoptions}
-
-	{foreach $item in $sortOptions}
-		
-		{let $itemClass: $item.default ? 'selected default' : ''/}
-		
-		<li class="{$itemClass}">
-			<a data-value="{$item.key}" href="#">
-				<span class="text">{$item.localization}</span>
-			</a>
-		</li>
-	{/foreach}
-{/template}
 
 

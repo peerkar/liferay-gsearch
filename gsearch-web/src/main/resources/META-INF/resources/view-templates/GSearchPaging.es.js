@@ -21,6 +21,8 @@ class GSearchPaging extends Component {
 		this.debug = opt_config.JSDebugEnabled;
 
 		this.initialQueryParameters = opt_config.initialQueryParameters; 
+		
+		this.portletNamespace = opt_config.portletNamespace;
 	}
 	
 	/**
@@ -97,24 +99,6 @@ class GSearchPaging extends Component {
 			}
 		});			
 	}
-	
-	/**
-	 * @inheritDoc 
-	 */
-	shouldUpdate(changes, propsChanges) {
-
-		if (this.debug) {
-			console.log("GSearchPaging.shouldUpdate()");
-		}		
-		
-		$('#' + this.portletNamespace + 'Paging span a').each(function() {	
-			$(this).unbind();
-		});
-
-		$('#' + this.portletNamespace + 'Paging').remove();
-
-		return true;
-    }		
 }
 
 /** 
