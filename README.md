@@ -631,14 +631,13 @@ This solution, as is, relies on the content specific permissions.
 
 How does it work in the standard Liferay search portlet? The search result view permissions rely on both the index (roleId and groupRoleId fields defining content specific permissions) and programmatical post filtering of the result set, taking the inherited role permissions into account. 
 
-The post filtering is problematic of many reasons - that can also be seen in the standard portlet and that's why this portlet takes the approach that the permission to view the search result are in the index only. The solution here relies on the content specific permissions like the standard portlet but doesn't do any post filtering. That means the inherited role permissions are not taken into account whic is equal to more restrictive.
+The post filtering is problematic of many reasons - that can also be seen in the standard portlet and that's why this portlet takes the approach that a permission to view the search result is in the index document itself only. So the solution here relies on the content specific permissions like the standard portlet but doesn't do any post filtering. That means the inherited role permissions are not taken into account whic is equal to more restrictive.
 
 To extend this solution to take inherited role permissions and their changes into account, it's suggested to:
 
 1. Extend the index schema with custom permission fields
 1. Depending on the use case, develop a module to sync the inherited role permissions in the index, for example with a resource permission listener or with some scheduler based mechanism
 1. Create a custom fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher service priority to add the custom permission clauses. This extension point has a dynamic reference option so that it'd be easily customizable.
-
 
 # Adding Support for Asset Types<a name="Adding_Asset_Type_Support"></a>
 
