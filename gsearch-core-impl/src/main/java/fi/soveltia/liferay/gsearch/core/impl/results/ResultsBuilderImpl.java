@@ -363,11 +363,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		jsonObject.put(
 			"executionTime", String.format("%.3f", _hits.getSearchTime()));
 		jsonObject.put("querySuggestions", _hits.getQuerySuggestions());
-		jsonObject.put("start", _queryParams.getStart());
+		
+		
+		jsonObject.put("start", getStart());
 
-		int pageCount = (int) Math.ceil(
-			_hits.getLength() * 1.0 / _queryParams.getPageSize());
-		jsonObject.put("totalPages", pageCount);
+		jsonObject.put("totalPages", getPageCount());
 
 		jsonObject.put("totalHits", _hits.getLength());
 
@@ -383,29 +383,19 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		JSONObject pagingObject = JSONFactoryUtil.createJSONObject();
 
-		// Count of pages to show at once in the paging bar.
-
-		int pagesToShow = 10;
-		int pageSize = _queryParams.getPageSize();
 		int totalHits = _hits.getLength();
-		int start = _queryParams.getStart();
-
-		// Check start. We cannot get the start from Hits object but
-		// it might be that the actual start is not what we
-		// requested (if there are less results than the starting point)
-
-		if (totalHits < start) {
-			start = 0;
-		}
 
 		if (totalHits == 0) {
 			return pagingObject;
 		}
 
-		// Number of pages total.
+		// Count of pages to show at once in the paging bar.
 
-		int pageCount = (int) Math.ceil(totalHits * 1.0 / pageSize);
-
+		int pagesToShow = 10;
+		int pageSize = _queryParams.getPageSize();
+		int start = getStart();
+		int pageCount = getPageCount();
+		
 		// Page number to start from.
 
 		int currentPage = ((int) Math.floor((start + 1) / pageSize)) + 1;
@@ -555,7 +545,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 		return sortedList;
 	}
-
+	
 	/**
 	 * Get item type localization. Fall back to key if not found.
 	 * 
@@ -572,7 +562,46 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 		return key;
 	}
+	
+	/**
+	 * Get page count
+	 * 
+	 * @return
+	 */
+	private int getPageCount() {
+		return (int) Math.ceil(
+			_hits.getLength() * 1.0 / _queryParams.getPageSize());
 
+	}
+	
+
+	/**
+	 * Check start parameter.
+	 * 
+	 * We might get a start parameter higher than hits total.
+	 * In that case the last page is returned and start
+	 * has to be adjusted.
+	 * 
+	 * @return
+	 */
+	private int getStart() {
+		
+		int pageSize = _queryParams.getPageSize();
+		int totalHits = _hits.getLength();
+		int start = _queryParams.getStart();
+
+		if (totalHits < start) {
+			
+			start = (getPageCount()-1) * pageSize;
+			
+			if (start < 0) {
+				start = 0;
+			}
+		}
+		
+		return start;
+	}	
+	
 	protected Hits _hits;
 
 	protected PortletRequest _portletRequest;
