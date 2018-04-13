@@ -8,28 +8,28 @@ The Google like search for Liferay 7 CE and Liferay DXP.
 # Table of contents
 
 1. [Whats New](#Whats_New)
-2. [About](#Project_Background)
-3. [Features](#Features)
-4. [Screenshots](#Screenshots)
-5. [Requirements](#Requirements)
-6. [Project Modules](#Modules)
-7. [Quick Installation Guide](#Quick_Installation_Guide)
-8. [Full Installation Guide](#Full_Installation_Guide)
-9. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
-10. [Enabling Geolocation Contributor](#Geolocation_Contributor)
-11. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
-12. [Embedding Search Field into a Theme](#Search_Field)
-13. [Configuration](#Configuration)
-14. [Adding Support for Asset Types](#Adding_Asset_Type_Support)
-15. [Adding a New Query Contributor, in Google terms "signal"](#Adding_Query_Contributor)
-16. [Adding a Result Item Processor](#Adding_Result_Item_Processor)
-17. [Custom querySuggestion Mapping](#querySuggestion)
-18. [Important Notes](#Important)
-19. [FAQ](#FAQ)
-20. [Project Roadmap](#Roadmap)
-21. [Credits](#Credits)
-22. [Disclaimer](#Disclaimer)
-23. [Changelog](#Changelog)
+1. [About](#Project_Background)
+1. [Features](#Features)
+1. [Screenshots](#Screenshots)
+1. [Requirements](#Requirements)
+1. [Project Modules](#Modules)
+1. [Quick Installation Guide](#Quick_Installation_Guide)
+1. [Full Installation Guide](#Full_Installation_Guide)
+1. [Enabling Audience Targeting Contributor](#Audience_Targeting_Contributor)
+1. [Enabling Geolocation Contributor](#Geolocation_Contributor)
+1. [Enabling Result Item Highlighter](#Result_Item_Highlighter)
+1. [Embedding Search Field into a Theme](#Search_Field)
+1. [Configuration](#Configuration)
+1. [Important Note About Permissions](#Permissions)
+1. [Adding Support for Asset Types](#Adding_Asset_Type_Support)
+1. [Adding a New Query Contributor, in Google terms "signal"](#Adding_Query_Contributor)
+1. [Adding a Result Item Processor](#Adding_Result_Item_Processor)
+1. [Custom querySuggestion Mapping](#querySuggestion)
+1. [FAQ](#FAQ)
+2. [Project Roadmap](#Roadmap)
+2. [Credits](#Credits)
+2. [Disclaimer](#Disclaimer)
+2. [Changelog](#Changelog)
 
 
 # What's New <a name="Whats_New"></a>
@@ -625,6 +625,21 @@ The default configuration  below defines two should (OR) queries and one must qu
 ]
 ```
 
+# Important Note About Permissions <a name="Permissions"></a>
+
+This solution, as is, relies on the content specific permissions.
+
+How does it work in the standard Liferay search portlet? The search result view permissions rely on both the index (roleId and groupRoleId fields defining content specific permissions) and programmatical post filtering of the result set, taking the inherited role permissions into account. 
+
+The post filtering is problematic of many reasons - that can also be seen in the standard portlet and that's why this portlet takes the approach that the permission to view the search result are in the index only. The solution here relies on the content specific permissions like the standard portlet but doesn't do any post filtering. That means the inherited role permissions are not taken into account whic is equal to more restrictive.
+
+To extend this solution to take inherited role permissions and their changes into account, it's suggested to:
+
+1. Extend the index schema with custom permission fields
+1. Depending on the use case, develop a module to sync the inherited role permissions in the index, for example with a resource permission listener or with some scheduler based mechanism
+1. Create a custom fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher service priority to add the custom permission clauses. This extension point has a dynamic reference option so that it'd be easily customizable.
+
+
 # Adding Support for Asset Types<a name="Adding_Asset_Type_Support"></a>
 
 The process for adding support for asset types not implemented currently, including any custom, registered asset types:
@@ -651,13 +666,6 @@ With this interface it's possible to manipulate the result item to be sent to th
 2. Create a service component implementing ResultItemProcessor interface. See the gsearch-hightlight-result-item-by-tag module for example.
 3. Deploy the module and refresh the core-impl bundle in case of problems
 
-# Important Notes <a name="Important"></a>
-
-## Permissions
-Search result permissions rely currently on three fields in the indexed document: roleId, groupRoleId and userName(current owner). Thes role fields contain content specific the roles that have access to the document. When you create a content these fields contain correctly any inherited role information. However, when you update role permissions to, for example, grant web content view access to a contents on a site, these fields won't update in the index. 
-
-This is how Liferay works at least currently. This issue will be revisited later but it's important to know about it. 
-
 # FAQ <a name="FAQ"></a>
 
 ## This Portlet Doesn't Return the Same Results as the Standard Liferay Search Portlet?!
@@ -665,7 +673,8 @@ This is how Liferay works at least currently. This issue will be revisited later
 That's right. To improve relevancy the query in this portlet is constructed much differently from the standard portlet. Also, by default it targets the search only to title, description and content fields (with localization support) and not for example username, tags, categories etc. which I think, are generally better suitable for secondary facet filtering. For example, if I want to find documents where my name is mentioned in the content, I don't want to get all the documents where I'm a document author (username field). In the portlet configuration however, you can configure the target fields and their boost factors without any restrictions to your likings.
 
 ## Do I Have to Use the Custom Search Adapter?
-No you don't but then you loose pretty much all the good stuff improving the relevancy and also the possibility for autocompletion / keyword suggester functionality.
+
+No but then you loose pretty much all the good stuff improving the relevancy and also the possibility for autocompletion / keyword suggester functionality.
 
 ## How Does the Suggester Work?
 The suggester works by storing succesfull search keywords/phrases and offering them as autocompletion options. That's the way Google works, too.
