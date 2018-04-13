@@ -192,8 +192,12 @@ class View extends Component {
 
 				// Run callbacks
 				
-				for (let f of this.resultsCallbacks) {
-					
+				let length = this.resultsCallbacks.length;
+				
+				for (let i = 0; i < length; i++) {
+
+					let f = this.resultsCallbacks[i];
+									
 					f(this.portletNamespace, this.results);
 				}
 				

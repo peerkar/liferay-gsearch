@@ -74,9 +74,13 @@ class GSearchSort extends Component {
 	setupSortFieldOptions() {
 			
 		let html = '';
+		
+		let length = this.sortOptions.length;
+		
+		for (let i = 0; i < length; i++) {
 
-		for (let item of this.sortOptions) {
-			
+			let item = this.sortOptions[i];
+            			
 			let itemClass = item.default ? 'selected default' : '';
 				
 			html += '<li class="' + itemClass + '">';

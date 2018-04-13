@@ -18,8 +18,12 @@ class GSearchQuery extends State {
 
 		let params = '';
 		
-		for (let parameter of this.parameters) {
-			
+		let length = this.parameters.length;
+		
+		for (let i = 0; i < length; i++) {
+
+			let parameter = this.parameters[i];
+		
 			if (this.isValueNotNull(parameter.value)) {
 
 				if (params.length > 0) {
@@ -42,8 +46,12 @@ class GSearchQuery extends State {
 
 		let params = new MultiMap();
 
-		for (let parameter of this.parameters) {
-			
+		let length = this.parameters.length;
+		
+		for (let i = 0; i < length; i++) {
+
+			let parameter = this.parameters[i];
+					
 			if (this.isValueNotNull(parameter.value)) {
 				
 				params.add(parameter.key, parameter.value);
@@ -64,8 +72,12 @@ class GSearchQuery extends State {
 		
 		let clear = false;
 		
-		for (let param of this.queryClearingParameters) {
-			
+		let length = this.queryClearingParameters.length;
+		
+		for (let i = 0; i < length; i++) {
+
+			let param = this.queryClearingParameters[i];
+		
 			if (this.getOldParameterValue(param) &&
 					this.getOldParameterValue(param) != this.getParameterValue(param) && 
 					this.isParameterNotNull(param)) {
@@ -81,9 +93,13 @@ class GSearchQuery extends State {
 			this.parameters = [];
 			
 			// Copy old parameters 
+
+			let length2 = oldParameters.length;
 			
-			for (let oldParameter of oldParameters) {
-				
+			for (let i = 0; i < length2; i++) {
+
+				let oldParameter = oldParameters[i];
+							
 				if (this.basicParameters.indexOf(oldParameter.key) > -1 && typeof oldParameter.value !== 'undefined') {
 					this.setParameter(oldParameter.key, oldParameter.value);
 				}
@@ -91,8 +107,13 @@ class GSearchQuery extends State {
 		}
 
 		// Persist current values
+
+		let length3 = this.queryClearingParameters.length;
 		
-		for (let param of this.queryClearingParameters) {
+		for (let i = 0; i < length3; i++) {
+
+			let param = this.queryClearingParameters[i];
+		
 			this.setOldParameter(param, this.getParameterValue(param));
 		}
 
@@ -171,7 +192,11 @@ class GSearchQuery extends State {
 		
 		let values = [];
 		
-		for (let parameter of valueArray) {
+		let length = valueArray.length;
+		
+		for (let i = 0; i < length; i++) {
+
+			let parameter = valueArray[i];
 
 			if (parameter.key == key) {
 				values.push(parameter.value);
@@ -188,8 +213,12 @@ class GSearchQuery extends State {
 	 */
 	isParameterNotNull(key) {
 
-		for (let parameter of this.parameters) {
+		let length = this.parameters.length;
+		
+		for (let i = 0; i < length; i++) {
 
+			let parameter = this.parameters[i];
+		
 			if (parameter.key == key) {
 				return this.isValueNotNull(parameter.value);
 			}
@@ -251,8 +280,12 @@ class GSearchQuery extends State {
 
 		let newValues = [];
 
-		for (let parameter of this.parameters) {
+		let length = this.parameters.length;
+		
+		for (let i = 0; i < length; i++) {
 
+			let parameter = this.parameters[i];
+		
 			// Add other parameters
 			
 			if (parameter.key != key && this.isValueNotNull(parameter.value)) {
@@ -306,8 +339,12 @@ class GSearchQuery extends State {
 	 */
 	setValue(key, value, valueArray) {
 		
-		for (let parameter of valueArray) {
+		let length = valueArray.length;
+		
+		for (let i = 0; i < length; i++) {
 
+			let parameter = valueArray[i];
+		
 			if (parameter.key == key) {
 
 				parameter.value = value;
@@ -327,8 +364,6 @@ class GSearchQuery extends State {
 		// Do we have to clear the paging parameter
 		
 		if (this.transparentParameters.indexOf(key) < 0) {
-			
-			console.log(key);
 			
 			this.clearPaging = true;
 		}

@@ -94,16 +94,24 @@ class GSearchUtils {
 			return;
 		}
 
-		for (let field of keyArray) {
+		let length = keyArray.length;
+		
+		for (let i = 0; i < length; i++) {
 
+			let field = keyArray[i];
+		
 			let values = initialValues[field];
 
 			if (!values) {
 				continue
 			}
-			
-			for (let value of values) {
 
+			let length2 = values.length;
+			
+			for (let j = 0; j < length2; j++) {
+
+				let value = values[j];			
+			
 				if (value) {
 					queryParamSetter(field, value, false);
 
@@ -222,9 +230,13 @@ class GSearchUtils {
 				}
 
 			} else {
+				
+				let length = values.length;
+				
+				for (let i = 0; i < length; i++) {
 
-				for (let value of values) {
-									
+					let value = values[i];
+				
 					if ($(this).attr('data-value') == value) {
 						
 						valueFound = true;

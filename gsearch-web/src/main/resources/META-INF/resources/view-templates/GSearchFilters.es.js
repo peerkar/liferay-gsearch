@@ -80,9 +80,13 @@ class GSearchFilters extends Component {
 	setupAssetTypeOptions() {
 		
 		let html = '';
+		
+		let length = this.assetTypeOptions.length;
+		
+		for (let i = 0; i < length; i++) {
 
-		for (let item of this.assetTypeOptions) {
-			
+			let item = this.assetTypeOptions[i];
+
 			html += '<li><a data-facet="' + item.entryClassName + '" data-value="' + item.key + '" href="#">';
 			html += '<span class="text">' + item.localization + '</span>';
 			html += '<span class="count"></span>';
