@@ -5,10 +5,6 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
-import com.liferay.portal.kernel.model.Role;
-import com.liferay.portal.kernel.model.RoleConstants;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
@@ -19,10 +15,6 @@ import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
-import com.liferay.portal.kernel.service.RoleLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Date;
@@ -34,10 +26,15 @@ import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
+import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 
 /**
  * QueryFilterBuilder implementation. Notice that if you use BooleanQuery type
@@ -174,7 +171,8 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	protected void buildFacetConditions() {
 
-		Map<FacetParam, BooleanClauseOccur> facetParams = _queryParams.getFacetParams();
+		Map<FacetParam, BooleanClauseOccur> facetParams =
+			_queryParams.getFacetParams();
 
 		if (facetParams == null) {
 			return;
@@ -182,21 +180,29 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		BooleanQueryImpl facetQuery = new BooleanQueryImpl();
 
-		for (Entry<FacetParam, BooleanClauseOccur>facetParam : facetParams.entrySet()) {
+		for (Entry<FacetParam, BooleanClauseOccur> facetParam : facetParams.entrySet()) {
 
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (int i = 0; i < facetParam.getKey().getValues().length; i++) {
-			
+
 				// Limit max values just in case.
-				
+
 				if (i > MAX_FACET_VALUES) {
 					break;
 				}
-				
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Adding facet " + facetParam.getKey().getFieldName() +
+							":" + facetParam.getKey().getValues()[i]);
+				}
+
 				TermQuery condition;
-				
-				condition = new TermQueryImpl(facetParam.getKey().getFieldName(), facetParam.getKey().getValues()[i]);
+
+				condition = new TermQueryImpl(
+					facetParam.getKey().getFieldName(),
+					facetParam.getKey().getValues()[i]);
 
 				query.add(condition, facetParam.getKey().getOccur());
 			}
@@ -290,96 +296,29 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	protected void buildViewPermissionCondition()
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		User user = themeDisplay.getUser();
-		long userId = user.getUserId();
+		Query query = _permissionFilterQueryBuilder.buildPermissionQuery(
+			_portletRequest, _queryParams);
 
-		// Don't add conditions to company admin. Return.
-
-		if (_portal.isCompanyAdmin(user)) {
-			return;
+		if (query != null) {
+			addAsQueryFilter(query);
 		}
-
-		Role guestRole = _roleLocalService.getRole(
-			_queryParams.getCompanyId(), RoleConstants.GUEST);
-		Role siteMemberRole = _roleLocalService.getRole(
-			_queryParams.getCompanyId(), RoleConstants.SITE_MEMBER);
-
-		BooleanQueryImpl query = new BooleanQueryImpl();
-
-		// Show guest content for logged in users.
-
-		if (themeDisplay.isSignedIn()) {
-			TermQuery termQuery = new TermQueryImpl(
-				Field.ROLE_ID, String.valueOf(guestRole.getRoleId()));
-			query.add(termQuery, BooleanClauseOccur.SHOULD);
-		}
-
-		// Add user's regular roles.
-
-		for (Role r : _roleLocalService.getUserRoles(userId)) {
-
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Regular role " + r.getName() + "(" + r.getRoleId() + ")");
-			}
-
-			TermQuery termQuery =
-				new TermQueryImpl(Field.ROLE_ID, String.valueOf(r.getRoleId()));
-			query.add(termQuery, BooleanClauseOccur.SHOULD);
-		}
-
-		// Group roles.
-
-		// Notice that user.getGroupIds() won't give you groups joined by
-		// usergroup (Site Member Role)
-		//
-		// Group returned by getSiteGroups() means implicity being in a "Site
-		// Member" role.
-
-		for (Group g : user.getSiteGroups()) {
-
-			long l = g.getGroupId();
-
-			TermQuery termQuery = new TermQueryImpl(
-				Field.GROUP_ROLE_ID, l + "-" + siteMemberRole.getRoleId());
-			query.add(termQuery, BooleanClauseOccur.SHOULD);
-
-			for (Role r : _roleLocalService.getUserGroupRoles(userId, l)) {
-
-				TermQuery groupTermQuery = new TermQueryImpl(
-					Field.GROUP_ROLE_ID, l + "-" + r.getRoleId());
-				query.add(groupTermQuery, BooleanClauseOccur.SHOULD);
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(
-						"Group " + g.getName(_queryParams.getLocale()) +
-							": Role " + r.getName() + "(" + r.getRoleId() +
-							")");
-				}
-			}
-		}
-
-		// Add owner condition
-
-		TermQuery groupTermQuery =
-			new TermQueryImpl(Field.USER_ID, String.valueOf(userId));
-		query.add(groupTermQuery, BooleanClauseOccur.SHOULD);
-
-		addAsQueryFilter(query);
 	}
 
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
+	/**
+	 * Remove a result item processor from list.
+	 * 
+	 * @param resultItemProcessor
+	 */
+	protected void removePermissionFilterQueryBuilder(
+		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
 
-		_portal = portal;
+		_permissionFilterQueryBuilder = null;
 	}
 
-	@Reference(unbind = "-")
-	protected void setRoleLocalService(RoleLocalService roleLocalService) {
+	protected void setPermissionFilterQueryBuilder(
+		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
 
-		_roleLocalService = roleLocalService;
+		_permissionFilterQueryBuilder = permissionFilterQueryBuilder;
 	}
 
 	/**
@@ -395,16 +334,21 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	}
 
 	private static final int MAX_FACET_VALUES = 20;
-	
+
 	private BooleanFilter _filter;
 
-	private Portal _portal;
+	@Reference(
+		bind = "setPermissionFilterQueryBuilder", 
+		policy = ReferencePolicy.DYNAMIC, 
+		policyOption = ReferencePolicyOption.GREEDY, 
+		service = PermissionFilterQueryBuilder.class, 
+		unbind = "removePermissionFilterQueryBuilder"
+	)
+	private PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
 
 	private PortletRequest _portletRequest;
 
 	private QueryParams _queryParams;
-
-	private RoleLocalService _roleLocalService;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryFilterBuilderImpl.class);

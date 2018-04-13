@@ -1,5 +1,5 @@
 Bundle-Name: Liferay GSearch Core Implementation
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.core.impl
-Bundle-Version: 2.1.0
+Bundle-Version: 2.1.1
 Include-Resource:\
 	@commons-lang3-3.7.jar
