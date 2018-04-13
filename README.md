@@ -627,11 +627,11 @@ The default configuration  below defines two should (OR) queries and one must qu
 
 # Important Note About Permissions <a name="Permissions"></a>
 
-This solution, as is, relies on the content specific permissions.
+This solution, as is, relies only on the content specific permissions.
 
-How does it work in the standard Liferay search portlet? The search result view permissions rely on both the index (roleId and groupRoleId fields defining content specific permissions) and programmatical post filtering of the result set, taking the inherited role permissions into account. 
+How does it work in the standard Liferay search portlet? The invidual search result view permissions rely on both the index (roleId and groupRoleId fields defining content specific permissions) and programmatical post filtering of the result set, taking the inherited role permissions into account. 
 
-The post filtering is problematic of many reasons - that can also be seen in the standard portlet and that's why this portlet takes the approach that a permission to view the search result is in the index document itself only. So the solution here relies on the content specific permissions like the standard portlet but doesn't do any post filtering. That means the inherited role permissions are not taken into account whic is equal to more restrictive.
+The post filtering is problematic of many reasons which can also be seen in the standard portlet. This portlet takes the approach that the view permission to view the search result should be in the index document itself only. So the solution doesn't do any post filtering and is more restrictive.
 
 To extend this solution to take inherited role permissions and their changes into account, it's suggested to:
 
