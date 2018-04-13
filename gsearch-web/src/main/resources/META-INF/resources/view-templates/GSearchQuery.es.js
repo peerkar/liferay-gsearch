@@ -98,12 +98,14 @@ class GSearchQuery extends State {
 
 		// Should we reset paging
 		
-		if (this.clearPaging) {
+		
+		if (this.clearPaging && !this.isInitialQuery) {
 			
 			this.setParameter('start', '0');
 			this.clearPaging = false;
+		} else {
+			this.clearPaging = false;
 		}
-		
 	}		
 
 	/**
@@ -289,6 +291,7 @@ class GSearchQuery extends State {
 		// Do we have to clear the paging parameter
 		
 		if (this.transparentParameters.indexOf(key) < 0) {
+
 			this.clearPaging = true;
 		}
 		
@@ -324,6 +327,9 @@ class GSearchQuery extends State {
 		// Do we have to clear the paging parameter
 		
 		if (this.transparentParameters.indexOf(key) < 0) {
+			
+			console.log(key);
+			
 			this.clearPaging = true;
 		}
 	}
@@ -354,6 +360,9 @@ GSearchQuery.STATE = {
 	},
 	basicParameters: {
 		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
+	},
+	isInitialQuery: {
+		value: false
 	},
 	transparentParameters: {
 		value: ['resultsLayout', 'sortField', 'sortDirection']

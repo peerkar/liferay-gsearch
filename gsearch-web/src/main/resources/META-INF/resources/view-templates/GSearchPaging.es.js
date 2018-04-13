@@ -72,7 +72,7 @@ class GSearchPaging extends Component {
 
 			let value = $(this).attr('data-value');
 			
-			if (this.debug) {
+			if (_self.debug) {
 				console.log("Going to page " + value);
 			}
 			
@@ -95,6 +95,8 @@ class GSearchPaging extends Component {
 			        }, 400, 'swing', function() { 
 						_self.setQueryParam('start', value, true, false);
 			        });
+			    } else {
+					_self.setQueryParam('start', value, true, false);
 			    }
 			}
 		});			

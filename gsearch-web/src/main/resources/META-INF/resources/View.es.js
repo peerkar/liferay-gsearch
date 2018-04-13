@@ -44,6 +44,7 @@ class View extends Component {
 
 		if (q && q.length > 0) {
 
+			this.query.isInitialQuery = true;
 			this.executeQuery();
 			
 		} else {
@@ -154,7 +155,7 @@ class View extends Component {
 
 		this.setLoading(true);
 
-		// Clean filter parameters.
+		// Clean filter parameters on subsequent queries
 		
 		this.query.cleanFilterParameters();
 		
