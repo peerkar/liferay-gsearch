@@ -31,7 +31,7 @@ class GSearchField extends Component {
 
 		this.suggestionsURL = opt_config.suggestionsURL;
 
-		this.queryMinLength, opt_config.queryMinLength;
+		this.queryMinLength = opt_config.queryMinLength;
 
 		this.initialQueryParameters = opt_config.initialQueryParameters; 
 	}
