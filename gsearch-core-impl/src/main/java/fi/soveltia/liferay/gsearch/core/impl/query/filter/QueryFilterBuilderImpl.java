@@ -344,7 +344,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		service = PermissionFilterQueryBuilder.class, 
 		unbind = "removePermissionFilterQueryBuilder"
 	)
-	private PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
+	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
 
 	private PortletRequest _portletRequest;
 
