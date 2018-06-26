@@ -1,6 +1,8 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 
 import org.osgi.service.component.annotations.Component;
@@ -20,9 +22,9 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
 
 	@Override
-	public boolean canBuild(String name) {
+	public boolean canBuild(Document document) {
 
-		return NAME.equals(name);
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
 
 	/**
