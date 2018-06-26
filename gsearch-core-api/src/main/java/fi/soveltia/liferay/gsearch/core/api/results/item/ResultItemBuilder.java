@@ -17,9 +17,9 @@ import javax.portlet.PortletResponse;
 public interface ResultItemBuilder {
 
 	/**
-	 * Check if this builder can build the requested type.
+	 * Check if this builder can build the requested document.
 	 */
-	public boolean canBuild(String name);
+	public boolean canBuild(Document document);
 	
 	/**
 	 * Get item hit date.

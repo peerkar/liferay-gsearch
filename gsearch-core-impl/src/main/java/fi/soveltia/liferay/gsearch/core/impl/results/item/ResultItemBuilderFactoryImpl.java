@@ -43,7 +43,7 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		ResultItemBuilder resultItemBuilder = null;
 
 		for (ResultItemBuilder r : _resultItemBuilders) {
-			if (r.canBuild(entryClassName)) {
+			if (r.canBuild(document)) {
 				resultItemBuilder = r;
 				break;
 			}
