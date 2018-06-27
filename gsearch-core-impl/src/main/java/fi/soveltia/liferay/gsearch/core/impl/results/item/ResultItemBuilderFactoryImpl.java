@@ -6,12 +6,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import com.liferay.portal.kernel.util.SortedArrayList;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -42,9 +43,9 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 
 		ResultItemBuilder resultItemBuilder = null;
 
-		for (ResultItemBuilder r : _resultItemBuilders) {
-			if (r.canBuild(entryClassName)) {
-				resultItemBuilder = r;
+		for (ResultItemBuilderReference r : _resultItemBuilderReferences) {
+			if (r.getResultItemBuilder().canBuild(document)) {
+				resultItemBuilder = r.getResultItemBuilder();
 				break;
 			}
 		}
@@ -60,38 +61,44 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		return resultItemBuilder;
 	}
 
-	/**
-	 * Add result item builder to the list.
-	 * 
-	 * @param clauseBuilder
-	 */
-	protected void addResultItemBuilder(ResultItemBuilder resultItemBuilder) {
+	@Reference(
+			cardinality = ReferenceCardinality.MULTIPLE,
+			policy = ReferencePolicy.DYNAMIC,
+			service = ResultItemBuilder.class,
+			unbind = "removeResultItemBuilder"
+	)
+	protected synchronized void addResultItemBuilder(
+			ResultItemBuilder resultItemBuilder,
+			Map<String, Object> properties) {
 
-		if (_resultItemBuilders == null) {
-			_resultItemBuilders = new ArrayList<ResultItemBuilder>();
+		Integer serviceRanking = (Integer)properties.get("service.ranking");
+
+		if (serviceRanking == null) {
+			serviceRanking = 0;
 		}
-		_resultItemBuilders.add(resultItemBuilder);
+
+		_resultItemBuilderReferences.add(
+				new ResultItemBuilderReference(resultItemBuilder, serviceRanking));
 	}
 
 	/**
 	 * Remove a clause builder from list.
-	 * 
-	 * @param clauseBuilder
+	 *
+	 * @param resultItemBuilder
 	 */
-	protected void removeResultItemBuilder(
+	protected synchronized void removeResultItemBuilder(
 		ResultItemBuilder resultItemBuilder) {
 
-		_resultItemBuilders.remove(resultItemBuilder);
+		for (ResultItemBuilderReference reference : _resultItemBuilderReferences) {
+			if (reference.getResultItemBuilder() == resultItemBuilder) {
+				_resultItemBuilderReferences.remove(reference);
+				break;
+			}
+		}
 	}
 
-	@Reference(
-		bind = "addResultItemBuilder", 
-		cardinality = ReferenceCardinality.MULTIPLE, 
-		policy = ReferencePolicy.DYNAMIC, 
-		service = ResultItemBuilder.class,
-		unbind = "removeResultItemBuilder"
-	)
-	private volatile List<ResultItemBuilder> _resultItemBuilders;
+	private volatile List<ResultItemBuilderReference> _resultItemBuilderReferences =
+			new SortedArrayList<>();
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(ResultItemBuilderFactoryImpl.class);

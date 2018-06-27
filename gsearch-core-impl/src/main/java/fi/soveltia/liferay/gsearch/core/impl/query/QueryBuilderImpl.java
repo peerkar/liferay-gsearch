@@ -280,8 +280,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	private QueryFilterBuilder _queryFilterBuilder;
 
 	@Reference(
-		bind = "addQueryContributor", 
-		cardinality = ReferenceCardinality.MULTIPLE, 
+		cardinality = ReferenceCardinality.MULTIPLE,
 		policy = ReferencePolicy.DYNAMIC, 
 		service = QueryContributor.class, 
 		unbind = "removeQueryContributor"

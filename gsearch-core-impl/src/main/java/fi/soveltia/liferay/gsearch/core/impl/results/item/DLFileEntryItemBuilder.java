@@ -10,6 +10,7 @@ import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -38,9 +39,9 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
 
 	@Override
-	public boolean canBuild(String name) {
+	public boolean canBuild(Document document) {
 
-		return NAME.equals(name);
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
 
 	/**
