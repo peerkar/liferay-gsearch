@@ -4,6 +4,8 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.blogs.kernel.model.BlogsEntry;
 import com.liferay.blogs.kernel.service.BlogsEntryService;
 
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -22,9 +24,9 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
 
 	@Override
-	public boolean canBuild(String name) {
+	public boolean canBuild(Document document) {
 
-		return NAME.equals(name);
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
 
 	/**

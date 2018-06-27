@@ -8,6 +8,7 @@ import com.liferay.message.boards.kernel.model.MBMessage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
@@ -36,10 +37,9 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
 
 	@Override
-	public boolean canBuild(String name) {
+	public boolean canBuild(Document document) {
 
-		return NAME.equals(name);
-	}
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));	}
 
 	/**
 	 * This currently handles links for following MBMessage types (by message
