@@ -13,24 +13,24 @@
  */
 {template .render}
 
-	// Show / hide 
+	// Show / hide
 
 	{let $displayClass: ($results and $results.items and length($results.items) > 0) ? '' : 'hide' /}
 
 	<div class="container-fluid gsearch-container" id="{$id}">
-	
+
 		// Help modal dialog.
-	
-		{call GSearchHelp.render}
-			{param portletNamespace: $portletNamespace /}
-		{/call}
+
+//		{call GSearchHelp.render}
+//			{param portletNamespace: $portletNamespace /}
+//		{/call}
 
 		// Help button.
 
 		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-help gsearch-centered">
-			{call GSearchHelp.button}
-				{param portletNamespace: $portletNamespace /}
-			{/call}
+//			{call GSearchHelp.button}
+//				{param portletNamespace: $portletNamespace /}
+//			{/call}
 		</div>
 
 		// Searchfield.
@@ -39,7 +39,7 @@
 			{call GSearchField.render}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
-			{/call}			
+			{/call}
 		</div>
 
 		// Basic Filters.
@@ -68,64 +68,69 @@
 
 			<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10  gsearch-stats gsearch-centered">
 				<div class="row text-center">
-					{msg desc=""}page-{$results.paging.currentPage}-{$results.meta.totalPages}-of-{$results.meta.totalHits}-total-search-took-{$results.meta.executionTime}{/msg}
+					{if $results.meta.totalPages > 1}
+						{msg desc=""}results-{$results.meta.start + 1}-{$results.meta.end}-of-{$results.meta.totalHits}{/msg}
+					{else}
+						{msg desc=""}results-{$results.meta.totalHits}{/msg}
+
+					{/if}
 				</div>
-			</div>  			
+			</div>
 		{/if}
-			
+
 		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered {$displayClass}">
 
 			<div class="row">
 
 				// Sort.
-			
+
 				<div class="col-xs-8 col-sm-8 col-md-6 col-lg-6 gsearch-sort">
-					{call GSearchSort.render}
-						{param getQueryParam: $getQueryParam /}
-						{param setQueryParam: $setQueryParam /}
-					{/call}				
+//					{call GSearchSort.render}
+//						{param getQueryParam: $getQueryParam /}
+//						{param setQueryParam: $setQueryParam /}
+//					{/call}
 				</div>
-				
+
 				// Results layout.
 
 				<div class="col-xs-4 col-sm-4 col-md-6 col-lg-6 gsearch-results-layout">
-					{call GSearchResultsLayouts.render}
-						{param getQueryParam: $getQueryParam /}
-						{param setQueryParam: $setQueryParam /}
-					{/call}
+//					{call GSearchResultsLayouts.render}
+//						{param getQueryParam: $getQueryParam /}
+//						{param setQueryParam: $setQueryParam /}
+//					{/call}
 				</div>
-			</div>  			
-		</div>  			
+			</div>
+		</div>
 
 		{if $results}
 
 			// Wider layout for images.
-			
+
 			{let $widthlg: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
 			{let $widthsm: $results.meta.resultsLayout == 'image' ? '12' : '12' /}
-			
-			<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-results 
+
+			<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-results
 				gsearch-centered" id="{$portletNamespace}SearchResults">
-	
+
 				// Query suggestions.
-	
+
 				{if length($results.meta.querySuggestions) > 0}
 					{call GSearchQuerySuggestions.render}
 						{param results: $results /}
 					{/call}
 				{/if}
-				
+
 				// Results.
-	
+
 				{call GSearchResults.render}
 					{param results: $results /}
 					{param getQueryParam: $getQueryParam /}
 					{param setQueryParam: $setQueryParam /}
 				{/call}
-	
+
 			</div>
 		{/if}
-		
+
 		// Paging.
 
 		<div class="gsearch-paging gsearch-centered text-center">
@@ -134,6 +139,6 @@
 				{param setQueryParam: $setQueryParam /}
 				{param results: $results /}
 			{/call}
-		</div>	
+		</div>
 	</div>
 {/template}

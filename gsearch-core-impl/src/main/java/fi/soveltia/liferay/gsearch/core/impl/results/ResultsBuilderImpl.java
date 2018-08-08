@@ -47,12 +47,12 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 /**
  * Results builder implementation. Localization is here local because of
  * https://issues.liferay.com/browse/LPS-75141 Move to web module when fixed.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
-	immediate = true, 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore",
+	immediate = true,
 	service = ResultsBuilder.class
 )
 public class ResultsBuilderImpl implements ResultsBuilder {
@@ -119,7 +119,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Add result item processor to the list.
-	 * 
+	 *
 	 * @param resultItemProcessor
 	 */
 	protected void addResultItemProcessor(
@@ -133,7 +133,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Create facets array for the results.
-	 * 
+	 *
 	 * @param searchContext
 	 * @return facets as JSON array
 	 * @throws Exception
@@ -232,7 +232,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Create array of result items as JSON array.
-	 * 
+	 *
 	 * @return JSON array of result items
 	 */
 	protected JSONArray createItemsArray() {
@@ -341,7 +341,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Create meta information object of the results.
-	 * 
+	 *
 	 * @return meta information JSON object
 	 */
 	protected JSONObject createMetaObject() {
@@ -363,9 +363,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		jsonObject.put(
 			"executionTime", String.format("%.3f", _hits.getSearchTime()));
 		jsonObject.put("querySuggestions", _hits.getQuerySuggestions());
-		
-		
+
+
 		jsonObject.put("start", getStart());
+
+		jsonObject.put("end", getEnd());
 
 		jsonObject.put("totalPages", getPageCount());
 
@@ -374,9 +376,13 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return jsonObject;
 	}
 
+	private int getEnd() {
+		return Math.min(_queryParams.getPageSize() * getCurrentPage(_queryParams.getPageSize(), getStart()), _hits.getLength());
+	}
+
 	/**
 	 * Create paging object.
-	 * 
+	 *
 	 * @return paging JSON object
 	 */
 	protected JSONObject createPagingObject() {
@@ -395,10 +401,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		int pageSize = _queryParams.getPageSize();
 		int start = getStart();
 		int pageCount = getPageCount();
-		
+
 		// Page number to start from.
 
-		int currentPage = ((int) Math.floor((start + 1) / pageSize)) + 1;
+		int currentPage = getCurrentPage(pageSize, start);
 		pagingObject.put("currentPage", currentPage);
 
 		// Page number to start to loop from.
@@ -456,9 +462,13 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return pagingObject;
 	}
 
+	private int getCurrentPage(int pageSize, int start) {
+		return ((int) Math.floor((start + 1) / pageSize)) + 1;
+	}
+
 	/**
 	 * Execute result item processors.
-	 * 
+	 *
 	 * @param document
 	 * @param resultItem
 	 */
@@ -496,7 +506,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Remove a result item processor from list.
-	 * 
+	 *
 	 * @param resultItemProcessor
 	 */
 	protected void removeResultItemProcessor(
@@ -521,7 +531,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 	/**
 	 * Sort facet list. Use the order of configuration.
-	 * 
+	 *
 	 * @param facets
 	 * @param configuration
 	 * @return sorted facet list
@@ -545,10 +555,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 		return sortedList;
 	}
-	
+
 	/**
 	 * Get item type localization. Fall back to key if not found.
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 */
@@ -562,10 +572,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 		return key;
 	}
-	
+
 	/**
 	 * Get page count
-	 * 
+	 *
 	 * @return
 	 */
 	private int getPageCount() {
@@ -573,35 +583,35 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			_hits.getLength() * 1.0 / _queryParams.getPageSize());
 
 	}
-	
+
 
 	/**
 	 * Check start parameter.
-	 * 
+	 *
 	 * We might get a start parameter higher than hits total.
 	 * In that case the last page is returned and start
 	 * has to be adjusted.
-	 * 
+	 *
 	 * @return
 	 */
 	private int getStart() {
-		
+
 		int pageSize = _queryParams.getPageSize();
 		int totalHits = _hits.getLength();
 		int start = _queryParams.getStart();
 
 		if (totalHits < start) {
-			
+
 			start = (getPageCount()-1) * pageSize;
-			
+
 			if (start < 0) {
 				start = 0;
 			}
 		}
-		
+
 		return start;
-	}	
-	
+	}
+
 	protected Hits _hits;
 
 	protected PortletRequest _portletRequest;
@@ -619,10 +629,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	private ResultItemBuilderFactory _resultsBuilderFactory;
 
 	@Reference(
-		bind = "addResultItemProcessor", 
-		cardinality = ReferenceCardinality.MULTIPLE, 
-		policy = ReferencePolicy.DYNAMIC, 
-		service = ResultItemProcessor.class, 
+		bind = "addResultItemProcessor",
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
+		service = ResultItemProcessor.class,
 		unbind = "removeResultItemProcessor"
 	)
 	private volatile List<ResultItemProcessor> _resultItemProcessors;
