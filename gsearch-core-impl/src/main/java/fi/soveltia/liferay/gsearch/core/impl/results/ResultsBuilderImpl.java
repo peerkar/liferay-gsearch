@@ -309,6 +309,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				jsonObject.put("link", resultItemBuilder.getLink());
 
+
+				jsonObject.put("breadcrumbs", resultItemBuilder.getBreadcrumbs());
+
 				// Tags
 
 				String[] tags = resultItemBuilder.getTags();

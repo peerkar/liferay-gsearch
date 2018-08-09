@@ -40,7 +40,7 @@ import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Abstract base result builder class.
- * 
+ *
  * @author Petteri Karttunen
  */
 public abstract class BaseResultItemBuilder implements ResultItemBuilder {
@@ -84,7 +84,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Override
@@ -123,7 +123,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	/**
 	 * Get a view url for an article which is not bound to a layout or has a
 	 * default view page.
-	 * 
+	 *
 	 * @return url string
 	 * @throws PortalException
 	 */
@@ -195,6 +195,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getBreadcrumbs() throws Exception {
+		return "";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setProperties(
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document, String assetPublisherPageFriendlyURL) {
@@ -212,7 +220,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * s Get AssetRenderer
-	 * 
+	 *
 	 * @return asset renderer object specific for the item type
 	 * @throws PortalException
 	 * @throws NumberFormatException
@@ -234,7 +242,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * Get asset renderer for a class.
-	 * 
+	 *
 	 * @param entryClassName
 	 * @param entryClassPK
 	 * @return
@@ -254,7 +262,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * Get indexer for the item class name.
-	 * 
+	 *
 	 * @param name
 	 *            of the item class
 	 * @return indexer object
@@ -266,7 +274,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * Get document summary.
-	 * 
+	 *
 	 * @return document summary object
 	 * @throws SearchException
 	 */

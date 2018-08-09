@@ -11,7 +11,7 @@ import javax.portlet.PortletResponse;
 /**
  * Asset type specific result item builder. Implementations of this class build
  * a single result item.
- * 
+ *
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
@@ -20,10 +20,10 @@ public interface ResultItemBuilder {
 	 * Check if this builder can build the requested document.
 	 */
 	public boolean canBuild(Document document);
-	
+
 	/**
 	 * Get item hit date.
-	 * 
+	 *
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
@@ -32,7 +32,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item description.
-	 * 
+	 *
 	 * @return item description
 	 */
 	public String getDescription()
@@ -40,7 +40,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item image src i.e. src attribute for img tag.
-	 * 
+	 *
 	 * @return item description
 	 */
 	public String getImageSrc()
@@ -48,7 +48,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item link.
-	 * 
+	 *
 	 * @return item link
 	 * @throws Exception
 	 */
@@ -57,7 +57,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item additional metadata.
-	 * 
+	 *
 	 * @return item metadata
 	 * @throws Exception
 	 */
@@ -66,7 +66,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item tags.
-	 * 
+	 *
 	 * @return item tags
 	 */
 	public String[] getTags()
@@ -74,7 +74,7 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item title.
-	 * 
+	 *
 	 * @return item title
 	 */
 	public String getTitle()
@@ -82,15 +82,17 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item type
-	 * 
+	 *
 	 * @return name of the item asset type
 	 */
 	public String getType()
 		throws Exception;
 
+	public String getBreadcrumbs() throws Exception;
+
 	/**
 	 * Set item builder properties.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document

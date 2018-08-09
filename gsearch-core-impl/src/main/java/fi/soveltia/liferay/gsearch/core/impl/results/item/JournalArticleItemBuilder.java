@@ -3,11 +3,18 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
+import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -17,9 +24,15 @@ import org.osgi.service.component.annotations.Reference;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * JournalArticle item type result builder.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
@@ -37,7 +50,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Override
@@ -71,8 +84,57 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getBreadcrumbs() throws Exception {
+
+		final List<String> breadcrumbs = new ArrayList<>();
+
+		long groupId = getJournalArticle().getGroupId();
+
+		String link = getLink();
+
+		if (link != null) {
+			String regex = ".*https?://[\\w\\.]+(?:/group/\\w+|)(/.*?)(?:/-/.*|)";
+
+			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(link);
+
+			if (matcher.matches()) {
+				String friendlyURL = matcher.group(1);
+				try {
+					Layout layout = _layoutLocalService.getFriendlyURLLayout(groupId, true, friendlyURL);
+					breadcrumbs.add(layout.getName(_locale));
+					List<Layout> ancestors = layout.getAncestors();
+					ancestors.forEach(a -> breadcrumbs.add(a.getName(_locale)));
+				} catch (NoSuchLayoutException e) {
+					// do nothing
+				}
+			}
+		}
+
+		breadcrumbs.add(getGroupName(groupId));
+
+		Collections.reverse(breadcrumbs);
+
+		return String.join(" / ", breadcrumbs);
+	}
+
+	private String getGroupName(long groupId) {
+		String groupName = "";
+		try {
+			Group group = _groupLocalService.getGroup(groupId);
+			groupName = group.getDescriptiveName(_locale);
+		} catch (PortalException e) {
+			log.warn(String.format("Group with id %s not found", groupId));
+		}
+		return groupName;
+	}
+
+	/**
 	 * Get journal article.
-	 * 
+	 *
 	 * @return
 	 * @throws PortalException
 	 */
@@ -89,8 +151,27 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		_journalArticleService = journalArticleService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(
+		GroupLocalService groupLocalService) {
+
+		_groupLocalService = groupLocalService;
+	}
+
 	private static JournalArticleService _journalArticleService;
+
+	private static LayoutLocalService _layoutLocalService;
+
+	private static GroupLocalService _groupLocalService;
 
 	private static final String NAME = JournalArticle.class.getName();
 
+	private static final Log log = LogFactoryUtil.getLog(JournalArticleItemBuilder.class);
 }
