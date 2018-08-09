@@ -137,7 +137,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 				} catch (PortalException e) {
 					log.error(String.format("Cannot get asset category for id %s", id));
 				} catch (NumberFormatException e) {
-					log.error(String.format("Cannot parse '%s' as long.", id));
+					// do nothing
 				}
 			}
 
