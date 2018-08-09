@@ -129,14 +129,22 @@
 					{/if}
 				</div>
 
-				{if $item.tags}
-					<div class="tags">
-						<span>{msg desc=""}tags{/msg}:</span>
-						{foreach $tag in $item.tags}
-							<span class="tag">{$tag}</span>
+				{if $item.categories}
+					<div class="categories">
+						{foreach $cat in $item.categories}
+							<span class="category">{$cat}</span>
 						{/foreach}
 					</div>
 				{/if}
+
+//				{if $item.tags}
+//					<div class="tags">
+//						<span>{msg desc=""}tags{/msg}:</span>
+//						{foreach $tag in $item.tags}
+//							<span class="tag">{$tag}</span>
+//						{/foreach}
+//					</div>
+//				{/if}
 			</div>
 		</div>
 	</div>

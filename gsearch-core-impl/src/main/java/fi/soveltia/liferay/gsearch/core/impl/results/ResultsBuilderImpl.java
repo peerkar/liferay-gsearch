@@ -321,6 +321,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 					jsonObject.put("tags", tags);
 				}
 
+				String[] categories = resultItemBuilder.getCategories();
+
+				if (categories != null && categories.length > 0 && categories[0].length() > 0) {
+
+					jsonObject.put("categories", categories);
+				}
+
+
+
 				// Additional metadata
 
 				jsonObject.put("metadata", resultItemBuilder.getMetadata());

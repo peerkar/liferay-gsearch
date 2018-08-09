@@ -90,6 +90,8 @@ public interface ResultItemBuilder {
 
 	public String getBreadcrumbs() throws Exception;
 
+	public String[] getCategories() throws Exception;
+
 	/**
 	 * Set item builder properties.
 	 *

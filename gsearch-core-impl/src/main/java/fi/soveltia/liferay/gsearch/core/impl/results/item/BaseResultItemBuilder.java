@@ -203,6 +203,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String[] getCategories() throws Exception {
+		return new String[] {};
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void setProperties(
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document, String assetPublisherPageFriendlyURL) {
@@ -263,8 +271,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	/**
 	 * Get indexer for the item class name.
 	 *
-	 * @param name
-	 *            of the item class
+	 * @param className name of the item class
 	 * @return indexer object
 	 */
 	protected Indexer<Object> getIndexer(String className) {

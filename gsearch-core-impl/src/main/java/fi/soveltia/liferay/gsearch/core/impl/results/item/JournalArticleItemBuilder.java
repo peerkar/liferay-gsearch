@@ -1,6 +1,8 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
@@ -121,6 +123,28 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		return String.join(" / ", breadcrumbs);
 	}
 
+	@Override
+	public String[] getCategories() {
+		String[] categoryIds = _document.getValues(Field.ASSET_CATEGORY_IDS);
+
+		List<String> categories = new ArrayList<>();
+
+		if (categoryIds != null) {
+			for (String id : categoryIds) {
+				try {
+					AssetCategory category = _assetCategoryLocalService.getCategory(Long.valueOf(id));
+					categories.add(category.getTitle(_locale));
+				} catch (PortalException e) {
+					log.error(String.format("Cannot get asset category for id %s", id));
+				} catch (NumberFormatException e) {
+					log.error(String.format("Cannot parse '%s' as long.", id));
+				}
+			}
+
+		}
+		return categories.toArray(new String[] {});
+	}
+
 	private String getGroupName(long groupId) {
 		String groupName = "";
 		try {
@@ -165,11 +189,20 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		_groupLocalService = groupLocalService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setAssetCategoryLocalService(
+		AssetCategoryLocalService assetCategoryLocalService) {
+
+		_assetCategoryLocalService = assetCategoryLocalService;
+	}
+
 	private static JournalArticleService _journalArticleService;
 
 	private static LayoutLocalService _layoutLocalService;
 
 	private static GroupLocalService _groupLocalService;
+
+	private static AssetCategoryLocalService _assetCategoryLocalService;
 
 	private static final String NAME = JournalArticle.class.getName();
 
