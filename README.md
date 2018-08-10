@@ -14,7 +14,7 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 Find out the right module versions for your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
 
-Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
+Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar (optional)
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
@@ -24,7 +24,7 @@ Download and deploy following jars from [binaries folder](https://github.com/pee
 
 Check that all the modules were deployed correctly.
 
-Download the default configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) file and put it into osgi/configs.
+Download the default core configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
 
 Do full reindex.
 
