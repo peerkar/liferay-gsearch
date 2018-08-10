@@ -50,7 +50,7 @@ So, is this application secure? Because Liferay permissioning only understands *
 To extend this solution to fully support inherited role permissions, it's suggested to:
 
 1. Extend the index schema with custom permission fields
-1. Depending on the use case, develop a module to sync the inherited role permissions in the index, for example with a resource permission listener or with some scheduler based mechanism
+1. Sync the inherited role permissions to the index
 1. Create a custom fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher service priority to add the custom permission clauses. This extension point has a dynamic reference option so that it'd be easily customizable.
 
 In a large scale system, this approach would have to be designed carefully to avoid performance problems.
