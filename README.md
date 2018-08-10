@@ -12,7 +12,7 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 # Quick Installation Guide
 
-Find out the right module versions for your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
+Find out the right module versions for your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
 Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
