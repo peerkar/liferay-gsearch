@@ -6,8 +6,8 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 * [Documentation Wiki](https://github.com/peerkar/liferay-gsearch/wiki)
 * [Compatibility Matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
-* [About](https://github.com/peerkar/liferay-gsearch/About)
-* [Screenshots](https://github.com/peerkar/liferay-gsearch/Screenshots)
+* [About](https://github.com/peerkar/liferay-gsearch/wiki/About)
+* [Screenshots](https://github.com/peerkar/liferay-gsearch/wiki/Screenshots)
 * [Changelog](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 
 # Quick Installation Guide
