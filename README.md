@@ -12,11 +12,11 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 # Quick Installation Guide
 
-Find out the right module versions for your portal version in [Compatibility Matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
+Find out the right module versions for your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
 
-Download and deploy following jars from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest)
+Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
 
-* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar
+* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar (optional)
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
 * fi.soveltia.liferay.gsearch.query-VERSION.jar
