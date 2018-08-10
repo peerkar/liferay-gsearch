@@ -12,30 +12,34 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 # Quick Installation Guide
 
-Find out the compatible module versions for your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
+1) Find out the module versions compatible to your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+2) Download the following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
 * fi.soveltia.liferay.gsearch.query-VERSION.jar
 * fi.soveltia.liferay.gsearch.web-VERSION.jar
 
-Check that all the modules are deployed correctly.
+3) Deploy the jars and check that all the modules are deployed correctly (active state).
 
-Download the default core configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
+4) Download the default core configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
 
-You need to have an Asset Publisher to show the search result. By default there it has to be on a page with friendlyURL '/viewasset'. You can change that later in the configuration.
+5) Create a page with friendlyURL */viewasset* and put an Asset Publisher on it (Can be changed later in the configuration).
 
-If you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. 
+Additionally, if you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. For that:
 
-For that, download and deploy following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+6) Download the following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar 
 
-Check that module installs correctly, do full reindex and installation is done.
+7) Deploy and check that module installs correctly (there might be errors in the log when standard adapter gets uninstalled).
 
-Place the GSearch portlet on some page and test.
+8) Do full reindex
+
+9) Place the GSearch portlet on some page and test.
+
+Done.
 
 For full installation guide, including add-ons, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
 
