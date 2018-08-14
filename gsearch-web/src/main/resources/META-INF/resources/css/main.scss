@@ -5,10 +5,6 @@
 */
 .gsearch-portlet {
 	
-	a { 
-		color:#1a0dab;
-	}
-	
 	/* Highlighting (Mark.js) */
 	
 	mark,
@@ -382,11 +378,9 @@
 				}
 		
 				.link a {
-					color: #006621;
 				}
 		
 				.description {
-					color: #545454;
 					
 					@include media-query(null, $screen-xs-max) {
 						word-break: break-all;
