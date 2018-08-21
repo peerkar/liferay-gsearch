@@ -1,9 +1,14 @@
 package fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+
 import aQute.bnd.annotation.metatype.Meta;
 
+@ExtendedObjectClassDefinition(
+	category = "GSearch"
+)
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.highlightresultitembytag.GSearchHighlightResultItemByTag",
+	id = "fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.ModuleConfiguration",
 	localization = "content/Language",
 	name = "GSearch Highlight Result Item by Tag"
 )

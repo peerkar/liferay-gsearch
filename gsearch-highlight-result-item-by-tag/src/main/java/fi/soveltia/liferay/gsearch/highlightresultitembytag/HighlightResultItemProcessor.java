@@ -22,7 +22,7 @@ import fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.Module
  *
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.highlightresultitembytag.GSearchHighlightResultItemByTag", 
+	configurationPid = "fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.ModuleConfiguration",
 	immediate = true, 
 	service = ResultItemProcessor.class
 )
