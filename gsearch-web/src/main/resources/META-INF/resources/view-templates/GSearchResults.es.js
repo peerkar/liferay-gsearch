@@ -3,28 +3,23 @@ import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 import Mark from '../js/mark.es';
 
+import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
 import templates from './GSearchResults.soy';
 
 /**
  * GSearch results component.
  */
 class GSearchResults extends Component {
-	
+		
 	/**
 	 * @inheritDoc
 	 * 
 	 */
-	constructor(opt_config, opt_parentElement) {
-	
-		super(opt_config, opt_parentElement);
+	attached() {		
 		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.assetTagParam = opt_config.assetTagParam;
-
-		this.showAssetTags = opt_config.showAssetTags;
+		if (this.debug) {
+			console.log("GSearchResults.attached()");
+		}
 	}
 	
 	/**
@@ -34,7 +29,8 @@ class GSearchResults extends Component {
 	doHighlightKeywords() {
 		
 		if (this.results.items.length > 0 & this.results.meta.queryTerms.length > 0) {
-			new Mark($('#' + this.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(this.results.meta.queryTerms);
+			new Mark($('#' + this.portletNamespace + 'SearchResults .item .highlightable')
+					.toArray()).mark(this.results.meta.queryTerms);
 		}
 	}
 	
@@ -48,12 +44,15 @@ class GSearchResults extends Component {
 			console.log("GSearchResults.rendered()");
 		}
 		
-		this.doHighlightKeywords();
+		if (this.results) {
+
+			this.doHighlightKeywords();
 		
-		// Set up tags (if present) links
-		
-		if (this.showAssetTags) {
-			this.setupTagLinks();
+			// Set up tags (if present) links
+			
+			if (this.showAssetTags) {
+				this.setupTagLinks();
+			}
 		}
 	}
 	
@@ -94,11 +93,18 @@ class GSearchResults extends Component {
  * @static
  */
 GSearchResults.STATE = {
-	results: {
+		
+	assetTagParam: {
 		value: null
+	},
+	debug: {
+		value: false
 	},
 	getQueryParam: {
 		validator: core.isFunction
+	},
+	portletNamespace: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction

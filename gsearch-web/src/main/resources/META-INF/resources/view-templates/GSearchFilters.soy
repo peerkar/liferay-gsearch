@@ -3,9 +3,10 @@
 /**
  * Print filters.
  *
- * @param? portletNamespace
  */
 {template .render}
+	{@param? portletNamespace: string}
+	{@param? typeOptionsMenu: html}
 
 	<div class="row text-center" id="{$portletNamespace}BasicFilters">
 
@@ -19,6 +20,7 @@
 			</button>
 			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu" id="{$portletNamespace}TypeFilterOptions">
 				<li class="selected default"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
+				{$typeOptionsMenu}
 			</ul>
 		</div>
 		

@@ -9,6 +9,10 @@
 		color:#1a0dab;
 	}
 	
+	.row {
+		display: block;
+	}
+	
 	/* Highlighting (Mark.js) */
 	
 	mark,
@@ -31,6 +35,7 @@
 	
 	.modal {
 		display: none;
+		text-align: left;
 	}
 	
 	.modal-dialog {
@@ -39,6 +44,10 @@
 		
 		@include media-query(null, $screen-xs-max) {
 			position: inherit;
+		}
+		
+		@media only screen and (min-width: 768px) {
+			max-width: 600px !important;
 		}
 	}
 
@@ -234,13 +243,10 @@
 	.gsearch-sort {
 	
 		float: left;
-		
-		@include media-query(null, $screen-xs-max) {
-			padding-left: 0;
-		}
+		padding-left: 0;
 	
 		.btn-link {
-			padding-left: 0px;
+			/* padding-left: 0; */
 		}
 
 	    .btn-link:hover {
@@ -307,6 +313,7 @@
 	
 	.gsearch-results {
 	
+		clear: both;
 		margin-top: 20px;
 		
 		.suggestions {

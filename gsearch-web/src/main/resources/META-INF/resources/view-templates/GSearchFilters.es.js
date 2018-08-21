@@ -12,23 +12,7 @@ import templates from './GSearchFilters.soy';
  * GSearch filters component.
  */
 class GSearchFilters extends Component {
-
-	/**
-	 * @inheritDoc
-	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-
-		this.assetTypeOptions = opt_config.assetTypeOptions;
-	}
-
+			
 	/**
 	 * @inheritDoc
 	 */
@@ -37,10 +21,6 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.attached()");
 		}
-		
-		// Setup asset type options
-		
-		this.setupAssetTypeOptions()
 		
 		// Set initial query parameters from calling url.
 
@@ -53,10 +33,9 @@ class GSearchFilters extends Component {
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'BasicFilters', 
+			'BasicFilters', 
 			'optionmenu', 
-			this.getQueryParam, 
-			this.setQueryParam
+			this
 		);
 		
 		// Add results callback
@@ -64,6 +43,13 @@ class GSearchFilters extends Component {
 		this.addResultsCallback(this.updateAssetTypeFacetCounts);
 	}
 	
+	created() {
+		
+		// Setup asset type options 
+		
+		this.setupAssetTypeOptions()
+	}
+		
 	/**
 	 * @inheritDoc
 	 */
@@ -92,7 +78,7 @@ class GSearchFilters extends Component {
 			html += '<span class="count"></span>';
 			html += '</a></li>';
 		}
-		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
+		this.typeOptionsMenu = html;
 	}
 	
 	/**
@@ -145,16 +131,30 @@ class GSearchFilters extends Component {
 GSearchFilters.STATE = {
 	addResultsCallback: {
 		validator: core.isFunction
+	},		
+	assetTypeOptions: {
+		internal: true,
+		value: null
+	},
+	debug: {
+		value: false
 	},
 	getQueryParam: {
 		validator: core.isFunction
+	},	
+	initialQueryParameters: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction
 	},
 	templateParameters: {
 		value: ['type','scope','time']
-	}	
+	},	
+	typeOptionsMenu: {
+		internal: true,
+		value: null
+	}
 };
 
 // Register component

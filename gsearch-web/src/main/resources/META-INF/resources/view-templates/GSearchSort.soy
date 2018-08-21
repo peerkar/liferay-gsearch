@@ -3,16 +3,17 @@
 /**
  * Print sort controls.
  *
- * @param? portletNamespace
  */
 {template .render}
+	{@param portletNamespace: string}
+	{@param? sortFieldOptionsMenu: html}
+
 
 	<div class="row" id="{$portletNamespace}Sort">
 	
 		// Sort field
 		
 		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="sortField" data-ismultivalued="false">
-		
 			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
 				data-toggle="dropdown" id="{$portletNamespace}SortField" type="button">
 				{msg desc=""}sort-by{/msg} : <span class="selection"></span>
@@ -20,6 +21,7 @@
 			</button>
 
 			<ul aria-labelledby="{$portletNamespace}SortField" class="dropdown-menu" id="{$portletNamespace}SortFieldOptions">
+				{$sortFieldOptionsMenu}
 			</ul>
 		</div>
 		
@@ -44,6 +46,3 @@
 		</div>
 	</div>
 {/template}
-
-
-

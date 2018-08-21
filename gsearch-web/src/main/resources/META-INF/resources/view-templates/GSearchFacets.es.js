@@ -16,22 +16,6 @@ class GSearchFacets extends Component {
 	/**
 	 * @inheritDoc
 	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.templateParameters = opt_config.facetFields;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	attached() {
 
 		if (this.debug) {
@@ -42,7 +26,7 @@ class GSearchFacets extends Component {
 		
 		GSearchUtils.setInitialQueryParameters(
 			this.initialQueryParameters, 
-			this.templateParameters, 
+			this.facetFields, 
 			this.setQueryParam
 		);		
 	}
@@ -59,10 +43,9 @@ class GSearchFacets extends Component {
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'Facets', 
+			'Facets', 
 			'optionmenu', 
-			this.getQueryParam, 
-			this.setQueryParam
+			this
 		);
 	}
 	
@@ -75,11 +58,10 @@ class GSearchFacets extends Component {
 			console.log("GSearchFacets.shouldUpdate()");
 		}		
 
-		$('#' + this.portletNamespace + 'Facets').remove();
+		$('#' + this.portletNamespace + 'Facets .optionmenu').remove();
 
 		return true;
-    }	
-	
+    }		
 }
 
 /**
@@ -88,17 +70,20 @@ class GSearchFacets extends Component {
  * @static
  */
 GSearchFacets.STATE = {
+	debug: {
+		value: false
+	},
+	facetFields: {
+		value: null
+	},
 	getQueryParam: {
 		validator: core.isFunction
 	},
-	results: {
+	initialQueryParameters: {
 		value: null
-	},	
+	},
 	setQueryParam: {
 		validator: core.isFunction
-	},
-	templateParameters: {
-		value: null
 	}
 };
 

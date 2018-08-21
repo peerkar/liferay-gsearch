@@ -13,21 +13,6 @@ class GSearchResultsLayouts extends Component {
 	
 	/**
 	 * @inheritDoc
-	 * 
-	 */
-	constructor(opt_config, opt_parentElement) {
-	
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-	}
-	
-	/**
-	 * @inheritDoc
 	 */
 	attached() {
 
@@ -45,16 +30,26 @@ class GSearchResultsLayouts extends Component {
 		
 		// Setup options lists.
 
+		let menuElement = $(this.element.querySelector('#' + this.portletNamespace + 'LayoutOptions'));
+		
 		GSearchUtils.setupOptionList(
-			this.portletNamespace + 'LayoutOptions', 
-			null, 
-			this.getQueryParam, 
-			this.setQueryParam, 
+			this,
+			menuElement,
 			'resultsLayout',
 			false
-		);
+		);			
 	}
+	
+	/**
+	 * @inheritDoc
+	 */
+	created() {
 
+		// Hide initially
+		
+		this.visible = false;
+	}
+	
 	/**
 	 * @inheritDoc
 	 */
@@ -64,6 +59,25 @@ class GSearchResultsLayouts extends Component {
 			console.log("GSearchResultsLayout.rendered()");
 		}
 	}
+	
+	setResultLayoutOptions(results) {
+		
+		// Show image layout option if type filter is "file" or extension is "image".
+		
+		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
+			
+			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
+		} else {
+
+			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
+		}
+		
+		// We might have a forced layout from results
+		
+		if (results.meta.resultsLayout) {
+			this.setQueryParam('resultsLayout', results.meta.resultsLayout, false, false);
+		}
+	}	
 }
 	
 /** 
@@ -73,14 +87,20 @@ class GSearchResultsLayouts extends Component {
  * @static
  */
 GSearchResultsLayouts.STATE = {
+	debug: {
+		value: false
+	},
 	getQueryParam: {
+		validator: core.isFunction
+	},
+	initialQueryParameters: {
+		value: null
+	},
+	setQueryParam: {
 		validator: core.isFunction
 	},
 	templateParameters: {
 		value: ['resultsLayout']
-	},
-	setQueryParam: {
-		validator: core.isFunction
 	}
 };
 

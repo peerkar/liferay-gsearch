@@ -3,12 +3,12 @@
 /**
  * Print results layout options.
  *
- * @param? portletNamespace
+ * @param portletNamespace
  */
 {template .render}
 
-	<div class="row" id="{$portletNamespace}ResultsLayout" data-ismultivalued="false">
-		<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-paramname="resultsLayout">
+	<div class="row" id="{$portletNamespace}ResultsLayout">
+		<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-ismultivalued="false" data-paramname="resultsLayout">
 			<li class="list-layout selected default">
 				<a data-value="list" href="#" title="{msg desc=""}list-layout{/msg}">
 					<img src="/o/gsearch-web/images/result-layouts/icon-list.png"/>
@@ -26,4 +26,5 @@
 			</li>
 		</ul>
 	</div>
+	
 {/template}

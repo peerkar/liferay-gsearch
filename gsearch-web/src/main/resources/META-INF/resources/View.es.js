@@ -2,17 +2,16 @@ import Component from 'metal-component/src/Component';
 import Ajax from 'metal-ajax/src/Ajax';
 import Soy from 'metal-soy/src/Soy';
 
-import GSearchUtils from './js/GSearchUtils.es';
 import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
 import GSearchFilters from './view-templates/GSearchFilters.es';
 import GSearchFacets from './view-templates/GSearchFacets.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
-import GSearchQuerySuggestions from './view-templates/GSearchQuerySuggestions.soy';
 import GSearchResults from './view-templates/GSearchResults.es';
 import GSearchResultsLayouts from './view-templates/GSearchResultsLayouts.es';
 import GSearchSort from './view-templates/GSearchSort.es';
+import GSearchStats from './view-templates/GSearchStats.es';
 
 import templates from './View.soy';
 
@@ -20,22 +19,19 @@ import templates from './View.soy';
  * View component.
  */
 class View extends Component {
-
-	constructor(opt_config) {
+	
+	/**
+	 * @inheritDoc
+	 */
+	attached() {
 		
-		super(opt_config);		
+		if (this.debug) {
+			console.log("View.attached()");
+		}
 		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.searchResultsURL = opt_config.searchResultsURL;
-
-		this.portletNamespace = opt_config.portletNamespace;
+		// This component is hidden initially to get all the subcomponents to render fully before shown.
 		
-		this.queryMinLength = opt_config.queryMinLength;
-
-		this.requestTimeout = opt_config.requestTimeout;
+		this.visible = true;
 
 		// If this was linked call i.e. if keyword parameter was present in the calling url, 
 		// then execute search. Notice that nested templates are processed before parent.
@@ -58,16 +54,6 @@ class View extends Component {
 	}
 
 	/**
-	 * @inheritDoc
-	 */
-	attached() {
-		
-		if (this.debug) {
-			console.log("View.attached()");
-		}
-	}
-
-	/**
 	 * Add a callback function to be called after results
 	 * retrieval.
 	 */
@@ -79,11 +65,9 @@ class View extends Component {
 	 * @inheritDoc
 	 */
 	created() {
-		
-		if (this.debug) {
-			console.log("View.created()");
-		}
 
+		console.log("View.created()");
+		
 		// Create query object. 
 		// Need to create the query object here for that to be available 
 		// for the nested templates. Constructor of this template
@@ -176,7 +160,7 @@ class View extends Component {
 				
 				// Set results object.
 				
-				this.results =  JSON.parse(response.responseText);
+				let results =  JSON.parse(response.responseText);
 														
 				// Remove loading placeholder.
 
@@ -186,10 +170,6 @@ class View extends Component {
 
 				this.updateAddressBar(this.query.buildAddressBarURL());
 				
-				// Set result layout options
-				
-				this.setResultLayoutOptions();
-
 				// Run callbacks
 				
 				let length = this.resultsCallbacks.length;
@@ -198,7 +178,23 @@ class View extends Component {
 
 					let f = this.resultsCallbacks[i];
 									
-					f(this.portletNamespace, this.results);
+					f(this.portletNamespace, results);
+				}
+				
+				// Component updates
+
+				this.components.facetComponent.facets = results.facets;
+				this.components.statsComponent.results = results;
+				this.components.resultsComponent.results = results;
+				this.components.pagingComponent.paging = results.paging;
+				
+				if (results.items && results.items.length > 0) {
+					this.components.resultsLayoutComponent.visible = true;
+					this.components.resultsLayoutComponent.setResultLayoutOptions(results);
+					this.components.sortComponent.visible = true;
+				} else {
+					this.components.resultsLayoutComponent.visible = false;
+					this.components.sortComponent.visible = false;
 				}
 				
 			} else {
@@ -241,28 +237,6 @@ class View extends Component {
 	}
 	
 	/**
-	 * @inheritDoc
-	 */
-	setResultLayoutOptions() {
-		
-		// Show image layout option if type filter is "file" or extension is "image".
-		
-		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
-			
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
-		} else {
-
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
-		}
-		
-		// We might have a forced layout from results
-		
-		if (this.results) {
-			this.setQueryParam('resultsLayout', this.results.meta.resultsLayout, false, false);
-		}
-	}
-	
-	/**
 	 * Update address bar.
 	 * 
 	 * @param {address} key
@@ -283,11 +257,29 @@ class View extends Component {
  * @static
  */
 View.STATE = {
-	query: {
+	debug: {
+		value: false
+	},
+	initialQueryParameters: {
 		value: null
+	},
+	portletNamespace: {
+		value: null
+	},
+	query: {
+		value: null 
+	},
+	queryMinLength: {
+		value: 3
+	},
+	requestTimeout: {
+		value: 10000
 	},
 	resultsCallbacks: {
 		value: [] 
+	},
+	searchResultsURL: {
+		value:null
 	}
 };
 

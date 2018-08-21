@@ -3,37 +3,62 @@
 /**
  * Print search results
  *
+ * @param portletNamespace
  * @param? results
  */
 {template .render}
 	
-	{if $results.items and length($results.items) > 0}
+	<div>	
+		{if $results}
 
-		{if $results.meta.resultsLayout == 'image'}
+			{if $results.items and length($results.items) > 0}
 		
-			<ul class="display-class-icon list-unstyled row">
+				// Wider layout for images.
+				
+				{let $widthlg: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
+				{let $widthsm: $results.meta.resultsLayout == 'image' ? '12' : '12' /}
+				
+				<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-centered gsearch-results" id="{$portletNamespace}SearchResults">
+		
+					// Query suggestions.
+		
+					{if length($results.meta.querySuggestions) > 0}
+						{call GSearchQuerySuggestions.render data="all"}
+							{param meta: $results.meta /}
+						{/call}
+					{/if}
+					
+					{if $results.meta.resultsLayout == 'image'}
+					
+						<ul class="display-class-icon list-unstyled row">
+						
+							{foreach $item in $results.items}
+								{call .imageItem}
+									{param item: $item /}
+								{/call}
+							{/foreach}
+						</ul>
 			
-				{foreach $item in $results.items}
-					{call .imageItem}
-						{param item: $item /}
-					{/call}
-				{/foreach}
-			</ul>
+					{else}	
+			
+						{foreach $item in $results.items}
+							{call .item}
+								{param item: $item /}
+							{/call}
+						{/foreach}
+			
+					{/if}
+				</div>
 
-		{else}	
-
-			{foreach $item in $results.items}
-				{call .item}
-					{param item: $item /}
-				{/call}
-			{/foreach}
-
+			{else}
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered  gsearch-results">
+					<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
+				</div>
+			{/if}
 		{/if}
-	{else}
-	
-		<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
 
-	{/if}
+	</div>
+	
 {/template}
 
 /**

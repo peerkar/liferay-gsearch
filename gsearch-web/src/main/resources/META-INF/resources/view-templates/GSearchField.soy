@@ -3,18 +3,33 @@
 /**
  * Print searchfield.
  *
- * @param? portletNamespace
  */
 {template .render}
-
+  	{@param portletNamespace: string}
+  
 	<div class="row">
+	
 		<div class="input-group">
 
-			<input autofocus class="form-control input-lg" id="{$portletNamespace}SearchField" name="{$portletNamespace}SearchField"
-				maxlength="100" placeholder="{msg desc=""}keywords{/msg}" required="required" type="text" value="" />
+			<input 
+				autofocus 
+				class="form-control input-lg" 
+				data-onkeyup="handleKeyUp" 				
+				id="{$portletNamespace}SearchField" 
+				maxlength="100" 
+				name="{$portletNamespace}SearchField"
+				placeholder="{msg desc=""}keywords{/msg}" 
+				required="required" 
+				type="text" 
+				value=""
+			/>
 				
 			<span class="input-group-btn">
-				<button class="btn btn-primary input-lg" id="{$portletNamespace}SearchButton" type="button">
+				<button 
+					class="btn btn-primary input-lg" 
+					data-onclick="doSearch" 
+					id="{$portletNamespace}SearchButton" 
+					type="button">
 					{msg desc=""}search{/msg}
 				</button>
 			</span>

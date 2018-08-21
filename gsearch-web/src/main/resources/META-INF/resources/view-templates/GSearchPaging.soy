@@ -3,26 +3,26 @@
 /**
  * Print paging.
  *
- * @param? portletNamespace
- * @param? results
+ * @param portletNamespace
+ * @param? paging
  */
 {template .render}
 
-	{if $results and $results.paging.pages}
-	
-		<div class="row" id="{$portletNamespace}Paging">
-		
+	<div class="row" id="{$portletNamespace}Paging">
+
+		{if $paging and $paging.pages}
+					
 			// Do we have a previous set of pages?
 		
-			{if $results.paging.prevStart}
+			{if $paging.prevStart}
 				{call .prevStart}
-					{param prevStart: $results.paging.prevStart /}
+					{param prevStart: $paging.prevStart /}
 				{/call}
 			{/if}
 	
 			// Print pages
 			
-			{foreach $page in $results.paging.pages}
+			{foreach $page in $paging.pages}
 				{call .page}
 					{param page: $page /}
 				{/call}
@@ -30,13 +30,14 @@
 			
 			// Do we have a next set of pages?
 		
-			{if $results.paging.nextStart}
+			{if $paging.nextStart}
 				{call .nextStart}
-					{param nextStart: $results.paging.nextStart /}
+					{param nextStart: $paging.nextStart /}
 				{/call}
 			{/if}
-		</div>
-	{/if}
+		{/if}
+	</div>
+	
 {/template}
 
 /**

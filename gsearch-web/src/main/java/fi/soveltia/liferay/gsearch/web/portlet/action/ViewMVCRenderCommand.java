@@ -39,10 +39,11 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet",
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration",
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
+		"mvc.command.name=View",
 		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class
@@ -126,7 +127,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		// Enable / disable JS console logging messages.
 		
 		template.put(
-			GSearchWebKeys.JS_DEBUG_ENABLED,
+			GSearchWebKeys.JS_DEBUG_ENABLED, 
 			_moduleConfiguration.jsDebuggingEnabled());
 		
 		// Get/set parameters from url

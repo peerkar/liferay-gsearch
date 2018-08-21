@@ -3,29 +3,31 @@
 /**
  * Print facets.
  *
- * @param? portletNamespace
- * @param? results
+ * @param portletNamespace
+ * @param? facets
  */
 {template .render}
 
-		{if $results and length($results.facets) > 0}
+	<div class="row text-center facets" id="{$portletNamespace}Facets">
 
-			<div class="row text-center facets" id="{$portletNamespace}Facets">
+		{if $facets and length($facets) > 0}
 			
-				{foreach $item in $results.facets}
-	
-					// Don't render entryClassName (is main menu)
-	
-					{if $item.paramName != 'entryClassName'}
-					
-						{call .dropdown}
-							{param portletNamespace: $portletNamespace /}
-							{param facet: $item /}
-						{/call}
-					{/if}
-				{/foreach}
-			</div>
+			{foreach $item in $facets}
+
+				// Don't render entryClassName (is main menu)
+
+				{if $item.paramName != 'entryClassName'}
+				
+					{call .dropdown}
+						{param portletNamespace: $portletNamespace /}
+						{param facet: $item /}
+					{/call}
+				{/if}
+			{/foreach}
 		{/if}
+		
+	</div>
+		
 {/template}
 			
 /**

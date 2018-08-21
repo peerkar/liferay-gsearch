@@ -41,7 +41,7 @@ import fi.soveltia.liferay.gsearch.web.portlet.GSearchPortlet;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet", 
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
