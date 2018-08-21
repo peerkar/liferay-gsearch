@@ -12,12 +12,25 @@
 
 		<div class="input-group">
 		
-			<input autofocus class="form-control input-lg textinput" id="{$portletNamespace}MiniSearchField" 
-				name="{$portletNamespace}MiniSearchField" maxlength="100" 
-					placeholder="{msg desc=""}keywords{/msg}" required="required" type="text" value="" />
+			<input 
+				autofocus 
+				class="form-control input-lg textinput" 
+				data-onkeyup="handleKeyUp" 				
+				id="{$portletNamespace}MiniSearchField" 
+				name="{$portletNamespace}MiniSearchField" 
+				maxlength="100" 
+				placeholder="{msg desc=""}keywords{/msg}" 
+				required="required" 
+				type="text" 
+				value="" 
+			/>
 				
 			<span class="input-group-btn">
-				<button class="btn btn-secondary" id="{$portletNamespace}MiniSearchButton" type="button">
+				<button 
+					class="btn btn-secondary" 
+					data-onclick="doSearch" 
+					id="{$portletNamespace}MiniSearchButton" 
+					type="button">
 					<svg class="lexicon-icon">
 				        <use xlink:href="/o/classic-theme/images/lexicon/icons.svg#search" />
 					</svg>

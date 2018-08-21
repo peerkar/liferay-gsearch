@@ -1,4 +1,7 @@
+
 package fi.soveltia.liferay.gsearch.mini.web.configuration;
+
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 
 import aQute.bnd.annotation.metatype.Meta;
 
@@ -8,8 +11,11 @@ import aQute.bnd.annotation.metatype.Meta;
  * @author Petteri Karttunen
  *
  */
+@ExtendedObjectClassDefinition(
+	category = "GSearch"
+)
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchMiniportlet",
+	id = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
 	localization = "content/Language",
 	name = "GSearch Mini Portlet"
 )

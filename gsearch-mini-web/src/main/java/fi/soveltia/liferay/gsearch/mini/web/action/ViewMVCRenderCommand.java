@@ -31,10 +31,11 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
  */
 
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchMiniportlet",
+	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
+		"mvc.command.name=MiniView",
 		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class

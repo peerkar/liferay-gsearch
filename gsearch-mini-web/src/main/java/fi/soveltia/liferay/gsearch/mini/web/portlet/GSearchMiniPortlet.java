@@ -1,9 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.mini.web.portlet;
 
-import com.liferay.portal.portlet.bridge.soy.SoyPortlet;
-
-import javax.portlet.Portlet;
+import com.liferay.portal.portlet.bridge.soy.SoyPortletRegister;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -35,13 +33,14 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 		"javax.portlet.display-name=gsearch-miniportlet",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.copy-request-parameters=false",
+		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.view-template=MiniView",
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
 		"javax.portlet.supports.mime-type=text/html"
-	},		
-	service = Portlet.class
+	}
 )
-public class GSearchMiniPortlet extends SoyPortlet {
+public class GSearchMiniPortlet implements SoyPortletRegister {
 
 }

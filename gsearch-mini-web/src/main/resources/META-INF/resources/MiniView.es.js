@@ -13,41 +13,21 @@ class MiniView extends Component {
 	/**
 	 * @inheritDoc
 	 */
-	constructor(opt_config) {
+	attached() {
 
-		super(opt_config);
-
-		this.autoCompleteEnabled = opt_config.autoCompleteEnabled;
-
-		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.queryMinLength = opt_config.queryMinLength;
-
-		this.requestTimeout = opt_config.requestTimeout;
-
-		this.searchPageURL = opt_config.searchPageURL;
-
-		this.suggestionsURL = opt_config.suggestionsURL;
-		
 		// Init autocomplete.
 
 		if (this.autoCompleteEnabled) {
 			this.initAutocomplete();
 		}
-		
-		// Set click events
-		
-		this.setClickEvents();
 	}
-
+	
 	/**
 	 * Execute search
 	 */
 	doSearch() {
 
-		let q = $('#' + this.portletNamespace + 'MiniSearchField').val();
+		let q = $(this.element.querySelector('#' + this.portletNamespace + 'MiniSearchField')).val();
 		
 		if (q.length < this.queryMinLength) {
 			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + 
@@ -61,13 +41,28 @@ class MiniView extends Component {
 	}
 	
 	/**
+	 * Handle keyup  events.
+	 */
+	handleKeyUp(event) {
+
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        
+        if(keycode === 13){
+			this.doSearch();
+	    }
+	}
+	
+	/**
 	 * Init autocomplete / suggester.
 	 */
 	initAutocomplete() {
 
 		let _self = this;
 		 
-		$('#' + this.portletNamespace + 'MiniSearchField').devbridgeAutocomplete({
+		let searchFieldElement = this.element.querySelector('#' + this.portletNamespace + 'MiniSearchField');
+		 
+		$(searchFieldElement).devbridgeAutocomplete({
+		
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
 			minChars: _self.queryMinLength,
@@ -99,38 +94,13 @@ class MiniView extends Component {
 	}	
 	
 	/**
-	 * Set click events.
-	 */
-	setClickEvents() {
-
-		let _self = this;
-
-		// Bind button click event
-
-		$('#' + this.portletNamespace + 'MiniSearchButton').on('click', function (event) {
-			_self.doSearch();
-		});
-
-		// Bind search field keypress event.
-
-		$('#' + this.portletNamespace + 'MiniSearchField').keypress(function (event) {
-	        var keycode = (event.keyCode ? event.keyCode : event.which);
-	        if(keycode === 13){
-				_self.doSearch();
-	        }
-	    });	
-	}
-	
-	/**
 	 * Show message
 	 * 
 	 * @param {String} title
 	 */
 	showMessage(title) {
 		
-		let elementId = this.portletNamespace + 'MiniSearchFieldMessage';
-
-		$('#' + elementId).tooltip({title: title}).tooltip('show');
+		$(this.element.querySelector('#' + this.portletNamespace + 'MiniSearchFieldMessage')).tooltip({title: title}).tooltip('show');
 		
 		// Setting delay doesn't work on manual show
 		
@@ -139,6 +109,37 @@ class MiniView extends Component {
 		}, 2000);		
 	}	
 }
+
+/** 
+ * State definition.
+ * 
+ * @type {!Object}
+ * @static
+ */
+MiniView.STATE = {
+
+	autoCompleteEnabled: {
+		value: false
+	},
+	autoCompleteRequestDelay: {
+		value: 200
+	},
+	portletNamespace: {
+		value: null
+	},
+	queryMinLength: {
+		value: 3 
+	},
+	requestTimeout: {
+		value: 200
+	},
+	searchPageURL: {
+		value: null
+	},
+	suggestionsURL: {
+		value: null
+	}		
+};
 
 // Register component
 
