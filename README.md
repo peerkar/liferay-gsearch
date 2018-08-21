@@ -15,6 +15,9 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 __Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Most of the plugins are not yet upgraded to 7.1. because of platform features like Audience Targeting and IPGeoCoder still missing. 
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
+
+## Step 1 
+
 Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
@@ -24,10 +27,18 @@ Download and deploy following jars from [binaries folder](https://github.com/pee
 
 Check that all the modules are deployed correctly.
 
+## Step 2
+
 Download the default core configuration for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
 
-You need to have an Asset Publisher to show the search result. By default there it has to be on a page with friendlyURL '/viewasset'. You can change that later in the configuration.
+## Step 3 
 
+You need to have an Asset Publisher to show the search result. By default there it has to be on a page with friendlyURL '/viewasset'. You can change that later in the configuration.
+ 
+## Step 4
+
+__This is currently for 7.0 versions only__ (ES6 adapter upgrade for 7.1 coming soon).
+ 
 If you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. 
 
 For that, download and deploy following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
@@ -35,6 +46,8 @@ For that, download and deploy following jar from [binaries folder](https://githu
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar 
 
 Check that module installs correctly, do full reindex and installation is done.
+
+## Step 5
 
 Place the GSearch portlet on some page and test.
 
