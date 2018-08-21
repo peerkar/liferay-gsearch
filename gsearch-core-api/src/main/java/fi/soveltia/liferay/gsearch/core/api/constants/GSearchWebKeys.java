@@ -35,7 +35,7 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String INITIAL_QUERY_PARAMETERS = "initialQueryParameters";
 
-	public static final String JS_DEBUG_ENABLED = "JSDebugEnabled";
+	public static final String JS_DEBUG_ENABLED = "debug";
 
 	public static final String KEYWORDS = "q";
 	
