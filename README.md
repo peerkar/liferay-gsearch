@@ -1,6 +1,6 @@
 # Liferay GSearch
 
-Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard search portlet available.
+Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard search portlet available.
 
 # Documentation
 
@@ -12,34 +12,31 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 # Quick Installation Guide
 
-1) Find out the module versions compatible to your portal version in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
+__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Most of the plugins are not yet upgraded to 7.1. because of platform features like Audience Targeting and IPGeoCoder still missing. 
+Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-2) Download the following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
 * fi.soveltia.liferay.gsearch.query-VERSION.jar
 * fi.soveltia.liferay.gsearch.web-VERSION.jar
 
-3) Deploy the jars and check that all the modules are deployed correctly (active state).
+Check that all the modules are deployed correctly.
 
-4) Download the default core configuration **fi.soveltia.liferay.gsearch.core.configuration.GSearchCore.config** for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
+Download the default core configuration for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
 
-5) Create a page with friendlyURL */viewasset* and put an Asset Publisher on it (Can be changed later in the configuration).
+You need to have an Asset Publisher to show the search result. By default there it has to be on a page with friendlyURL '/viewasset'. You can change that later in the configuration.
 
-Additionally, if you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. For that:
+If you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. 
 
-6) Download the following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+For that, download and deploy following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar 
 
-7) Deploy and check that module installs correctly (there might be errors in the log when standard adapter gets uninstalled).
+Check that module installs correctly, do full reindex and installation is done.
 
-8) Do full reindex
-
-9) Place the GSearch portlet on some page and test.
-
-Done.
+Place the GSearch portlet on some page and test.
 
 For full installation guide, including add-ons, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
 
