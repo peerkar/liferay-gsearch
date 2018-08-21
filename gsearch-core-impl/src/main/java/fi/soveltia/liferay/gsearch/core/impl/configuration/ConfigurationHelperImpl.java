@@ -28,7 +28,7 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
  * @author Petteri
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
 	immediate = true,
 	service = ConfigurationHelper.class
 )

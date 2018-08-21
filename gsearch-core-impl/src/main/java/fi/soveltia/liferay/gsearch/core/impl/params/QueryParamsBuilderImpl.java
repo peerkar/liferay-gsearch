@@ -47,7 +47,7 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = QueryParamsBuilder.class
 )

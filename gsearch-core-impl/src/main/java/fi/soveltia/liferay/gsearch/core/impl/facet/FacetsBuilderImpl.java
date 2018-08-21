@@ -27,7 +27,7 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = FacetsBuilder.class
 )
