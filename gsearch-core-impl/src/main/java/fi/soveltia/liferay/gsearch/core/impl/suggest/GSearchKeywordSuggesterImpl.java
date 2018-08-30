@@ -209,7 +209,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 
 		PhraseSuggester suggester =
 			new PhraseSuggester(getSuggesterName(), fieldName, keywords);
-
+		
 		int size =
 			GetterUtil.getInteger(configuration.get("numberOfSuggestions"), 5);
 		suggester.setSize(size);

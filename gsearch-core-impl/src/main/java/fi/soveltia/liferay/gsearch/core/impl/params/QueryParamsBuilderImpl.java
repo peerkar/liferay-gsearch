@@ -335,6 +335,9 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		if (GSearchResultsLayouts.THUMBNAIL_LIST.equals(resultsLayoutParam)) {
 			_queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
 		}
+		else if (GSearchResultsLayouts.USER_IMAGE_LIST.equals(resultsLayoutParam)) {
+			_queryParams.setResultsLayout(GSearchResultsLayouts.USER_IMAGE_LIST);
+		}
 		else if (GSearchResultsLayouts.IMAGE.equals(resultsLayoutParam) &&
 			imageLayoutAvailable) {
 			_queryParams.setResultsLayout(GSearchResultsLayouts.IMAGE);

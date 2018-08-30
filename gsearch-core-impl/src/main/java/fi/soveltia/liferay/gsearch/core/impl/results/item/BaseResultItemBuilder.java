@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -79,7 +78,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	public String getDescription()
 		throws SearchException {
 
-		return HtmlUtil.stripHtml(getSummary().getContent());
+		return getSummary().getContent();
+//		return HtmlUtil.stripHtml(getSummary().getContent());
 	}
 
 	/**
@@ -179,7 +179,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		if (Validator.isNull(title)) {
 			title = getAssetRenderer().getTitle(_locale);
 		}
-		return HtmlUtil.stripHtml(title);
+		return title;
+		//return HtmlUtil.stripHtml(title);
 	}
 
 	/**
@@ -190,7 +191,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return _entryClassName;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -279,6 +280,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 				getIndexer(_document.get(Field.ENTRY_CLASS_NAME));
 
 			if (indexer != null) {
+
 				String snippet = _document.get(Field.SNIPPET);
 
 				_summary = indexer.getSummary(
@@ -292,7 +294,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return _summary;
 	}
-
+	
 	protected String _assetPublisherPageFriendlyURL;
 	protected Document _document;
 	protected String _entryClassName;
@@ -300,7 +302,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	protected Locale _locale;
 	protected PortletRequest _portletRequest;
 	protected PortletResponse _portletResponse;
-
 	private AssetRenderer<?> _assetRenderer;
 	private Summary _summary = null;
 
