@@ -1,7 +1,6 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
-import Mark from '../js/mark.es';
 
 import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
 import templates from './GSearchResults.soy';
@@ -22,15 +21,25 @@ class GSearchResults extends Component {
 		}
 	}
 	
+	decodeEntities(encodedString) {
+	    var textArea = document.createElement('textarea');
+	    textArea.innerHTML = encodedString;
+	    return textArea.value;
+	}
+	
 	/**
-	 * Highlight keywords in results
+	 * Decode highlight tags in results.
 	 * 
 	 */
-	doHighlightKeywords() {
+	decodeHighlightHTML() {
 		
-		if (this.results.items.length > 0 & this.results.meta.queryTerms.length > 0) {
-			new Mark($('#' + this.portletNamespace + 'SearchResults .item .highlightable')
-					.toArray()).mark(this.results.meta.queryTerms);
+		let _self = this;
+		
+		if (this.results.items.length) {
+			
+			$('#' + this.portletNamespace + 'SearchResults .item .highlightable').each(function() {
+				$(this).html(_self.decodeEntities($(this).html()));
+			});
 		}
 	}
 	
@@ -46,7 +55,7 @@ class GSearchResults extends Component {
 		
 		if (this.results) {
 
-			this.doHighlightKeywords();
+			this.decodeHighlightHTML();
 		
 			// Set up tags (if present) links
 			

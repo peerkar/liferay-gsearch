@@ -55,9 +55,9 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("ViewMVCRenderCommand.render()");
+			_log.debug("ViewMVCRenderCommand.render()");			
 		}
-			
+				
 		Template template =
 			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
 
