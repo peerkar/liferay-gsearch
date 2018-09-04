@@ -27,6 +27,7 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -98,13 +99,22 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		String link = getLink();
 
 		if (link != null) {
-			String regex = ".*https?://[\\w\\.]+(?:/group/\\w+|)(/.*?)(?:/-/.*|)";
+			String regex = ".*https?://[\\w\\.]+(/.*?)(?:/-/.*|)";
 
 			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(link);
 
 			if (matcher.matches()) {
-				String friendlyURL = matcher.group(1);
+				String fullPath = matcher.group(1);
+
+				String friendlyURL = "";
+				if (fullPath.startsWith("/group/")) {
+					List<String> path = Arrays.asList(fullPath.split("/"));
+					friendlyURL = "/" + String.join("/", path.subList(3, path.size()));
+				} else {
+					friendlyURL = fullPath;
+				}
+
 				try {
 					Layout layout = _layoutLocalService.getFriendlyURLLayout(groupId, true, friendlyURL);
 					breadcrumbs.add(layout.getName(_locale));
