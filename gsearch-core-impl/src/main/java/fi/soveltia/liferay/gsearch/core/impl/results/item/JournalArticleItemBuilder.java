@@ -15,9 +15,13 @@ import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import org.osgi.service.component.annotations.Component;
@@ -154,6 +158,25 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		}
 		return categories.toArray(new String[] {});
 	}
+
+	@Override
+	public String getDescription() throws SearchException {
+
+		String languageId = _locale.toString();
+
+		Indexer<?> indexer =
+			getIndexer(_document.get(Field.ENTRY_CLASS_NAME));
+
+		if (indexer != null) {
+			String snippet = _document.get(Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT + StringPool.UNDERLINE + languageId);
+
+			if ((snippet != null) && !snippet.isEmpty()) {
+				return HtmlUtil.stripHtml(snippet);
+			}
+		}
+		return super.getDescription();
+	}
+
 
 	private String getGroupName(long groupId) {
 		String groupName = "";

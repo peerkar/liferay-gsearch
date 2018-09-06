@@ -300,6 +300,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 					_document, snippet, _portletRequest, _portletResponse);
 
 				_summary.setHighlight(true);
+				_summary.setMaxContentLength(300);
 
 				return _summary;
 			}
