@@ -81,13 +81,15 @@
 
 		<div class="item">
 
-			// Do we have a thumbnail?
-
 			{if $item.imageSrc}
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
 						<a href="{$item.link}">
-							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+							<div class="file-icon">
+								<svg role="img">
+									<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
+								</svg>
+                			</div>
 						</a>
 					{/if}
 				</div>
@@ -97,27 +99,16 @@
 			{/if}
 
 				<div class="heading">
-//					{if $item.type != ''}
-//						<span class="type"><a href="{$item.link}">[{$item.type}]</a></span>
-//					{/if}
 					<h4>
 						<a href="{$item.link}">{$item.title}</a>
 					</h4>
-
-					// Mark highlighted item.
 
 					{if $item.highlight}
 						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
 					{/if}
 				</div>
-//				<div class="link">
-//					<a href="{$item.link}">{$item.link}</a>
-//				</div>
 
 				<div class="description ">
-//					{if $item.date != ''}
-//						<strong>{$item.date}</strong>
-//					{/if}
 					{if $item.description != ''}
 						<span class="highlightable">{$item.description}</span>
 					{/if}
@@ -137,14 +128,6 @@
 					</div>
 				{/if}
 
-//				{if $item.tags}
-//					<div class="tags">
-//						<span>{msg desc=""}tags{/msg}:</span>
-//						{foreach $tag in $item.tags}
-//							<span class="tag">{$tag}</span>
-//						{/foreach}
-//					</div>
-//				{/if}
 			</div>
 		</div>
 	</div>

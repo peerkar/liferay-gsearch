@@ -289,12 +289,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Image src
 
-				if (_queryParams.getResultsLayout().equals(
-					GSearchResultsLayouts.THUMBNAIL_LIST) ||
-					_queryParams.getResultsLayout().equals(
-						GSearchResultsLayouts.IMAGE) &&
-						document.get(Field.ENTRY_CLASS_NAME).equals(
-							DLFileEntry.class.getName())) {
+				if (document.get(Field.ENTRY_CLASS_NAME).equals(
+					DLFileEntry.class.getName())) {
 
 					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
 				}

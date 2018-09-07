@@ -28,7 +28,7 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
  * DLFileEntry item type result builder.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
@@ -46,19 +46,12 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc()
-		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
-			GSearchWebKeys.THEME_DISPLAY);
-
-		FileEntry fileEntry = _dLAppService.getFileEntry(_entryClassPK);
-
-		return DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
+	public String getImageSrc() {
+		return "icon-file-text";
 	}
 
 	/**
@@ -81,7 +74,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Override
@@ -111,7 +104,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * Set image metadata.
-	 * 
+	 *
 	 * @param metaData
 	 * @throws Exception
 	 */
@@ -131,7 +124,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * Translate mimetype for UI
-	 * 
+	 *
 	 * @param mimeType
 	 * @return
 	 */
@@ -158,7 +151,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * Beautify file size
-	 * 
+	 *
 	 * @param size
 	 * @param locale
 	 * @return
@@ -184,7 +177,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	/**
 	 * Get index translated field name for a Tikaraw metadata field.
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 * @throws Exception
@@ -207,7 +200,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	/**
 	 * Get the id for structure holding image metadata ("TIKARAWMETADATA") Using
 	 * static map here to reduce DB queries.
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
