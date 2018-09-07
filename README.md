@@ -10,7 +10,8 @@ Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
 
 * [About](https://github.com/peerkar/liferay-gsearch/wiki/About)
 * [Screenshots](https://github.com/peerkar/liferay-gsearch/wiki/Screenshots)
-* [Compatibility Matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
+* [About project modules](https://github.com/peerkar/liferay-gsearch/wiki/Project-Modules)
+* [Compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
 * [Changelog](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * [Documentation Wiki](https://github.com/peerkar/liferay-gsearch/wiki)
 
