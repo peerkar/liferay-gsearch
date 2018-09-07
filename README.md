@@ -2,7 +2,11 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard search portlet available.
 
-# Documentation
+## News
+
+Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
+
+## Documentation
 
 * [About](https://github.com/peerkar/liferay-gsearch/wiki/About)
 * [Screenshots](https://github.com/peerkar/liferay-gsearch/wiki/Screenshots)
@@ -10,13 +14,12 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 * [Changelog](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * [Documentation Wiki](https://github.com/peerkar/liferay-gsearch/wiki)
 
-# Quick Installation Guide
+## Quick Installation Guide
 
-__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Most of the plugins are not yet upgraded to 7.1. because of platform features like Audience Targeting and IPGeoCoder still missing. 
+__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Most of the plugins are not yet upgraded to 7.1. because of platform features like Audience Targeting and IPGeoCoder are still missing. 
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-
-## Step 1 
+### Step 1 
 
 Download and deploy following jars from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
@@ -27,33 +30,35 @@ Download and deploy following jars from [binaries folder](https://github.com/pee
 
 Check that all the modules are deployed correctly.
 
-## Step 2
+### Step 2
 
 Download the default core configuration for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
 
-## Step 3 
+### Step 3 
 
 You need to have an Asset Publisher to show the search result. By default there it has to be on a page with friendlyURL '/viewasset'. You can change that later in the configuration.
  
-## Step 4
+### Step 4
 
-__This is currently for 7.0 versions only__ (ES6 adapter upgrade for 7.1 coming soon).
- 
-If you want to take advantage of query suggestions and fully configurable query building and relevancy you need to install additionally the custom Elasticsearch adapter. 
+If you want to take advantage of all the goodies, including query suggestions and configurable query building and relevancy you need to install the custom Elasticsearch adapter (recommended). 
 
-For that, download and deploy following jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+Find out the compatible adapter version for your portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-* com.liferay.portal.search.elasticsearch-VERSION-GSEARCH-PATCHED.jar 
+Notice, that __7.1 users have to install a standalone Elasticsearch server__ as the analyzers use stemmer filter and that's not supported in the embedded server.
 
-Check that module installs correctly, do full reindex and installation is done.
+Download and deploy the jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
-## Step 5
+Check that module installs correctly. When installing, this module tries to disable the standard adapter and might cause errors to log. Give it a minute to finish the process.
+
+__Do full reindex__ to create custom analyzers, mappings and settings.
+
+### Step 5
 
 Place the GSearch portlet on some page and test.
 
 For full installation guide, including add-ons, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
 
-# Important Note About Permissions
+## Important Note About Permissions
 
 This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index.
 
@@ -69,6 +74,6 @@ To extend this solution to fully support inherited role permissions, it's sugges
 
 In a large scale system, this approach would have to be designed carefully to avoid performance problems.
 
-# Disclaimer
+## Disclaimer
 
 This portlet hasn't been thoroughly tested and is provided as is. You can freely develop it further to serve your own purposes. If you have good development ideas, please leave ticket or ping me. Also many thanks in advance for any bug findings.
