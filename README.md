@@ -44,7 +44,7 @@ If you want to take advantage of all the goodies, including query suggestions an
 
 Find out the compatible adapter version for your portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-Notice, that __7.1 users have to install a standalone Elasticsearch server__ as the analyzers use stemmer filter and that's not supported in the embedded server.
+Notice, that when using custom adapter on __7.1__, a __standalone Elasticsearch server has to be used__ as the analyzers use stemmer filter which is not supported in the embedded server.
 
 Download and deploy the jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
