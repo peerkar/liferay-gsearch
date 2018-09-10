@@ -82,7 +82,7 @@
 		<div class="item">
 
 			{if $item.imageSrc}
-				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+				<div class="item-icon hidden-xs">
 					{if $item.imageSrc != ''}
 						<a href="{$item.link}">
 							<div class="file-icon">
@@ -93,9 +93,9 @@
 						</a>
 					{/if}
 				</div>
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">
+				<div class="document-content">
 			{else}
-				<div class="content">
+				<div class="web-content">
 			{/if}
 
 				<div class="heading">
@@ -129,6 +129,8 @@
 				{/if}
 
 			</div>
+			<div class="clear"></div>
 		</div>
+
 	</div>
 {/template}
