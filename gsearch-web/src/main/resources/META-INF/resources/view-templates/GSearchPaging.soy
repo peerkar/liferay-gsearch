@@ -9,27 +9,39 @@
 {template .render}
 
 	{if $results and $results.paging.pages}
-	
+
 		<div class="row" id="{$portletNamespace}Paging">
-		
+
 			// Do we have a previous set of pages?
-		
+
 			{if $results.paging.prevStart}
 				{call .prevStart}
 					{param prevStart: $results.paging.prevStart /}
 				{/call}
 			{/if}
-	
-			// Print pages
-			
+
+			{if $results.paging.prevPageStart > -1}
+				{call .prevPage}
+					{param prevPageStart: $results.paging.prevPageStart /}
+				{/call}
+			{/if}
+
+			    // Print pages
+
 			{foreach $page in $results.paging.pages}
 				{call .page}
 					{param page: $page /}
 				{/call}
 			{/foreach}
-			
+
 			// Do we have a next set of pages?
-		
+
+			{if $results.paging.nextPageStart > -1}
+				{call .nextPage}
+					{param nextPageStart: $results.paging.nextPageStart /}
+				{/call}
+			{/if}
+
 			{if $results.paging.nextStart}
 				{call .nextStart}
 					{param nextStart: $results.paging.nextStart /}
@@ -71,5 +83,27 @@
 {template .nextStart}
 	<span class="forward">
 		<a data-value="{$nextStart}" href="#">&raquo;</a>
+	</span>
+{/template}
+
+/**
+ * Print link to previous page
+ *
+ * @param prevPageStart
+ */
+{template .prevPage}
+    <span class="back">
+		<a data-value="{$prevPageStart}" href="#">{msg desc=""}previous{/msg}</a>
+	</span>
+{/template}
+
+/**
+ * Print link to next page
+ *
+ * @param nextPageStart
+ */
+{template .nextPage}
+    <span class="forward">
+		<a data-value="{$nextPageStart}" href="#">{msg desc=""}next{/msg}</a>
 	</span>
 {/template}

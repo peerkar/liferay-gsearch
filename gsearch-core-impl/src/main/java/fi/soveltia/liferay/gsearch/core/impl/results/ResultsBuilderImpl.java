@@ -452,6 +452,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		JSONArray pageArray = JSONFactoryUtil.createJSONArray();
 
+		int prevPageStart = -1;
+		int nextPageStart = -1;
+
 		for (int i = loopStart; i <= loopEnd; i++) {
 
 			JSONObject pageObject = JSONFactoryUtil.createJSONObject();
@@ -461,11 +464,18 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 			if (i == currentPage) {
 				pageObject.put("selected", true);
+				prevPageStart = (i - 2) * pageSize;
+				if (currentPage < pageCount) {
+					nextPageStart = i * pageSize;
+				}
 			}
 			pageArray.put(pageObject);
 		}
 
 		pagingObject.put("pages", pageArray);
+
+		pagingObject.put("prevPageStart", prevPageStart);
+		pagingObject.put("nextPageStart", nextPageStart);
 
 		return pagingObject;
 	}
