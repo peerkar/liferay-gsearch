@@ -94,12 +94,12 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		// Create facets
 
-		try {
-			resultsObject.put("facets", createFacetsArray(searchContext));
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
+//		try {
+//			resultsObject.put("facets", createFacetsArray(searchContext));
+//		}
+//		catch (Exception e) {
+//			_log.error(e, e);
+//		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(

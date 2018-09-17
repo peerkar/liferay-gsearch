@@ -4,6 +4,7 @@
  * GSearch portlet main view.
  *
  * @param id
+ * @param? addResultsCallback
  * @param portletNamespace
  * @param? getQueryParam
  * @param? results
@@ -46,22 +47,22 @@
 		// Basic Filters.
 
 		<div class="gsearch-filters gsearch-centered">
-//			{call GSearchFilters.render}
-//				{param getQueryParam: $getQueryParam /}
-//				{param setQueryParam: $setQueryParam /}
-//				{param addResultsCallback: $addResultsCallback /}
-//			{/call}
+			{call GSearchFilters.render}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+				{param addResultsCallback: $addResultsCallback /}
+			{/call}
 		</div>
 
 		// Facets.
 
-		<div class="gsearch-filters gsearch-facets gsearch-centered">
+//		<div class="gsearch-filters gsearch-facets gsearch-centered">
 //			{call GSearchFacets.render}
 //				{param getQueryParam: $getQueryParam /}
 //				{param setQueryParam: $setQueryParam /}
 //				{param results: $results /}
 //			{/call}
-		</div>
+//		</div>
 
 		// Stats.
 

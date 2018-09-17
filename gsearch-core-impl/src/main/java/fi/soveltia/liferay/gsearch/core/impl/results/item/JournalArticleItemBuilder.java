@@ -237,7 +237,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 
 	private static AssetCategoryLocalService _assetCategoryLocalService;
 
-	private static final String NAME = JournalArticle.class.getName();
+	static final String NAME = JournalArticle.class.getName();
 
 	private static final Log log = LogFactoryUtil.getLog(JournalArticleItemBuilder.class);
 }

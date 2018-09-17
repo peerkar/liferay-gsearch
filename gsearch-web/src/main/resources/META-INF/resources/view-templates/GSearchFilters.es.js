@@ -19,10 +19,10 @@ class GSearchFilters extends Component {
 	constructor(opt_config, opt_parentElement) {
 
 		super(opt_config, opt_parentElement);
-		
+
 		this.debug = opt_config.JSDebugEnabled;
 
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
+		this.initialQueryParameters = opt_config.initialQueryParameters;
 
 		this.portletNamespace = opt_config.portletNamespace;
 
@@ -37,77 +37,77 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.attached()");
 		}
-		
+
 		// Setup asset type options
-		
+
 		this.setupAssetTypeOptions()
-		
+
 		// Set initial query parameters from calling url.
 
 		GSearchUtils.setInitialQueryParameters(
-			this.initialQueryParameters, 
-			this.templateParameters, 
+			this.initialQueryParameters,
+			this.templateParameters,
 			this.setQueryParam
-		);	
-		
+		);
+
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'BasicFilters', 
-			'optionmenu', 
-			this.getQueryParam, 
+			this.portletNamespace + 'BasicFilters',
+			'optionmenu',
+			this.getQueryParam,
 			this.setQueryParam
 		);
-		
+
 		// Add results callback
-		
+
 		this.addResultsCallback(this.updateAssetTypeFacetCounts);
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
 	rendered() {
-		
+
 		if (this.debug) {
 			console.log("GSearchFilters.rendered()");
 		}
 	}
-	
+
 	/**
 	 * Setup asset type options
 	 */
 	setupAssetTypeOptions() {
-		
+
 		let html = '';
-		
+
 		let length = this.assetTypeOptions.length;
-		
+
 		for (let i = 0; i < length; i++) {
 
 			let item = this.assetTypeOptions[i];
 
 			html += '<li><a data-facet="' + item.entryClassName + '" data-value="' + item.key + '" href="#">';
-			html += '<span class="text">' + item.localization + '</span>';
+			html += '<span class="text">' + item.localization + '</span> foo';
 			html += '<span class="count"></span>';
 			html += '</a></li>';
 		}
 		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
 	}
-	
+
 	/**
-	 * Update asset type facet counts. 
+	 * Update asset type facet counts.
 	 */
-	updateAssetTypeFacetCounts(portletNamespace, results) {		
+	updateAssetTypeFacetCounts(portletNamespace, results) {
 
 		// Clear current values
-		
+
 		$('#' + portletNamespace + 'TypeFilterOptions li .count').html('');
-		
+
 		if (results && results.facets) {
-			
+
 			let entryClassNameFacets = null;
-			
+
 			let length = results.facets.length;
 
 			for (let i = 0; i < length; i++) {
@@ -117,23 +117,23 @@ class GSearchFilters extends Component {
 					break;
 				}
 			}
-			
+
 			if (entryClassNameFacets) {
 
 				let valueCount = entryClassNameFacets.length;
-				
+
 				for (let i = 0; i < valueCount; i++) {
 
 					let term =  entryClassNameFacets[i].term;
 					let frequency =  entryClassNameFacets[i].frequency;
 					let element = $('#' + portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
-				
+
 					if (element) {
 						$(element).find('.count').html('(' + frequency + ')');
 					}
 				}
 			}
-		}			
+		}
 	}
 }
 
@@ -154,7 +154,7 @@ GSearchFilters.STATE = {
 	},
 	templateParameters: {
 		value: ['type','scope','time']
-	}	
+	}
 };
 
 // Register component

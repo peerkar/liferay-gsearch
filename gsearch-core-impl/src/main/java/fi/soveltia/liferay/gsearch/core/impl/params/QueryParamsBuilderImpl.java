@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import javax.portlet.PortletRequest;
 
@@ -43,12 +44,12 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
 
 /**
  * Query params builder implementation.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
-	immediate = true, 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore",
+	immediate = true,
 	service = QueryParamsBuilder.class
 )
 public class QueryParamsBuilderImpl implements QueryParamsBuilder {
@@ -72,7 +73,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setTimeParam();
 		setTypeParam();
 
-		setFacetParams();
+//		setFacetParams();
 
 		setResultsLayoutParam();
 
@@ -93,57 +94,59 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Parse asset class name corresponding the key.
-	 * 
+	 * Parse asset class name and other type related params corresponding the key.
+	 *
 	 * @param key
 	 *            search key
-	 * @return corresponding class name.
+	 * @return corresponding query type object.
 	 * @throws JSONException
 	 */
-	protected String parseAssetClass(String key)
+	protected QueryType parseQueryType(String key)
 		throws JSONException, ClassNotFoundException {
 
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.typeConfiguration());
 
-		String className = null;
-
+		QueryType queryType = QueryType.newBuilder().build();
 		for (int i = 0; i < configurationArray.length(); i++) {
 
 			JSONObject item = configurationArray.getJSONObject(i);
 
 			if (key.equals(item.getString("key"))) {
-
-				className = item.getString("entryClassName");
+				queryType = getQueryType(item);
 				break;
 			}
 		}
 
-		return className;
+		return queryType;
+	}
+
+	private QueryType getQueryType(JSONObject item) {
+		String entryClassName = item.getString("entryClassName");
+		String ddmStructureKey = item.getString("ddmStructureKey", null);
+		return QueryType.newBuilder().entryClassName(entryClassName).ddmStructureKey(ddmStructureKey).build();
 	}
 
 	/**
 	 * Parse default set of asset class names to search for.
-	 * 
+	 *
 	 * @return list of class names
 	 * @throws JSONException
 	 */
-	protected List<String> parseDefaultAssetClasses()
+	protected List<QueryType> parseDefaultQueryTypes()
 		throws ClassNotFoundException, JSONException {
 
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.typeConfiguration());
 
-		List<String> classNames = new ArrayList<String>();
+		List<QueryType> queryTypes = new ArrayList<>();
 
 		for (int i = 0; i < configurationArray.length(); i++) {
-
 			JSONObject item = configurationArray.getJSONObject(i);
-
-			classNames.add(item.getString("entryClassName"));
+			queryTypes.add(getQueryType(item));
 		}
 
-		return classNames;
+		return queryTypes;
 	}
 
 	/**
@@ -159,7 +162,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	/**
 	 * Set facet parameters.
-	 * 
+	 *
 	 * @throws JSONException
 	 */
 	protected void setFacetParams()
@@ -219,7 +222,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 				else {
 
 					if (isMultiValued) {
-						
+
 						FacetParam facetParam = new FacetParam(
 							fieldName, fieldValues, BooleanClauseOccur.MUST);
 						facetParams.put(facetParam, BooleanClauseOccur.MUST);
@@ -272,7 +275,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	/**
 	 * Set keywords parameter.
-	 * 
+	 *
 	 * @throws KeywordsException
 	 */
 	protected void setKeywordsParam()
@@ -346,7 +349,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	/**
 	 * Set sort. Default sort field equals to score.
-	 * 
+	 *
 	 * @throws JSONException
 	 */
 	protected void setSortParam()
@@ -492,7 +495,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	/**
 	 * Set types (asset types to search for).
-	 * 
+	 *
 	 * @throws ClassNotFoundException
 	 * @throws PatternSyntaxException
 	 * @throws JSONException
@@ -505,16 +508,25 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		List<String> classNames = new ArrayList<String>();
 
-		String className = parseAssetClass(typeFilter);
+		List<String> ddmStructureKeys = new ArrayList<>();
+		QueryType queryType = parseQueryType(typeFilter);
 
-		if (className != null) {
-			classNames.add(className);
+		if (queryType.getEntryClassName() != null) {
+			classNames.add(queryType.getEntryClassName());
+			ddmStructureKeys.add(queryType.getDdmStructureKey());
 		}
 		else {
-			classNames.addAll(parseDefaultAssetClasses());
+			List<QueryType> queryTypes = parseDefaultQueryTypes();
+			classNames.addAll(
+				queryTypes
+					.stream()
+					.map(QueryType::getEntryClassName)
+					.collect(Collectors.toList())
+			);
 		}
 
 		_queryParams.setClassNames(classNames);
+		//TODO _queryParams.setddmstructurekeys
 	}
 
 	/**
