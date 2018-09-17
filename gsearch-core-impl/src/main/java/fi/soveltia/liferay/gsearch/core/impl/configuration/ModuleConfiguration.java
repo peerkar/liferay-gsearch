@@ -11,7 +11,7 @@ import aQute.bnd.annotation.metatype.Meta;
 public interface ModuleConfiguration {
 
 	@Meta.AD(
-		deflt = "10", 
+		deflt = "10",
 		description = "page-size-desc",
 		name = "page-size-name",
 		required = false
@@ -19,13 +19,13 @@ public interface ModuleConfiguration {
 	public int pageSize();
 
 	@Meta.AD(
-		deflt = "/viewasset", 
+		deflt = "/viewasset",
 	    name = "asset-publisher-page-name",
 	    description = "asset-publisher-page-desc",
 		required = false
 	)
 	public String assetPublisherPage();
-		
+
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
 		description = "suggest-configuration-desc",
@@ -35,7 +35,7 @@ public interface ModuleConfiguration {
 	public String suggestConfiguration();
 
 	@Meta.AD(
-		deflt = "true", 
+		deflt = "true",
 	    description = "enable-query-suggestions-name-desc",
 	    name = "enable-query-suggestions-name",
 		required = false
@@ -43,7 +43,7 @@ public interface ModuleConfiguration {
 	public boolean enableQuerySuggestions();
 
 	@Meta.AD(
-		deflt = "1", 
+		deflt = "1",
 		description = "query-suggestions-hits-threshold-desc",
 	    name = "Query Suggestion hits threshold.",
 		required = false
@@ -51,20 +51,20 @@ public interface ModuleConfiguration {
 	public int querySuggestionsHitsThreshold();
 
 	@Meta.AD(
-		deflt = "1", 
+		deflt = "1",
 	    name = "query-suggestions-max",
 		required = false
 	)
 	public int querySuggestionsMax();
 
 	@Meta.AD(
-		deflt = "2", 
+		deflt = "2",
 		description = "query-indexing-threshold-desc",
 	    name = "query-indexing-threshold-name",
 		required = false
 	)
 	public int queryIndexingThreshold();
-		
+
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
 		description = "type-configuration-desc",
@@ -72,7 +72,7 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public String typeConfiguration();
-	
+
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
 	    description = "facet-configuration-desc",
@@ -91,9 +91,17 @@ public interface ModuleConfiguration {
 
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
-	    description = "sortfield-configuration-desc",
-	    name = "sortfield-configuration-name",
+		description = "sortfield-configuration-desc",
+		name = "sortfield-configuration-name",
 		required = false
 	)
 	public String sortFieldConfiguration();
+
+	@Meta.AD(
+		deflt = "[Please get the default configuration from workgroups",
+		description = "ddm-structure-mapping-configuration-desc",
+		name = "ddm-structure-mapping",
+		required = false
+	)
+	public String ddmStructureMappingConfiguration();
 }

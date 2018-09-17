@@ -299,7 +299,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				jsonObject.put(
 					"type",
-					getLocalization(resultItemBuilder.getType().toLowerCase()));
+					getLocalization("type." + resultItemBuilder.getType().toLowerCase()));
 
 				// Link
 

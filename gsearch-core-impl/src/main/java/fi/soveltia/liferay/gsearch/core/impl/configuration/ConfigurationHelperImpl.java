@@ -24,11 +24,11 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 
 /**
  * JSON configuration helper service implementation.
- * 
+ *
  * @author Petteri
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore",
 	immediate = true,
 	service = ConfigurationHelper.class
 )
@@ -62,7 +62,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 			item.put(
 				"localization",
 				getLocalization(
-					"type." + item.getString("entryClassName").toLowerCase(),
+					"type." + item.getString("key").toLowerCase(),
 					locale));
 			translatedOptions.put(item);
 
@@ -113,12 +113,24 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	 */
 	@Override
 	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName) {
-		
-		fieldName = fieldName.replace("$language_id", portletRequest.getLocale().toString());		
-		
+
+		fieldName = fieldName.replace("$language_id", portletRequest.getLocale().toString());
+
 		return fieldName;
-	}	
-	
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JSONObject getDDMStructureMapping() throws JSONException {
+
+		return JSONFactoryUtil.createJSONObject(
+			_gSearchConfiguration.ddmStructureMappingConfiguration());
+	}
+
+
+
 	private String getLocalization(String key, Locale locale) {
 
 		if (_resourceBundle == null) {
@@ -134,7 +146,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		return key;
 	}
 
-	
+
 	private volatile ModuleConfiguration _gSearchConfiguration;
 
 	private ResourceBundle _resourceBundle;
