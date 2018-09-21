@@ -506,14 +506,16 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String typeFilter =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE);
 
-		List<String> classNames = new ArrayList<String>();
-
+		List<String> classNames = new ArrayList<>();
 		List<String> ddmStructureKeys = new ArrayList<>();
+
 		QueryType queryType = parseQueryType(typeFilter);
 
 		if (queryType.getEntryClassName() != null) {
 			classNames.add(queryType.getEntryClassName());
-			ddmStructureKeys.add(queryType.getDdmStructureKey());
+			if (queryType.getDDMStructureKey() != null) {
+				ddmStructureKeys.add(queryType.getDDMStructureKey());
+			}
 		}
 		else {
 			List<QueryType> queryTypes = parseDefaultQueryTypes();
@@ -526,7 +528,24 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 
 		_queryParams.setClassNames(classNames);
-		//TODO _queryParams.setddmstructurekeys
+
+		if (ddmStructureKeys.size() > 0) {
+			setDDMStructureParams(ddmStructureKeys);
+		}
+
+	}
+
+	private void setDDMStructureParams(List<String> ddmStructureKeys) {
+
+		String[] values = ddmStructureKeys.toArray(new String[0]);
+
+		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<>();
+
+		FacetParam facetParam = new FacetParam(
+			"ddmStructureKey", values, BooleanClauseOccur.SHOULD);
+		facetParams.put(facetParam, BooleanClauseOccur.MUST);
+
+		_queryParams.setFacetsParams(facetParams);
 	}
 
 	/**

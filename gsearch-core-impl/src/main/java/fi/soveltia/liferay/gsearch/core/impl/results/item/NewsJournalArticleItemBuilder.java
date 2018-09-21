@@ -24,14 +24,15 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
     @Reference
     private ConfigurationHelper _configurationHelperService;
 
-    @Activate
-    protected void activate() {
-        try {
-           DDM_STRUCTURE_KEY = (String) _configurationHelperService.getDDMStructureMapping().get("newsDDMStructureKey");
-        } catch (JSONException e) {
-            log.error("Cannot get DDM structure key mapping for news");
-        }
-    }
+//    @Activate
+//    protected void activate() {
+//        try {
+//            DDM_STRUCTURE_KEY = _configurationHelperService.getDDMStructureMapping().getJSONObject("news").getString("ddmStructureKey");
+            // todo get from module type conf
+//        } catch (JSONException e) {
+//            log.error("Cannot get DDM structure key mapping for news");
+//        }
+//    }
 
     @Override
     public boolean canBuild(Document document) {
@@ -40,7 +41,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
     @Override
     public String getType() {
-        return "web-content-news";
+        return "news";
     }
 
 }

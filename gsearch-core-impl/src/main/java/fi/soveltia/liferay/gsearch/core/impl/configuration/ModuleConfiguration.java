@@ -97,11 +97,5 @@ public interface ModuleConfiguration {
 	)
 	public String sortFieldConfiguration();
 
-	@Meta.AD(
-		deflt = "[Please get the default configuration from workgroups",
-		description = "ddm-structure-mapping-configuration-desc",
-		name = "ddm-structure-mapping",
-		required = false
-	)
-	public String ddmStructureMappingConfiguration();
+
 }

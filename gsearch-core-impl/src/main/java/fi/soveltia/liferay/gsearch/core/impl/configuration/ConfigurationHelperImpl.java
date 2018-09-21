@@ -119,18 +119,6 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		return fieldName;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JSONObject getDDMStructureMapping() throws JSONException {
-
-		return JSONFactoryUtil.createJSONObject(
-			_gSearchConfiguration.ddmStructureMappingConfiguration());
-	}
-
-
-
 	private String getLocalization(String key, Locale locale) {
 
 		if (_resourceBundle == null) {

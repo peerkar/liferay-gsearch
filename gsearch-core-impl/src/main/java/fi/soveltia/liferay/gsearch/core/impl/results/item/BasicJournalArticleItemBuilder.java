@@ -24,14 +24,15 @@ public class BasicJournalArticleItemBuilder extends JournalArticleItemBuilder im
     @Reference
     private ConfigurationHelper _configurationHelperService;
 
-    @Activate
-    protected void activate() {
-        try {
-            DDM_STRUCTURE_KEY = (String) _configurationHelperService.getDDMStructureMapping().get("basicDDMStructureKey");
-        } catch (JSONException e) {
-            log.error("Cannot get DDM structure key mapping for basic web content");
-        }
-    }
+//    @Activate
+//    protected void activate() {
+//        try {
+//            DDM_STRUCTURE_KEY = _configurationHelperService.getDDMStructureMapping().getJSONObject("content").getString("ddmStructureKey");
+    // todo get from module type conf
+//        } catch (JSONException e) {
+//            log.error("Cannot get DDM structure key mapping for basic web content");
+//        }
+//    }
 
     @Override
     public boolean canBuild(Document document) {
@@ -40,7 +41,7 @@ public class BasicJournalArticleItemBuilder extends JournalArticleItemBuilder im
 
     @Override
     public String getType() {
-        return "web-content-basic";
+        return "basic";
     }
 
 }

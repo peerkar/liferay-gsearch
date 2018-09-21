@@ -55,9 +55,4 @@ public interface ConfigurationHelper {
 	 */
 	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName);
 
-
-	/**
-	 * Parse DDM structure mapping as json object
-	 */
-	public JSONObject getDDMStructureMapping() throws JSONException;
 }

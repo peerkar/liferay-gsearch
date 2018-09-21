@@ -1,6 +1,6 @@
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
-public class QueryType {
+class QueryType {
 
     private final String entryClassName;
     private final String ddmStructureKey;
@@ -10,15 +10,15 @@ public class QueryType {
         ddmStructureKey = builder.ddmStructureKey;
     }
 
-    public String getEntryClassName() {
+    String getEntryClassName() {
         return entryClassName;
     }
 
-    public String getDdmStructureKey() {
+    String getDDMStructureKey() {
         return ddmStructureKey;
     }
 
-    public static Builder newBuilder() {
+    static Builder newBuilder() {
         return new Builder();
     }
 
@@ -30,17 +30,17 @@ public class QueryType {
         private Builder() {
         }
 
-        public Builder entryClassName(String entryClassName) {
+        Builder entryClassName(String entryClassName) {
             this.entryClassName = entryClassName;
             return this;
         }
 
-        public Builder ddmStructureKey(String ddmStructureKey) {
+        Builder ddmStructureKey(String ddmStructureKey) {
             this.ddmStructureKey = ddmStructureKey;
             return this;
         }
 
-        public QueryType build() {
+        QueryType build() {
             return new QueryType(this);
         }
     }
