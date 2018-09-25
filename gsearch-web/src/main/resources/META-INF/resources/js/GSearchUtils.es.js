@@ -175,28 +175,35 @@ class GSearchUtils {
 
 		$('#' + optionElementId + ' li a').on('click', function(event) {
 
-			let currentValues = queryParamGetter(queryParam);
+			// disable clearing current filter when it is clicked again
+			let parent = event.currentTarget.parentElement;
+			let isAlreadySelected = $(parent).hasClass('selected');
 
-			let value = $(this).attr('data-value');
+			if (!isAlreadySelected) {
+                let currentValues = queryParamGetter(queryParam);
 
-			if (currentValues.indexOf(value) < 0) {
+                let value = $(this).attr('data-value');
 
-				queryParamSetter(queryParam, value, true, isMultiValued);
+                if (currentValues.indexOf(value) < 0) {
 
-				let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
-						triggerElementId, [value], isMultiValued);
+                    queryParamSetter(queryParam, value, true, isMultiValued);
 
-				if (selectedItems.length > 0) {
+                    let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
+                        triggerElementId, [value], isMultiValued);
 
-					GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-				}
+                    if (selectedItems.length > 0) {
 
-			} else {
+                        GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+                    }
 
-				queryParamSetter(queryParam, null, true, isMultiValued, value);
+                } else {
 
-				GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
-			}
+                    queryParamSetter(queryParam, null, true, isMultiValued, value);
+
+                    GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+                }
+
+            }
 			event.preventDefault();
 		});
 	}
