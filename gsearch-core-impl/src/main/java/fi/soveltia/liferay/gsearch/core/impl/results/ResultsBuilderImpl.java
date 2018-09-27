@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
@@ -86,20 +85,12 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		// Create meta info array
 
-		resultsObject.put("meta", createMetaObject());
+		resultsObject.put("meta", createMetaObject(searchContext));
 
 		// Paging object
 
 		resultsObject.put("paging", createPagingObject());
 
-		// Create facets
-
-//		try {
-//			resultsObject.put("facets", createFacetsArray(searchContext));
-//		}
-//		catch (Exception e) {
-//			_log.error(e, e);
-//		}
 
 		if (_log.isDebugEnabled()) {
 			_log.debug(
@@ -352,7 +343,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return meta information JSON object
 	 */
-	protected JSONObject createMetaObject() {
+	protected JSONObject createMetaObject(SearchContext searchContext) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -381,7 +372,44 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		jsonObject.put("totalHits", _hits.getLength());
 
+		jsonObject.put("typeCounts", getTypeCounts(searchContext));
+
 		return jsonObject;
+	}
+
+	private JSONObject getTypeCounts(SearchContext searchContext) {
+
+		JSONObject typeCounts = JSONFactoryUtil.createJSONObject();
+		try {
+			JSONArray configuration = JSONFactoryUtil.createJSONArray(
+				_moduleConfiguration.typeConfiguration());
+
+			Map<String, Facet> facets = searchContext.getFacets();
+
+			for (int i = 0; i < configuration.length(); i++) {
+				JSONObject entry = configuration.getJSONObject(i);
+				String mainFacetKey = "";
+				String term = "";
+				String typeKey = entry.getString("key");
+				if (entry.has("ddmStructureKey")) {
+					mainFacetKey = "ddmStructureKey";
+					term = entry.getString("ddmStructureKey");
+				} else {
+					mainFacetKey = "entryClassName";
+					term = entry.getString("entryClassName");
+				}
+				if (facets.containsKey(mainFacetKey)) {
+					Facet mainFacet = facets.get(mainFacetKey);
+					TermCollector termCollector = mainFacet.getFacetCollector().getTermCollector(term);
+					typeCounts.put(typeKey, termCollector.getFrequency());
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return typeCounts;
 	}
 
 	private int getEnd() {

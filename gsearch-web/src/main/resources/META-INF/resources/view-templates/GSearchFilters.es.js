@@ -87,7 +87,7 @@ class GSearchFilters extends Component {
 
 			let item = this.assetTypeOptions[i];
 
-			html += '<li><a data-facet="' + item.entryClassName + '" data-value="' + item.key + '" href="#">';
+			html += '<li><a data-value="' + item.key + '" href="#">';
 			html += '<span class="text">' + item.localization + '</span>';
 			html += '<span class="count"></span>';
 			html += '</a></li>';
@@ -104,35 +104,17 @@ class GSearchFilters extends Component {
 
 		$('#' + portletNamespace + 'TypeFilterOptions li .count').html('');
 
-		if (results && results.facets) {
+		if (results && results.meta.typeCounts) {
 
-			let entryClassNameFacets = null;
-
-			let length = results.facets.length;
-
-			for (let i = 0; i < length; i++) {
-
-				if(results.facets[i].paramName == 'entryClassName') {
-					entryClassNameFacets = results.facets[i].values;
-					break;
+			todo ao. each ei toimi?
+            $('#' + portletNamespace + 'TypeFilterOptions li a').each(function(element) {
+            	let key = element.attr('data-value');
+            	if (key in results.meta.typeCounts) {
+					let frequency = results.meta.typeCounts[key];
+                    $(element).find('.count').html('(' + frequency + ')');
 				}
-			}
+			});
 
-			if (entryClassNameFacets) {
-
-				let valueCount = entryClassNameFacets.length;
-
-				for (let i = 0; i < valueCount; i++) {
-
-					let term =  entryClassNameFacets[i].term;
-					let frequency =  entryClassNameFacets[i].frequency;
-					let element = $('#' + portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
-
-					if (element) {
-						$(element).find('.count').html('(' + frequency + ')');
-					}
-				}
-			}
 		}
 	}
 }
