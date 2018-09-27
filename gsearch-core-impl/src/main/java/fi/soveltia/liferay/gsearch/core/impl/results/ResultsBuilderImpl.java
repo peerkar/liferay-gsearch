@@ -372,14 +372,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		jsonObject.put("totalHits", _hits.getLength());
 
-		jsonObject.put("typeCounts", getTypeCounts(searchContext));
+		jsonObject.put("typeCounts", getTypeCounts(searchContext, _hits.getLength()));
 
 		return jsonObject;
 	}
 
-	private JSONObject getTypeCounts(SearchContext searchContext) {
+	private JSONObject getTypeCounts(SearchContext searchContext, int totalHits) {
 
 		JSONObject typeCounts = JSONFactoryUtil.createJSONObject();
+		typeCounts.put("everything", totalHits);
 		try {
 			JSONArray configuration = JSONFactoryUtil.createJSONArray(
 				_moduleConfiguration.typeConfiguration());
@@ -388,18 +389,18 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 			for (int i = 0; i < configuration.length(); i++) {
 				JSONObject entry = configuration.getJSONObject(i);
-				String mainFacetKey = "";
+				String facetKey = "";
 				String term = "";
 				String typeKey = entry.getString("key");
 				if (entry.has("ddmStructureKey")) {
-					mainFacetKey = "ddmStructureKey";
+					facetKey = "ddmStructureKey";
 					term = entry.getString("ddmStructureKey");
 				} else {
-					mainFacetKey = "entryClassName";
+					facetKey = "entryClassName";
 					term = entry.getString("entryClassName");
 				}
-				if (facets.containsKey(mainFacetKey)) {
-					Facet mainFacet = facets.get(mainFacetKey);
+				if (facets.containsKey(facetKey)) {
+					Facet mainFacet = facets.get(facetKey);
 					TermCollector termCollector = mainFacet.getFacetCollector().getTermCollector(term);
 					typeCounts.put(typeKey, termCollector.getFrequency());
 				}

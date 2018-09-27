@@ -73,7 +73,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setTimeParam();
 		setTypeParam();
 
-//		setFacetParams();
+		setFacetParams();
 
 		setResultsLayoutParam();
 

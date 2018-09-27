@@ -18,7 +18,7 @@
 				<span class="caret"></span>
 			</button>
 			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="nav nav-tabs tabs-menu" id="{$portletNamespace}TypeFilterOptions">
-				<li class="selected default"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
+				<li class="selected default"><a data-value="everything" href="#"><span class="text">{msg desc=""}search-everything{/msg}</span>&nbsp;<span class="count"></span></a></li>
 			</ul>
 		</div>
 
@@ -38,21 +38,21 @@
 
 	  	// Time filter
 
-		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
-			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle"
-			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
-				<span class="selection"></span>
-				<span class="caret"></span>
-			</button>
-			<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
-				<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
-				<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
-				<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
-				<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
-				<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
-				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
-			</ul>
-		</div>
+//		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
+//			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle"
+//			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
+//				<span class="selection"></span>
+//				<span class="caret"></span>
+//			</button>
+//			<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
+//				<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
+//				<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
+//				<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
+//				<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+//				<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+//				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+//			</ul>
+//		</div>
 	</div>
 {/template}
 

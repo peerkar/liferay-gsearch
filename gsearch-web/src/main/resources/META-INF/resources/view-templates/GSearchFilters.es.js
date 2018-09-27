@@ -89,6 +89,7 @@ class GSearchFilters extends Component {
 
 			html += '<li><a data-value="' + item.key + '" href="#">';
 			html += '<span class="text">' + item.localization + '</span>';
+            html += '&nbsp;'
 			html += '<span class="count"></span>';
 			html += '</a></li>';
 		}
@@ -106,14 +107,15 @@ class GSearchFilters extends Component {
 
 		if (results && results.meta.typeCounts) {
 
-			todo ao. each ei toimi?
+
             $('#' + portletNamespace + 'TypeFilterOptions li a').each(function(element) {
-            	let key = element.attr('data-value');
+                let key = $(this).attr('data-value');
             	if (key in results.meta.typeCounts) {
 					let frequency = results.meta.typeCounts[key];
-                    $(element).find('.count').html('(' + frequency + ')');
+                    $(this).find('.count').html('(' + frequency + ')');
 				}
 			});
+
 
 		}
 	}
