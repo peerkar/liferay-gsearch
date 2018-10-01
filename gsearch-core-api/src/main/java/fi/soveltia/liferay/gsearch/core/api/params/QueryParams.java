@@ -4,14 +4,16 @@ package fi.soveltia.liferay.gsearch.core.api.params;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Sort;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Query parameters pojo.
- * 
+ *
  * @author Petteri Karttunen
  */
 public class QueryParams {
@@ -83,14 +85,14 @@ public class QueryParams {
 
 		this.classNames = classNames;
 	}
-	
+
 	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
-	
+
 		return facetParams;
 	}
-	
+
 	public void setFacetsParams(Map<FacetParam, BooleanClauseOccur> facetParams) {
-	
+
 		this.facetParams = facetParams;
 	}
 
@@ -183,4 +185,17 @@ public class QueryParams {
 
 		this.sorts = sort;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		QueryParams that = (QueryParams) o;
+		return companyId == that.companyId && userId == that.userId && start == that.start && end == that.end && pageSize == that.pageSize && Arrays
+			.equals(groupIds, that.groupIds) && Objects.equals(locale, that.locale) && Objects.equals(classNames, that.classNames) && Objects
+			.equals(facetParams, that.facetParams) && Objects.equals(keywords, that.keywords) && Objects
+			.equals(originalKeywords, that.originalKeywords) && Objects.equals(resultsLayout, that.resultsLayout) && Objects
+			.equals(timeFrom, that.timeFrom) && Objects.equals(timeTo, that.timeTo) && Arrays.equals(sorts, that.sorts);
+	}
+
 }

@@ -8,7 +8,7 @@ import javax.portlet.PortletRequest;
 /**
  * Query parameters builder. This service builds query params object from
  * request parameters.
- * 
+ *
  * @author Petteri Karttunen
  */
 public interface QueryParamsBuilder {
@@ -21,6 +21,17 @@ public interface QueryParamsBuilder {
 	 * @throws PortalException
 	 */
 	public QueryParams buildQueryParams(
+		PortletRequest portletRequest)
+		throws Exception;
+
+	/**
+	 * Parse parameters from request and build a query params object, ignore filters.
+	 *
+	 * @param portletRequest
+	 * @return QueryParams object
+	 * @throws PortalException
+	 */
+	public QueryParams buildUnfilteredQueryParams(
 		PortletRequest portletRequest)
 		throws Exception;
 }

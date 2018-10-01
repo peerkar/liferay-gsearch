@@ -62,27 +62,46 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		throws Exception {
 
 		_portletRequest = portletRequest;
-		_queryParams = new QueryParams();
 
-		setCompanyParam();
-		setGroupsParam();
-		setLocaleParam();
-		setUserParam();
+		String typeFilter =
+			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE, "");
 
-		setKeywordsParam();
-		setTimeParam();
-		setTypeParam();
+		// todo add also time filter as in setTimeParam()
+		return buildQueryParamsWithType(portletRequest, typeFilter);
 
-		setFacetParams();
+	}
 
-		setResultsLayoutParam();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public QueryParams buildUnfilteredQueryParams(PortletRequest portletRequest) throws Exception {
+		return buildQueryParamsWithType(portletRequest, "everything");
+	}
 
-		setStartEndParams();
-		setPageSizeParam();
+	private QueryParams buildQueryParamsWithType(PortletRequest portletRequest, String type)
+		throws Exception {
 
-		setSortParam();
+		QueryParams queryParams = new QueryParams();
+		setCompanyParam(queryParams);
+		setGroupsParam(queryParams);
+		setLocaleParam(queryParams);
+		setUserParam(queryParams);
 
-		return _queryParams;
+		setKeywordsParam(queryParams);
+		setTimeParam(queryParams);
+		setTypeParam(queryParams, type);
+
+//		setFacetParams(queryParams);
+
+//		setResultsLayoutParam(queryParams);
+
+		setStartEndParams(queryParams);
+		setPageSizeParam(queryParams);
+
+//		setSortParam(queryParams);
+
+		return queryParams;
 	}
 
 	@Activate
@@ -152,12 +171,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set company parameter.
 	 */
-	protected void setCompanyParam() {
+	protected void setCompanyParam(QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		_queryParams.setCompanyId(themeDisplay.getCompanyId());
+		queryParams.setCompanyId(themeDisplay.getCompanyId());
 	}
 
 	/**
@@ -165,7 +184,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 *
 	 * @throws JSONException
 	 */
-	protected void setFacetParams()
+	protected void setFacetParams(QueryParams queryParams)
 		throws JSONException {
 
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
@@ -239,7 +258,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 				}
 			}
 		}
-		_queryParams.setFacetsParams(facetParams);
+		queryParams.setFacetsParams(facetParams);
 	}
 
 	@Reference(unbind = "-")
@@ -252,7 +271,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set groups parameter.
 	 */
-	protected void setGroupsParam() {
+	protected void setGroupsParam(QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -270,7 +289,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		else {
 			groupIds = new long[] {};
 		}
-		_queryParams.setGroupIds(groupIds);
+		queryParams.setGroupIds(groupIds);
 	}
 
 	/**
@@ -278,7 +297,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 *
 	 * @throws KeywordsException
 	 */
-	protected void setKeywordsParam()
+	protected void setKeywordsParam(QueryParams queryParams)
 		throws KeywordsException {
 
 		String keywords =
@@ -289,25 +308,25 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		if (!_requestParamValidator.validateKeywords(keywords)) {
 			throw new KeywordsException();
 		}
-		_queryParams.setKeywords(keywords);
+		queryParams.setKeywords(keywords);
 	}
 
 	/**
 	 * Set locale parameter.
 	 */
-	protected void setLocaleParam() {
+	protected void setLocaleParam(QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		_queryParams.setLocale(themeDisplay.getLocale());
+		queryParams.setLocale(themeDisplay.getLocale());
 	}
 
 	/**
 	 * Set page size parameter.
 	 */
-	protected void setPageSizeParam() {
+	protected void setPageSizeParam(QueryParams queryParams) {
 
-		_queryParams.setPageSize(_moduleConfiguration.pageSize());
+		queryParams.setPageSize(_moduleConfiguration.pageSize());
 	}
 
 	@Reference(unbind = "-")
@@ -321,7 +340,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * Set search type (normal / image search). Search type is determined from
 	 * typefilter value
 	 */
-	protected void setResultsLayoutParam() {
+	protected void setResultsLayoutParam(QueryParams queryParams) {
 
 		String resultsLayoutParam =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
@@ -336,14 +355,14 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			"file".equals(type) || "Image".equals(extensionParam);
 
 		if (GSearchResultsLayouts.THUMBNAIL_LIST.equals(resultsLayoutParam)) {
-			_queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
+			queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
 		}
 		else if (GSearchResultsLayouts.IMAGE.equals(resultsLayoutParam) &&
 			imageLayoutAvailable) {
-			_queryParams.setResultsLayout(GSearchResultsLayouts.IMAGE);
+			queryParams.setResultsLayout(GSearchResultsLayouts.IMAGE);
 		}
 		else {
-			_queryParams.setResultsLayout(GSearchResultsLayouts.LIST);
+			queryParams.setResultsLayout(GSearchResultsLayouts.LIST);
 		}
 	}
 
@@ -352,7 +371,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 *
 	 * @throws JSONException
 	 */
-	protected void setSortParam()
+	protected void setSortParam(QueryParams queryParams)
 		throws JSONException {
 
 		String sortField =
@@ -426,7 +445,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
 		}
 
-		_queryParams.setSorts(new Sort[] {
+		queryParams.setSorts(new Sort[] {
 			sort1, sort2
 		});
 	}
@@ -434,18 +453,18 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set start and end parameter.
 	 */
-	protected void setStartEndParams() {
+	protected void setStartEndParams(QueryParams queryParams) {
 
 		int start =
 			ParamUtil.getInteger(_portletRequest, GSearchWebKeys.START, 0);
-		_queryParams.setStart(start);
-		_queryParams.setEnd(start + _moduleConfiguration.pageSize());
+		queryParams.setStart(start);
+		queryParams.setEnd(start + _moduleConfiguration.pageSize());
 	}
 
 	/**
 	 * Set time parameter (modification date between).
 	 */
-	protected void setTimeParam() {
+	protected void setTimeParam(QueryParams queryParams) {
 
 		String timeFilter =
 			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TIME);
@@ -489,7 +508,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 
 		if (timeFrom != null) {
-			_queryParams.setTimeFrom(timeFrom);
+			queryParams.setTimeFrom(timeFrom);
 		}
 	}
 
@@ -500,16 +519,13 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * @throws PatternSyntaxException
 	 * @throws JSONException
 	 */
-	protected void setTypeParam()
+	protected void setTypeParam(QueryParams queryParams, String type)
 		throws PatternSyntaxException, ClassNotFoundException, JSONException {
-
-		String typeFilter =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE);
 
 		List<String> classNames = new ArrayList<>();
 		List<String> ddmStructureKeys = new ArrayList<>();
 
-		QueryType queryType = parseQueryType(typeFilter);
+		QueryType queryType = parseQueryType(type);
 
 		if (queryType.getEntryClassName() != null) {
 			classNames.add(queryType.getEntryClassName());
@@ -527,15 +543,15 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			);
 		}
 
-		_queryParams.setClassNames(classNames);
+		queryParams.setClassNames(classNames);
 
 		if (ddmStructureKeys.size() > 0) {
-			setDDMStructureParams(ddmStructureKeys);
+			setDDMStructureParams(ddmStructureKeys, queryParams);
 		}
 
 	}
 
-	private void setDDMStructureParams(List<String> ddmStructureKeys) {
+	private void setDDMStructureParams(List<String> ddmStructureKeys, QueryParams queryParams) {
 
 		String[] values = ddmStructureKeys.toArray(new String[0]);
 
@@ -545,18 +561,18 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			"ddmStructureKey", values, BooleanClauseOccur.SHOULD);
 		facetParams.put(facetParam, BooleanClauseOccur.MUST);
 
-		_queryParams.setFacetsParams(facetParams);
+		queryParams.setFacetsParams(facetParams);
 	}
 
 	/**
 	 * Set user parameter.
 	 */
-	protected void setUserParam() {
+	protected void setUserParam(QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		_queryParams.setUserId(themeDisplay.getUserId());
+		queryParams.setUserId(themeDisplay.getUserId());
 	}
 
 	// Modification date field name in the index.
@@ -571,8 +587,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private PortletRequest _portletRequest;
-
-	private QueryParams _queryParams;
 
 	private RequestParamValidator _requestParamValidator;
 }

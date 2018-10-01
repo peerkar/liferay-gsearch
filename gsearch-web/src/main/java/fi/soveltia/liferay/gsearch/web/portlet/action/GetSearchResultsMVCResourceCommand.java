@@ -23,15 +23,15 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 
 /**
  * Resource command for getting the search results.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true, 
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"mvc.command.name=" + GSearchResourceKeys.GET_SEARCH_RESULTS
-	}, 
+	},
 	service = MVCResourceCommand.class
 )
 public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
@@ -46,13 +46,17 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		JSONObject responseObject = null;
+		JSONObject unfilteredResponseObject = null;
 
 		// Build query parameters object.
 
 		QueryParams queryParams = null;
+		QueryParams unfilteredQueryParams = null;
 
 		try {
 			queryParams = _queryParamsBuilder.buildQueryParams(
+				resourceRequest);
+			unfilteredQueryParams = _queryParamsBuilder.buildUnfilteredQueryParams(
 				resourceRequest);
 		}
 		catch (PortalException e) {
@@ -63,10 +67,22 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		// Try to get search results.
-		
+
 		try {
 			responseObject = _gSearch.getSearchResults(
 				resourceRequest, resourceResponse, queryParams);
+
+			// fetch unfiltered results only if there is a filter applied
+			if (!queryParams.equals(unfilteredQueryParams)) {
+				unfilteredResponseObject = _gSearch.getSearchResults(
+					resourceRequest, resourceResponse, unfilteredQueryParams);
+			}
+
+			// overwrite meta.typeCounts in responseObject if necessary
+			if (unfilteredResponseObject != null) {
+				updateTypeCountsToResponse(responseObject, unfilteredResponseObject);
+			}
+
 		}
 		catch (Exception e) {
 
@@ -79,6 +95,22 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
+	}
+
+	private void updateTypeCountsToResponse(JSONObject responseObject, JSONObject responseObjectWithTypeCounts) {
+
+		JSONObject typeCounts = null;
+		if (responseObjectWithTypeCounts.has("meta") &&
+			responseObjectWithTypeCounts.getJSONObject("meta") != null) {
+			JSONObject meta = responseObjectWithTypeCounts.getJSONObject("meta");
+			if (meta.has("typeCounts") && (meta.getJSONObject("typeCounts") != null)) {
+				typeCounts = meta.getJSONObject("typeCounts");
+			}
+		}
+
+		if (responseObject.has("meta") && (responseObject.getJSONObject("meta") != null) && (typeCounts != null)) {
+			responseObject.getJSONObject("meta").put("typeCounts", typeCounts);
+		}
 	}
 
 	@Reference(unbind = "-")
