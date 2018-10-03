@@ -14,11 +14,8 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +39,12 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * Query builder implementation.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore", 
-	immediate = true, 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore",
+	immediate = true,
 	service = QueryBuilder.class
 )
 public class QueryBuilderImpl implements QueryBuilder {
@@ -92,7 +89,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	/**
 	 * Add query contributor to the list.
-	 * 
+	 *
 	 * @param queryContributor
 	 */
 	protected void addQueryContributor(QueryContributor queryContributor) {
@@ -105,7 +102,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	/**
 	 * Process registered query contributors.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param query
 	 */
@@ -154,7 +151,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * adapter, this falls silently to the default StringQuery. Remember however
 	 * that with standard adapter you loose the possibility to define target
 	 * fields or boosts (configuration) - or, they just don't get applied.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param queryParams
 	 * @return
@@ -231,7 +228,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	/**
 	 * Remove a query contributor from list.
-	 * 
+	 *
 	 * @param clauseBuilder
 	 */
 	protected void removeQueryContributor(QueryContributor queryContributor) {
@@ -248,30 +245,27 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	/**
 	 * Set queryconfig.
-	 * 
+	 *
 	 * @param query
 	 */
 	protected void setQueryConfig(BooleanQuery query, QueryParams queryParams) {
 
 		// Create Queryconfig.
-		
+
 		QueryConfig queryConfig = new QueryConfig();
 		queryConfig.setHighlightEnabled(true);
-		
+
 		// Set highlighted fields
-		
+
 		String contentFieldLocalized =
 						Field.CONTENT + "_" + queryParams.getLocale().toString();
-		
+
 		String titleFieldLocalized =
 						Field.TITLE + "_" + queryParams.getLocale().toString();
 
 		queryConfig.setHighlightFieldNames(new String[]{Field.CONTENT, contentFieldLocalized, Field.TITLE, titleFieldLocalized});
 		query.setQueryConfig(queryConfig);
 	}
-	
-	public static final DateFormat INDEX_DATE_FORMAT =
-		new SimpleDateFormat("yyyyMMddHHmmss");
 
 	protected volatile ModuleConfiguration _moduleConfiguration;
 
@@ -281,8 +275,8 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE,
-		policy = ReferencePolicy.DYNAMIC, 
-		service = QueryContributor.class, 
+		policy = ReferencePolicy.DYNAMIC,
+		service = QueryContributor.class,
 		unbind = "removeQueryContributor"
 	)
 	private volatile List<QueryContributor> _queryContributors = null;

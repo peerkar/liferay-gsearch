@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
@@ -57,7 +58,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		try {
 			if (Validator.isNotNull(_document.get(Field.MODIFIED_DATE))) {
 
-				Date lastModified = QueryBuilderImpl.INDEX_DATE_FORMAT.parse(
+				DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+				Date lastModified = df.parse(
 					_document.get(Field.MODIFIED_DATE));
 
 				DateFormat dateFormat =
