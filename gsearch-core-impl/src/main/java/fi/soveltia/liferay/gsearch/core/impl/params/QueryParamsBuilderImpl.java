@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -142,8 +143,16 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 	private QueryType getQueryType(JSONObject item) {
 		String entryClassName = item.getString("entryClassName");
-		String ddmStructureKey = item.getString("ddmStructureKey", null);
-		return QueryType.newBuilder().entryClassName(entryClassName).ddmStructureKey(ddmStructureKey).build();
+		List<String> ddmStructureKeys = getCSVStringAsList(item.getString("ddmStructureKey", null));
+		return QueryType.newBuilder().entryClassName(entryClassName).ddmStructureKeys(ddmStructureKeys).build();
+	}
+
+	private List<String> getCSVStringAsList(String input) {
+		if (input == null) {
+			return null;
+		}
+		String[] values = input.split("\\s*,\\s*");
+		return Arrays.asList(values);
 	}
 
 	/**
@@ -529,8 +538,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		if (queryType.getEntryClassName() != null) {
 			classNames.add(queryType.getEntryClassName());
-			if (queryType.getDDMStructureKey() != null) {
-				ddmStructureKeys.add(queryType.getDDMStructureKey());
+			if (queryType.getDDMStructureKeys() != null) {
+				ddmStructureKeys.addAll(queryType.getDDMStructureKeys());
 			}
 		}
 		else {

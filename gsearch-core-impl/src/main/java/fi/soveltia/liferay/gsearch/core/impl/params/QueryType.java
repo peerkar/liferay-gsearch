@@ -1,21 +1,24 @@
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class QueryType {
 
     private final String entryClassName;
-    private final String ddmStructureKey;
+    private final List<String> ddmStructureKeys;
 
     private QueryType(Builder builder) {
         entryClassName = builder.entryClassName;
-        ddmStructureKey = builder.ddmStructureKey;
+        ddmStructureKeys = builder.ddmStructureKeys;
     }
 
     String getEntryClassName() {
         return entryClassName;
     }
 
-    String getDDMStructureKey() {
-        return ddmStructureKey;
+    List<String> getDDMStructureKeys() {
+        return ddmStructureKeys;
     }
 
     static Builder newBuilder() {
@@ -25,7 +28,7 @@ class QueryType {
 
     public static final class Builder {
         private String entryClassName;
-        private String ddmStructureKey;
+        private List<String> ddmStructureKeys;
 
         private Builder() {
         }
@@ -35,8 +38,10 @@ class QueryType {
             return this;
         }
 
-        Builder ddmStructureKey(String ddmStructureKey) {
-            this.ddmStructureKey = ddmStructureKey;
+        Builder ddmStructureKeys(List<String> ddmStructureKeys) {
+            if (ddmStructureKeys != null) {
+                this.ddmStructureKeys = new ArrayList<>(ddmStructureKeys);
+            }
             return this;
         }
 

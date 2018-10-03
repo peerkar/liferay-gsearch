@@ -390,19 +390,24 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			for (int i = 0; i < configuration.length(); i++) {
 				JSONObject entry = configuration.getJSONObject(i);
 				String facetKey = "";
-				String term = "";
+				String termString = "";
 				String typeKey = entry.getString("key");
 				if (entry.has("ddmStructureKey")) {
 					facetKey = "ddmStructureKey";
-					term = entry.getString("ddmStructureKey");
+					termString = entry.getString("ddmStructureKey");
 				} else {
 					facetKey = "entryClassName";
-					term = entry.getString("entryClassName");
+					termString = entry.getString("entryClassName");
 				}
 				if (facets.containsKey(facetKey)) {
 					Facet mainFacet = facets.get(facetKey);
-					TermCollector termCollector = mainFacet.getFacetCollector().getTermCollector(term);
-					typeCounts.put(typeKey, termCollector.getFrequency());
+					String[] terms = termString.split("\\s*,\\s*");
+					int count = 0;
+					for (String term : terms) {
+						TermCollector termCollector = mainFacet.getFacetCollector().getTermCollector(term);
+						count += termCollector.getFrequency();
+					}
+					typeCounts.put(typeKey, count);
 				}
 			}
 		}
