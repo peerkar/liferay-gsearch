@@ -63,7 +63,7 @@ class GSearchFilters extends Component {
 			this.setQueryParam
 		);
 
-		// Add results callback
+        // Add results callback
 
 		this.addResultsCallback(this.updateAssetTypeFacetCounts);
 	}
@@ -124,21 +124,35 @@ class GSearchFilters extends Component {
 	}
 
 	setupUnitFilters() {
-		var units = this.unitFilters;
-		this.createUnitFilters(units, $('#' + this.portletNamespace + 'UnitFilterOptions'), true);
+		let units = this.unitFilters;
+		this.createUnitFilters(units, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
 	}
 
 	createUnitFilters(units, element, isRootCategory) {
-        for (var i = 0; i < units.length; i++) {
-            var unit = units[i];
-            element.append('<li>' + unit.name + '</li>');
+        let colspan = 12 / units.length; // note: not tested for more than 4 columns
+        for (let i = 0; i < units.length; i++) {
+            let unit = units[i];
+            let li = null;
+            li = $(document.createElement('li'));
+            if (isRootCategory) {
+                li.addClass('list-group-item');
+                li.addClass('col-xs-' + Math.floor(colspan));
+			}
+
+
+            let checkbox = $('<input />', { type: 'checkbox', id: this.portletNamespace + 'unitCategory-' + unit.categoryId, value: unit.name , 'data-value': unit.categoryId });
+            checkbox.addClass('unit-selection');
+            checkbox.appendTo(li);
+
+            let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
+            label.addClass('unit-selection');
+            label.appendTo(li);
+
+            element.append(li);
             if ((unit.children !== null) && (unit.children.length > 0)) {
                 var ul = $(document.createElement('ul'));
-                if (isRootCategory) {
-                	ul.addClass('root-unit');
-				}
                 this.createUnitFilters(unit.children, ul, false);
-				element.append(ul);
+				li.append(ul);
             }
         }
 

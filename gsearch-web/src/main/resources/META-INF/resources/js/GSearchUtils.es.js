@@ -173,7 +173,7 @@ class GSearchUtils {
 	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter,
 			queryParamSetter, queryParam, isMultiValued) {
 
-		$('#' + optionElementId + ' li a').on('click', function(event) {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li input.unit-selection, #' + optionElementId + ' li label.unit-selection').on('click', function(event) {
 
 			// disable clearing current filter when it is clicked again
 			let parent = event.currentTarget.parentElement;
@@ -204,7 +204,9 @@ class GSearchUtils {
                 }
 
             }
-			event.preventDefault();
+            if (event.currentTarget.nodeName === 'A') {
+                event.preventDefault();
+			}
 		});
 	}
 

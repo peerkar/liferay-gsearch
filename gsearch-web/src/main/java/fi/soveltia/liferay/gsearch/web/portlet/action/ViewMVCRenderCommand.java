@@ -216,6 +216,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			.map(cat ->
 				CategoryDTO.newBuilder()
 					.name(cat.getTitle(locale))
+					.categoryId(cat.getCategoryId())
 					.children(getChildCategoryDtos(cat, locale))
 					.build())
 			.collect(Collectors.toList());
