@@ -5,12 +5,12 @@ import com.liferay.portal.kernel.util.WebKeys;
 
 /**
  * Web keys.
- * 
+ *
  * @author Petteri Karttunen
  *
  */
 public class GSearchWebKeys implements WebKeys {
-	
+
 	public static final String ASSET_TYPE_OPTIONS = "assetTypeOptions";
 
 	public static final String ASSET_TAG_PARAM = "assetTagParam";
@@ -24,7 +24,7 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String FILTER_SCOPE = "scope";
 
 	public static final String FILTER_TIME = "time";
-	
+
 	public static final String FILTER_TYPE = "type";
 
 	public static final String HELP_TEXT = "helpText";
@@ -38,7 +38,7 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String JS_DEBUG_ENABLED = "JSDebugEnabled";
 
 	public static final String KEYWORDS = "q";
-	
+
 	public static final String PAGE_SIZE = "pageSize";
 
 	public static final String PORTLET_NAMESPACE = "portletNamespace";
@@ -52,11 +52,11 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String SEARCH_QUERY_TIME = "searchQueryTime";
 
 	public static final String SEARCH_RESULTS_URL = "searchResultsURL";
-	
+
 	public static final String SHOW_ASSET_TAGS = "showAssetTags";
 
 	public static final String SUGGESTIONS_URL = "suggestionsURL";
-	
+
 	public static final String SORT_DIRECTION = "sortDirection";
 
 	public static final String SORT_FIELD = "sortField";
@@ -65,4 +65,5 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String START = "start";
 
+	public static final String UNIT_FILTERS = "unitFilters";
 }

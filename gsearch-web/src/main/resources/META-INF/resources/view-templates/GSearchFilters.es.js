@@ -27,6 +27,8 @@ class GSearchFilters extends Component {
 		this.portletNamespace = opt_config.portletNamespace;
 
 		this.assetTypeOptions = opt_config.assetTypeOptions;
+
+		this.unitFilters = opt_config.unitFilters;
 	}
 
 	/**
@@ -40,7 +42,9 @@ class GSearchFilters extends Component {
 
 		// Setup asset type options
 
-		this.setupAssetTypeOptions()
+		this.setupAssetTypeOptions();
+
+		this.setupUnitFilters();
 
 		// Set initial query parameters from calling url.
 
@@ -107,7 +111,6 @@ class GSearchFilters extends Component {
 
 		if (results && results.meta.typeCounts) {
 
-
             $('#' + portletNamespace + 'TypeFilterOptions li a').each(function(element) {
                 let key = $(this).attr('data-value');
             	if (key in results.meta.typeCounts) {
@@ -118,6 +121,27 @@ class GSearchFilters extends Component {
 
 
 		}
+	}
+
+	setupUnitFilters() {
+		var units = this.unitFilters;
+		this.createUnitFilters(units, $('#' + this.portletNamespace + 'UnitFilterOptions'), true);
+	}
+
+	createUnitFilters(units, element, isRootCategory) {
+        for (var i = 0; i < units.length; i++) {
+            var unit = units[i];
+            element.append('<li>' + unit.name + '</li>');
+            if ((unit.children !== null) && (unit.children.length > 0)) {
+                var ul = $(document.createElement('ul'));
+                if (isRootCategory) {
+                	ul.addClass('root-unit');
+				}
+                this.createUnitFilters(unit.children, ul, false);
+				element.append(ul);
+            }
+        }
+
 	}
 }
 
