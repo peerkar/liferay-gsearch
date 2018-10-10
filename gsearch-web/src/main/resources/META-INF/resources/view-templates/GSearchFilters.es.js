@@ -137,16 +137,16 @@ class GSearchFilters extends Component {
             if (isRootCategory) {
                 li.addClass('list-group-item');
                 li.addClass('col-xs-' + Math.floor(colspan));
+				$('<span/>', {text: unit.name}).appendTo(li);
+            } else {
+                let checkbox = $('<input />', { type: 'checkbox', id: this.portletNamespace + 'unitCategory-' + unit.categoryId, value: unit.name , 'data-value': unit.categoryId });
+                checkbox.addClass('unit-selection');
+                checkbox.appendTo(li);
+
+                let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
+                label.addClass('unit-selection');
+                label.appendTo(li);
 			}
-
-
-            let checkbox = $('<input />', { type: 'checkbox', id: this.portletNamespace + 'unitCategory-' + unit.categoryId, value: unit.name , 'data-value': unit.categoryId });
-            checkbox.addClass('unit-selection');
-            checkbox.appendTo(li);
-
-            let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
-            label.addClass('unit-selection');
-            label.appendTo(li);
 
             element.append(li);
             if ((unit.children !== null) && (unit.children.length > 0)) {
