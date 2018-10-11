@@ -7,11 +7,8 @@ import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
@@ -32,9 +29,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
@@ -62,10 +57,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	public QueryParams buildQueryParams(PortletRequest portletRequest)
 		throws Exception {
 
-		_portletRequest = portletRequest;
-
 		String typeFilter =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE, "");
+			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE, "");
 
 		// todo add also time filter as in setTimeParam()
 		return buildQueryParamsWithType(portletRequest, typeFilter);
@@ -83,24 +76,24 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	private QueryParams buildQueryParamsWithType(PortletRequest portletRequest, String type)
 		throws Exception {
 
-		QueryParams queryParams = new QueryParams();
-		setCompanyParam(queryParams);
-		setGroupsParam(queryParams);
-		setLocaleParam(queryParams);
-		setUserParam(queryParams);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		setKeywordsParam(queryParams);
-		setTimeParam(queryParams);
+		QueryParams queryParams = new QueryParams();
+		queryParams.setCompanyId(themeDisplay.getCompanyId());
+		queryParams.setLocale(themeDisplay.getLocale());
+
+		setGroupsParam(portletRequest, queryParams);
+		setUserParam(themeDisplay, queryParams);
+
+		setKeywordsParam(portletRequest, queryParams);
+		setTimeParam(portletRequest, queryParams);
 		setTypeParam(queryParams, type);
 
-//		setFacetParams(queryParams);
+//		setUnitParam(queryParams, unit);
 
-//		setResultsLayoutParam(queryParams);
-
-		setStartEndParams(queryParams);
+		setStartEndParams(portletRequest, queryParams);
 		setPageSizeParam(queryParams);
-
-//		setSortParam(queryParams);
 
 		return queryParams;
 	}
@@ -178,115 +171,15 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Set company parameter.
-	 */
-	protected void setCompanyParam(QueryParams queryParams) {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		queryParams.setCompanyId(themeDisplay.getCompanyId());
-	}
-
-	/**
-	 * Set facet parameters.
-	 *
-	 * @throws JSONException
-	 */
-	protected void setFacetParams(QueryParams queryParams)
-		throws JSONException {
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.facetConfiguration());
-
-		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<FacetParam, BooleanClauseOccur>();
-
-		String fieldParam;
-		String fieldName;
-		String[] fieldValues;
-		boolean isMultiValued;
-
-		for (int i = 0; i < configurationArray.length(); i++) {
-
-			JSONObject facetConfiguration = configurationArray.getJSONObject(i);
-
-			isMultiValued = GetterUtil.getBoolean(
-				facetConfiguration.getString("isMultiValued"), false);
-
-			fieldParam = facetConfiguration.getString("paramName");
-
-			fieldName = facetConfiguration.getString("fieldName");
-
-			fieldValues =
-				ParamUtil.getStringValues(_portletRequest, fieldParam);
-
-			if (Validator.isNotNull(fieldValues) && fieldValues.length > 0) {
-
-				FacetTranslator translator =
-					_facetTranslatorFactory.getTranslator(fieldName);
-
-				if (translator != null) {
-
-					if (isMultiValued) {
-						for (String fieldValue : fieldValues) {
-
-							String[] values = translator.translateParams(
-								fieldValue, facetConfiguration);
-
-							FacetParam facetParam = new FacetParam(
-								fieldName, values, BooleanClauseOccur.SHOULD);
-							facetParams.put(facetParam, BooleanClauseOccur.MUST);
-						}
-					}
-					else {
-						String[] values = translator.translateParams(
-							fieldValues[0], facetConfiguration);
-
-						FacetParam facetParam = new FacetParam(
-							fieldName, values, BooleanClauseOccur.SHOULD);
-						facetParams.put(facetParam, BooleanClauseOccur.MUST);
-					}
-				}
-				else {
-
-					if (isMultiValued) {
-
-						FacetParam facetParam = new FacetParam(
-							fieldName, fieldValues, BooleanClauseOccur.MUST);
-						facetParams.put(facetParam, BooleanClauseOccur.MUST);
-
-					}
-					else {
-
-						FacetParam facetParam =
-							new FacetParam(fieldName, new String[] {
-								fieldValues[0]
-							}, BooleanClauseOccur.MUST);
-						facetParams.put(facetParam, BooleanClauseOccur.MUST);
-					}
-				}
-			}
-		}
-		queryParams.setFacetsParams(facetParams);
-	}
-
-	@Reference(unbind = "-")
-	protected void setFacetTranslatorFactory(
-		FacetTranslatorFactory facetTranslatorFactory) {
-
-		_facetTranslatorFactory = facetTranslatorFactory;
-	}
-
-	/**
 	 * Set groups parameter.
 	 */
-	protected void setGroupsParam(QueryParams queryParams) {
+	protected void setGroupsParam(PortletRequest portletRequest, QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		String scopeFilter =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_SCOPE);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_SCOPE);
 
 		long[] groupIds;
 
@@ -306,11 +199,11 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 *
 	 * @throws KeywordsException
 	 */
-	protected void setKeywordsParam(QueryParams queryParams)
+	protected void setKeywordsParam(PortletRequest portletRequest, QueryParams queryParams)
 		throws KeywordsException {
 
 		String keywords =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.KEYWORDS);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
 
 		// Validate keywords.
 
@@ -318,16 +211,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			throw new KeywordsException();
 		}
 		queryParams.setKeywords(keywords);
-	}
-
-	/**
-	 * Set locale parameter.
-	 */
-	protected void setLocaleParam(QueryParams queryParams) {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		queryParams.setLocale(themeDisplay.getLocale());
 	}
 
 	/**
@@ -346,126 +229,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Set search type (normal / image search). Search type is determined from
-	 * typefilter value
-	 */
-	protected void setResultsLayoutParam(QueryParams queryParams) {
-
-		String resultsLayoutParam =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
-
-		String extensionParam =
-			ParamUtil.getString(_portletRequest, "extension");
-
-		String type =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TYPE);
-
-		boolean imageLayoutAvailable =
-			"file".equals(type) || "Image".equals(extensionParam);
-
-		if (GSearchResultsLayouts.THUMBNAIL_LIST.equals(resultsLayoutParam)) {
-			queryParams.setResultsLayout(GSearchResultsLayouts.THUMBNAIL_LIST);
-		}
-		else if (GSearchResultsLayouts.IMAGE.equals(resultsLayoutParam) &&
-			imageLayoutAvailable) {
-			queryParams.setResultsLayout(GSearchResultsLayouts.IMAGE);
-		}
-		else {
-			queryParams.setResultsLayout(GSearchResultsLayouts.LIST);
-		}
-	}
-
-	/**
-	 * Set sort. Default sort field equals to score.
-	 *
-	 * @throws JSONException
-	 */
-	protected void setSortParam(QueryParams queryParams)
-		throws JSONException {
-
-		String sortField =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.SORT_FIELD);
-
-		String sortDirection =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.SORT_DIRECTION);
-
-		Sort sort1 = null;
-		Sort sort2 = null;
-
-		boolean reverse;
-
-		if ("desc".equals(sortDirection)) {
-			reverse = true;
-		}
-		else {
-			reverse = false;
-		}
-
-		String defaultFieldName = null;
-		Integer defaultFieldType = 0;
-
-		String fieldName = null;
-		Integer fieldType = null;
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.sortFieldConfiguration());
-
-		for (int i = 0; i < configurationArray.length(); i++) {
-
-			JSONObject item = configurationArray.getJSONObject(i);
-
-			if (item.getString("key").equals(sortField)) {
-
-				fieldName = _configurationHelper.parseConfigurationKey(
-					_portletRequest, item.getString("fieldName"));
-
-				fieldType = Integer.valueOf(item.getString("fieldType"));
-
-				break;
-
-			}
-			else if (item.getBoolean("default")) {
-
-				defaultFieldName = _configurationHelper.parseConfigurationKey(
-					_portletRequest, item.getString("fieldName"));
-
-				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
-			}
-		}
-
-		if (fieldName == null || fieldType == null) {
-
-			fieldName = defaultFieldName;
-			fieldType = defaultFieldType;
-		}
-
-		sort1 = new Sort(fieldName, fieldType, reverse);
-
-		// If primary sort is score, use modified as secondary
-		// Use score as secondary for other primary sorts
-
-		if (Validator.isNull(fieldName) || "_score".equals(fieldName)) {
-
-			sort2 = new Sort(MODIFIED_SORT_FIELD, Sort.LONG_TYPE, reverse);
-
-		}
-		else {
-
-			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
-		}
-
-		queryParams.setSorts(new Sort[] {
-			sort1, sort2
-		});
-	}
-
-	/**
 	 * Set start and end parameter.
 	 */
-	protected void setStartEndParams(QueryParams queryParams) {
+	protected void setStartEndParams(PortletRequest portletRequest, QueryParams queryParams) {
 
 		int start =
-			ParamUtil.getInteger(_portletRequest, GSearchWebKeys.START, 0);
+			ParamUtil.getInteger(portletRequest, GSearchWebKeys.START, 0);
 		queryParams.setStart(start);
 		queryParams.setEnd(start + _moduleConfiguration.pageSize());
 	}
@@ -473,10 +242,10 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set time parameter (modification date between).
 	 */
-	protected void setTimeParam(QueryParams queryParams) {
+	protected void setTimeParam(PortletRequest portletRequest, QueryParams queryParams) {
 
 		String timeFilter =
-			ParamUtil.getString(_portletRequest, GSearchWebKeys.FILTER_TIME);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME);
 
 		Date timeFrom = null;
 
@@ -576,10 +345,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set user parameter.
 	 */
-	protected void setUserParam(QueryParams queryParams) {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+	protected void setUserParam(ThemeDisplay themeDisplay, QueryParams queryParams) {
 
 		queryParams.setUserId(themeDisplay.getUserId());
 	}
@@ -594,8 +360,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	private FacetTranslatorFactory _facetTranslatorFactory;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
-
-	private PortletRequest _portletRequest;
 
 	private RequestParamValidator _requestParamValidator;
 }
