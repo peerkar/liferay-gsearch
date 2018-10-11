@@ -34,7 +34,7 @@ import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
 
 /**
  * GSearch service implementation.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
@@ -61,7 +61,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Add query post processor to the list.
-	 * 
+	 *
 	 * @param clauseBuilder
 	 */
 	protected void addQueryPostProcessor(
@@ -75,7 +75,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Execute search.
-	 * 
+	 *
 	 * @param searchContext
 	 * @param query
 	 * @return Hits
@@ -87,7 +87,11 @@ public class GSearchImpl implements GSearch {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing search with query: " + query.toString());
+			if (query.getPreBooleanFilter() != null) {
+				_log.debug("Pre boolean filters: " + query.getPreBooleanFilter().toString());
+			}
 		}
+
 
 		BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 			query, BooleanClauseOccur.MUST.getName());
@@ -111,7 +115,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Execute registered query post processors.
-	 * 
+	 *
 	 * @param searchContext
 	 * @param hits
 	 */
@@ -145,7 +149,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Get results object.
-	 * 
+	 *
 	 * @return results as a JSON object
 	 * @throws Exception
 	 */
@@ -177,7 +181,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Get searchcontext.
-	 * 
+	 *
 	 * @return searchcontext object
 	 * @throws Exception
 	 */
@@ -202,7 +206,7 @@ public class GSearchImpl implements GSearch {
 
 	/**
 	 * Remove a query post processor from list.
-	 * 
+	 *
 	 * @param clauseBuilder
 	 */
 	protected void removeQueryPostProcessor(
@@ -251,9 +255,9 @@ public class GSearchImpl implements GSearch {
 	private QueryParams _queryParams;
 
 	@Reference(
-		bind = "addQueryPostProcessor", 
-		cardinality = ReferenceCardinality.MULTIPLE, 
-		policy = ReferencePolicy.DYNAMIC, 
+		bind = "addQueryPostProcessor",
+		cardinality = ReferenceCardinality.MULTIPLE,
+		policy = ReferencePolicy.DYNAMIC,
 		service = QueryPostProcessor.class,
 		unbind = "removeQueryPostProcessor"
 	)

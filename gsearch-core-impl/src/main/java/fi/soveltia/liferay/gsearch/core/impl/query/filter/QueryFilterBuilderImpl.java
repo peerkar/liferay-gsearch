@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.portlet.PortletRequest;
 
@@ -40,11 +41,11 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemPro
  * QueryFilterBuilder implementation. Notice that if you use BooleanQuery type
  * for filter conditions, they get translated to 3 subqueries: match, phrase,
  * and phrase_prefix = use TermQuery for filtering.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = QueryFilterBuilder.class
 )
 public class QueryFilterBuilderImpl implements QueryFilterBuilder {
@@ -76,6 +77,8 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		buildFacetConditions();
 
+		buildCategoryConditions();
+
 		buildViewPermissionCondition();
 
 		return _filter;
@@ -83,7 +86,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add DLFileEntry class condition
-	 * 
+	 *
 	 * @param query
 	 * @param dedicatedTypeQuery
 	 * @throws ParseException
@@ -98,7 +101,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add journal article class condition.
-	 * 
+	 *
 	 * @param query
 	 * @throws ParseException
 	 */
@@ -134,7 +137,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add classes condition.
-	 * 
+	 *
 	 * @throws ParseException
 	 */
 	protected void buildClassesCondition()
@@ -167,6 +170,19 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	protected void buildCompanyCondition() {
 
 		_filter.addRequiredTerm(Field.COMPANY_ID, _queryParams.getCompanyId());
+	}
+
+	protected void buildCategoryConditions() {
+		List<Long> categoryIds = _queryParams.getCategories();
+		if ((categoryIds != null) && !categoryIds.isEmpty()) {
+
+			BooleanQueryImpl query = new BooleanQueryImpl();
+			categoryIds.forEach(categoryId -> {
+				TermQuery condition = new TermQueryImpl(Field.ASSET_CATEGORY_IDS, String.valueOf(categoryId));
+				query.add(condition, BooleanClauseOccur.SHOULD);
+			});
+			addAsQueryFilter(query);
+		}
 	}
 
 	protected void buildFacetConditions() {
@@ -214,7 +230,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add groups condition.
-	 * 
+	 *
 	 * @throws ParseException
 	 */
 	protected void buildGroupsCondition()
@@ -237,7 +253,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add modification date condition.
-	 * 
+	 *
 	 * @throws ParseException
 	 */
 	protected void buildModificationTimeCondition()
@@ -290,7 +306,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add view permissions condition.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	protected void buildViewPermissionCondition()
@@ -306,7 +322,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Remove a result item processor from list.
-	 * 
+	 *
 	 * @param resultItemProcessor
 	 */
 	protected void removePermissionFilterQueryBuilder(
@@ -323,7 +339,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 	/**
 	 * Add Query object to filters as a QueryFilter.
-	 * 
+	 *
 	 * @param query
 	 */
 	private void addAsQueryFilter(Query query) {
@@ -338,10 +354,10 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	private BooleanFilter _filter;
 
 	@Reference(
-		bind = "setPermissionFilterQueryBuilder", 
-		policy = ReferencePolicy.DYNAMIC, 
-		policyOption = ReferencePolicyOption.GREEDY, 
-		service = PermissionFilterQueryBuilder.class, 
+		bind = "setPermissionFilterQueryBuilder",
+		policy = ReferencePolicy.DYNAMIC,
+		policyOption = ReferencePolicyOption.GREEDY,
+		service = PermissionFilterQueryBuilder.class,
 		unbind = "removePermissionFilterQueryBuilder"
 	)
 	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;

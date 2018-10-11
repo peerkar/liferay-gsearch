@@ -6,9 +6,12 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
@@ -171,10 +174,19 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	protected void setUnitParam(PortletRequest portletRequest, QueryParams queryParams) {
-
 		String[] units = ParamUtil.getStringValues(portletRequest, GSearchWebKeys.UNIT_PARAM);
-		//queryParams.setUnits(Arrays.asList(units));
-
+		if ((units != null) && (units.length > 0)) {
+			List<String> unitList = Arrays.asList(units);
+			try {
+				queryParams.setCategories(unitList
+					.stream()
+					.map(Long::valueOf)
+					.collect(Collectors.toList())
+				);
+			} catch (NumberFormatException e) {
+				log.warn(String.format("Cannot parse %s as long", StringUtil.merge(units, ", ")));
+			}
+		}
 	}
 
 	/**
@@ -356,6 +368,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		queryParams.setUserId(themeDisplay.getUserId());
 	}
+
+	private static final Log log = LogFactoryUtil.getLog(QueryParamsBuilderImpl.class);
 
 	// Modification date field name in the index.
 
