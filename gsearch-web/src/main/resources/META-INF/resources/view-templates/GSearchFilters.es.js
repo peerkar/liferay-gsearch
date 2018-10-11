@@ -28,7 +28,7 @@ class GSearchFilters extends Component {
 
 		this.assetTypeOptions = opt_config.assetTypeOptions;
 
-		this.unit = opt_config.unit;
+		this.unitFilters = opt_config.unitFilters;
 	}
 
 	/**
@@ -124,11 +124,12 @@ class GSearchFilters extends Component {
 	}
 
 	setupUnitFilters() {
-		this.createUnitFilters(this.unit, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
+		this.createUnitFilters(this.unitFilters, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
 	}
 
 	createUnitFilters(units, element, isRootCategory) {
         let colspan = 12 / units.length; // note: not tested for more than 4 columns
+		let initialUnitParams = this.initialQueryParameters.unit !== null ? this.initialQueryParameters.unit : null;
         for (let i = 0; i < units.length; i++) {
             let unit = units[i];
             let li = null;
@@ -138,7 +139,13 @@ class GSearchFilters extends Component {
                 li.addClass('col-xs-' + Math.floor(colspan));
 				$('<span/>', {text: unit.name}).appendTo(li);
             } else {
-                let checkbox = $('<input />', { type: 'checkbox', id: this.portletNamespace + 'unitCategory-' + unit.categoryId, value: unit.name , 'data-value': unit.categoryId });
+                let checkbox = $('<input />', {
+					type: 'checkbox',
+					id: this.portletNamespace + 'unitCategory-' + unit.categoryId,
+					value: unit.name ,
+					'data-value': unit.categoryId,
+					checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
+                });
                 checkbox.addClass('unit-selection');
                 checkbox.appendTo(li);
 
@@ -174,7 +181,7 @@ GSearchFilters.STATE = {
 		validator: core.isFunction
 	},
 	templateParameters: {
-		value: ['type','scope','time']
+		value: ['type','scope','time','unit']
 	}
 };
 

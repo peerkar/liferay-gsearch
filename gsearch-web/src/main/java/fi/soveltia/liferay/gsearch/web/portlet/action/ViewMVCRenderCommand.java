@@ -162,7 +162,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _moduleConfiguration.showTags());
 
-		template.put(GSearchWebKeys.UNIT_PARAM, getUnitCategories(PortalUtil.getCompanyId(renderRequest), renderRequest.getLocale()));
+		template.put(GSearchWebKeys.UNIT_FILTERS, getUnitCategories(PortalUtil.getCompanyId(renderRequest), renderRequest.getLocale()));
 
 		return "View";
 	}
@@ -303,6 +303,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		String resultsLayout = ParamUtil.getString(request, GSearchWebKeys.RESULTS_LAYOUT);
 
+		String[] unitFilter = ParamUtil.getStringValues(request, GSearchWebKeys.UNIT_PARAM);
+
 		Map<String, String[]>initialParameters = new HashMap<String, String[]>();
 
 		if (Validator.isNotNull(keywords)) {
@@ -335,6 +337,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		if (Validator.isNotNull(resultsLayout)) {
 			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, new String[]{resultsLayout});
+		}
+
+		if (Validator.isNotNull(unitFilter)) {
+			initialParameters.put(GSearchWebKeys.UNIT_PARAM, unitFilter);
 		}
 
 		// Facets.

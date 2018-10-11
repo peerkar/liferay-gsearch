@@ -65,5 +65,6 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String START = "start";
 
+	public static final String UNIT_FILTERS = "unitFilters";
 	public static final String UNIT_PARAM = "unit";
 }
