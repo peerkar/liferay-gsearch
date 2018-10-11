@@ -28,7 +28,7 @@ class GSearchFilters extends Component {
 
 		this.assetTypeOptions = opt_config.assetTypeOptions;
 
-		this.unitFilters = opt_config.unitFilters;
+		this.unit = opt_config.unit;
 	}
 
 	/**
@@ -124,8 +124,7 @@ class GSearchFilters extends Component {
 	}
 
 	setupUnitFilters() {
-		let units = this.unitFilters;
-		this.createUnitFilters(units, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
+		this.createUnitFilters(this.unit, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
 	}
 
 	createUnitFilters(units, element, isRootCategory) {

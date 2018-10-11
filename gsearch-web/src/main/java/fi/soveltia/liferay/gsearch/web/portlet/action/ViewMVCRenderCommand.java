@@ -162,7 +162,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _moduleConfiguration.showTags());
 
-		template.put(GSearchWebKeys.UNIT_FILTERS, getUnitCategories(PortalUtil.getCompanyId(renderRequest), renderRequest.getLocale()));
+		template.put(GSearchWebKeys.UNIT_PARAM, getUnitCategories(PortalUtil.getCompanyId(renderRequest), renderRequest.getLocale()));
 
 		return "View";
 	}

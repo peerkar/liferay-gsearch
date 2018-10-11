@@ -90,7 +90,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setTimeParam(portletRequest, queryParams);
 		setTypeParam(queryParams, type);
 
-//		setUnitParam(queryParams, unit);
+		setUnitParam(portletRequest, queryParams);
 
 		setStartEndParams(portletRequest, queryParams);
 		setPageSizeParam(queryParams);
@@ -168,6 +168,13 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		}
 
 		return queryTypes;
+	}
+
+	protected void setUnitParam(PortletRequest portletRequest, QueryParams queryParams) {
+
+		String[] units = ParamUtil.getStringValues(portletRequest, GSearchWebKeys.UNIT_PARAM);
+		//queryParams.setUnits(Arrays.asList(units));
+
 	}
 
 	/**

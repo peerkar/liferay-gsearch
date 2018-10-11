@@ -35,6 +35,7 @@ public class QueryParams {
 	private int end;
 	private int pageSize;
 	private Sort[] sorts;
+	private List<String> units;
 
 	public long getCompanyId() {
 
@@ -186,6 +187,14 @@ public class QueryParams {
 		this.sorts = sort;
 	}
 
+	public List<String> getUnits() {
+		return units;
+	}
+
+	public void setUnits(List<String> units) {
+		this.units = units;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -195,7 +204,8 @@ public class QueryParams {
 			.equals(groupIds, that.groupIds) && Objects.equals(locale, that.locale) && Objects.equals(classNames, that.classNames) && Objects
 			.equals(facetParams, that.facetParams) && Objects.equals(keywords, that.keywords) && Objects
 			.equals(originalKeywords, that.originalKeywords) && Objects.equals(resultsLayout, that.resultsLayout) && Objects
-			.equals(timeFrom, that.timeFrom) && Objects.equals(timeTo, that.timeTo) && Arrays.equals(sorts, that.sorts);
+			.equals(timeFrom, that.timeFrom) && Objects.equals(timeTo, that.timeTo) && Arrays.equals(sorts, that.sorts) && Objects
+			.equals(units, that.units);
 	}
 
 }
