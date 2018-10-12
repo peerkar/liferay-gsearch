@@ -1,6 +1,5 @@
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
@@ -11,6 +10,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.List;
+
 @Component(
     immediate = true,
     service = ResultItemBuilder.class
@@ -19,24 +20,19 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
     private static final Log log = LogFactoryUtil.getLog(NewsJournalArticleItemBuilder.class);
 
-    private String DDM_STRUCTURE_KEY = "";
+    private List<String> DDM_STRUCTURE_KEYS;
 
     @Reference
     private ConfigurationHelper _configurationHelperService;
 
-//    @Activate
-//    protected void activate() {
-//        try {
-//            DDM_STRUCTURE_KEY = _configurationHelperService.getDDMStructureMapping().getJSONObject("news").getString("ddmStructureKey");
-            // todo get from module type conf
-//        } catch (JSONException e) {
-//            log.error("Cannot get DDM structure key mapping for news");
-//        }
-//    }
+    @Activate
+    protected void activate() {
+        DDM_STRUCTURE_KEYS = _configurationHelperService.getDDMStructureKeys(getType());
+    }
 
     @Override
     public boolean canBuild(Document document) {
-        return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEY.equals(document.get("ddmStructureKey"));
+        return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEYS.contains(document.get("ddmStructureKey"));
     }
 
     @Override

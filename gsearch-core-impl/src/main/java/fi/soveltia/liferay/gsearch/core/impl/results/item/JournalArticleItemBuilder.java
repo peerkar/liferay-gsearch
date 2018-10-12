@@ -52,7 +52,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public boolean canBuild(Document document) {
 
-		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
+		return false; // replaced with ddm structure specific journal article builders
 	}
 
 	/**

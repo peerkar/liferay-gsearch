@@ -10,6 +10,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -117,6 +120,26 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		fieldName = fieldName.replace("$language_id", portletRequest.getLocale().toString());
 
 		return fieldName;
+	}
+
+	@Override
+	public List<String> getDDMStructureKeys(String typeKey) {
+		List<String> ddmStructureKeys = new ArrayList<>();
+		try {
+			JSONArray types = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.typeConfiguration());
+			for (int i = 0; i < types.length(); i++) {
+				JSONObject type = types.getJSONObject(i);
+				if (typeKey.equalsIgnoreCase(type.getString("key"))) {
+					String structureKeys = type.getString("ddmStructureKey");
+					ddmStructureKeys.addAll(Arrays.asList(structureKeys.split("\\s*,\\s*")));
+					break;
+				}
+			}
+
+		} catch (JSONException e) {
+			_log.error("Cannot create json array from GSearch types configuration.", e);
+		}
+		return ddmStructureKeys;
 	}
 
 	private String getLocalization(String key, Locale locale) {

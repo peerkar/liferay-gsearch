@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
 
+import java.util.List;
 import java.util.Locale;
 
 import javax.portlet.PortletRequest;
@@ -54,5 +55,7 @@ public interface ConfigurationHelper {
 	 * @return
 	 */
 	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName);
+
+	public List<String> getDDMStructureKeys(String typeKey);
 
 }
