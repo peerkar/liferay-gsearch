@@ -96,9 +96,24 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getBreadcrumbs() throws Exception {
 
+		long groupId = getJournalArticle().getGroupId();
+
 		final List<String> breadcrumbs = new ArrayList<>();
 
-		long groupId = getJournalArticle().getGroupId();
+		Layout layout = getJournalArticleLayout(groupId);
+		if (layout != null) {
+			breadcrumbs.add(layout.getName(_locale));
+			List<Layout> ancestors = layout.getAncestors();
+			ancestors.forEach(a -> breadcrumbs.add(a.getName(_locale)));
+		}
+		breadcrumbs.add(getGroupName(groupId));
+
+		Collections.reverse(breadcrumbs);
+
+		return String.join(" / ", breadcrumbs);
+	}
+
+	protected Layout getJournalArticleLayout(long groupId) throws Exception {
 
 		String link = getLink();
 
@@ -120,21 +135,14 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 				}
 
 				try {
-					Layout layout = _layoutLocalService.getFriendlyURLLayout(groupId, true, friendlyURL);
-					breadcrumbs.add(layout.getName(_locale));
-					List<Layout> ancestors = layout.getAncestors();
-					ancestors.forEach(a -> breadcrumbs.add(a.getName(_locale)));
+					return _layoutLocalService.getFriendlyURLLayout(groupId, true, friendlyURL);
 				} catch (NoSuchLayoutException e) {
 					// do nothing
 				}
 			}
 		}
+		return null;
 
-		breadcrumbs.add(getGroupName(groupId));
-
-		Collections.reverse(breadcrumbs);
-
-		return String.join(" / ", breadcrumbs);
 	}
 
 	@Override
