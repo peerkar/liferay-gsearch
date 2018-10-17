@@ -43,45 +43,45 @@ public class BasicJournalArticleItemBuilder extends JournalArticleItemBuilder im
         return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEYS.contains(document.get("ddmStructureKey"));
     }
 
-    @Override
-    public String getTitle()
-        throws NumberFormatException, PortalException {
-
-        String title = getHeadline();
-        if ((title == null) || title.isEmpty()) {
-            try {
-                title = getLayoutTitle();
-            } catch (Exception e) {
-                log.error(String.format("Cannot get layout title for journalArticle %s", getJournalArticle().getArticleId()), e);
-                return super.getTitle();
-            }
-        }
-        return HtmlUtil.stripHtml(title);
-    }
-
-    private String getHeadline() throws PortalException {
-        String headline = null;
-        try {
-            com.liferay.portal.kernel.xml.Document docXml = saxReader.read(getJournalArticle().getContentByLocale(_locale.getLanguage()));
-            headline = docXml.valueOf("//dynamic-element[@name='headline']/dynamic-content/text()");
-        } catch (DocumentException e) {
-            log.error(String.format("Cannot read content xml of journalArticle %s", getJournalArticle().getArticleId()));
-        }
-
-        return headline;
-    }
-
-    private String getLayoutTitle() throws Exception {
-
-        long groupId = getJournalArticle().getGroupId();
-
-        Layout layout = getJournalArticleLayout(groupId);
-        if (layout != null) {
-            return layout.getName(_locale);
-        }
-
-        return null;
-    }
+//    @Override
+//    public String getTitle()
+//        throws NumberFormatException, PortalException {
+//
+//        String title = getHeadline();
+//        if ((title == null) || title.isEmpty()) {
+//            try {
+//                title = getLayoutTitle();
+//            } catch (Exception e) {
+//                log.error(String.format("Cannot get layout title for journalArticle %s", getJournalArticle().getArticleId()), e);
+//                return super.getTitle();
+//            }
+//        }
+//        return HtmlUtil.stripHtml(title);
+//    }
+//
+//    private String getHeadline() throws PortalException {
+//        String headline = null;
+//        try {
+//            com.liferay.portal.kernel.xml.Document docXml = saxReader.read(getJournalArticle().getContentByLocale(_locale.getLanguage()));
+//            headline = docXml.valueOf("//dynamic-element[@name='headline']/dynamic-content/text()");
+//        } catch (DocumentException e) {
+//            log.error(String.format("Cannot read content xml of journalArticle %s", getJournalArticle().getArticleId()));
+//        }
+//
+//        return headline;
+//    }
+//
+//    private String getLayoutTitle() throws Exception {
+//
+//        long groupId = getJournalArticle().getGroupId();
+//
+//        Layout layout = getJournalArticleLayout(groupId);
+//        if (layout != null) {
+//            return layout.getName(_locale);
+//        }
+//
+//        return null;
+//    }
 
     @Override
     public String getType() {
