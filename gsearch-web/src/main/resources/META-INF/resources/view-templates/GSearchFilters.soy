@@ -7,7 +7,7 @@
  */
 {template .render}
 
-	<div class="row text-center" id="{$portletNamespace}BasicFilters">
+	<div class="row" id="{$portletNamespace}BasicFilters">
 
 		// Type filter
 
@@ -24,34 +24,38 @@
 
 		// Scope filter
 
-		<div class="dropdown gsearch-dropdown optionmenu unitmenu" data-paramname="unit" data-ismultivalued="true">
-			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle"
-				data-toggle="dropdown" id="{$portletNamespace}UnitFilter" type="button">
-				<span class="selection"></span>
-				<span class="caret"></span>
-			</button>
-			<div aria-labelledby="{$portletNamespace}UnitFilter" class="dropdown-menu" id="{$portletNamespace}UnitFilterOptions">
-				<ul class="list-group row" id="{$portletNamespace}UnitFilterUl"></ul>
-			</div>
-		</div>
+        <div class="filter-dropdowns">
+            <div class="dropdown gsearch-dropdown optionmenu unitmenu" data-paramname="unit" data-ismultivalued="true">
+                <button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
+                    data-toggle="dropdown" id="{$portletNamespace}UnitFilter" type="button">
+                    <span class="">Yksikön mukaan</span>
+                    <svg class="navi-arrow" role="img">
+                        <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
+                    </svg>
+                </button>
+                <div aria-labelledby="{$portletNamespace}UnitFilter" class="dropdown-menu" id="{$portletNamespace}UnitFilterOptions">
+                    <ul id="{$portletNamespace}UnitFilterUl"></ul>
+                </div>
+            </div>
 
-	  	// Time filter
+            // Time filter
 
-//		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
-//			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle"
-//			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
-//				<span class="selection"></span>
-//				<span class="caret"></span>
-//			</button>
-//			<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
-//				<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
-//				<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
-//				<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
-//				<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
-//				<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
-//				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
-//			</ul>
-//		</div>
+    //		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
+    //			<button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
+    //			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
+    //				<span class="selection"></span>
+    //				<span class="caret"></span>
+    //			</button>
+    //			<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
+    //				<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
+    //				<li><a data-value="last-hour" href="#">{msg desc=""}last-hour{/msg}</a></li>
+    //				<li><a data-value="last-day" href="#">{msg desc=""}last-day{/msg}</a></li>
+    //				<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+    //				<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+    //				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+    //			</ul>
+    //		</div>
+        </div>
 	</div>
 {/template}
 

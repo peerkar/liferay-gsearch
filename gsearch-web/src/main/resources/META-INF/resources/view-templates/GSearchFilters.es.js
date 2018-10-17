@@ -135,22 +135,26 @@ class GSearchFilters extends Component {
             let li = null;
             li = $(document.createElement('li'));
             if (isRootCategory) {
-                li.addClass('list-group-item');
-                li.addClass('col-xs-' + Math.floor(colspan));
-				$('<span/>', {text: unit.name}).appendTo(li);
+                // li.addClass('list-group-item');
+                // li.addClass('col-xs-' + Math.floor(colspan));
+				// $('<span/>', {text: unit.name}).appendTo(li);
             } else {
-                let checkbox = $('<input />', {
-					type: 'checkbox',
-					id: this.portletNamespace + 'unitCategory-' + unit.categoryId,
-					value: unit.name ,
-					'data-value': unit.categoryId,
-					checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
-                });
-                checkbox.addClass('unit-selection');
-                checkbox.appendTo(li);
 
                 let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
-                label.addClass('unit-selection');
+                label.addClass('unit-selection checkbox');
+
+                let checkbox = $('<input />', {
+                    type: 'checkbox',
+                    id: this.portletNamespace + 'unitCategory-' + unit.categoryId,
+                    value: unit.name ,
+                    'data-value': unit.categoryId,
+                    checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
+                });
+                checkbox.addClass('unit-selection');
+                checkbox.appendTo(label);
+
+                $('<span class="checkmark"></span>').appendTo(label);
+
                 label.appendTo(li);
 			}
 
