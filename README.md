@@ -4,7 +4,8 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 ## News
 
-Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
+* __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest).
+* __(2018-09-17)__ Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
 
 ## Documentation
 
@@ -17,7 +18,7 @@ Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
 
 ## Quick Installation Guide
 
-__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Most of the plugins are not yet upgraded to 7.1. because of platform features like Audience Targeting and IPGeoCoder are still missing. 
+__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. Audience Targeting query contributor is not updated because Audience targeting for 7.1 is not yet released.
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
 ### Step 1 
