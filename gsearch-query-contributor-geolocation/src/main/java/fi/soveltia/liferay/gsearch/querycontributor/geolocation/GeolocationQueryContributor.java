@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.querycontributor.geolocation;
 
-import com.liferay.ip.geocoder.IPGeocoder;
-import com.liferay.ip.geocoder.IPInfo;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -24,6 +22,7 @@ import org.osgi.service.component.annotations.Reference;
 import fi.soveltia.liferay.gsearch.core.api.query.contributor.QueryContributor;
 import fi.soveltia.liferay.gsearch.query.DecayFunctionScoreQuery;
 import fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.ModuleConfiguration;
+import fi.soveltia.liferay.gsearch.querycontributor.geolocation.service.GeoLocationService;
 
 /**
  * Geolocation query contributor.
@@ -31,7 +30,7 @@ import fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.Mo
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.GSearchGeolocation", 
+	configurationPid = "fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = QueryContributor.class
 )
@@ -47,14 +46,14 @@ public class GeolocationQueryContributor implements QueryContributor {
 
 		String ipAddress = getIpAddress(portletRequest);
 
-		IPInfo ipInfo = _ipGeocoder.getIPInfo(ipAddress);
-
-		if (ipInfo == null) {
+		Float[]coordinates = _geolocationService.getCoordinates(ipAddress);
+		
+		if (coordinates == null) {
 			return null;
 		}
 
-		float latitude = ipInfo.getLatitude();
-		float longitude = ipInfo.getLongitude();
+		float latitude = coordinates[0];
+		float longitude = coordinates[1];
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Current user's ip: " + ipAddress);
@@ -127,11 +126,11 @@ public class GeolocationQueryContributor implements QueryContributor {
 	protected volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
-	private IPGeocoder _ipGeocoder;
-
-	@Reference
 	Portal _portal;
 
+	@Reference
+	private GeoLocationService _geolocationService;
+	
 	private static final Log _log =
 		LogFactoryUtil.getLog(GeolocationQueryContributor.class);
 

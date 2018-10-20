@@ -1,5 +1,7 @@
 package fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+
 import aQute.bnd.annotation.metatype.Meta;
 import fi.soveltia.liferay.gsearch.querycontributor.geolocation.DecayFunction;
 
@@ -9,8 +11,11 @@ import fi.soveltia.liferay.gsearch.querycontributor.geolocation.DecayFunction;
  * @author Petteri Karttunen
  *
  */
+@ExtendedObjectClassDefinition(
+	category = "GSearch"
+)
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.GSearchGeolocation",
+	id = "fi.soveltia.liferay.gsearch.querycontributor.geolocation.configuration.ModuleConfiguration",
 	localization = "content/Language",
 	name = "GSearch Geolocation Query Contributor"
 )
@@ -81,10 +86,18 @@ public interface ModuleConfiguration {
 	public String indexField();
 
 	@Meta.AD(
-		deflt = "", 
+		deflt = "193.166.186.254", 
 		description = "test-ip-desc",
 	    name = "test-ip-name",
 		required = false
 	)
 	public String testIpAddress();
+	
+	@Meta.AD(
+		deflt = "", 
+		description = "ipstack-api-key-desc",
+	    name = "ipstack-api-key-name",
+		required = false
+	)
+	public String IPStackApiKey();
 }
