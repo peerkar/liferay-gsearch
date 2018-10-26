@@ -10,22 +10,20 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
  * GSearch service. This service is responsible for getting the search results.
- * 
+ *
  * @author Petteri Karttunen
  */
 public interface GSearch {
 
 	/**
 	 * Get search results.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param portletResponse
-	 * @param queryParams
 	 * @return search results JSON object
 	 * @throws Exception
 	 */
 	public JSONObject getSearchResults(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams)
+		PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception;
 }

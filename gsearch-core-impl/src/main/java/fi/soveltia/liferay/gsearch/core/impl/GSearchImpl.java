@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -20,6 +21,7 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -48,21 +50,71 @@ public class GSearchImpl implements GSearch {
 	 */
 	@Override
 	public JSONObject getSearchResults(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams)
+		PortletRequest portletRequest, PortletResponse portletResponse)
 		throws Exception {
 
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_queryParams = queryParams;
+		JSONObject responseObject = null;
+		JSONObject unfilteredResponseObject = null;
 
-		return getResults();
+		// Build query parameters object.
+
+		QueryParams queryParams = null;
+		QueryParams unfilteredQueryParams = null;
+
+		try {
+			queryParams = _queryParamsBuilder.buildQueryParams(portletRequest);
+			unfilteredQueryParams = _queryParamsBuilder.buildUnfilteredQueryParams(portletRequest);
+		} catch (PortalException e) {
+
+			_log.error(e, e);
+
+			return null;
+		}
+
+		// Try to get search results.
+
+		try {
+			responseObject = getResults(portletRequest, portletResponse, queryParams);
+
+			// fetch unfiltered results only if there is a filter applied
+			if (!queryParams.equals(unfilteredQueryParams)) {
+				unfilteredResponseObject = getResults(portletRequest, portletResponse, unfilteredQueryParams);
+			}
+
+			// overwrite meta.typeCounts in responseObject if necessary
+			if (unfilteredResponseObject != null) {
+				updateTypeCountsToResponse(responseObject, unfilteredResponseObject);
+			}
+
+		} catch (Exception e) {
+
+			_log.error(e, e);
+
+			return null;
+		}
+
+		return responseObject;
+	}
+
+	private void updateTypeCountsToResponse(JSONObject responseObject, JSONObject responseObjectWithTypeCounts) {
+
+		JSONObject typeCounts = null;
+		if (responseObjectWithTypeCounts.has("meta") &&
+			responseObjectWithTypeCounts.getJSONObject("meta") != null) {
+			JSONObject meta = responseObjectWithTypeCounts.getJSONObject("meta");
+			if (meta.has("typeCounts") && (meta.getJSONObject("typeCounts") != null)) {
+				typeCounts = meta.getJSONObject("typeCounts");
+			}
+		}
+
+		if (responseObject.has("meta") && (responseObject.getJSONObject("meta") != null) && (typeCounts != null)) {
+			responseObject.getJSONObject("meta").put("typeCounts", typeCounts);
+		}
 	}
 
 	/**
 	 * Add query post processor to the list.
 	 *
-	 * @param clauseBuilder
 	 */
 	protected void addQueryPostProcessor(
 		QueryPostProcessor queryPostProcessor) {
@@ -120,7 +172,7 @@ public class GSearchImpl implements GSearch {
 	 * @param hits
 	 */
 	protected void executeQueryPostProcessors(
-		SearchContext searchContext, Hits hits) {
+		SearchContext searchContext, Hits hits, PortletRequest portletRequest, QueryParams queryParams) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing query post processors.");
@@ -139,7 +191,7 @@ public class GSearchImpl implements GSearch {
 
 			try {
 				queryPostProcessor.process(
-					_portletRequest, searchContext, _queryParams, hits);
+					portletRequest, searchContext, queryParams, hits);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -153,14 +205,14 @@ public class GSearchImpl implements GSearch {
 	 * @return results as a JSON object
 	 * @throws Exception
 	 */
-	protected JSONObject getResults()
+	protected JSONObject getResults(PortletRequest portletRequest, PortletResponse portletResponse, QueryParams queryParams)
 		throws Exception {
 
-		Query query = _queryBuilder.buildQuery(_portletRequest, _queryParams);
+		Query query = _queryBuilder.buildQuery(portletRequest, queryParams);
 
 		// Create SearchContext.
 
-		SearchContext searchContext = getSearchContext();
+		SearchContext searchContext = getSearchContext(portletRequest, queryParams);
 
 		// Execute search.
 
@@ -168,12 +220,12 @@ public class GSearchImpl implements GSearch {
 
 		// Executre query post processors.
 
-		executeQueryPostProcessors(searchContext, hits);
+		executeQueryPostProcessors(searchContext, hits, portletRequest, queryParams);
 
 		// Build results JSON object.
 
 		JSONObject resultsObject = _resultsBuilder.buildResults(
-			_portletRequest, _portletResponse, _queryParams, searchContext,
+			portletRequest, portletResponse, queryParams, searchContext,
 			hits);
 
 		return resultsObject;
@@ -185,17 +237,17 @@ public class GSearchImpl implements GSearch {
 	 * @return searchcontext object
 	 * @throws Exception
 	 */
-	protected SearchContext getSearchContext()
+	protected SearchContext getSearchContext(PortletRequest portletRequest, QueryParams queryParams)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		SearchContext searchContext = new SearchContext();
 		searchContext.setCompanyId(themeDisplay.getCompanyId());
-		searchContext.setStart(_queryParams.getStart());
-		searchContext.setEnd(_queryParams.getEnd());
-		searchContext.setSorts(_queryParams.getSorts());
+		searchContext.setStart(queryParams.getStart());
+		searchContext.setEnd(queryParams.getEnd());
+		searchContext.setSorts(queryParams.getSorts());
 
 		// Set facets.
 
@@ -207,7 +259,6 @@ public class GSearchImpl implements GSearch {
 	/**
 	 * Remove a query post processor from list.
 	 *
-	 * @param clauseBuilder
 	 */
 	protected void removeQueryPostProcessor(
 		QueryPostProcessor queryPostProcessor) {
@@ -246,13 +297,16 @@ public class GSearchImpl implements GSearch {
 
 	private QueryBuilder _queryBuilder;
 
-	private PortletRequest _portletRequest;
-
-	private PortletResponse _portletResponse;
-
 	private ResultsBuilder _resultsBuilder;
 
-	private QueryParams _queryParams;
+	@Reference(unbind = "-")
+	protected void setQueryParamsBuilder(QueryParamsBuilder queryParamsBuilder) {
+
+		_queryParamsBuilder = queryParamsBuilder;
+	}
+
+	@Reference
+	protected QueryParamsBuilder _queryParamsBuilder;
 
 	@Reference(
 		bind = "addQueryPostProcessor",
