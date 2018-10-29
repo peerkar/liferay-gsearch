@@ -1,7 +1,7 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 
-import devbridgeAutocomplete from './js/DevbridgeAutocomplete.es';  
+import devbridgeAutocomplete from './js/DevbridgeAutocomplete.es';
 
 import templates from './MiniView.soy';
 
@@ -9,7 +9,7 @@ import templates from './MiniView.soy';
  * View component.
  */
 class MiniView extends Component {
-	
+
 	/**
 	 * @inheritDoc
 	 */
@@ -22,7 +22,7 @@ class MiniView extends Component {
 		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay
 
 		this.portletNamespace = opt_config.portletNamespace;
-		
+
 		this.queryMinLength = opt_config.queryMinLength;
 
 		this.requestTimeout = opt_config.requestTimeout;
@@ -30,15 +30,15 @@ class MiniView extends Component {
 		this.searchPageURL = opt_config.searchPageURL;
 
 		this.suggestionsURL = opt_config.suggestionsURL;
-		
+
 		// Init autocomplete.
 
 		if (this.autoCompleteEnabled) {
 			this.initAutocomplete();
 		}
-		
+
 		// Set click events
-		
+
 		this.setClickEvents();
 	}
 
@@ -48,25 +48,25 @@ class MiniView extends Component {
 	doSearch() {
 
 		let q = $('#' + this.portletNamespace + 'MiniSearchField').val();
-		
+
 		if (q.length < this.queryMinLength) {
-			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' + 
+			this.showMessage(Liferay.Language.get('min-character-count-is') + ' ' +
 					this.queryMinLength);
 			return false;
 		}
-		
+
 		let url = this.searchPageURL + "?q=" + q;
 
 		window.location.replace(url);
 	}
-	
+
 	/**
 	 * Init autocomplete / suggester.
 	 */
 	initAutocomplete() {
 
 		let _self = this;
-		 
+
 		$('#' + this.portletNamespace + 'MiniSearchField').devbridgeAutocomplete({
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
@@ -77,27 +77,10 @@ class MiniView extends Component {
 		    },
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,
-			transformResult: function(response) {
-
-				if (response) {
-				    return {
-	    				suggestions: $.map(response, function(item) {
-				    		return {
-				    			value: item, 
-				    			data: item
-				    		};
-				        })
-				    };
-    			} else {
-    				return {
-    					suggestions: []
-    				}
-	    		}
-			},
 			triggerSelectOnValidInput: false
 		});
-	}	
-	
+	}
+
 	/**
 	 * Set click events.
 	 */
@@ -118,26 +101,26 @@ class MiniView extends Component {
 	        if(keycode === 13){
 				_self.doSearch();
 	        }
-	    });	
+	    });
 	}
-	
+
 	/**
 	 * Show message
-	 * 
+	 *
 	 * @param {String} title
 	 */
 	showMessage(title) {
-		
+
 		let elementId = this.portletNamespace + 'MiniSearchFieldMessage';
 
 		$('#' + elementId).tooltip({title: title}).tooltip('show');
-		
+
 		// Setting delay doesn't work on manual show
-		
+
 		setTimeout(function(){
 			$('#' + elementId).tooltip('hide');
-		}, 2000);		
-	}	
+		}, 2000);
+	}
 }
 
 // Register component
