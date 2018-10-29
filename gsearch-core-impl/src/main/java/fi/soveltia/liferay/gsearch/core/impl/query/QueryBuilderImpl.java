@@ -229,7 +229,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	/**
 	 * Remove a query contributor from list.
 	 *
-	 * @param clauseBuilder
+	 * @param queryContributor
 	 */
 	protected void removeQueryContributor(QueryContributor queryContributor) {
 

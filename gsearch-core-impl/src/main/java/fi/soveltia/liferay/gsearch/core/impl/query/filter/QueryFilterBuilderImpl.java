@@ -58,37 +58,34 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 		PortletRequest portletRequest, QueryParams queryParams)
 		throws Exception {
 
-		_queryParams = queryParams;
 		_portletRequest = portletRequest;
 
-		_filter = new BooleanFilter();
+		BooleanFilter booleanFilter = new BooleanFilter();
+		buildClassesCondition(queryParams, booleanFilter);
 
-		buildClassesCondition();
+		buildCompanyCondition(queryParams, booleanFilter);
 
-		buildCompanyCondition();
+		buildGroupsCondition(queryParams, booleanFilter);
 
-		buildGroupsCondition();
+		buildModificationTimeCondition(queryParams, booleanFilter);
 
-		buildModificationTimeCondition();
+		buildStagingGroupCondition(booleanFilter);
 
-		buildStagingGroupCondition();
+		buildStatusCondition(booleanFilter);
 
-		buildStatusCondition();
+		buildFacetConditions(queryParams, booleanFilter);
 
-		buildFacetConditions();
+		buildCategoryConditions(queryParams, booleanFilter);
 
-		buildCategoryConditions();
+		buildViewPermissionCondition(queryParams, booleanFilter);
 
-		buildViewPermissionCondition();
-
-		return _filter;
+		return booleanFilter;
 	}
 
 	/**
 	 * Add DLFileEntry class condition
 	 *
 	 * @param query
-	 * @param dedicatedTypeQuery
 	 * @throws ParseException
 	 */
 	protected void addDLFileEntryClassCondition(BooleanQuery query)
@@ -140,10 +137,10 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 *
 	 * @throws ParseException
 	 */
-	protected void buildClassesCondition()
+	protected void buildClassesCondition(QueryParams queryParams, BooleanFilter booleanFilter)
 		throws ParseException {
 
-		List<String> classNames = _queryParams.getClassNames();
+		List<String> classNames = queryParams.getClassNames();
 
 		BooleanQuery query = new BooleanQueryImpl();
 
@@ -161,19 +158,19 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
 		}
-		addAsQueryFilter(query);
+		addAsQueryFilter(query, booleanFilter);
 	}
 
 	/**
 	 * Add company condition.
 	 */
-	protected void buildCompanyCondition() {
+	protected void buildCompanyCondition(QueryParams queryParams, BooleanFilter booleanFilter) {
 
-		_filter.addRequiredTerm(Field.COMPANY_ID, _queryParams.getCompanyId());
+		booleanFilter.addRequiredTerm(Field.COMPANY_ID, queryParams.getCompanyId());
 	}
 
-	protected void buildCategoryConditions() {
-		List<Long> categoryIds = _queryParams.getCategories();
+	protected void buildCategoryConditions(QueryParams queryParams, BooleanFilter booleanFilter) {
+		List<Long> categoryIds = queryParams.getCategories();
 		if ((categoryIds != null) && !categoryIds.isEmpty()) {
 
 			BooleanQueryImpl query = new BooleanQueryImpl();
@@ -181,14 +178,14 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 				TermQuery condition = new TermQueryImpl(Field.ASSET_CATEGORY_IDS, String.valueOf(categoryId));
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			});
-			addAsQueryFilter(query);
+			addAsQueryFilter(query, booleanFilter);
 		}
 	}
 
-	protected void buildFacetConditions() {
+	protected void buildFacetConditions(QueryParams queryParams, BooleanFilter booleanFilter) {
 
 		Map<FacetParam, BooleanClauseOccur> facetParams =
-			_queryParams.getFacetParams();
+			queryParams.getFacetParams();
 
 		if (facetParams == null) {
 			return;
@@ -225,7 +222,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 			facetQuery.add(query, facetParam.getValue());
 		}
-		addAsQueryFilter(facetQuery);
+		addAsQueryFilter(facetQuery, booleanFilter);
 	}
 
 	/**
@@ -233,10 +230,10 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 *
 	 * @throws ParseException
 	 */
-	protected void buildGroupsCondition()
+	protected void buildGroupsCondition(QueryParams queryParams, BooleanFilter booleanFilter)
 		throws ParseException {
 
-		long[] groupIds = _queryParams.getGroupIds();
+		long[] groupIds = queryParams.getGroupIds();
 
 		if (groupIds.length > 0) {
 
@@ -247,7 +244,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 					new TermQueryImpl(Field.SCOPE_GROUP_ID, String.valueOf(l));
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
-			addAsQueryFilter(query);
+			addAsQueryFilter(query, booleanFilter);
 		}
 	}
 
@@ -256,52 +253,52 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 *
 	 * @throws ParseException
 	 */
-	protected void buildModificationTimeCondition()
+	protected void buildModificationTimeCondition(QueryParams queryParams, BooleanFilter booleanFilter)
 		throws ParseException {
 
 		// Set modified from limit.
 
-		Date from = _queryParams.getTimeFrom();
+		Date from = queryParams.getTimeFrom();
 
 		if (from != null) {
 			BooleanQuery query = new BooleanQueryImpl();
 			query.addRangeTerm(
 				"modified_sortable", from.getTime(), Long.MAX_VALUE);
 
-			addAsQueryFilter(query);
+			addAsQueryFilter(query, booleanFilter);
 		}
 
 		// Set modified to limit.
 
-		Date to = _queryParams.getTimeTo();
+		Date to = queryParams.getTimeTo();
 
 		if (to != null) {
 			BooleanQuery query = new BooleanQueryImpl();
 			query.addRangeTerm(
 				"modified_sortable", to.getTime(), Long.MAX_VALUE);
 
-			addAsQueryFilter(query);
+			addAsQueryFilter(query, booleanFilter);
 		}
 	}
 
 	/**
 	 * Add (no) staging group condition.
 	 */
-	protected void buildStagingGroupCondition() {
+	protected void buildStagingGroupCondition(BooleanFilter booleanFilter) {
 
-		_filter.addRequiredTerm(Field.STAGING_GROUP, false);
+		booleanFilter.addRequiredTerm(Field.STAGING_GROUP, false);
 	}
 
 	/**
 	 * Add status condition.
 	 */
-	protected void buildStatusCondition() {
+	protected void buildStatusCondition(BooleanFilter booleanFilter) {
 
 		// Set to approved only
 
 		int status = WorkflowConstants.STATUS_APPROVED;
 
-		_filter.addRequiredTerm(Field.STATUS, status);
+		booleanFilter.addRequiredTerm(Field.STATUS, status);
 	}
 
 	/**
@@ -309,21 +306,21 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 *
 	 * @throws Exception
 	 */
-	protected void buildViewPermissionCondition()
+	protected void buildViewPermissionCondition(QueryParams queryParams, BooleanFilter booleanFilter)
 		throws Exception {
 
 		Query query = _permissionFilterQueryBuilder.buildPermissionQuery(
-			_portletRequest, _queryParams);
+			_portletRequest, queryParams);
 
 		if (query != null) {
-			addAsQueryFilter(query);
+			addAsQueryFilter(query, booleanFilter);
 		}
 	}
 
 	/**
 	 * Remove a result item processor from list.
 	 *
-	 * @param resultItemProcessor
+	 * @param permissionFilterQueryBuilder
 	 */
 	protected void removePermissionFilterQueryBuilder(
 		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
@@ -342,16 +339,14 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 *
 	 * @param query
 	 */
-	private void addAsQueryFilter(Query query) {
+	private void addAsQueryFilter(Query query, BooleanFilter booleanFilter) {
 
 		QueryFilter queryFilter = new QueryFilter(query);
 
-		_filter.add(queryFilter, BooleanClauseOccur.MUST);
+		booleanFilter.add(queryFilter, BooleanClauseOccur.MUST);
 	}
 
 	private static final int MAX_FACET_VALUES = 20;
-
-	private BooleanFilter _filter;
 
 	@Reference(
 		bind = "setPermissionFilterQueryBuilder",
@@ -363,8 +358,6 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
 
 	private PortletRequest _portletRequest;
-
-	private QueryParams _queryParams;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(QueryFilterBuilderImpl.class);

@@ -23,11 +23,11 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactor
 
 /**
  * Result item builder factory implementation.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = ResultItemBuilderFactory.class
 )
 public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
@@ -37,7 +37,7 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 	 */
 	public ResultItemBuilder getResultBuilder(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL) {
+		Document document) {
 
 		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
 
@@ -53,10 +53,6 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		if (resultItemBuilder == null) {
 			_log.info("No result item builder found for " + entryClassName);
 		}
-
-		resultItemBuilder.setProperties(
-			portletRequest, portletResponse, document,
-			assetPublisherPageFriendlyURL);
 
 		return resultItemBuilder;
 	}

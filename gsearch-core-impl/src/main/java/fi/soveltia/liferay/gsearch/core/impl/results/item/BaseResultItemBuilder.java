@@ -4,40 +4,27 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
-import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
-import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Layout;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.WindowState;
-
-import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
-import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
-import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Abstract base result builder class.
@@ -50,20 +37,20 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDate()
+	public String getDate(Document document, Locale locale)
 		throws ParseException {
 
 		String dateString = "";
 
 		try {
-			if (Validator.isNotNull(_document.get(Field.MODIFIED_DATE))) {
+			if (Validator.isNotNull(document.get(Field.MODIFIED_DATE))) {
 
 				DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 				Date lastModified = df.parse(
-					_document.get(Field.MODIFIED_DATE));
+					document.get(Field.MODIFIED_DATE));
 
 				DateFormat dateFormat =
-					DateFormat.getDateInstance(DateFormat.SHORT, _locale);
+					DateFormat.getDateInstance(DateFormat.SHORT, locale);
 				dateString = dateFormat.format(lastModified);
 			}
 		}
@@ -78,10 +65,10 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDescription()
+	public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale)
 		throws SearchException {
 
-		return HtmlUtil.stripHtml(getSummary().getContent());
+		return HtmlUtil.stripHtml(getSummary(portletRequest, portletResponse, document).getContent());
 	}
 
 	/**
@@ -90,7 +77,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc()
+	public String getImageSrc(PortletRequest portletRequest, long entryClassPK)
 		throws Exception {
 
 		return null;
@@ -100,104 +87,46 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getLink()
-		throws Exception {
-
-		StringBundler sb = new StringBundler();
-		sb.append(
-			getAssetRenderer().getURLView(
-				(LiferayPortletResponse) _portletResponse,
-				WindowState.MAXIMIZED));
-
-		return sb.toString();
-	}
+	public abstract String getLink(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK)
+		throws Exception;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(Document document, Locale locale, long companyId)
 		throws Exception {
 
 		return null;
 	}
 
+
 	/**
-	 * Get a view url for an article which is not bound to a layout or has a
-	 * default view page.
-	 *
-	 * @return url string
-	 * @throws PortalException
+	 * {@inheritDoc}
 	 */
-	public String getNotLayoutBoundJournalArticleUrl(
-		JournalArticle journalArticle)
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
-			_portletRequest, _assetPublisherPageFriendlyURL);
-
-		String assetPublisherInstanceId =
-			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
-
-		StringBundler sb = new StringBundler();
-		sb.append(PortalUtil.getLayoutFriendlyURL(layout, themeDisplay));
-		sb.append("/-/asset_publisher/");
-		sb.append(assetPublisherInstanceId);
-		sb.append("/content/");
-		sb.append(journalArticle.getUrlTitle());
-		sb.append("?_");
-		sb.append(AssetPublisherPortletKeys.ASSET_PUBLISHER);
-		sb.append("_INSTANCE_");
-		sb.append(assetPublisherInstanceId);
-		sb.append("_groupId=");
-		sb.append(journalArticle.getGroupId());
-
-		return sb.toString();
+	@Override
+	public String[] getTags(Document document) {
+		return document.getValues(Field.ASSET_TAG_NAMES);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getTags() {
-
-		String[] tags = _document.getValues(Field.ASSET_TAG_NAMES);
-
-		return tags;
-	}
+	public abstract String getTitle(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale, long entryClassPK)
+		throws NumberFormatException, PortalException;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTitle()
-		throws NumberFormatException, PortalException {
-
-		String title = getSummary().getTitle();
-
-		if (Validator.isNull(title)) {
-			title = getAssetRenderer().getTitle(_locale);
-		}
-		return HtmlUtil.stripHtml(title);
-	}
+	public abstract String getType();
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getType() {
-
-		return _entryClassName;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getBreadcrumbs() throws Exception {
+	public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception {
 		return "";
 	}
 
@@ -205,49 +134,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getCategories() throws Exception {
+	public String[] getCategories(Document document, Locale locale) throws Exception {
 		return new String[] {};
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setProperties(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL) {
-
-		_assetPublisherPageFriendlyURL = assetPublisherPageFriendlyURL;
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_document = document;
-		_locale = _portletRequest.getLocale();
-		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
-		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
-		_assetRenderer = null;
-		_summary = null;
-	}
-
-	/**
-	 * s Get AssetRenderer
-	 *
-	 * @return asset renderer object specific for the item type
-	 * @throws PortalException
-	 * @throws NumberFormatException
-	 */
-	protected AssetRenderer<?> getAssetRenderer()
-		throws NumberFormatException, PortalException {
-
-		if (_assetRenderer == null) {
-
-			AssetRendererFactory<?> assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-					_entryClassName);
-			_assetRenderer =
-				assetRendererFactory.getAssetRenderer(_entryClassPK);
-		}
-
-		return _assetRenderer;
 	}
 
 	/**
@@ -276,7 +164,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @param className name of the item class
 	 * @return indexer object
 	 */
-	protected Indexer<Object> getIndexer(String className) {
+	Indexer<Object> getIndexer(String className) {
 
 		return IndexerRegistryUtil.getIndexer(className);
 	}
@@ -287,40 +175,28 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @return document summary object
 	 * @throws SearchException
 	 */
-	protected Summary getSummary()
+	protected Summary getSummary(PortletRequest portletRequest, PortletResponse portletResponse, Document document)
 		throws SearchException {
 
-		if (_summary == null) {
-
 			Indexer<?> indexer =
-				getIndexer(_document.get(Field.ENTRY_CLASS_NAME));
+				getIndexer(document.get(Field.ENTRY_CLASS_NAME));
+
+			Summary summary = null;
 
 			if (indexer != null) {
-				String snippet = _document.get(Field.SNIPPET);
+				String snippet = document.get(Field.SNIPPET);
 
-				_summary = indexer.getSummary(
-					_document, snippet, _portletRequest, _portletResponse);
+				summary = indexer.getSummary(
+					document, snippet, portletRequest, portletResponse);
 
-				_summary.setHighlight(true);
-				_summary.setMaxContentLength(300);
-
-				return _summary;
+				summary.setHighlight(true);
+				summary.setMaxContentLength(300);
 			}
-		}
 
-		return _summary;
+		return summary;
 	}
 
-	protected String _assetPublisherPageFriendlyURL;
-	protected Document _document;
-	protected String _entryClassName;
-	protected long _entryClassPK;
-	protected Locale _locale;
-	protected PortletRequest _portletRequest;
-	protected PortletResponse _portletResponse;
-
-	private AssetRenderer<?> _assetRenderer;
-	private Summary _summary = null;
+	private AssetRenderer _assetRenderer;
 
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);

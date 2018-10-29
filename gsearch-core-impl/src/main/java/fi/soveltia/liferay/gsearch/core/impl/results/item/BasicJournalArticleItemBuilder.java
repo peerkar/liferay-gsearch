@@ -1,13 +1,11 @@
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.xml.DocumentException;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.SAXReader;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
@@ -15,6 +13,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import java.util.List;
 
 @Component(
@@ -27,11 +27,9 @@ public class BasicJournalArticleItemBuilder extends JournalArticleItemBuilder im
 
     private List<String> DDM_STRUCTURE_KEYS;
 
-    @Reference
-    private ConfigurationHelper _configurationHelperService;
 
     @Reference
-    private SAXReader saxReader;
+    private ConfigurationHelper _configurationHelperService;
 
     @Activate
     protected void activate() {

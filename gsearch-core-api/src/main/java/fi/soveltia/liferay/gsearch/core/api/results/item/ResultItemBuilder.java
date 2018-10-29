@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.core.api.results.item;
 
 import com.liferay.portal.kernel.search.Document;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
@@ -27,7 +28,7 @@ public interface ResultItemBuilder {
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
-	public String getDate()
+	public String getDate(Document document, Locale locale)
 		throws Exception;
 
 	/**
@@ -35,7 +36,7 @@ public interface ResultItemBuilder {
 	 *
 	 * @return item description
 	 */
-	public String getDescription()
+	public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale)
 		throws Exception;
 
 	/**
@@ -43,7 +44,7 @@ public interface ResultItemBuilder {
 	 *
 	 * @return item description
 	 */
-	public String getImageSrc()
+	public String getImageSrc(PortletRequest portletRequest, long entryClassPK)
 		throws Exception;
 
 	/**
@@ -52,7 +53,7 @@ public interface ResultItemBuilder {
 	 * @return item link
 	 * @throws Exception
 	 */
-	public String getLink()
+	public String getLink(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK)
 		throws Exception;
 
 	/**
@@ -61,7 +62,7 @@ public interface ResultItemBuilder {
 	 * @return item metadata
 	 * @throws Exception
 	 */
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(Document document, Locale locale, long companyId)
 		throws Exception;
 
 	/**
@@ -69,7 +70,7 @@ public interface ResultItemBuilder {
 	 *
 	 * @return item tags
 	 */
-	public String[] getTags()
+	public String[] getTags(Document document)
 		throws Exception;
 
 	/**
@@ -77,7 +78,7 @@ public interface ResultItemBuilder {
 	 *
 	 * @return item title
 	 */
-	public String getTitle()
+	public String getTitle(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale, long entryClassPK)
 		throws Exception;
 
 	/**
@@ -88,23 +89,8 @@ public interface ResultItemBuilder {
 	public String getType()
 		throws Exception;
 
-	public String getBreadcrumbs() throws Exception;
+	public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception;
 
-	public String[] getCategories() throws Exception;
-
-	/**
-	 * Set item builder properties.
-	 *
-	 * @param portletRequest
-	 * @param portletResponse
-	 * @param document
-	 *            search document
-	 * @param assetPublisherFriendlyURL
-	 *            friendly url of the page where there is an assetpublisher for
-	 *            showing contents without any bound layout
-	 */
-	public void setProperties(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherFriendlyURL);
+	public String[] getCategories(Document document, Locale locale) throws Exception;
 
 }
