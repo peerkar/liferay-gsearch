@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.liferay.portal.kernel.util.Validator;
 import org.osgi.service.component.annotations.Component;
@@ -250,7 +251,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 			DDMStructure structure = structures.get(0);
 
-			TIKARAW_STRUCTURE_ID_MAP = new HashMap<Long, Long>();
+			TIKARAW_STRUCTURE_ID_MAP = new ConcurrentHashMap<Long, Long>();
 
 			TIKARAW_STRUCTURE_ID_MAP.put(companyId, structure.getStructureId());
 
