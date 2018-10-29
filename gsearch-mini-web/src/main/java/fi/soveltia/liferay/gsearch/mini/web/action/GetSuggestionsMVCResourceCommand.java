@@ -62,14 +62,12 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 					.value(searchResult.getString("title"))
 					.data(QuerySuggestionData.newBuilder()
 						.type(searchResult.getString("type"))
+						.url(searchResult.getString("link"))
+						.description(searchResult.getString("breadcrumbs"))
 						.build())
 					.build()
 			);
 		}
-
-//		todo
-//			lisää group by js puolelle devbridgeautocompleteen
-//			autocomplete pois päältä varsinaisessa hakuportletissa (päällä vain miniportletissa)
 
 		Map<String, Object> j = new HashMap<>();
 		Gson gson = new Gson();

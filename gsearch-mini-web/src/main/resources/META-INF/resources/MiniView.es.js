@@ -31,6 +31,8 @@ class MiniView extends Component {
 
 		this.suggestionsURL = opt_config.suggestionsURL;
 
+		this.noSuggestionsNotice = opt_config.noSuggestionsNotice;
+
 		// Init autocomplete.
 
 		if (this.autoCompleteEnabled) {
@@ -73,11 +75,24 @@ class MiniView extends Component {
 			minChars: _self.queryMinLength,
 			noCache: false,
 		    onSelect: function (suggestion) {
-		    	_self.doSearch();
+		    	window.location.href = suggestion.data.url;
 		    },
 			paramName: 'q',
 			serviceUrl: _self.suggestionsURL,
-			triggerSelectOnValidInput: false
+			groupBy: "type",
+			triggerSelectOnValidInput: false,
+			formatResult: function(suggestion, currentValue) {
+				let title = $('<div/>').html(suggestion.value);
+				title.addClass('search-suggestion-item-title');
+				let description = $('<div/>').html(suggestion.data.description);
+				description.addClass('search-suggestion-item-description');
+				return $('<div/>').addClass('search-suggestion-item').append(title).append(description).prop('outerHTML');
+			},
+			formatGroup: function (suggestion, category) {
+				return $('<div/>').addClass('search-suggestion-category').html(category).prop('outerHTML');
+			},
+            showNoSuggestionNotice: true,
+            noSuggestionNotice: _self.noSuggestionsNotice
 		});
 	}
 
