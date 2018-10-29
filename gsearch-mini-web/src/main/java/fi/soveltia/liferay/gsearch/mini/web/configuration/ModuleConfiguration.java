@@ -4,7 +4,7 @@ import aQute.bnd.annotation.metatype.Meta;
 
 /**
  * GSearch Mini Web module configuration.
- * 
+ *
  * @author Petteri Karttunen
  *
  */
@@ -14,24 +14,24 @@ import aQute.bnd.annotation.metatype.Meta;
 	name = "GSearch Mini Portlet"
 )
 public interface ModuleConfiguration {
-	
+
 	@Meta.AD(
-		deflt = "/search", 
+		deflt = "/search",
 	    name = "search-portlet-page-name",
 	    description = "search-portlet-page-desc",
 		required = false
 	)
 	public String searchPortletPage();
-	
+
 	@Meta.AD(
-		deflt = "3", 
+		deflt = "3",
 	    name = "keywords-min-length",
 		required = false
 	)
 	public int queryMinLength();
-	
+
 	@Meta.AD(
-		deflt = "true", 
+		deflt = "true",
 	    name = "enable-autocompletion-name",
 	    description = "enable-autocompletion-desc",
 		required = false
@@ -39,15 +39,23 @@ public interface ModuleConfiguration {
 	public boolean enableAutoComplete();
 
 	@Meta.AD(
-		deflt = "150", 
+		deflt = "150",
 	    description = "autocomplete-delay-desc",
 	    name = "autocomplete-delay-name",
 		required = false
 	)
-	public int autoCompleteRequestDelay();	
+	public int autoCompleteRequestDelay();
 
 	@Meta.AD(
-		deflt = "10000", 
+		deflt = "5",
+		description = "search-suggestions-max-count",
+		name = "search-suggestions-max-count",
+		required = false
+	)
+	public int searchSuggestionsMaxCount();
+
+	@Meta.AD(
+		deflt = "10000",
 		description = "request-timeout-desc",
 	    name = "request-timeout-name",
 		required = false

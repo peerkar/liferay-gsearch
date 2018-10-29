@@ -92,7 +92,8 @@ class MiniView extends Component {
 				return $('<div/>').addClass('search-suggestion-category').html(category).prop('outerHTML');
 			},
             showNoSuggestionNotice: true,
-            noSuggestionNotice: _self.noSuggestionsNotice
+            noSuggestionNotice: _self.noSuggestionsNotice,
+            preventBadQueries: false
 		});
 	}
 

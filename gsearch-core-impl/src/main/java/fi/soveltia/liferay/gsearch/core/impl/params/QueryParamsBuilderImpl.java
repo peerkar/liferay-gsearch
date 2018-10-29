@@ -255,7 +255,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		int start =
 			ParamUtil.getInteger(portletRequest, GSearchWebKeys.START, 0);
 		queryParams.setStart(start);
-		queryParams.setEnd(start + _moduleConfiguration.pageSize());
+		int pageSize = ParamUtil.getInteger(portletRequest, GSearchWebKeys.PAGE_SIZE, _moduleConfiguration.pageSize());
+		queryParams.setEnd(start + pageSize);
 	}
 
 	/**

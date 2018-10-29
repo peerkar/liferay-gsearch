@@ -132,6 +132,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		ResourceURL portletURL = renderResponse.createResourceURL();
 
 		portletURL.setResourceID(resourceId);
+		portletURL.setParameter(GSearchMiniWebKeys.PAGE_SIZE, String.valueOf(_moduleConfiguration.searchSuggestionsMaxCount()));
 
 		return portletURL.toString();
 	}
