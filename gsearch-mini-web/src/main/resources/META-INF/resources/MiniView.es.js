@@ -93,7 +93,8 @@ class MiniView extends Component {
 			},
             showNoSuggestionNotice: true,
             noSuggestionNotice: _self.noSuggestionsNotice,
-            preventBadQueries: false
+            preventBadQueries: false,
+			preserveInput: true
 		});
 	}
 
