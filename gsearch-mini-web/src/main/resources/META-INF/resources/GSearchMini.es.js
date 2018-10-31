@@ -3,12 +3,12 @@ import Soy from 'metal-soy/src/Soy';
 
 import devbridgeAutocomplete from './js/DevbridgeAutocomplete.es';  
 
-import templates from './MiniView.soy';
+import templates from './GSearchMini.soy';
 
 /**
  * View component.
  */
-class MiniView extends Component {
+class GSearchMini extends Component {
 	
 	/**
 	 * @inheritDoc
@@ -116,7 +116,7 @@ class MiniView extends Component {
  * @type {!Object}
  * @static
  */
-MiniView.STATE = {
+GSearchMini.STATE = {
 
 	autoCompleteEnabled: {
 		value: false
@@ -143,6 +143,6 @@ MiniView.STATE = {
 
 // Register component
 
-Soy.register(MiniView, templates);
+Soy.register(GSearchMini, templates);
 
-export default MiniView;
+export default GSearchMini;

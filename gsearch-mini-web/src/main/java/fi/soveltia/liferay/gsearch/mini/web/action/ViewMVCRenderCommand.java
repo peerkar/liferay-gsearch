@@ -35,7 +35,7 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
-		"mvc.command.name=MiniView",
+		"mvc.command.name=GSearchMini",
 		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class
@@ -100,7 +100,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			GSearchMiniWebKeys.SUGGESTIONS_URL,
 			createResourceURL(renderResponse, GSearchMiniResourceKeys.GET_SUGGESTIONS));
 		
-		return "MiniView";
+		return "GSearchMini";
 	}
 	
 	@Activate
