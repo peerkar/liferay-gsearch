@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.highlightresultitembytag;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -8,10 +9,14 @@ import com.liferay.portal.kernel.search.Field;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.portlet.PortletRequest;
+
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 import fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.ModuleConfiguration;
 
@@ -19,7 +24,6 @@ import fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.Module
  * Results item tag highlighter implementation.
  * 
  * @author Petteri Karttunen
- *
  */
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.ModuleConfiguration",
@@ -41,30 +45,35 @@ public class HighlightResultItemProcessor implements ResultItemProcessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(Document document, JSONObject resultItem) throws Exception {
+	public void process(
+		PortletRequest portletRequest, QueryParams queryParams,
+		Document document,ResultItemBuilder resultItemBuilder,
+		JSONObject resultItem)
+		throws Exception {
 
 		if (!isEnabled()) {
 			return;
 		}
-		
-		String[]tags = getTags(document);
-		
+
+		String[] tags = getTags(document);
+
 		if (tags != null) {
-			
+
 			String highlightTag = _moduleConfiguration.tagName();
-			
+
 			if (Arrays.stream(tags).anyMatch(highlightTag::equals)) {
 				resultItem.put("highlight", true);
 			}
 		}
 	}
-	
+
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}		
+	}
 
 	protected String[] getTags(Document document) {
 
@@ -72,7 +81,7 @@ public class HighlightResultItemProcessor implements ResultItemProcessor {
 
 		return tags;
 	}
-	
+
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 }

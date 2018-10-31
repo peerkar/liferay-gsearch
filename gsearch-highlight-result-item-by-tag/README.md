@@ -1,8 +1,8 @@
 # Liferay GSearch Highlight Result Item by Tag
 
-This is the GSearch Highlight Result Item by tTag module.
+This is the GSearch Highlight Result Item by Tag module.
 
-This feature allows to add a property called "highlight" to the UI result item, based on the existence of configured tag in the index document.
+This result item post processor adds a property called "highlight" to the UI result item if document contains certain tag, configured in the settings.
 
 ## Installation
 
