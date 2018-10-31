@@ -222,7 +222,17 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		throws KeywordsException {
 
 		String keywords =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS, "");
+
+//		boolean suggestions = Boolean.valueOf(ParamUtil.getString(portletRequest, GSearchWebKeys.SUGGESTIONS_MODE, "false"));
+
+		// to make autocomplete search find results starting with given string
+//		if (suggestions &&
+//			!keywords.isEmpty() &&
+//			!keywords.endsWith("*") &&
+//			!keywords.matches("\\W$")) {
+//			keywords += "*";
+//		}
 
 		// Validate keywords.
 
