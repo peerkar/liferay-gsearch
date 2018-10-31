@@ -27,6 +27,8 @@ public class GSearchWebKeys implements WebKeys {
 	
 	public static final String FILTER_TYPE = "type";
 
+	public static final String GMAP_API_KEY = "googleMapAPIKey";
+
 	public static final String HELP_TEXT = "helpText";
 
 	public static final String HELP_TEXT_URL = "helpTextURL";
@@ -49,11 +51,15 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String RESULTS_LAYOUT = "resultsLayout";
 
+	public static final String RESULTS_LAYOUT_OPTIONS = "resultLayoutOptions";
+
 	public static final String SEARCH_QUERY_TIME = "searchQueryTime";
 
 	public static final String SEARCH_RESULTS_URL = "searchResultsURL";
 	
 	public static final String SHOW_ASSET_TAGS = "showAssetTags";
+
+	public static final String STATUS = "status";
 
 	public static final String SUGGESTIONS_URL = "suggestionsURL";
 	

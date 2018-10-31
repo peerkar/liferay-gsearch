@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.api;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import javax.portlet.PortletRequest;
@@ -28,4 +29,23 @@ public interface GSearch {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryParams queryParams)
 		throws Exception;
+	
+	/**
+	 * Get search results.
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param queryParams
+	 * @param queryConfiguration
+	 * @param executeQueryPostProcessors
+	 * @param processQueryContributors
+	 * @return search results JSON object
+	 * @throws Exception
+	 */
+	public JSONObject getSearchResults(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryParams queryParams, JSONArray queryConfiguration, 
+		boolean executeQuerypostProcessors, boolean processQueryContributors)
+		throws Exception;
+	
 }

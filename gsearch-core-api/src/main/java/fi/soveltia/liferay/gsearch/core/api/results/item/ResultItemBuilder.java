@@ -20,48 +20,67 @@ public interface ResultItemBuilder {
 	 * Check if this builder can build the requested document.
 	 */
 	public boolean canBuild(Document document);
-	
+
 	/**
 	 * Get item hit date.
 	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
-	public String getDate()
+	public String getDate(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
 	 * Get item description.
 	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
 	 * @return item description
+	 * @throws Exception
 	 */
-	public String getDescription()
+	public String getDescription(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws Exception;
 
 	/**
 	 * Get item image src i.e. src attribute for img tag.
 	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return item description
+	 * @throws Exception
 	 */
-	public String getImageSrc()
+	public String getImageSrc(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
 	 * Get item link.
 	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param assetPublisherPageFriendlyURL
 	 * @return item link
 	 * @throws Exception
 	 */
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL)
 		throws Exception;
 
 	/**
 	 * Get item additional metadata.
 	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return item metadata
 	 * @throws Exception
 	 */
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
@@ -69,38 +88,30 @@ public interface ResultItemBuilder {
 	 * 
 	 * @return item tags
 	 */
-	public String[] getTags()
+	public String[] getTags(Document document)
 		throws Exception;
 
 	/**
 	 * Get item title.
 	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
 	 * @return item title
+	 * @throws Exception
 	 */
-	public String getTitle()
+	public String getTitle(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws Exception;
 
 	/**
 	 * Get item type
 	 * 
-	 * @return name of the item asset type
-	 */
-	public String getType()
-		throws Exception;
-
-	/**
-	 * Set item builder properties.
-	 * 
-	 * @param portletRequest
-	 * @param portletResponse
 	 * @param document
-	 *            search document
-	 * @param assetPublisherFriendlyURL
-	 *            friendly url of the page where there is an assetpublisher for
-	 *            showing contents without any bound layout
+	 * @return name of the item asset type
+	 * @throws Exception
 	 */
-	public void setProperties(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherFriendlyURL);
-
+	public String getType(Document document)
+		throws Exception;
 }

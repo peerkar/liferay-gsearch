@@ -26,6 +26,7 @@ public class QueryParams {
 	private String keywords;
 	private String originalKeywords;
 	private String resultsLayout;
+	private Integer status;
 	private Date timeFrom = null;
 	private Date timeTo = null;
 
@@ -33,6 +34,8 @@ public class QueryParams {
 	private int end;
 	private int pageSize;
 	private Sort[] sorts;
+
+	private Map<String, Object> extraParams;
 
 	public long getCompanyId() {
 
@@ -83,14 +86,25 @@ public class QueryParams {
 
 		this.classNames = classNames;
 	}
-	
+
+	public Map<String, Object> getExtraParams() {
+
+		return extraParams;
+	}
+
+	public void setExtraParams(Map<String, Object> extraParams) {
+
+		this.extraParams = extraParams;
+	}
+
 	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
-	
+
 		return facetParams;
 	}
-	
-	public void setFacetsParams(Map<FacetParam, BooleanClauseOccur> facetParams) {
-	
+
+	public void setFacetsParams(
+		Map<FacetParam, BooleanClauseOccur> facetParams) {
+
 		this.facetParams = facetParams;
 	}
 
@@ -122,6 +136,16 @@ public class QueryParams {
 	public void setResultsLayout(String resultsLayout) {
 
 		this.resultsLayout = resultsLayout;
+	}
+
+	public Integer getStatus() {
+
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+
+		this.status = status;
 	}
 
 	public Date getTimeFrom() {

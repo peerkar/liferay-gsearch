@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.api.query;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.search.Query;
 
 import javax.portlet.PortletRequest;
@@ -20,10 +21,12 @@ public interface QueryBuilder {
 	 * 
 	 * @param portletRequest
 	 * @param queryParams
+	 * @param queryConfiguration
+	 * @param processQueryContributors
 	 * @return Query object
 	 * @throws Exception
 	 */
 	public Query buildQuery(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryParams queryParams, JSONArray queryConfiguration, boolean processQueryContributors)
 		throws Exception;
 }
