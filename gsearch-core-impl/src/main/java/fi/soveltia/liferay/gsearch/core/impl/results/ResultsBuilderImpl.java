@@ -16,10 +16,12 @@ import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
@@ -64,15 +66,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryParams queryParams, SearchContext searchContext, Hits hits) {
 
-		_hits = hits;
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_queryParams = queryParams;
-
 		// See class comments
 
 		_resourceBundle = ResourceBundleUtil.getBundle(
-			"content.Language", _queryParams.getLocale(),
+			"content.Language", queryParams.getLocale(),
 			ResultsBuilderImpl.class);
 
 		JSONObject resultsObject = JSONFactoryUtil.createJSONObject();
@@ -81,15 +78,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		// Create items array
 
-		resultsObject.put("items", createItemsArray());
+		resultsObject.put("items", createItemsArray(portletRequest, portletResponse, hits));
 
 		// Create meta info array
 
-		resultsObject.put("meta", createMetaObject(searchContext));
+		resultsObject.put("meta", createMetaObject(searchContext, queryParams, hits));
 
 		// Paging object
 
-		resultsObject.put("paging", createPagingObject());
+		resultsObject.put("paging", createPagingObject(queryParams, hits));
 
 
 		if (_log.isDebugEnabled()) {
@@ -129,7 +126,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @return facets as JSON array
 	 * @throws Exception
 	 */
-	protected JSONArray createFacetsArray(SearchContext searchContext)
+	protected JSONArray createFacetsArray(SearchContext searchContext, QueryParams queryParams)
 		throws Exception {
 
 		// Get facets configuration
@@ -175,7 +172,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 			if (translator != null) {
 				termArray = translator.translateValues(
-					_queryParams, facetCollector, facetConfiguration);
+					queryParams, facetCollector, facetConfiguration);
 
 			}
 			else {
@@ -226,18 +223,23 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return JSON array of result items
 	 */
-	protected JSONArray createItemsArray() {
+	protected JSONArray createItemsArray(PortletRequest portletRequest, PortletResponse portletResponse, Hits hits) {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		Document[] docs = _hits.getDocs();
+		Document[] docs = hits.getDocs();
 
-		if (_hits == null || docs.length == 0) {
+		if (hits == null || docs.length == 0) {
 			return jsonArray;
 		}
 
 		// Loop through search result documents and create the
 		// JSON array of items to be delivered for UI
+
+		Locale locale = portletRequest.getLocale();
+		long companyId = PortalUtil.getCompanyId(portletRequest);
+
+		String assetPublisherPageFriendlyURL = _moduleConfiguration.assetPublisherPage();
 
 		for (int i = 0; i < docs.length; i++) {
 
@@ -249,7 +251,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 					_log.debug(
 						"##############################################");
 
-					_log.debug("Score: " + _hits.getScores()[i]);
+					_log.debug("Score: " + hits.getScores()[i]);
 
 					for (Entry<String, Field> e : document.getFields().entrySet()) {
 						_log.debug(e.getKey() + ":" + e.getValue().getValue());
@@ -258,32 +260,33 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
+				long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+
 				// Get item type specific item result builder
 
 				ResultItemBuilder resultItemBuilder =
 					_resultsBuilderFactory.getResultBuilder(
-						_portletRequest, _portletResponse, document,
-						_moduleConfiguration.assetPublisherPage());
+						portletRequest, portletResponse, document);
 
 				// Title
 
-				jsonObject.put("title", resultItemBuilder.getTitle());
+				jsonObject.put("title", resultItemBuilder.getTitle(portletRequest, portletResponse, document, locale, entryClassPK));
 
 				// Date
 
-				jsonObject.put("date", resultItemBuilder.getDate());
+				jsonObject.put("date", resultItemBuilder.getDate(document, locale));
 
 				// Description
 
 				jsonObject.put(
-					"description", resultItemBuilder.getDescription());
+					"description", resultItemBuilder.getDescription(portletRequest, portletResponse, document, locale));
 
 				// Image src
 
 				if (document.get(Field.ENTRY_CLASS_NAME).equals(
 					DLFileEntry.class.getName())) {
 
-					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
+					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc(portletRequest, entryClassPK));
 				}
 
 				// Type
@@ -294,21 +297,21 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Link
 
-				jsonObject.put("link", resultItemBuilder.getLink());
+				jsonObject.put("link", resultItemBuilder.getLink(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, entryClassPK));
 
 
-				jsonObject.put("breadcrumbs", resultItemBuilder.getBreadcrumbs());
+				jsonObject.put("breadcrumbs", resultItemBuilder.getBreadcrumbs(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, entryClassPK));
 
 				// Tags
 
-				String[] tags = resultItemBuilder.getTags();
+				String[] tags = resultItemBuilder.getTags(document);
 
 				if (tags != null && tags.length > 0 && tags[0].length() > 0) {
 
 					jsonObject.put("tags", tags);
 				}
 
-				String[] categories = resultItemBuilder.getCategories();
+				String[] categories = resultItemBuilder.getCategories(document, locale);
 
 				if (categories != null && categories.length > 0 && categories[0].length() > 0) {
 
@@ -319,7 +322,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Additional metadata
 
-				jsonObject.put("metadata", resultItemBuilder.getMetadata());
+				jsonObject.put("metadata", resultItemBuilder.getMetadata(document, locale, companyId));
 
 				// Execute result item processors
 
@@ -343,36 +346,36 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return meta information JSON object
 	 */
-	protected JSONObject createMetaObject(SearchContext searchContext) {
+	protected JSONObject createMetaObject(SearchContext searchContext, QueryParams queryParams, Hits hits) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		jsonObject.put("resultsLayout", _queryParams.getResultsLayout());
+		jsonObject.put("resultsLayout", queryParams.getResultsLayout());
 
 		// If this parameter is populated, there was an alternate search.
 
-		String originalQueryTerms = _queryParams.getOriginalKeywords();
+		String originalQueryTerms = queryParams.getOriginalKeywords();
 
 		if (originalQueryTerms != null) {
 			jsonObject.put("originalQueryTerms", originalQueryTerms);
 		}
 
-		jsonObject.put("queryTerms", _queryParams.getKeywords());
+		jsonObject.put("queryTerms", queryParams.getKeywords());
 
 		jsonObject.put(
-			"executionTime", String.format("%.3f", _hits.getSearchTime()));
-		jsonObject.put("querySuggestions", _hits.getQuerySuggestions());
+			"executionTime", String.format("%.3f", hits.getSearchTime()));
+		jsonObject.put("querySuggestions", hits.getQuerySuggestions());
 
 
-		jsonObject.put("start", getStart());
+		jsonObject.put("start", getStart(queryParams, hits));
 
-		jsonObject.put("end", getEnd());
+		jsonObject.put("end", getEnd(queryParams, hits));
 
-		jsonObject.put("totalPages", getPageCount());
+		jsonObject.put("totalPages", getPageCount(queryParams, hits));
 
-		jsonObject.put("totalHits", _hits.getLength());
+		jsonObject.put("totalHits", hits.getLength());
 
-		jsonObject.put("typeCounts", getTypeCounts(searchContext, _hits.getLength()));
+		jsonObject.put("typeCounts", getTypeCounts(searchContext, hits.getLength()));
 
 		return jsonObject;
 	}
@@ -418,8 +421,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return typeCounts;
 	}
 
-	private int getEnd() {
-		return Math.min(_queryParams.getPageSize() * getCurrentPage(_queryParams.getPageSize(), getStart()), _hits.getLength());
+	private int getEnd(QueryParams queryParams, Hits hits) {
+		return Math.min(queryParams.getPageSize() * getCurrentPage(queryParams.getPageSize(), getStart(queryParams, hits)), hits.getLength());
 	}
 
 	/**
@@ -427,11 +430,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return paging JSON object
 	 */
-	protected JSONObject createPagingObject() {
+	protected JSONObject createPagingObject(QueryParams queryParams, Hits hits) {
 
 		JSONObject pagingObject = JSONFactoryUtil.createJSONObject();
 
-		int totalHits = _hits.getLength();
+		int totalHits = hits.getLength();
 
 		if (totalHits == 0) {
 			return pagingObject;
@@ -440,9 +443,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		// Count of pages to show at once in the paging bar.
 
 		int pagesToShow = 10;
-		int pageSize = _queryParams.getPageSize();
-		int start = getStart();
-		int pageCount = getPageCount();
+		int pageSize = queryParams.getPageSize();
+		int start = getStart(queryParams, hits);
+		int pageCount = getPageCount(queryParams, hits);
 
 		// Page number to start from.
 
@@ -630,9 +633,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return
 	 */
-	private int getPageCount() {
+	private int getPageCount(QueryParams queryParams, Hits hits) {
 		return (int) Math.ceil(
-			_hits.getLength() * 1.0 / _queryParams.getPageSize());
+			hits.getLength() * 1.0 / queryParams.getPageSize());
 
 	}
 
@@ -646,15 +649,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 *
 	 * @return
 	 */
-	private int getStart() {
+	private int getStart(QueryParams queryParams, Hits hits) {
 
-		int pageSize = _queryParams.getPageSize();
-		int totalHits = _hits.getLength();
-		int start = _queryParams.getStart();
+		int pageSize = queryParams.getPageSize();
+		int totalHits = hits.getLength();
+		int start = queryParams.getStart();
 
 		if (totalHits < start) {
 
-			start = (getPageCount()-1) * pageSize;
+			start = (getPageCount(queryParams, hits)-1) * pageSize;
 
 			if (start < 0) {
 				start = 0;
@@ -663,14 +666,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		return start;
 	}
-
-	protected Hits _hits;
-
-	protected PortletRequest _portletRequest;
-
-	protected PortletResponse _portletResponse;
-
-	protected QueryParams _queryParams;
 
 	protected ResourceBundle _resourceBundle;
 
