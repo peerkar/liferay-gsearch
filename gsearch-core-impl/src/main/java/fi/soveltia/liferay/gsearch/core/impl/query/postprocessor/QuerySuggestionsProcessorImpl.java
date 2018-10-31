@@ -115,7 +115,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 
 			queryParams.setKeywords(querySuggestions[0]);
 
-			Query query = _queryBuilder.buildQuery(portletRequest, queryParams);
+			Query query = _queryBuilder.buildQuery(portletRequest, queryParams, null, true);
 
 			BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 				query, BooleanClauseOccur.MUST.getName());

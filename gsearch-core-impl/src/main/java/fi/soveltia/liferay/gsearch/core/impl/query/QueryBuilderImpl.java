@@ -56,17 +56,24 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 */
 	@Override
 	public BooleanQuery buildQuery(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryParams queryParams, JSONArray queryConfiguration, boolean processQueryContributors)
 		throws Exception {
 
+		if (queryConfiguration == null) {
+			queryConfiguration = JSONFactoryUtil.createJSONArray(_moduleConfiguration.queryConfiguration());
+		}
+		
 		// Build query
 
-		BooleanQuery query = constructQuery(portletRequest, queryParams);
+		BooleanQuery query = constructQuery(portletRequest, queryParams, queryConfiguration);
 
 		// Add query contributors
 
-		processQueryContributors(portletRequest, query);
-
+		if (processQueryContributors) {
+		
+			processQueryContributors(portletRequest, query);
+		}
+		
 		// Add filters
 
 		BooleanFilter preBooleanFilter =
@@ -80,7 +87,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 		return query;
 	}
-
+	
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -160,23 +167,20 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * @throws Exception
 	 */
 	protected BooleanQuery constructQuery(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryParams queryParams, JSONArray queryConfiguration)
 		throws Exception {
-
+		
 		BooleanQuery query = new BooleanQueryImpl();
 
 		// Build query
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.searchFieldConfiguration());
 
 		ClauseBuilder clauseBuilder;
 
 		Query clause;
 
-		for (int i = 0; i < configurationArray.length(); i++) {
+		for (int i = 0; i < queryConfiguration.length(); i++) {
 
-			JSONObject queryItem = configurationArray.getJSONObject(i);
+			JSONObject queryItem = queryConfiguration.getJSONObject(i);
 
 			String queryType = queryItem.getString("queryType");
 

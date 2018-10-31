@@ -6,6 +6,10 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
@@ -28,16 +32,15 @@ public class KBArticleItemBuilder extends BaseResultItemBuilder
 		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL)
 		throws Exception {
 
-		return getAssetRenderer().getURLViewInContext(
-			(LiferayPortletRequest) _portletRequest,
-			(LiferayPortletResponse) _portletResponse, null);
+		return getAssetRenderer(document).getURLViewInContext(
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, null);
 	}
 
 	// Avoiding KB dependency in gradle.build

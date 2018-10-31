@@ -3,13 +3,11 @@ package fi.soveltia.liferay.gsearch.core.impl.results;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
@@ -17,9 +15,6 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
-import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 
@@ -39,8 +34,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchResultsLayouts;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslatorFactory;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
@@ -48,7 +41,10 @@ import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactory;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
+import fi.soveltia.liferay.gsearch.core.api.results.layout.ResultLayoutService;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.results.layout.ImageListResultLayout;
+import fi.soveltia.liferay.gsearch.core.impl.results.layout.ThumbnailListResultLayout;
 
 /**
  * Results builder implementation. Localization is here local because of
@@ -70,14 +66,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	public JSONObject buildResults(PortletRequest portletRequest, PortletResponse portletResponse,
 			QueryParams queryParams, SearchContext searchContext, Hits hits) {
 
-		_hits = hits;
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_queryParams = queryParams;
-
 		// See class comments
 
-		_resourceBundle = ResourceBundleUtil.getBundle("content.Language", _queryParams.getLocale(),
+		_resourceBundle = ResourceBundleUtil.getBundle("content.Language", queryParams.getLocale(),
 				ResultsBuilderImpl.class);
 
 		JSONObject resultsObject = JSONFactoryUtil.createJSONObject();
@@ -86,24 +77,24 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		// Create items array
 
-		resultsObject.put("items", createItemsArray());
+		resultsObject.put("items", createItemsArray(portletRequest, portletResponse, queryParams, hits));
 
 		// Create meta info array
 
-		resultsObject.put("meta", createMetaObject());
+		resultsObject.put("meta", createMetaObject(queryParams, hits));
 
 		// Paging object
 
-		resultsObject.put("paging", createPagingObject());
+		resultsObject.put("paging", createPagingObject(queryParams, hits));
 
 		// Create facets
 
 		try {
-			resultsObject.put("facets", createFacetsArray(searchContext));
+			resultsObject.put("facets", createFacetsArray(searchContext, queryParams));
 		} catch (Exception e) {
 			_log.error(e, e);
 		}
-
+		
 		if (_log.isDebugEnabled()) {
 			_log.debug("Results processing took: " + (System.currentTimeMillis() - startTime));
 		}
@@ -137,7 +128,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @return facets as JSON array
 	 * @throws Exception
 	 */
-	protected JSONArray createFacetsArray(SearchContext searchContext) throws Exception {
+	protected JSONArray createFacetsArray(SearchContext searchContext, QueryParams queryParams) throws Exception {
 
 		// Get facets configuration
 
@@ -177,7 +168,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			FacetTranslator translator = _facetTranslatorFactory.getTranslator(facet.getFieldName());
 
 			if (translator != null) {
-				termArray = translator.translateValues(_queryParams, facetCollector, facetConfiguration);
+				termArray = translator.translateValues(queryParams, facetCollector, facetConfiguration);
 
 			} else {
 
@@ -222,13 +213,13 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return JSON array of result items
 	 */
-	protected JSONArray createItemsArray() {
+	protected JSONArray createItemsArray(PortletRequest portletRequest, PortletResponse portletResponse, QueryParams queryParams, Hits hits) {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		Document[] docs = _hits.getDocs();
+		Document[] docs = hits.getDocs();
 
-		if (_hits == null || docs.length == 0) {
+		if (hits == null || docs.length == 0) {
 			return jsonArray;
 		}
 
@@ -244,7 +235,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				if (_log.isDebugEnabled()) {
 					_log.debug("##############################################");
 
-					_log.debug("Score: " + _hits.getScores()[i]);
+					_log.debug("Score: " + hits.getScores()[i]);
 
 					for (Entry<String, Field> e : document.getFields().entrySet()) {
 						_log.debug(e.getKey() + ":" + e.getValue().getValue());
@@ -253,50 +244,36 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
+				String assetPublisherPageFriendlyURL = _moduleConfiguration.assetPublisherPage();
+				
 				// Get item type specific item result builder
 
-				ResultItemBuilder resultItemBuilder = _resultsBuilderFactory.getResultBuilder(_portletRequest,
-						_portletResponse, document, _moduleConfiguration.assetPublisherPage());
+				ResultItemBuilder resultItemBuilder = _resultsBuilderFactory.getResultBuilder(document);
 
 				// Title
 
-				jsonObject.put("title", resultItemBuilder.getTitle());
+				jsonObject.put("title", resultItemBuilder.getTitle(portletRequest, portletResponse, document));
 
 				// Date
 
-				jsonObject.put("date", resultItemBuilder.getDate());
+				jsonObject.put("date", resultItemBuilder.getDate(portletRequest, document));
 
 				// Description
 
-				jsonObject.put("description", resultItemBuilder.getDescription());
-
-				// Image src
-
-				if (_queryParams.getResultsLayout().equals(GSearchResultsLayouts.THUMBNAIL_LIST)
-						|| _queryParams.getResultsLayout().equals(GSearchResultsLayouts.IMAGE)
-								&& document.get(Field.ENTRY_CLASS_NAME).equals(DLFileEntry.class.getName())) {
-
-					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc());
-				}
-
-				// User image
-
-				if (_queryParams.getResultsLayout().equals(GSearchResultsLayouts.USER_IMAGE_LIST)) {
-					
-					setUserProperties(document, jsonObject);
-				} 
-
+				jsonObject.put("description", resultItemBuilder.getDescription(portletRequest, 
+					portletResponse, document));
+				
 				// Type
 
-				jsonObject.put("type", getLocalization(resultItemBuilder.getType().toLowerCase()));
+				jsonObject.put("type", getLocalization(resultItemBuilder.getType(document).toLowerCase()));
 
 				// Link
 
-				jsonObject.put("link", resultItemBuilder.getLink());
+				jsonObject.put("link", resultItemBuilder.getLink(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL));
 
 				// Tags
 
-				String[] tags = resultItemBuilder.getTags();
+				String[] tags = resultItemBuilder.getTags(document);
 
 				if (tags != null && tags.length > 0 && tags[0].length() > 0) {
 
@@ -305,11 +282,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Additional metadata
 
-				jsonObject.put("metadata", resultItemBuilder.getMetadata());
+				jsonObject.put("metadata", resultItemBuilder.getMetadata(portletRequest, document));
 
 				// Execute result item processors
 
-				executeResultItemProcessors(document, jsonObject);
+				executeResultItemProcessors(portletRequest, queryParams, document, resultItemBuilder, jsonObject);
 
 				// Put single item to result array
 
@@ -328,30 +305,30 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return meta information JSON object
 	 */
-	protected JSONObject createMetaObject() {
+	protected JSONObject createMetaObject(QueryParams queryParams, Hits hits) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		jsonObject.put("resultsLayout", _queryParams.getResultsLayout());
+		jsonObject.put("resultsLayout", queryParams.getResultsLayout());
 
 		// If this parameter is populated, there was an alternate search.
 
-		String originalQueryTerms = _queryParams.getOriginalKeywords();
+		String originalQueryTerms = queryParams.getOriginalKeywords();
 
 		if (originalQueryTerms != null) {
 			jsonObject.put("originalQueryTerms", originalQueryTerms);
 		}
 
-		jsonObject.put("queryTerms", _queryParams.getKeywords());
+		jsonObject.put("queryTerms", queryParams.getKeywords());
 
-		jsonObject.put("executionTime", String.format("%.3f", _hits.getSearchTime()));
-		jsonObject.put("querySuggestions", _hits.getQuerySuggestions());
+		jsonObject.put("executionTime", String.format("%.3f", hits.getSearchTime()));
+		jsonObject.put("querySuggestions", hits.getQuerySuggestions());
 
-		jsonObject.put("start", getStart());
+		jsonObject.put("start", getStart(queryParams, hits));
 
-		jsonObject.put("totalPages", getPageCount());
+		jsonObject.put("totalPages", getPageCount(queryParams, hits));
 
-		jsonObject.put("totalHits", _hits.getLength());
+		jsonObject.put("totalHits", hits.getLength());
 
 		return jsonObject;
 	}
@@ -361,11 +338,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return paging JSON object
 	 */
-	protected JSONObject createPagingObject() {
+	protected JSONObject createPagingObject(QueryParams queryParams, Hits hits) {
 
 		JSONObject pagingObject = JSONFactoryUtil.createJSONObject();
 
-		int totalHits = _hits.getLength();
+		int totalHits = hits.getLength();
 
 		if (totalHits == 0) {
 			return pagingObject;
@@ -374,9 +351,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		// Count of pages to show at once in the paging bar.
 
 		int pagesToShow = 10;
-		int pageSize = _queryParams.getPageSize();
-		int start = getStart();
-		int pageCount = getPageCount();
+		int pageSize = queryParams.getPageSize();
+		int start = getStart(queryParams, hits);
+		int pageCount = getPageCount(queryParams, hits);
 
 		// Page number to start from.
 
@@ -444,7 +421,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @param document
 	 * @param resultItem
 	 */
-	protected void executeResultItemProcessors(Document document, JSONObject resultItem) {
+	protected void executeResultItemProcessors(PortletRequest portletRequest, QueryParams queryParams, Document document, ResultItemBuilder resultItemBuilder, JSONObject resultItem) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing result item processors.");
@@ -459,7 +436,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			if (r.isEnabled()) {
 
 				try {
-					r.process(document, resultItem);
+					r.process(portletRequest, queryParams, document, resultItemBuilder, resultItem);
 				} catch (Exception e) {
 					_log.error(e, e);
 				}
@@ -493,21 +470,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		_resultsBuilderFactory = resultsBuilderFactory;
 	}
-	
-	protected void setUserProperties(Document document, JSONObject jsonObject) throws PortalException {
-
-		long userId = GetterUtil.getLong(document.get(Field.USER_ID));
-		User user = _userLocalService.getUser(userId);
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(GSearchWebKeys.THEME_DISPLAY);
-				
-		if (user.getPortraitId() == 0) {
-			jsonObject.put("userInitials", user.getFirstName().substring(0,1) + user.getLastName().substring(0, 1));
-		} else {
-			jsonObject.put("userPortraitUrl", user.getPortraitURL(themeDisplay));
-		}
-	}
-	
 
 	/**
 	 * Sort facet list. Use the order of configuration.
@@ -555,8 +517,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return
 	 */
-	private int getPageCount() {
-		return (int) Math.ceil(_hits.getLength() * 1.0 / _queryParams.getPageSize());
+	private int getPageCount(QueryParams queryParams, Hits hits) {
+		return (int) Math.ceil(hits.getLength() * 1.0 / queryParams.getPageSize());
 
 	}
 
@@ -568,15 +530,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return
 	 */
-	private int getStart() {
+	private int getStart(QueryParams queryParams, Hits hits) {
 
-		int pageSize = _queryParams.getPageSize();
-		int totalHits = _hits.getLength();
-		int start = _queryParams.getStart();
+		int pageSize = queryParams.getPageSize();
+		int totalHits = hits.getLength();
+		int start = queryParams.getStart();
 
 		if (totalHits < start) {
 
-			start = (getPageCount() - 1) * pageSize;
+			start = (getPageCount(queryParams, hits) - 1) * pageSize;
 
 			if (start < 0) {
 				start = 0;
@@ -585,14 +547,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		return start;
 	}
-
-	protected Hits _hits;
-
-	protected PortletRequest _portletRequest;
-
-	protected PortletResponse _portletResponse;
-
-	protected QueryParams _queryParams;
 
 	protected ResourceBundle _resourceBundle;
 
@@ -612,7 +566,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	private volatile List<ResultItemProcessor> _resultItemProcessors;
 	
 	@Reference
-	private UserLocalService _userLocalService;
-
+	private ResultLayoutService _resultLayoutService;
+	
 	private static final Log _log = LogFactoryUtil.getLog(ResultsBuilderImpl.class);
 }

@@ -70,6 +70,14 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public int queryIndexingThreshold();
+	
+	@Meta.AD(
+		deflt = "list",
+	    description = "default-result-layout-desc",
+	    name = "default-result-layout-name",
+		required = false
+	)
+	public String defaultResultLayout();
 		
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
@@ -89,11 +97,11 @@ public interface ModuleConfiguration {
 
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",
-		description = "searchfield-configuration-desc",
-	    name = "searchfield-configuration-name",
+		description = "query-configuration-desc",
+	    name = "query-configuration-name",
 		required = false
 	)
-	public String searchFieldConfiguration();
+	public String queryConfiguration();
 
 	@Meta.AD(
 		deflt = "[Please get the default configuration from project README page.",

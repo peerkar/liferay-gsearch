@@ -3,7 +3,6 @@ dependencies {
 
 	compileOnly group: 'com.liferay', name: 'com.liferay.asset.publisher.api', version: '1.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api', version: '4.2.1'
-
 	
 	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '3.0.0'
 	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "1.0.0"

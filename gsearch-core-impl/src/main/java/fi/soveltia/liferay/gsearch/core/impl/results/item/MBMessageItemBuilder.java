@@ -16,6 +16,8 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.model.WikiPage;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -39,7 +41,8 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	@Override
 	public boolean canBuild(Document document) {
 
-		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));	}
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
+	}
 
 	/**
 	 * This currently handles links for following MBMessage types (by message
@@ -47,40 +50,46 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 * com.liferay.journal.model.JournalArticle
 	 */
 	@Override
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL)
 		throws Exception {
 
 		long classNameId =
-			GetterUtil.getLong(_document.get(Field.CLASS_NAME_ID));
+			GetterUtil.getLong(document.get(Field.CLASS_NAME_ID));
 
-		long classPK = GetterUtil.getLong(_document.get(Field.CLASS_PK));
+		long classPK = GetterUtil.getLong(document.get(Field.CLASS_PK));
 
 		if (classNameId > 0) {
 
 			String className = _portal.getClassName(classNameId);
 
 			if (JournalArticle.class.getName().equals(className)) {
-				return getJournalArticleCommentLink(classPK);
+				return getJournalArticleCommentLink(
+					portletRequest, portletResponse,
+					assetPublisherPageFriendlyURL, classPK);
 			}
 			else if (WikiPage.class.getName().equals(className)) {
-				return getWikiPageCommentLink(classPK);
+				return getWikiPageCommentLink(portletResponse, classPK);
 			}
 		}
 
-		return getAssetRenderer().getURLViewInContext(
-			(LiferayPortletRequest) _portletRequest,
-			(LiferayPortletResponse) _portletResponse, "");
+		return getAssetRenderer(document).getURLViewInContext(
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, "");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTitle()
+	public String getTitle(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws NumberFormatException, PortalException {
 
 		long classNameId =
-			GetterUtil.getLong(_document.get(Field.CLASS_NAME_ID));
+			GetterUtil.getLong(document.get(Field.CLASS_NAME_ID));
 
 		if (classNameId > 0) {
 
@@ -89,7 +98,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 			if (JournalArticle.class.getName().equals(className) ||
 				WikiPage.class.getName().equals(className)) {
 
-				String title = _document.get(Field.CONTENT);
+				String title = document.get(Field.CONTENT);
 
 				if (title.length() > TITLE_MAXLENGTH) {
 					title = title.substring(0, TITLE_MAXLENGTH) + "...";
@@ -103,7 +112,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 				return title;
 			}
 		}
-		return super.getTitle();
+		return super.getTitle(portletRequest, portletResponse, document);
 	}
 
 	protected String getDLFileEntryCommentLink() {
@@ -118,21 +127,24 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws Exception
 	 */
-	protected String getJournalArticleCommentLink(long classPK)
+	protected String getJournalArticleCommentLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		String assetPublisherPageFriendlyURL, long classPK)
 		throws Exception {
 
 		AssetRenderer<?> assetRenderer =
 			getAssetRenderer(JournalArticle.class.getName(), classPK);
 
 		String link = assetRenderer.getURLViewInContext(
-			(LiferayPortletRequest) _portletRequest,
-			(LiferayPortletResponse) _portletResponse, null);
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, null);
 
 		if (Validator.isNull(link)) {
 
 			JournalArticle journalArticle =
 				_journalArticleService.getLatestArticle(classPK);
-			link = getNotLayoutBoundJournalArticleUrl(journalArticle);
+			link = getNotLayoutBoundJournalArticleUrl(
+				portletRequest, journalArticle, assetPublisherPageFriendlyURL);
 		}
 
 		return link;
@@ -144,14 +156,15 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws Exception
 	 */
-	protected String getWikiPageCommentLink(long classPK)
+	protected String getWikiPageCommentLink(
+		PortletResponse portletResponse, long classPK)
 		throws Exception {
 
 		AssetRenderer<?> assetRenderer =
 			getAssetRenderer(WikiPage.class.getName(), classPK);
 
 		return assetRenderer.getURLView(
-			(LiferayPortletResponse) _portletResponse, WindowState.MAXIMIZED);
+			(LiferayPortletResponse) portletResponse, WindowState.MAXIMIZED);
 	}
 
 	@Reference(unbind = "-")

@@ -18,7 +18,11 @@ import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -43,54 +47,51 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws Exception
-	 */
+	
 	@Override
-	public String getImageSrc()
+	public String getImageSrc(PortletRequest portletRequest, Document document)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
-		FileEntry fileEntry = _dLAppService.getFileEntry(_entryClassPK);
+		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+
+		FileEntry fileEntry = _dLAppService.getFileEntry(entryClassPK);
 
 		return DLUtil.getThumbnailSrc(fileEntry, themeDisplay);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public String getLink() {
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL)
+		throws Exception {
 
 		StringBundler sb = new StringBundler();
-		sb.append(PortalUtil.getPortalURL(_portletRequest));
+		sb.append(PortalUtil.getPortalURL(portletRequest));
 		sb.append("/documents/");
-		sb.append(_document.get(Field.SCOPE_GROUP_ID));
+		sb.append(document.get(Field.SCOPE_GROUP_ID));
 		sb.append("/");
-		sb.append(_document.get(Field.FOLDER_ID));
+		sb.append(document.get(Field.FOLDER_ID));
 		sb.append("/");
-		sb.append(_document.get("path"));
+		sb.append(document.get("path"));
 
 		return sb.toString();
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 * 
 	 * @throws Exception
 	 */
 	@Override
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		Map<String, String> metaData = new HashMap<String, String>();
 
-		String mimeType = _document.get("mimeType");
+		String mimeType = document.get("mimeType");
 
 		// Format
 
@@ -98,12 +99,12 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 		// Size
 
-		metaData.put("size", getSize());
+		metaData.put("size", getSize(document));
 
 		// Image metadata
 
 		if (mimeType.startsWith("image_")) {
-			setImageMetadata(metaData);
+			setImageMetadata(portletRequest, document, metaData);
 		}
 
 		return metaData;
@@ -115,15 +116,15 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	 * @param metaData
 	 * @throws Exception
 	 */
-	protected void setImageMetadata(Map<String, String> metaData)
+	protected void setImageMetadata(PortletRequest portletRequest, Document document, Map<String, String> metaData)
 		throws Exception {
 
 		// Dimensions
 
 		StringBundler sb = new StringBundler();
-		sb.append(_document.get(getTikaRawMetadataField("WIDTH")));
+		sb.append(document.get(getTikaRawMetadataField(portletRequest, "WIDTH")));
 		sb.append(" x ");
-		sb.append(_document.get(getTikaRawMetadataField("LENGTH")));
+		sb.append(document.get(getTikaRawMetadataField(portletRequest, "LENGTH")));
 		sb.append(" px");
 
 		metaData.put("dimensions", sb.toString());
@@ -163,9 +164,9 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	 * @param locale
 	 * @return
 	 */
-	protected String getSize() {
+	protected String getSize(Document document) {
 
-		long size = Long.valueOf(_document.get("size"));
+		long size = Long.valueOf(document.get("size"));
 
 		StringBundler sb = new StringBundler();
 
@@ -189,17 +190,19 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws Exception
 	 */
-	protected String getTikaRawMetadataField(String key)
+	protected String getTikaRawMetadataField(PortletRequest portletRequest, String key)
 		throws Exception {
 
+		Locale locale = portletRequest.getLocale();
+		
 		StringBundler sb = new StringBundler();
 
 		sb.append("ddm__text__");
-		sb.append(String.valueOf(getTikaRawStructureId()));
+		sb.append(String.valueOf(getTikaRawStructureId(portletRequest)));
 		sb.append("__TIFF_IMAGE_");
 		sb.append(key);
 		sb.append("_");
-		sb.append(_locale.toString());
+		sb.append(locale.toString());
 
 		return sb.toString();
 	}
@@ -211,10 +214,10 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws Exception
 	 */
-	protected long getTikaRawStructureId()
+	protected long getTikaRawStructureId(PortletRequest portletRequest)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
 		long companyId = themeDisplay.getCompanyId();

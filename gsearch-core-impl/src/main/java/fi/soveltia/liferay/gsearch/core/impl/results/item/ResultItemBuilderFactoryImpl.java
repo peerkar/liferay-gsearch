@@ -5,14 +5,11 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.util.SortedArrayList;
 
 import java.util.List;
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
-import com.liferay.portal.kernel.util.SortedArrayList;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -35,9 +32,7 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 	/**
 	 * {@inheritDoc}
 	 */
-	public ResultItemBuilder getResultBuilder(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL) {
+	public ResultItemBuilder getResultBuilder(Document document) {
 
 		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
 
@@ -53,10 +48,6 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		if (resultItemBuilder == null) {
 			_log.info("No result item builder found for " + entryClassName);
 		}
-
-		resultItemBuilder.setProperties(
-			portletRequest, portletResponse, document,
-			assetPublisherPageFriendlyURL);
 
 		return resultItemBuilder;
 	}

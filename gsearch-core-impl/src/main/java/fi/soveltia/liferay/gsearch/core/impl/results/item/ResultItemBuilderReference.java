@@ -23,6 +23,7 @@ public class ResultItemBuilderReference implements Comparable<ResultItemBuilderR
     public int compareTo(ResultItemBuilderReference r) {
 
         // Return descending order
+    	
         return Integer.compare(r._serviceRanking, this._serviceRanking);
     }
 

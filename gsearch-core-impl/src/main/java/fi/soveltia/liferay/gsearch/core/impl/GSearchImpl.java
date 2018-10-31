@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.impl;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -51,14 +52,45 @@ public class GSearchImpl implements GSearch {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryParams queryParams)
 		throws Exception {
-
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_queryParams = queryParams;
-
-		return getResults();
+		
+		return getSearchResults(portletRequest, portletResponse, queryParams, null, true, true);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JSONObject getSearchResults(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryParams queryParams, JSONArray queryConfiguration, boolean executeQueryPostProcessors, boolean processQueryContributors) 
+		throws Exception {
+			
+		Query query = _queryBuilder.buildQuery(portletRequest, queryParams, queryConfiguration, processQueryContributors);
 
+		// Create SearchContext.
+
+		SearchContext searchContext = getSearchContext(portletRequest, queryParams);
+
+		// Execute search.
+		
+		Hits hits = execute(searchContext, query);
+		
+		// Execute query post processors.
+
+		if (executeQueryPostProcessors) {
+		
+			executeQueryPostProcessors(portletRequest, searchContext, queryParams, hits);
+		}
+		
+		// Build results JSON object.
+
+		JSONObject resultsObject = _resultsBuilder.buildResults(
+			portletRequest, portletResponse, queryParams, searchContext,
+			hits);
+
+		return resultsObject;		
+	}
+	
 	/**
 	 * Add query post processor to the list.
 	 * 
@@ -116,7 +148,7 @@ public class GSearchImpl implements GSearch {
 	 * @param hits
 	 */
 	protected void executeQueryPostProcessors(
-		SearchContext searchContext, Hits hits) {
+		PortletRequest portletRequest, SearchContext searchContext, QueryParams queryParams, Hits hits) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing query post processors.");
@@ -135,7 +167,7 @@ public class GSearchImpl implements GSearch {
 
 			try {
 				queryPostProcessor.process(
-					_portletRequest, searchContext, _queryParams, hits);
+					portletRequest, searchContext, queryParams, hits);
 			}
 			catch (Exception e) {
 				_log.error(e, e);
@@ -144,54 +176,22 @@ public class GSearchImpl implements GSearch {
 	}
 
 	/**
-	 * Get results object.
-	 * 
-	 * @return results as a JSON object
-	 * @throws Exception
-	 */
-	protected JSONObject getResults()
-		throws Exception {
-
-		Query query = _queryBuilder.buildQuery(_portletRequest, _queryParams);
-
-		// Create SearchContext.
-
-		SearchContext searchContext = getSearchContext();
-
-		// Execute search.
-
-		Hits hits = execute(searchContext, query);
-
-		// Executre query post processors.
-
-		executeQueryPostProcessors(searchContext, hits);
-
-		// Build results JSON object.
-
-		JSONObject resultsObject = _resultsBuilder.buildResults(
-			_portletRequest, _portletResponse, _queryParams, searchContext,
-			hits);
-
-		return resultsObject;
-	}
-
-	/**
 	 * Get searchcontext.
 	 * 
 	 * @return searchcontext object
 	 * @throws Exception
 	 */
-	protected SearchContext getSearchContext()
+	protected SearchContext getSearchContext(PortletRequest portletRequest, QueryParams queryParams)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		SearchContext searchContext = new SearchContext();
 		searchContext.setCompanyId(themeDisplay.getCompanyId());
-		searchContext.setStart(_queryParams.getStart());
-		searchContext.setEnd(_queryParams.getEnd());
-		searchContext.setSorts(_queryParams.getSorts());
+		searchContext.setStart(queryParams.getStart());
+		searchContext.setEnd(queryParams.getEnd());
+		searchContext.setSorts(queryParams.getSorts());
 
 		// Set facets.
 
@@ -242,13 +242,7 @@ public class GSearchImpl implements GSearch {
 
 	private QueryBuilder _queryBuilder;
 
-	private PortletRequest _portletRequest;
-
-	private PortletResponse _portletResponse;
-
 	private ResultsBuilder _resultsBuilder;
-
-	private QueryParams _queryParams;
 
 	@Reference(
 		bind = "addQueryPostProcessor", 

@@ -133,7 +133,6 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		}
 		return key;
 	}
-
 	
 	private volatile ModuleConfiguration _gSearchConfiguration;
 

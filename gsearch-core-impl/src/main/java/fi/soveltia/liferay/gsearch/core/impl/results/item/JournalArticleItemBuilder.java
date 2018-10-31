@@ -11,6 +11,9 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -35,36 +38,32 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws Exception
-	 */
 	@Override
-	public String getImageSrc()
+	public String getImageSrc(PortletRequest portletRequest, Document document)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) _portletRequest.getAttribute(
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
-		return getJournalArticle().getArticleImageURL(themeDisplay);
+		return getJournalArticle(document).getArticleImageURL(themeDisplay);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, String assetPublisherPageFriendlyURL)
 		throws Exception {
 
 		String link = null;
 
-		link = getAssetRenderer().getURLViewInContext(
-			(LiferayPortletRequest) _portletRequest,
-			(LiferayPortletResponse) _portletResponse, null);
+		link = getAssetRenderer(document).getURLViewInContext(
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, null);
 
 		if (Validator.isNull(link)) {
-			link = getNotLayoutBoundJournalArticleUrl(getJournalArticle());
+			link = getNotLayoutBoundJournalArticleUrl(
+				portletRequest, getJournalArticle(document),
+				assetPublisherPageFriendlyURL);
 		}
 
 		return link;
@@ -76,10 +75,12 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws PortalException
 	 */
-	protected JournalArticle getJournalArticle()
+	protected JournalArticle getJournalArticle(Document document)
 		throws PortalException {
 
-		return _journalArticleService.getLatestArticle(_entryClassPK);
+		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+
+		return _journalArticleService.getLatestArticle(entryClassPK);
 	}
 
 	@Reference(unbind = "-")
