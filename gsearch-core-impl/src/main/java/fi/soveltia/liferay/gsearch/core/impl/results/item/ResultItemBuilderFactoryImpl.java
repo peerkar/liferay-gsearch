@@ -51,7 +51,8 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		}
 
 		if (resultItemBuilder == null) {
-			_log.info("No result item builder found for " + entryClassName);
+			String entryClassPK = document.get(Field.ENTRY_CLASS_NAME);
+			throw new NullPointerException(String.format("No result item builder found for '%s', entryClassPK %s ", entryClassName, entryClassPK));
 		}
 
 		return resultItemBuilder;

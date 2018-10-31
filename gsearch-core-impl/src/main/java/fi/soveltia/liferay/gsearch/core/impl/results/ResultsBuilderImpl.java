@@ -334,7 +334,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 			}
 			catch (Exception e) {
-				_log.error(e, e);
+				_log.error(e.getMessage(), e);
 			}
 		}
 
