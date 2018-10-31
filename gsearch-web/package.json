@@ -5,6 +5,7 @@
     "metal-soy": "^2.4.5"
   },
   "devDependencies": {
+    "google-maps": "^3.3.0",
     "liferay-module-config-generator": "^1.2.1",
     "metal-ajax": "1.0.0",
     "metal-cli": "^4.0.1",
@@ -12,5 +13,5 @@
     "metal-multimap": "1.0.0"
   },
   "name": "gsearch-web",
-  "version": "3.0.1"
+  "version": "3.0.2"
 }

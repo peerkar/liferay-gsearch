@@ -9,16 +9,16 @@ import GSearchFacets from './view-templates/GSearchFacets.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
 import GSearchResults from './view-templates/GSearchResults.es';
-import GSearchResultsLayouts from './view-templates/GSearchResultsLayouts.es';
+import GSearchResultLayoutOptions from './view-templates/GSearchResultLayoutOptions.es';
 import GSearchSort from './view-templates/GSearchSort.es';
 import GSearchStats from './view-templates/GSearchStats.es';
 
-import templates from './View.soy';
+import templates from './GSearch.soy';
 
 /**
  * View component.
  */
-class View extends Component {
+class GSearch extends Component {
 	
 	/**
 	 * @inheritDoc
@@ -26,7 +26,7 @@ class View extends Component {
 	attached() {
 		
 		if (this.debug) {
-			console.log("View.attached()");
+			console.log("GSearch.attached()");
 		}
 		
 		// This component is hidden initially to get all the subcomponents to render fully before shown.
@@ -49,7 +49,6 @@ class View extends Component {
 			
 			this.query.oldParameters = [];
 			this.query.parameters = [];
-			
 		}
 	}
 
@@ -66,7 +65,7 @@ class View extends Component {
 	 */
 	created() {
 
-		console.log("View.created()");
+		console.log("GSearch.created()");
 		
 		// Create query object. 
 		// Need to create the query object here for that to be available 
@@ -187,13 +186,11 @@ class View extends Component {
 				this.components.statsComponent.results = results;
 				this.components.resultsComponent.results = results;
 				this.components.pagingComponent.paging = results.paging;
+				this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
 				
 				if (results.items && results.items.length > 0) {
-					this.components.resultsLayoutComponent.visible = true;
-					this.components.resultsLayoutComponent.setResultLayoutOptions(results);
 					this.components.sortComponent.visible = true;
 				} else {
-					this.components.resultsLayoutComponent.visible = false;
 					this.components.sortComponent.visible = false;
 				}
 				
@@ -215,7 +212,7 @@ class View extends Component {
 	 */
 	rendered() {
 		if (this.debug) {
-			console.log("View.rendered()");
+			console.log("GSearch.rendered()");
 		}
 	}
 
@@ -242,8 +239,8 @@ class View extends Component {
 	 * @param {address} key
 	 */
 	updateAddressBar(address) {
-		if (window.history.pushState) {
-			window.history.pushState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+		if (window.history.replaceState) {
+			window.history.replaceState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
 		} else {
 			document.location.hash = address;
 		}		
@@ -256,7 +253,7 @@ class View extends Component {
  * @type {!Object}
  * @static
  */
-View.STATE = {
+GSearch.STATE = {
 	debug: {
 		value: false
 	},
@@ -285,6 +282,6 @@ View.STATE = {
 
 // Register component
 
-Soy.register(View, templates);
+Soy.register(GSearch, templates);
 
-export default View;
+export default GSearch;

@@ -1,71 +1,21 @@
-{namespace GSearchResults}
+{namespace GSearchMapsResultLayout}
 
 /**
- * Print search results
+ * Print maps result layout.
  *
- * @param portletNamespace
- * @param? results
+ * @param results
  */
 {template .render}
-	
-	<div>	
-		{if $results}
 
-			{if $results.items and length($results.items) > 0}
-		
-				// Wider layout for images.
-				
-				{let $widthlg: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
-				{let $widthsm: $results.meta.resultsLayout == 'image' ? '12' : '12' /}
-				
-				<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-centered gsearch-results" id="{$portletNamespace}SearchResults">
-		
-					// Query suggestions.
-		
-					{if length($results.meta.querySuggestions) > 0}
-						{call GSearchQuerySuggestions.render data="all"}
-							{param meta: $results.meta /}
-						{/call}
-					{/if}
-					
-					// Result layout
-										
-					{if $results.meta.resultsLayout == 'image'}
-					
-						{call GSearchImageResultLayout.render}
-							{param results: $results /}
-						{/call}
-									
-					{elseif $results.meta.resultsLayout == 'maps'}	
+	<div id="gsearch-map"></div>
 
-						// Maps layout
-
-						{call GSearchMapsResultLayout.render}
-							{param results: $results /}
-						{/call}
-
-					{else}	
-			
-						// Default result layout rendering.
-			
-						{foreach $item in $results.items}
-							{call .default}
-								{param item: $item /}
-							{/call}
-						{/foreach}
-			
-					{/if}
-				</div>
-
-			{else}
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered  gsearch-results">
-					<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
-				</div>
-			{/if}
-		{/if}
-
-	</div>
-	
+	<ul class="display-class-icon list-unstyled row">
+		{foreach $item in $results.items}
+			{call .item}
+				{param item: $item /}
+			{/call}
+		{/foreach}
+	</ul> 
 {/template}
 
 /**
@@ -73,7 +23,7 @@
  *
  * @param item
  */
-{template .default}
+{template .item}
 
 	<div class="row">
 	

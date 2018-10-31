@@ -50,12 +50,12 @@ class GSearchPaging extends Component {
 
 		let _self = this;
 		
-		$(this.element.querySelector('#' + this.portletNamespace + 'Paging')).find('span a').on('click', function(event) {
+		$('#' + this.portletNamespace + 'Paging').find('span a').on('click', function(event) {
 
 			event.preventDefault();
 
 			let value = $(this).attr('data-value');
-			
+
 			if (_self.debug) {
 				console.log("Going to page " + value);
 			}

@@ -4,12 +4,12 @@ import core from 'metal/src/core';
 
 import GSearchUtils from '../js/GSearchUtils.es';
 
-import templates from './GSearchResultsLayouts.soy';
+import templates from './GSearchResultLayoutOptions.soy';
 
 /**
  * GSearch results layout component.
  */
-class GSearchResultsLayouts extends Component {
+class GSearchResultLayoutOptions extends Component {
 	
 	/**
 	 * @inheritDoc
@@ -17,7 +17,7 @@ class GSearchResultsLayouts extends Component {
 	attached() {
 
 		if (this.debug) {
-			console.log("GSearchResultsLayouts.attached()");
+			console.log("GSearchResultLayoutOptions.attached()");
 		}
 
 		// Set initial query parameters from calling url.
@@ -27,57 +27,39 @@ class GSearchResultsLayouts extends Component {
 			this.templateParameters, 
 			this.setQueryParam
 		);		
-		
-		// Setup options lists.
-
-		let menuElement = $(this.element.querySelector('#' + this.portletNamespace + 'LayoutOptions'));
-		
-		GSearchUtils.setupOptionList(
-			this,
-			menuElement,
-			'resultsLayout',
-			false
-		);			
 	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	created() {
-
-		// Hide initially
 		
-		this.visible = false;
-	}
-	
 	/**
 	 * @inheritDoc
 	 */
 	rendered() {
 		
 		if (this.debug) {
-			console.log("GSearchResultsLayout.rendered()");
+			console.log("GSearchResultLayoutOptions.rendered()");
 		}
+		
+		// Setup options lists.
+
+		GSearchUtils.bulkSetupOptionLists(
+			'ResultLayouts', 
+			'optionmenu', 
+			this
+		);
 	}
 	
-	setResultLayoutOptions(results) {
-		
-		// Show image layout option if type filter is "file" or extension is "image".
-		
-		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
-			
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
-		} else {
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
 
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
-		}
-		
-		// We might have a forced layout from results
-		
-		if (results.meta.resultsLayout) {
-			this.setQueryParam('resultsLayout', results.meta.resultsLayout, false, false);
-		}
-	}	
+		if (this.debug) {
+			console.log("GSearchResultLayouts.shouldUpdate()");
+		}		
+
+		$('#' + this.portletNamespace + 'ResultLayouts .optionmenu').remove();
+
+		return true;
+    }		
 }
 	
 /** 
@@ -86,7 +68,7 @@ class GSearchResultsLayouts extends Component {
  * @type {!Object}
  * @static
  */
-GSearchResultsLayouts.STATE = {
+GSearchResultLayoutOptions.STATE = {
 	debug: {
 		value: false
 	},
@@ -94,6 +76,9 @@ GSearchResultsLayouts.STATE = {
 		validator: core.isFunction
 	},
 	initialQueryParameters: {
+		value: null
+	},
+	resultLayoutOptions: {
 		value: null
 	},
 	setQueryParam: {
@@ -106,6 +91,6 @@ GSearchResultsLayouts.STATE = {
 
 // Register component
 
-Soy.register(GSearchResultsLayouts, templates);
+Soy.register(GSearchResultLayoutOptions, templates);
 
-export default GSearchResultsLayouts;	
+export default GSearchResultLayoutOptions;	

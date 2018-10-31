@@ -1,35 +1,41 @@
-{namespace GSearchResultsLayouts}
+{namespace GSearchResultLayoutOptions}
 
 /**
  * Print results layout options.
  *
  * @param portletNamespace
+ * @param? resultLayoutOptions
  */
 {template .render}
 
-	<div class="row" id="{$portletNamespace}ResultsLayout">
-		<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-ismultivalued="false" data-paramname="resultsLayout">
-			<li class="list-layout selected default">
-				<a data-value="list" href="#" title="{msg desc=""}list-layout{/msg}">
-					<img src="/o/gsearch-web/images/result-layouts/icon-list.png"/>
-				</a>
-			</li>
-			<li class="user-image-layout hidden-sm hidden-xs">
-				<a data-value="userImageList" href="#" title="{msg desc=""}user-image-layout{/msg}">
-					<img src="/o/gsearch-web/images/result-layouts/icon-user-list.png"/>
-				</a>
-			</li>
-			<li class="thumbnail-list-layout hidden-sm hidden-xs">
-				<a data-value="thumbnailList" href="#" title="{msg desc=""}thumbnail-layout{/msg}">
-					<img src="/o/gsearch-web/images/result-layouts/icon-thumbnail-list.png" />
-				</a>
-			</li>
-			<li class="image-layout hide">
-				<a data-value="image" href="#" title="{msg desc=""}image-layout{/msg}">
-					<img src="/o/gsearch-web/images/result-layouts/icon-image-list.png" />
-				</a>
-			</li>
-		</ul>
+	<div class="row" id="{$portletNamespace}ResultLayouts">
+
+		{if $resultLayoutOptions and length($resultLayoutOptions) > 0}
+		
+			<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-ismultivalued="false" data-paramname="resultsLayout">
+				{foreach $item in $resultLayoutOptions}
+					{call .item}
+						{param item: $item /}
+					{/call}
+				{/foreach}
+			</ul>
+		{/if}
 	</div>
 	
+{/template}
+
+/**
+ * Print single result layout option.
+ *
+ * @param item
+ */
+{template .item}
+
+	{let $cssClasses: $item.default ? 'selected default' : ''/}
+
+	<li class="list-layout {$item.cssClasses} {$cssClasses}">
+		<a data-value="{$item.key}" href="#" title="{$item.title}">
+			<img src="/o/gsearch-web/images/result-layouts/{$item.icon}" />
+		</a>
+	</li>
 {/template}

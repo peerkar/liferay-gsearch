@@ -3,6 +3,8 @@ import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 
 import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
+import GSearchImageResultLayout from './GSearchImageResultLayout.soy';
+import GSearchMapsResultLayout from './GSearchMapsResultLayout.es';
 import templates from './GSearchResults.soy';
 
 /**
@@ -113,6 +115,9 @@ GSearchResults.STATE = {
 		validator: core.isFunction
 	},
 	portletNamespace: {
+		value: null
+	},
+	resultLayoutOptions: {
 		value: null
 	},
 	setQueryParam: {

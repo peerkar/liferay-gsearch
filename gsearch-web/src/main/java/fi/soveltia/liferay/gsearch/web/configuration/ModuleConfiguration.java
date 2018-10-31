@@ -83,5 +83,22 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public boolean showTags();
+	
+	@Meta.AD(
+		deflt = "", 
+		description = "result-layouts-desc",
+	    name = "result-layouts-name",
+		required = false
+	)
+	public String resultLayouts();
+	
+	@Meta.AD(
+		deflt = "", 
+		description = "google-maps-api-key-desc",
+	    name = "google-maps-api-key-name",
+		required = false
+	)
+	public String googleMapsAPIKey();
+	
 }
 

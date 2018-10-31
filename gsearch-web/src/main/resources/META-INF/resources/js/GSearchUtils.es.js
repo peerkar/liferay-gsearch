@@ -20,6 +20,19 @@ class GSearchUtils {
 		}
 		return true;
 	}
+
+	static addToSelections(portletNamespace, value) {
+		
+		let html = '<li>';
+		html += '<a href="#" class="facet">';
+		html += value;
+		html += '</a>';
+		html += '<span class="close">';
+		html += '</span>';
+		html += '</li>';
+		
+		$('#' + portletNamespace + 'facet-selections').append(html);
+	}
 	
 	/**
 	 * Remove event listeners
@@ -179,6 +192,8 @@ class GSearchUtils {
 					
 					GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
 				}
+
+				// GSearchUtils.addToSelections(component.portletNamespace, value);
 				
 			} else {
 

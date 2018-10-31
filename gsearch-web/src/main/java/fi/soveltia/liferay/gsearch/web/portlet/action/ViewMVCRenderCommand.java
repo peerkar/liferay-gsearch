@@ -43,7 +43,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
-		"mvc.command.name=View",
+		"mvc.command.name=GSearch",
 		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class
@@ -104,12 +104,15 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 				GSearchWebKeys.ASSET_TYPE_OPTIONS,
 				_configurationHelperService.getAssetTypeOptions(renderRequest.getLocale()));
 
+			// Sort options
+			
 			template.put(
 				GSearchWebKeys.SORT_OPTIONS,
 				_configurationHelperService.getSortOptions(renderRequest.getLocale()));
 			
 		} catch (Exception e) {
-			_log.error(e, e);
+			
+			throw new RuntimeException(e);
 		}
 		
 		// Set request timeout.
@@ -146,7 +149,11 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		
 		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _moduleConfiguration.showTags());
 		
-		return "View";
+		// Google maps API key
+		
+		template.put(GSearchWebKeys.GMAP_API_KEY, _moduleConfiguration.googleMapsAPIKey());
+
+		return "GSearch";
 	}
 	
 	@Activate
@@ -162,7 +169,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			_log.error(e, e);
 		}
 	}
-	
+
 	/**
 	 * Create resource URL for a resourceId
 	 * 
@@ -179,7 +186,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		return portletURL.toString();
 	}	
-		
+
 	/**
 	 * Get / set facet field configuration
 	 * 
@@ -292,7 +299,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static String[] _facetFields = null;
-
+	
 	private static final Log _log = LogFactoryUtil.getLog(
 		ViewMVCRenderCommand.class);
 }
