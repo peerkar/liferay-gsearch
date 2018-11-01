@@ -243,7 +243,6 @@
 	
 	.gsearch-stats {
 		color: #ccc;
-		margin-top: 10px;
 		padding: 17px
 	}
 
@@ -505,62 +504,39 @@
 	
 	.gsearch-facet-selections {
 	
-		.facets {
-			list-style: none;
+		margin-top: 20px;
+		padding: 0;
+	
+		ul {
 			margin: 0;
 			overflow: hidden; 
 			padding: 0;
 		}
 		
-		.facets li {
-		  float: left;
-		  list-style-type: none; 
+		li {
+			border: 1px solid #999;
+			border-radius: 6px;
+			color: #888;
+			float: left;
+			list-style-type: none; 
+			margin-bottom: 15px;
+			margin-right: 15px;
+			padding: 9px 9px 9px 17px;
+			text-transform: capitalize;
 		}
 		
-		.facet {
-		  background: #eee;
-		  border-radius: 3px 0 0 3px;
-		  color: #999;
-		  display: inline-block;
-		  height: 26px;
-		  line-height: 26px;
-		  padding: 0 20px 0 23px;
-		  position: relative;
-		  margin: 0 10px 10px 0;
-		  text-decoration: none;
-		  -webkit-transition: color 0.2s;
+		a {
+			color: #a2acb9;
+			margin-left: 5px;
+			padding: 5px;
 		}
-		
-		.facet::before {
-		  background: #fff;
-		  border-radius: 10px;
-		  box-shadow: inset 0 1px rgba(0, 0, 0, 0.25);
-		  content: '';
-		  height: 6px;
-		  left: 10px;
-		  position: absolute;
-		  width: 6px;
-		  top: 10px;
-		}
-		
-		.facet::after {
-		  background: #fff;
-		  border-bottom: 13px solid transparent;
-		  border-left: 10px solid #eee;
-		  border-top: 13px solid transparent;
-		  content: '';
-		  position: absolute;
-		  right: 0;
-		  top: 0;
-		}
-		
-		.facet:hover {
-		  background-color: crimson;
-		  color: white;
-		}
-		
-		.facet:hover::after {
-		   border-left-color: crimson; 
+				
+		span {
+			top: 3px;
+		}		
+				
+		a:hover {
+			color: #31455f;
 		}
 	}
 }

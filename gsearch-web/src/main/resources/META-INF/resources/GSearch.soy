@@ -54,9 +54,9 @@
 		
 		// Selected facets.
 		
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10  gsearch-centered gsearch-facet-selections" id="{$portletNamespace}facet-selections">
-			<ul class="facets"></ul>			
-		</div>
+		{call GSearchFacetSelections.render data="all"}
+			{param ref: 'facetSelectionsComponent' /}
+		{/call}
 
 		// Stats.
 

@@ -6,6 +6,7 @@ import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
 import GSearchFilters from './view-templates/GSearchFilters.es';
 import GSearchFacets from './view-templates/GSearchFacets.es';
+import GSearchFacetSelections from './view-templates/GSearchFacetSelections.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
 import GSearchResults from './view-templates/GSearchResults.es';
@@ -182,15 +183,30 @@ class GSearch extends Component {
 				
 				// Component updates
 
-				this.components.facetComponent.facets = results.facets;
+				// Refresh the selections
+				
+				this.components.facetSelectionsComponent.update = Date.now();
+
+				// Store the facets for the initial query (and allow selecting multiple single value facets)
+
+				if (!this.components.facetComponent.facets) {
+					this.components.facetComponent.facets = results.facets;
+					this.originalFacets = results.facets;
+				} else if (!results.facets || results.facets.length == 0) {
+					this.components.facetComponent.facets = results.facets;
+				} else {
+					this.components.facetComponent.facets = this.originalFacets;
+				}
+				
 				this.components.statsComponent.results = results;
 				this.components.resultsComponent.results = results;
 				this.components.pagingComponent.paging = results.paging;
-				this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
 				
 				if (results.items && results.items.length > 0) {
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
 					this.components.sortComponent.visible = true;
 				} else {
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
 					this.components.sortComponent.visible = false;
 				}
 				

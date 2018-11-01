@@ -45,7 +45,8 @@ class GSearchFacets extends Component {
 		GSearchUtils.bulkSetupOptionLists(
 			'Facets', 
 			'optionmenu', 
-			this
+			this,
+			true
 		);
 	}
 	
