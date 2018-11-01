@@ -9,9 +9,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.Validator;
@@ -80,10 +78,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 			_queryFilterBuilder.buildQueryFilter(portletRequest, queryParams);
 
 		query.setPreBooleanFilter(preBooleanFilter);
-
-		// Set query config
-
-		setQueryConfig(query, queryParams);
 
 		return query;
 	}
@@ -247,30 +241,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 		QueryFilterBuilder queryFilterBuilder) {
 
 		_queryFilterBuilder = queryFilterBuilder;
-	}
-
-	/**
-	 * Set queryconfig.
-	 * 
-	 * @param query
-	 */
-	protected void setQueryConfig(BooleanQuery query, QueryParams queryParams) {
-
-		// Create Queryconfig.
-		
-		QueryConfig queryConfig = new QueryConfig();
-		queryConfig.setHighlightEnabled(true);
-		
-		// Set highlighted fields
-		
-		String contentFieldLocalized =
-						Field.CONTENT + "_" + queryParams.getLocale().toString();
-		
-		String titleFieldLocalized =
-						Field.TITLE + "_" + queryParams.getLocale().toString();
-
-		queryConfig.setHighlightFieldNames(new String[]{Field.CONTENT, contentFieldLocalized, Field.TITLE, titleFieldLocalized});
-		query.setQueryConfig(queryConfig);
 	}
 	
 	public static final DateFormat INDEX_DATE_FORMAT =

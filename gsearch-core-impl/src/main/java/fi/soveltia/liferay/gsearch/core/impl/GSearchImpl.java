@@ -8,9 +8,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -70,6 +72,10 @@ public class GSearchImpl implements GSearch {
 		// Create SearchContext.
 
 		SearchContext searchContext = getSearchContext(portletRequest, queryParams);
+		
+		// Set query config.
+		
+		setQueryConfig(searchContext, queryParams, query);
 
 		// Execute search.
 		
@@ -199,6 +205,36 @@ public class GSearchImpl implements GSearch {
 
 		return searchContext;
 	}
+	
+	/**
+	 * Set query config
+	 * 
+	 * @param searchContext
+	 * @param queryParams
+	 */
+	protected void setQueryConfig(SearchContext searchContext, QueryParams queryParams, Query query) {
+
+		// Create Queryconfig.
+		
+		QueryConfig queryConfig = searchContext.getQueryConfig();
+		
+		queryConfig.setHighlightEnabled(true);
+			
+		// Set highlighted fields
+		
+		String contentFieldLocalized =
+						Field.CONTENT + "_" + queryParams.getLocale().toString();
+		
+		String titleFieldLocalized =
+						Field.TITLE + "_" + queryParams.getLocale().toString();
+
+		queryConfig.setHighlightFieldNames(new String[]{Field.CONTENT, contentFieldLocalized, Field.TITLE, titleFieldLocalized});
+		queryConfig.setHighlightFragmentSize(SNIPPET_CONTENT_SIZE);
+	
+		// TODO: Of some reason queryconfig has to be set on both searchcontext and query.
+		
+		query.setQueryConfig(queryConfig);		
+	}	
 
 	/**
 	 * Remove a query post processor from list.
@@ -253,5 +289,7 @@ public class GSearchImpl implements GSearch {
 	)
 	private volatile List<QueryPostProcessor> _queryPostProcessors = null;
 
+	private static final int SNIPPET_CONTENT_SIZE = 50;
+	
 	private static final Log _log = LogFactoryUtil.getLog(GSearchImpl.class);
 }

@@ -174,6 +174,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String fieldName;
 		String[] fieldValues;
 		boolean isMultiValued;
+		String multiValueOperator;
+		BooleanClauseOccur multiValueOccur = null;
 
 		for (int i = 0; i < configurationArray.length(); i++) {
 
@@ -185,6 +187,19 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			fieldParam = facetConfiguration.getString("paramName");
 
 			fieldName = facetConfiguration.getString("fieldName");
+
+			multiValueOperator = facetConfiguration.getString("multiValueOperator");
+			
+			if (Validator.isNotNull(multiValueOperator)) {
+				
+				if ("or".equalsIgnoreCase(multiValueOperator)) {
+					multiValueOccur = BooleanClauseOccur.SHOULD;
+				} else {
+					multiValueOccur = BooleanClauseOccur.MUST;
+				}
+			} else {
+				multiValueOccur = BooleanClauseOccur.SHOULD;
+			}
 
 			fieldValues =
 				ParamUtil.getStringValues(portletRequest, fieldParam);
@@ -203,7 +218,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 								fieldValue, facetConfiguration);
 
 							FacetParam facetParam = new FacetParam(
-								fieldName, values, BooleanClauseOccur.SHOULD);
+								fieldName, values, multiValueOccur);
 							facetParams.put(facetParam, BooleanClauseOccur.MUST);
 						}
 					}
@@ -221,8 +236,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 					if (isMultiValued) {
 						
 						FacetParam facetParam = new FacetParam(
-							fieldName, fieldValues, BooleanClauseOccur.MUST);
-						facetParams.put(facetParam, BooleanClauseOccur.MUST);
+							fieldName, fieldValues, multiValueOccur);
+						facetParams.put(facetParam, BooleanClauseOccur.SHOULD);
 
 					}
 					else {

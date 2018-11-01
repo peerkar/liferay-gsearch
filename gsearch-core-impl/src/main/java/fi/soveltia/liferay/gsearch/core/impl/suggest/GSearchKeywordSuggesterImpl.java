@@ -87,6 +87,12 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		String keywords =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
 
+		// We don't need uppercases in suggestions.
+		
+		if (keywords != null) {
+			keywords = keywords.toLowerCase();
+		}
+		
 		AggregateSuggester aggregateSuggester =
 			new AggregateSuggester(GSEARCH_SUGGESTION_NAME, keywords);
 		

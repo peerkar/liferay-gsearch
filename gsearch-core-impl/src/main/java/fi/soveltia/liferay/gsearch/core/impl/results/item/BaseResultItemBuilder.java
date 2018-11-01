@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -81,10 +82,25 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document)
 		throws SearchException {
+		
+		Locale locale = portletRequest.getLocale();
 
-		return getSummary(
-			portletRequest, portletResponse, document).getContent();
-		// return HtmlUtil.stripHtml(getSummary().getContent());
+		String snippet = document.get(
+			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
+			Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
+		
+		if (Validator.isNull(snippet)) {
+			snippet = document.get(
+				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION);
+		}
+				
+		if (Validator.isNull(snippet)) {
+			snippet = getSummary(
+				portletRequest, portletResponse, document).getContent();
+		}
+		
+		return snippet;
 	}
 
 	/**
@@ -186,14 +202,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		Locale locale = portletRequest.getLocale();
 
-		String title =
-			getSummary(portletRequest, portletResponse, document).getTitle();
+		String snippet = document.get(
+				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+				Field.TITLE);
 
-		if (Validator.isNull(title)) {
-			title = getAssetRenderer(document).getTitle(locale);
+		if (Validator.isNull(snippet)) {
+			snippet = getSummary(portletRequest, portletResponse, document).getTitle();
 		}
-		return title;
-		// return HtmlUtil.stripHtml(title);
+		return snippet;
 	}
 
 	/**
@@ -268,7 +284,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		if (indexer != null) {
 
-			String snippet = document.get(Field.SNIPPET);
+			String snippet = document.get(Field.CONTENT);
 
 			Summary summary = indexer.getSummary(
 				document, snippet, portletRequest, portletResponse);
@@ -277,10 +293,10 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 			return summary;
 		}
-
+		
 		return null;
 	}
-
+	
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
 }
