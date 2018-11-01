@@ -56,6 +56,10 @@ public class GeoLocationResultItemProcessor implements ResultItemProcessor {
 		Field geoLocationPointField =
 			document.getField(_moduleConfiguration.indexField());
 
+		if (geoLocationPointField == null) {
+			return;
+		}
+		
 		GeoLocationPoint geoLocationPoint =
 			geoLocationPointField.getGeoLocationPoint();
 
