@@ -40,7 +40,7 @@ class GSearchUtils {
 	 * @param {String} menuWrapperElementId
 	 * @param {String} triggerElementId
 	 * @param {Object} queryParamGetter
-	 * @param {Object} queryParamSetter
+     * @param {Object} queryParamSetter
  	 *
 	 */
 	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
@@ -54,10 +54,12 @@ class GSearchUtils {
 			let trigger = $(this).find('button').attr('id');
 			let paramName = $(this).attr('data-paramname');
 			let isMultiValued = $(this).attr('data-ismultivalued');
+			let isClearOnClickDisabled = $(this).attr('data-isclearonclickdisabled');
 
 			// Convert to boolean
 
 			let isMulti = (isMultiValued == 'true');
+			let isClearDisabled = (isClearOnClickDisabled == 'true');
 
 			GSearchUtils.setupOptionList(
 				options,
@@ -65,22 +67,10 @@ class GSearchUtils {
 				queryParamGetter,
 				queryParamSetter,
 				paramName,
-				isMulti
+				isMulti,
+                isClearDisabled
 			);
 
-			/*
-
-			// Dropdown animation
-
-			$(this).on('show.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideDown(250);
-			});
-
-			$(this).on('hide.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
-			});
-
-			*/
 		});
 	}
 
@@ -136,28 +126,28 @@ class GSearchUtils {
 	 * @param {Object} queryParamGetter
 	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
-	 * @param {String} initialValue
-	 */
+	 * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
+     */
 	static setupOptionList(optionElementId, triggerElementId, queryParamGetter,
-			queryParamSetter, queryParam, isMultiValued = false) {
+			queryParamSetter, queryParam, isMultiValued = false, isClearDisabled = false) {
 
 		let values = queryParamGetter(queryParam);
 
 		// Set initially selected item
 
-		let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
+		GSearchUtils.setOptionListSelectedItems(optionElementId,
 				triggerElementId, values, isMultiValued);
 
 		// Set text
 
-		if (selectedItems.length > 0) {
-			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-		}
+//		if (selectedItems.length > 0) {
+//			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+//		}
 
 		// Set click events
-
 		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId,
-				queryParamGetter, queryParamSetter, queryParam, isMultiValued)
+				queryParamGetter, queryParamSetter, queryParam, isMultiValued, isClearDisabled)
 	}
 
 	/**
@@ -168,42 +158,65 @@ class GSearchUtils {
 	 * @param {Object} queryParamGetter
 	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
-	 * @param {Boolean} isMultiValued
+     * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
 	 */
 	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter,
-			queryParamSetter, queryParam, isMultiValued) {
+			queryParamSetter, queryParam, isMultiValued, isClearDisabled) {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').on('click', function(event) {
 
-		$('#' + optionElementId + ' li a, #' + optionElementId + ' li input.unit-selection, #' + optionElementId + ' li label.unit-selection').on('click', function(event) {
+			let isClickDisabled = false;
+			if (isClearDisabled) {
+                // disable clearing current filter when it is clicked again
+                let parent = event.currentTarget.parentElement;
+                isClickDisabled = $(parent).hasClass('selected');
+			}
 
-			// disable clearing current filter when it is clicked again
-			let parent = event.currentTarget.parentElement;
-			let isAlreadySelected = $(parent).hasClass('selected');
+            let currentValues = queryParamGetter(queryParam);
+            let value = $(this).attr('data-value');
 
-			if (!isAlreadySelected) {
-                let currentValues = queryParamGetter(queryParam);
+            // when default is clicked:
+			//    - clear all filters of this type
+			//    - remove all selected classes except default
+			//    - remove all checked checkboxes except check default
+            if (isMultiValued && $(this).closest('li').hasClass('default')) {
+				for (let i = 0; i < currentValues.length; i++) {
+                    queryParamSetter(queryParam, null, false, isMultiValued, currentValues[i]);
+				}
+                $('#' + optionElementId + ' li.selected').removeClass('selected');
+                queryParamSetter(queryParam, value, true, isMultiValued);
+                GSearchUtils.setOptionListSelectedItems(optionElementId,
+                    triggerElementId, [value], isMultiValued);
+                $('#' + optionElementId + ' li :checkbox').prop('checked', false);
+                $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
+            } else if (!isClickDisabled) {
 
-                let value = $(this).attr('data-value');
-
-                if (currentValues.indexOf(value) < 0) {
-
-                    queryParamSetter(queryParam, value, true, isMultiValued);
-
-                    let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
-                        triggerElementId, [value], isMultiValued);
-
-                    if (selectedItems.length > 0) {
-
-                        GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-                    }
-
-                } else {
-
-                    queryParamSetter(queryParam, null, true, isMultiValued, value);
-
-                    GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+            	if (isMultiValued) {
+                    $('#' + optionElementId + ' li.default').removeClass('selected');
+                    $('#' + optionElementId + ' li.default :checkbox').prop('checked', false);
+                    let defaultValue = $('#' + optionElementId + ' li.default :checkbox').attr('data-value');
+                    queryParamSetter(queryParam, null, false, isMultiValued, defaultValue);
                 }
+				if (currentValues.indexOf(value) < 0) {
 
-            }
+					queryParamSetter(queryParam, value, true, isMultiValued);
+
+					GSearchUtils.setOptionListSelectedItems(optionElementId,
+						triggerElementId, [value], isMultiValued);
+
+					// if (selectedItems.length > 0) {
+					//     GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+					// }
+
+				} else {
+
+					queryParamSetter(queryParam, null, true, isMultiValued, value);
+
+					GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+				}
+
+			}
+
             if (event.currentTarget.nodeName === 'A') {
                 event.preventDefault();
 			}
@@ -218,14 +231,16 @@ class GSearchUtils {
 	 */
 	static setOptionListSelectedItems(optionElementId, triggerElementId, values, isMultiValued) {
 
-		let selectedItems = [];
-
-		let defaultItem = $('#' + optionElementId + ' li.default a');
+		let defaultItem = $('#' + optionElementId + ' li.default');
 
 		let valueFound = false;
 
-		$('#' + optionElementId + ' li a').each(function() {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
 
+			let parentLi = $(this).parent();
+			if (parentLi.prop('tagName') !== 'LI') {
+				parentLi = parentLi.parent();
+        	}
 			if (!isMultiValued) {
 
 				if ($(this).attr('data-value') == values[0]) {
@@ -234,9 +249,7 @@ class GSearchUtils {
 
 					$('#' + optionElementId + ' li').removeClass('selected');
 
-					$(this).parent().addClass('selected');
-
-					selectedItems.push(this);
+					parentLi.addClass('selected');
 
 					return false;
 				}
@@ -253,22 +266,15 @@ class GSearchUtils {
 
 						valueFound = true;
 
-						$(defaultItem).parent().removeClass('selected');
+						defaultItem.removeClass('selected');
 
-						$(this).parent().addClass('selected');
+						parentLi.addClass('selected');
 
-						selectedItems.push(this);
 					}
 				}
 			}
 		});
 
-		if (!valueFound && defaultItem.length > 0) {
-
-			selectedItems.push(defaultItem);
-		}
-
-		return selectedItems;
 	}
 
 	/**
@@ -318,11 +324,14 @@ class GSearchUtils {
 	 */
 	static unsetOptionListSelectedItem(optionElementId, value) {
 
-		$('#' + optionElementId + ' li a').each(function() {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
 
 			if ($(this).attr('data-value') == value) {
-
-				$(this).parent().removeClass('selected');
+                let parentLi = $(this).parent();
+                if (parentLi.nodeName !== 'LI') {
+                    parentLi = parentLi.parent();
+                }
+				parentLi.removeClass('selected');
 
 				return false;
 			}
@@ -332,6 +341,7 @@ class GSearchUtils {
 
 		if ($('#' + optionElementId + ' li.selected').length === 0) {
 			$('#' + optionElementId + ' li.default').addClass('selected');
+            $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
 		}
 	}
 

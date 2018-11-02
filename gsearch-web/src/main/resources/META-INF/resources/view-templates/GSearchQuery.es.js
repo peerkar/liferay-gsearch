@@ -391,7 +391,7 @@ GSearchQuery.STATE = {
 		value: []
 	},
 	queryClearingParameters: {
-		value: ['q', 'type']
+		value: ['q']
 	},
 	basicParameters: {
 		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']

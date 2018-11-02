@@ -55,7 +55,6 @@ class GSearchFilters extends Component {
 		);
 
 		// Setup options lists.
-
 		GSearchUtils.bulkSetupOptionLists(
 			this.portletNamespace + 'BasicFilters',
 			'optionmenu',
@@ -124,46 +123,37 @@ class GSearchFilters extends Component {
 	}
 
 	setupUnitFilters() {
-		this.createUnitFilters(this.unitFilters, $('#' + this.portletNamespace + 'UnitFilterUl'), true);
+		this.createUnitFilters(this.unitFilters, $('#' + this.portletNamespace + 'UnitFilterUl'));
 	}
 
-	createUnitFilters(units, element, isRootCategory) {
-        let colspan = 12 / units.length; // note: not tested for more than 4 columns
+	createUnitFilters(units, element) {
 		let initialUnitParams = this.initialQueryParameters.unit !== null ? this.initialQueryParameters.unit : null;
         for (let i = 0; i < units.length; i++) {
             let unit = units[i];
             let li = null;
             li = $(document.createElement('li'));
-            if (isRootCategory) {
-                // li.addClass('list-group-item');
-                // li.addClass('col-xs-' + Math.floor(colspan));
-				// $('<span/>', {text: unit.name}).appendTo(li);
-            } else {
 
-                let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
-                label.addClass('unit-selection checkbox');
+            let label = $('<label />', { 'for': this.portletNamespace + 'unitCategory-' + unit.categoryId, text: unit.name });
+            label.addClass('unit-selection checkbox');
 
-                let checkbox = $('<input />', {
-                    type: 'checkbox',
-                    id: this.portletNamespace + 'unitCategory-' + unit.categoryId,
-                    value: unit.name ,
-                    'data-value': unit.categoryId,
-                    checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
-                });
-                checkbox.addClass('unit-selection');
-                checkbox.appendTo(label);
-
-                $('<span class="checkmark"></span>').appendTo(label);
-
-                label.appendTo(li);
+            let checkbox = $('<input />', {
+                type: 'checkbox',
+                id: this.portletNamespace + 'unitCategory-' + unit.categoryId,
+                value: unit.name ,
+                'data-value': unit.categoryId,
+                checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
+            });
+            checkbox.appendTo(label);
+            if (unit.categoryId === '0') {
+            	li.addClass('default');
 			}
 
+            $('<span class="checkmark"></span>').appendTo(label);
+
+            label.appendTo(li);
+
             element.append(li);
-            if ((unit.children !== null) && (unit.children.length > 0)) {
-                var ul = $(document.createElement('ul'));
-                this.createUnitFilters(unit.children, ul, false);
-				li.append(ul);
-            }
+
         }
 
 	}
