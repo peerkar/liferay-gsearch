@@ -82,6 +82,33 @@ class MiniView extends Component {
 			serviceUrl: _self.suggestionsURL,
 			groupBy: "type",
 			triggerSelectOnValidInput: false,
+            transformResult: function(response) {
+                if (response) {
+                	let resultObject = {};
+					let suggestionsArray = [];
+                    let content = [];
+                    let persons = [];
+                    let tools = [];
+
+                    for (let i = 0; i < response.suggestions.length; i++) {
+						let result = response.suggestions[i];
+						if (result.data.typeKey === 'person') {
+							persons.push(result);
+						} else if (result.data.typeKey === 'tool') {
+                            tools.push(result);
+						} else {
+							content.push(result);
+						}
+					}
+                    suggestionsArray = suggestionsArray.concat(content, persons, tools);
+                    resultObject.suggestions = suggestionsArray;
+					return resultObject;
+                } else {
+                    return {
+                        suggestions: []
+                    }
+                }
+            },
 			formatResult: function(suggestion, currentValue) {
 				let title = $('<div/>').html(suggestion.value);
 				title.addClass('search-suggestion-item-title');
