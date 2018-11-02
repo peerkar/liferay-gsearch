@@ -19,15 +19,18 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import javax.portlet.RenderRequest;
@@ -35,6 +38,7 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
 import javax.servlet.http.HttpServletRequest;
 
+import fi.helsinki.flamma.common.category.FlammaAssetCategoryService;
 import fi.soveltia.liferay.gsearch.web.portlet.CategoryDTO;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -182,33 +186,22 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	}
 
 	private List<CategoryDTO> getUnitCategories(long companyId, Locale locale) {
+		List<AssetCategory> facultyAssetCategories = flammaAssetCategoryService.getSelectableAssetCategories(companyId);
+		List<CategoryDTO> facultyCategories = new ArrayList<>();
+		facultyCategories.addAll(getCategoryDtos(locale, facultyAssetCategories));
+
+		CategoryDTO facultiesRoot = CategoryDTO.newBuilder()
+			.name(getLocalization("search-every-category", locale))
+			.children(facultyCategories)
+			.build();
+
+
 		List<CategoryDTO> categories = new ArrayList<>();
-
-		categories.add(CategoryDTO.newBuilder().name("Koko yliopisto").build()); // TODO add localization
-
-		try {
-			Optional<AssetVocabulary> unitVocabulary = getUnitVocabulary(companyId, locale);
-
-			if (unitVocabulary.isPresent()) {
-				categories = getCategoriesFromVocabulary(unitVocabulary.get(), locale);
-			} else {
-				_log.error("Cannot get unit categories: unit vocabulary not found!");
-			}
-			unitVocabulary.ifPresent(AssetVocabulary::getCategories);
-		} catch (PortalException e) {
-			_log.error(String.format("Cannot get Flamma group with friendly URL %s", FLAMMA_GROUP_FRIENDLY_URL), e);
-		}
-
+		categories.add(facultiesRoot);
 		return categories;
 
 	}
 
-	private List<CategoryDTO> getCategoriesFromVocabulary(AssetVocabulary assetVocabulary, Locale locale) {
-		List<AssetCategory> rootCategories =
-			assetCategoryLocalService.getVocabularyRootCategories(assetVocabulary.getVocabularyId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-
-		return getCategoryDtos(locale, rootCategories);
-	}
 
 	private List<CategoryDTO> getCategoryDtos(Locale locale, List<AssetCategory> assetCategories) {
 		return assetCategories
@@ -217,24 +210,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 				CategoryDTO.newBuilder()
 					.name(cat.getTitle(locale))
 					.categoryId(cat.getCategoryId())
-					.children(getChildCategoryDtos(cat, locale))
 					.build())
 			.collect(Collectors.toList());
-	}
-
-	private List<CategoryDTO> getChildCategoryDtos(AssetCategory assetCategory, Locale locale) {
-		List<AssetCategory> childCategories = assetCategoryLocalService.getChildCategories(assetCategory.getCategoryId(), QueryUtil.ALL_POS, QueryUtil.ALL_POS, null);
-		return getCategoryDtos(locale, childCategories);
-	}
-
-	private Optional<AssetVocabulary> getUnitVocabulary(long companyId, Locale locale) throws PortalException {
-		Group flammaGroup = groupLocalService.getFriendlyURLGroup(companyId, FLAMMA_GROUP_FRIENDLY_URL);
-		List<AssetVocabulary> vocabularies = assetVocabularyLocalService.getGroupVocabularies(flammaGroup.getGroupId());
-		return vocabularies
-			.stream()
-			.filter(v ->
-				v.getTitle(locale).equalsIgnoreCase(UNIT_VOCABULARY_NAME))
-			.findFirst();
 	}
 
 	/**
@@ -360,6 +337,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		template.put(GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
 	}
 
+	private String getLocalization(String key, Locale locale) {
+
+		if (_resourceBundle == null) {
+			_resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", locale, GetSuggestionsMVCResourceCommand.class);
+		}
+		try {
+			return _resourceBundle.getString(key);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+		return key;
+	}
+
+	private ResourceBundle _resourceBundle;
+
 	@Reference(unbind = "-")
 	protected void setJSONConfigurationHelperService(ConfigurationHelper configurationHelperService) {
 
@@ -377,6 +371,9 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 	@Reference
 	private GroupLocalService groupLocalService;
+
+	@Reference
+	FlammaAssetCategoryService flammaAssetCategoryService;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
 
