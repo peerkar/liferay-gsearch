@@ -194,21 +194,21 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 */
 	protected void setGroupsParam(PortletRequest portletRequest, QueryParams queryParams) {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		String scopeFilter =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_SCOPE);
+		String scopeFilter = ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_SCOPE, "");
 
 		long[] groupIds;
 
+		groupIds = new long[] {};
 		if ("this-site".equals(scopeFilter)) {
-			groupIds = new long[] {
-				themeDisplay.getScopeGroupId()
-			};
-		}
-		else {
-			groupIds = new long[] {};
+			groupIds = new long[]{themeDisplay.getScopeGroupId()};
+		} else if(!scopeFilter.isEmpty()) {
+			String[] groupIdStrings = scopeFilter.split(",");
+			groupIds = Arrays
+				.stream(groupIdStrings)
+				.mapToLong(Long::valueOf)
+				.toArray();
 		}
 		queryParams.setGroupIds(groupIds);
 	}
@@ -224,15 +224,15 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String keywords =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS, "");
 
-//		boolean suggestions = Boolean.valueOf(ParamUtil.getString(portletRequest, GSearchWebKeys.SUGGESTIONS_MODE, "false"));
+		boolean suggestions = Boolean.valueOf(ParamUtil.getString(portletRequest, GSearchWebKeys.SUGGESTIONS_MODE, "false"));
 
 		// to make autocomplete search find results starting with given string
-//		if (suggestions &&
-//			!keywords.isEmpty() &&
-//			!keywords.endsWith("*") &&
-//			!keywords.matches("\\W$")) {
-//			keywords += "*";
-//		}
+		if (suggestions &&
+			!keywords.isEmpty() &&
+			!keywords.endsWith("*") &&
+			!keywords.matches("\\W$")) {
+			keywords += "*";
+		}
 
 		// Validate keywords.
 
