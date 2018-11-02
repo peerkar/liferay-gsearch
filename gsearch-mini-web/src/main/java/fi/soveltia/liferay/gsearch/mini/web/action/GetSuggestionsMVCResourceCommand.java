@@ -65,19 +65,41 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		for (int i = 0; i < items.length(); i++) {
 			JSONObject searchResult = items.getJSONObject(i);
 			String typeKey = getSuggestionTypeKey(searchResult.getString("typeKey"));
+			String icon = getIcon(searchResult.getString("typeKey"));
+			String localizedType = getLocalization("suggestion-result-group-" + typeKey, resourceRequest.getLocale());
+			String url = searchResult.getString("link");
+			String description = searchResult.getString("breadcrumbs");
+			String title = searchResult.getString("title");
 			querySuggestions.add(
 				QuerySuggestion.newBuilder()
-					.value(searchResult.getString("title"))
+					.value(title)
 					.data(QuerySuggestionData.newBuilder()
-						.type(getLocalization("suggestion-result-group-" + typeKey, resourceRequest.getLocale()))
+						.type(localizedType)
 						.typeKey(typeKey)
-						.url(searchResult.getString("link"))
-						.description(searchResult.getString("breadcrumbs"))
+						.icon(icon)
+						.url(url)
+						.description(description)
 						.build())
 					.build()
 			);
 		}
 		return querySuggestions;
+	}
+
+	private String getIcon(String typeKey) {
+		// TODO set icon classes as specified in FXP-385
+		switch (typeKey) {
+			case "news":
+				return "file-text";
+			case "content":
+				return "file-text";
+			case "file":
+				return "file-text";
+			case "person":
+				return "person";
+			default:
+				return "";
+		}
 	}
 
 	private String getSuggestionTypeKey(String typeKey) {

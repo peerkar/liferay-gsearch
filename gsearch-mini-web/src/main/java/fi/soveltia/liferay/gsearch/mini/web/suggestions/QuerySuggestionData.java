@@ -3,12 +3,14 @@ package fi.soveltia.liferay.gsearch.mini.web.suggestions;
 public final class QuerySuggestionData {
     private final String type;
     private final String typeKey;
+    private final String icon;
     private final String url;
     private final String description;
 
     private QuerySuggestionData(Builder builder) {
         type = builder.type;
         typeKey = builder.typeKey;
+        icon = builder.icon;
         url = builder.url;
         description = builder.description;
     }
@@ -25,6 +27,10 @@ public final class QuerySuggestionData {
         return typeKey;
     }
 
+    public String getIcon() {
+        return icon;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -37,6 +43,7 @@ public final class QuerySuggestionData {
     public static final class Builder {
         private String type;
         private String typeKey;
+        private String icon;
         private String url;
         private String description;
 
@@ -50,6 +57,11 @@ public final class QuerySuggestionData {
 
         public Builder typeKey(String typeKey) {
             this.typeKey = typeKey;
+            return this;
+        }
+
+        public Builder icon(String icon) {
+            this.icon = icon;
             return this;
         }
 

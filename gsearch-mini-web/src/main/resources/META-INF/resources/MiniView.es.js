@@ -110,11 +110,32 @@ class MiniView extends Component {
                 }
             },
 			formatResult: function(suggestion, currentValue) {
-				let title = $('<div/>').html(suggestion.value);
-				title.addClass('search-suggestion-item-title');
-				let description = $('<div/>').html(suggestion.data.description);
-				description.addClass('search-suggestion-item-description');
-				return $('<div/>').addClass('search-suggestion-item').append(title).append(description).prop('outerHTML');
+				let iconDiv = $('<div/>');
+				iconDiv.addClass('item-icon');
+				if (suggestion.data.typeKey !== 'tool') {
+                    let svg = $('<svg/>');
+                    svg.attr('role', 'img');
+                    let use = $('<use/>');
+                    use.attr('xlink:href', '/o/flamma-theme/images/flamma/svg/svg.svg#icon-' + suggestion.data.icon);
+                    svg.append(use);
+                    iconDiv.append(svg);
+				} else {
+					let span = $('<span/>');
+					iconDiv.addClass('tool');
+					span.html(suggestion.value.trim().substring(0,1).toUpperCase());
+					iconDiv.append(span);
+				}
+
+				let dataDiv = $('<div/>');
+				dataDiv.addClass('item-data');
+				let titleDiv = $('<div/>').html(suggestion.value);
+				titleDiv.addClass('search-suggestion-item-title');
+				let descriptionDiv = $('<div/>').html(suggestion.data.description);
+				descriptionDiv.addClass('search-suggestion-item-description');
+                dataDiv.append(titleDiv);
+                dataDiv.append(descriptionDiv);
+
+				return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 			},
 			formatGroup: function (suggestion, category) {
 				return $('<div/>').addClass('search-suggestion-category').html(category).prop('outerHTML');
