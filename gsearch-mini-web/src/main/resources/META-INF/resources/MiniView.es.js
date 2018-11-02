@@ -130,11 +130,15 @@ class MiniView extends Component {
 				dataDiv.addClass('item-data');
 				let titleDiv = $('<div/>').html(suggestion.value);
 				titleDiv.addClass('search-suggestion-item-title');
-				let descriptionDiv = $('<div/>').html(suggestion.data.description);
+				let breadcrumbSpan = $('<span/>').addClass('breadcrumb').html(suggestion.data.description);
+                let descriptionDiv = $('<div/>').append(breadcrumbSpan);
+                if (suggestion.data.date !== '') {
+                    let dateSpan = $('<span/>').addClass('date').html(suggestion.data.date);
+                	descriptionDiv.append(dateSpan)
+				}
 				descriptionDiv.addClass('search-suggestion-item-description');
                 dataDiv.append(titleDiv);
                 dataDiv.append(descriptionDiv);
-
 				return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 			},
 			formatGroup: function (suggestion, category) {

@@ -64,11 +64,13 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		List<QuerySuggestion> querySuggestions = new ArrayList<>();
 		for (int i = 0; i < items.length(); i++) {
 			JSONObject searchResult = items.getJSONObject(i);
-			String typeKey = getSuggestionTypeKey(searchResult.getString("typeKey"));
-			String icon = getIcon(searchResult.getString("typeKey"));
+			String originalTypeKey = searchResult.getString("typeKey");
+			String typeKey = getSuggestionTypeKey(originalTypeKey);
+			String icon = getIcon(originalTypeKey);
 			String localizedType = getLocalization("suggestion-result-group-" + typeKey, resourceRequest.getLocale());
 			String url = searchResult.getString("link");
 			String description = searchResult.getString("breadcrumbs");
+			String date = originalTypeKey.equals("news") ? searchResult.getString("date") : "";
 			String title = searchResult.getString("title");
 			querySuggestions.add(
 				QuerySuggestion.newBuilder()
@@ -79,6 +81,7 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 						.icon(icon)
 						.url(url)
 						.description(description)
+						.date(date)
 						.build())
 					.build()
 			);

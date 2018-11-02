@@ -6,6 +6,7 @@ public final class QuerySuggestionData {
     private final String icon;
     private final String url;
     private final String description;
+    private final String date;
 
     private QuerySuggestionData(Builder builder) {
         type = builder.type;
@@ -13,6 +14,7 @@ public final class QuerySuggestionData {
         icon = builder.icon;
         url = builder.url;
         description = builder.description;
+        date = builder.date;
     }
 
     public static Builder newBuilder() {
@@ -39,6 +41,10 @@ public final class QuerySuggestionData {
         return description;
     }
 
+    public String getDate() {
+        return date;
+    }
+
 
     public static final class Builder {
         private String type;
@@ -46,6 +52,7 @@ public final class QuerySuggestionData {
         private String icon;
         private String url;
         private String description;
+        private String date;
 
         private Builder() {
         }
@@ -75,8 +82,14 @@ public final class QuerySuggestionData {
             return this;
         }
 
+        public Builder date(String date) {
+            this.date = date;
+            return this;
+        }
+
         public QuerySuggestionData build() {
             return new QuerySuggestionData(this);
         }
     }
 }
+
