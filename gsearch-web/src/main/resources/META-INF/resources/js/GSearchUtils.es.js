@@ -172,30 +172,51 @@ class GSearchUtils {
                 isClickDisabled = $(parent).hasClass('selected');
 			}
 
-			if (!isClickDisabled) {
-                let currentValues = queryParamGetter(queryParam);
+            let currentValues = queryParamGetter(queryParam);
+            let value = $(this).attr('data-value');
 
-                let value = $(this).attr('data-value');
+            // when default is clicked:
+			//    - clear all filters of this type
+			//    - remove all selected classes except default
+			//    - remove all checked checkboxes except check default
+            if (isMultiValued && $(this).closest('li').hasClass('default')) {
+				for (let i = 0; i < currentValues.length; i++) {
+                    queryParamSetter(queryParam, null, false, isMultiValued, currentValues[i]);
+				}
+                $('#' + optionElementId + ' li.selected').removeClass('selected');
+                queryParamSetter(queryParam, value, true, isMultiValued);
+                GSearchUtils.setOptionListSelectedItems(optionElementId,
+                    triggerElementId, [value], isMultiValued);
+                $('#' + optionElementId + ' li :checkbox').prop('checked', false);
+                $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
+            } else if (!isClickDisabled) {
 
-                if (currentValues.indexOf(value) < 0) {
-
-                    queryParamSetter(queryParam, value, true, isMultiValued);
-
-                    GSearchUtils.setOptionListSelectedItems(optionElementId,
-                        triggerElementId, [value], isMultiValued);
-
-                   // if (selectedItems.length > 0) {
-                   //     GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-                   // }
-
-                } else {
-
-                    queryParamSetter(queryParam, null, true, isMultiValued, value);
-
-                    GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+            	if (isMultiValued) {
+                    $('#' + optionElementId + ' li.default').removeClass('selected');
+                    $('#' + optionElementId + ' li.default :checkbox').prop('checked', false);
+                    let defaultValue = $('#' + optionElementId + ' li.default :checkbox').attr('data-value');
+                    queryParamSetter(queryParam, null, false, isMultiValued, defaultValue);
                 }
+				if (currentValues.indexOf(value) < 0) {
 
-            }
+					queryParamSetter(queryParam, value, true, isMultiValued);
+
+					GSearchUtils.setOptionListSelectedItems(optionElementId,
+						triggerElementId, [value], isMultiValued);
+
+					// if (selectedItems.length > 0) {
+					//     GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+					// }
+
+				} else {
+
+					queryParamSetter(queryParam, null, true, isMultiValued, value);
+
+					GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+				}
+
+			}
+
             if (event.currentTarget.nodeName === 'A') {
                 event.preventDefault();
 			}
@@ -210,9 +231,7 @@ class GSearchUtils {
 	 */
 	static setOptionListSelectedItems(optionElementId, triggerElementId, values, isMultiValued) {
 
-		let selectedItems = [];
-
-		let defaultItem = $('#' + optionElementId + ' li.default a, #' + optionElementId + ' li.default :checkbox');
+		let defaultItem = $('#' + optionElementId + ' li.default');
 
 		let valueFound = false;
 
@@ -222,11 +241,6 @@ class GSearchUtils {
 			if (parentLi.prop('tagName') !== 'LI') {
 				parentLi = parentLi.parent();
         	}
-            let defaultParentLi = $(this).parent();
-            if (defaultParentLi.prop('tagName') !== 'LI') {
-                defaultParentLi = defaultParentLi.parent();
-            }
-
 			if (!isMultiValued) {
 
 				if ($(this).attr('data-value') == values[0]) {
@@ -236,8 +250,6 @@ class GSearchUtils {
 					$('#' + optionElementId + ' li').removeClass('selected');
 
 					parentLi.addClass('selected');
-
-					selectedItems.push(this);
 
 					return false;
 				}
@@ -254,22 +266,15 @@ class GSearchUtils {
 
 						valueFound = true;
 
-						defaultParentLi.removeClass('selected');
+						defaultItem.removeClass('selected');
 
 						parentLi.addClass('selected');
 
-						selectedItems.push(this);
 					}
 				}
 			}
 		});
 
-		if (!valueFound && defaultItem.length > 0) {
-
-			selectedItems.push(defaultItem);
-		}
-
-		return selectedItems;
 	}
 
 	/**
@@ -336,6 +341,7 @@ class GSearchUtils {
 
 		if ($('#' + optionElementId + ' li.selected').length === 0) {
 			$('#' + optionElementId + ' li.default').addClass('selected');
+            $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
 		}
 	}
 

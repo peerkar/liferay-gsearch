@@ -144,6 +144,9 @@ class GSearchFilters extends Component {
                 checked: initialUnitParams !== null && initialUnitParams.indexOf(unit.categoryId) > -1
             });
             checkbox.appendTo(label);
+            if (unit.categoryId === '0') {
+            	li.addClass('default');
+			}
 
             $('<span class="checkmark"></span>').appendTo(label);
 
