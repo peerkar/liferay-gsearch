@@ -136,7 +136,7 @@ class GSearchUtils {
 
 		// Set initially selected item
 
-		let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
+		GSearchUtils.setOptionListSelectedItems(optionElementId,
 				triggerElementId, values, isMultiValued);
 
 		// Set text
