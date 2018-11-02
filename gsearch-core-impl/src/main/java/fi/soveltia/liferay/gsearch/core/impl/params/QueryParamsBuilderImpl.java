@@ -180,6 +180,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			try {
 				queryParams.setCategories(unitList
 					.stream()
+					.filter(unit -> !unit.equals("0")) // ignore 0 as it is used for 'search all categories'
 					.map(Long::valueOf)
 					.collect(Collectors.toList())
 				);

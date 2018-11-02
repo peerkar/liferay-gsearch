@@ -11,7 +11,7 @@
 
 		// Type filter
 
-		<div class="gsearch-tabs optionmenu" data-paramname="type" data-ismultivalued="false">
+		<div class="gsearch-tabs optionmenu" data-paramname="type" data-ismultivalued="false" data-isclearonclickdisabled="true">
 			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle hidden"
 				data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
 				<span class="selection"></span>
@@ -22,25 +22,21 @@
 			</ul>
 		</div>
 
-		// Scope filter
-
         <div class="filter-dropdowns">
             <div class="dropdown gsearch-dropdown optionmenu unitmenu" data-paramname="unit" data-ismultivalued="true">
                 <button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
-                    data-toggle="dropdown" id="{$portletNamespace}UnitFilter" type="button">
-                    <span class="text">{msg desc=""}by-unit{/msg}</span>
+                        data-toggle="dropdown" id="{$portletNamespace}UnitFilter" type="button">
+                    <span class="text selection">{msg desc=""}by-unit{/msg}</span>
                     <svg class="navi-arrow" role="img">
                         <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
                     </svg>
                 </button>
                 <div aria-labelledby="{$portletNamespace}UnitFilter" class="dropdown-menu" id="{$portletNamespace}UnitFilterOptions">
-                    <ul id="{$portletNamespace}UnitFilterUl"></ul>
+                    <ul class="list-group row" id="{$portletNamespace}UnitFilterUl"></ul>
                 </div>
             </div>
 
-            // Time filter
-
-    //		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
+             //		<div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
     //			<button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
     //			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
     //				<span class="selection"></span>
@@ -55,6 +51,7 @@
     //				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
     //			</ul>
     //		</div>
+
         </div>
 	</div>
 {/template}

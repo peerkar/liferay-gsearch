@@ -40,7 +40,7 @@ class GSearchUtils {
 	 * @param {String} menuWrapperElementId
 	 * @param {String} triggerElementId
 	 * @param {Object} queryParamGetter
-	 * @param {Object} queryParamSetter
+     * @param {Object} queryParamSetter
  	 *
 	 */
 	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
@@ -54,10 +54,12 @@ class GSearchUtils {
 			let trigger = $(this).find('button').attr('id');
 			let paramName = $(this).attr('data-paramname');
 			let isMultiValued = $(this).attr('data-ismultivalued');
+			let isClearOnClickDisabled = $(this).attr('data-isclearonclickdisabled');
 
 			// Convert to boolean
 
 			let isMulti = (isMultiValued == 'true');
+			let isClearDisabled = (isClearOnClickDisabled == 'true');
 
 			GSearchUtils.setupOptionList(
 				options,
@@ -65,22 +67,10 @@ class GSearchUtils {
 				queryParamGetter,
 				queryParamSetter,
 				paramName,
-				isMulti
+				isMulti,
+                isClearDisabled
 			);
 
-			/*
-
-			// Dropdown animation
-
-			$(this).on('show.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideDown(250);
-			});
-
-			$(this).on('hide.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
-			});
-
-			*/
 		});
 	}
 
@@ -136,10 +126,11 @@ class GSearchUtils {
 	 * @param {Object} queryParamGetter
 	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
-	 * @param {String} initialValue
-	 */
+	 * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
+     */
 	static setupOptionList(optionElementId, triggerElementId, queryParamGetter,
-			queryParamSetter, queryParam, isMultiValued = false) {
+			queryParamSetter, queryParam, isMultiValued = false, isClearDisabled = false) {
 
 		let values = queryParamGetter(queryParam);
 
@@ -150,14 +141,13 @@ class GSearchUtils {
 
 		// Set text
 
-		if (selectedItems.length > 0) {
-			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-		}
+//		if (selectedItems.length > 0) {
+//			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+//		}
 
 		// Set click events
-
 		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId,
-				queryParamGetter, queryParamSetter, queryParam, isMultiValued)
+				queryParamGetter, queryParamSetter, queryParam, isMultiValued, isClearDisabled)
 	}
 
 	/**
@@ -168,18 +158,21 @@ class GSearchUtils {
 	 * @param {Object} queryParamGetter
 	 * @param {Object} queryParamSetter
 	 * @param {String} queryParam
-	 * @param {Boolean} isMultiValued
+     * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
 	 */
 	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter,
-			queryParamSetter, queryParam, isMultiValued) {
+			queryParamSetter, queryParam, isMultiValued, isClearDisabled) {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').on('click', function(event) {
 
-		$('#' + optionElementId + ' li a, #' + optionElementId + ' li input.unit-selection, #' + optionElementId + ' li label.unit-selection').on('click', function(event) {
+			let isClickDisabled = false;
+			if (isClearDisabled) {
+                // disable clearing current filter when it is clicked again
+                let parent = event.currentTarget.parentElement;
+                isClickDisabled = $(parent).hasClass('selected');
+			}
 
-			// disable clearing current filter when it is clicked again
-			let parent = event.currentTarget.parentElement;
-			let isAlreadySelected = $(parent).hasClass('selected');
-
-			if (!isAlreadySelected) {
+			if (!isClickDisabled) {
                 let currentValues = queryParamGetter(queryParam);
 
                 let value = $(this).attr('data-value');
@@ -188,13 +181,12 @@ class GSearchUtils {
 
                     queryParamSetter(queryParam, value, true, isMultiValued);
 
-                    let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId,
+                    GSearchUtils.setOptionListSelectedItems(optionElementId,
                         triggerElementId, [value], isMultiValued);
 
-                    if (selectedItems.length > 0) {
-
-                        GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-                    }
+                   // if (selectedItems.length > 0) {
+                   //     GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+                   // }
 
                 } else {
 
@@ -220,11 +212,20 @@ class GSearchUtils {
 
 		let selectedItems = [];
 
-		let defaultItem = $('#' + optionElementId + ' li.default a');
+		let defaultItem = $('#' + optionElementId + ' li.default a, #' + optionElementId + ' li.default :checkbox');
 
 		let valueFound = false;
 
-		$('#' + optionElementId + ' li a').each(function() {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
+
+			let parentLi = $(this).parent();
+			if (parentLi.prop('tagName') !== 'LI') {
+				parentLi = parentLi.parent();
+        	}
+            let defaultParentLi = $(this).parent();
+            if (defaultParentLi.prop('tagName') !== 'LI') {
+                defaultParentLi = defaultParentLi.parent();
+            }
 
 			if (!isMultiValued) {
 
@@ -234,7 +235,7 @@ class GSearchUtils {
 
 					$('#' + optionElementId + ' li').removeClass('selected');
 
-					$(this).parent().addClass('selected');
+					parentLi.addClass('selected');
 
 					selectedItems.push(this);
 
@@ -253,9 +254,9 @@ class GSearchUtils {
 
 						valueFound = true;
 
-						$(defaultItem).parent().removeClass('selected');
+						defaultParentLi.removeClass('selected');
 
-						$(this).parent().addClass('selected');
+						parentLi.addClass('selected');
 
 						selectedItems.push(this);
 					}
@@ -318,11 +319,14 @@ class GSearchUtils {
 	 */
 	static unsetOptionListSelectedItem(optionElementId, value) {
 
-		$('#' + optionElementId + ' li a').each(function() {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
 
 			if ($(this).attr('data-value') == value) {
-
-				$(this).parent().removeClass('selected');
+                let parentLi = $(this).parent();
+                if (parentLi.nodeName !== 'LI') {
+                    parentLi = parentLi.parent();
+                }
+				parentLi.removeClass('selected');
 
 				return false;
 			}
