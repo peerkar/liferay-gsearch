@@ -295,6 +295,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 					"type",
 					getLocalization("type." + resultItemBuilder.getType().toLowerCase()));
 
+				jsonObject.put("typeKey", resultItemBuilder.getType().toLowerCase());
+
 				// Link
 
 				jsonObject.put("link", resultItemBuilder.getLink(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, entryClassPK));
