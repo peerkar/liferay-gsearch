@@ -9,13 +9,12 @@
 
 	<div id="gsearch-map"></div>
 
-	<ul class="display-class-icon list-unstyled row">
-		{foreach $item in $results.items}
-			{call .item}
-				{param item: $item /}
-			{/call}
-		{/foreach}
-	</ul> 
+	{foreach $item in $results.items}
+		{call .item}
+			{param item: $item /}
+		{/call}
+	{/foreach}
+
 {/template}
 
 /**
@@ -32,8 +31,6 @@
 			// Do we have a thumbnail?
 
 			{if $item.imageSrc}
-
-				{let $contentClasses: 'col-xs-12 col-sm-12 col-md-10 col-lg-10 ' /}
 
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}

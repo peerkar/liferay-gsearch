@@ -30,12 +30,19 @@ class GSearchUtils {
 	 * @param {String} isMultiValued
 	 * @param {String} value
 	 */
-	static addToSelections(component, optionMenu, paramName, isMultiValued, value) {
+	static addToSelections(component, optionMenu, paramName, isMultiValued, anchor) {
 
-		console.log("BBB");
-
+		let text = null;
+		let textElement = $(anchor).find('.text');
+		
+		if (textElement.length > 0) {
+			text = $(textElement).html();
+		} else {
+			text = $(anchor).html();
+		}
+		
 		let html = '<li>';
-		html += value;
+		html += text;
 		html += '<a href="#">';
 		html += '<span title="' + Liferay.Language.get('remove') + '" class="glyphicon glyphicon-remove-circle"></span>';
 		html += '</a>';
@@ -44,8 +51,7 @@ class GSearchUtils {
 		let item = $(html);
 		$('#' + component.portletNamespace + 'facet-selections ul').append(item);
 		$(item).on('click', function() {
-			console.log("AAAAAAAAAAA");
-			GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value);		
+			GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, $(anchor).attr('data-value'));		
 			event.preventDefault();
 		});
 	}
@@ -248,7 +254,7 @@ class GSearchUtils {
 					selectedItems.push(this);
 					
 					if (bindToSelections) {
-						GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, values[0]);
+						GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
 					}
 					return false;
 				}
@@ -270,7 +276,7 @@ class GSearchUtils {
 						$(this).parent().addClass('selected');
 						
 						if (bindToSelections) {
-							GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, value);
+							GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
 						}
 						
 						selectedItems.push(this);

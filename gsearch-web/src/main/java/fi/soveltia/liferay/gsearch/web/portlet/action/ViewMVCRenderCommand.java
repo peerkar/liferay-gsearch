@@ -43,8 +43,8 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
-		"mvc.command.name=GSearch",
-		"mvc.command.name=/"
+		"mvc.command.name=/",
+		"mvc.command.name=GSearch"
 	}, 
 	service = MVCRenderCommand.class
 )
@@ -54,10 +54,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
+ 		_log.info("ViewMVCRenderCommand.render()");
+
+		
 		if (_log.isDebugEnabled()) {
 			_log.debug("ViewMVCRenderCommand.render()");			
 		}
-				
+								
 		Template template =
 			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
 

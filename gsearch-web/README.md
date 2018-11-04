@@ -4,9 +4,7 @@ This is the GSearch portlet modulle.
 
 ## Installation
 
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
-
-* fi.soveltia.liferay.gsearch.web-VERSION.jar-[VERSION].jar
+Check the compatibility matrix on the documentation wiki and download a compatible version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries). Deploy.
 
 ## Configuration
 

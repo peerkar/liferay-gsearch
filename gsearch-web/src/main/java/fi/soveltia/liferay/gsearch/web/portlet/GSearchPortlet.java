@@ -28,7 +28,6 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 		"com.liferay.portlet.requires-namespaced-parameters=false",
 		"com.liferay.portlet.scopeable=false",
 		"com.liferay.portlet.single-page-application=false",
-		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=gsearch-portlet",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.copy-request-parameters=false",
