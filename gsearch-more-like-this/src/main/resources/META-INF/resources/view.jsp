@@ -107,7 +107,12 @@
 					jQuery('#<portlet:namespace />SearchResults').html(html);
 
 					jQuery('#p_p_id<portlet:namespace />').show();
+					
+				} else if (<%=themeDisplay.isSignedIn() %>){
+					
+					jQuery('#p_p_id<portlet:namespace />').show();
 				} else {
+					
 					jQuery('#p_p_id<portlet:namespace />').hide();
 				}
 			}
