@@ -4,7 +4,6 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -35,12 +34,11 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
-		"mvc.command.name=GSearchMini",
 		"mvc.command.name=/"
 	}, 
 	service = MVCRenderCommand.class
 )
-public class ViewMVCRenderCommand implements MVCRenderCommand{
+public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 	@Override
 	public String render(
@@ -49,58 +47,50 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		if (_log.isDebugEnabled()) {
 			_log.debug("ViewMVCRenderCommand.render()");
 		}
-			
+				
 		// Hide portlet if we are on the search page
 
 		if (getCurrentFriendlyURL(renderRequest).equals(_moduleConfiguration.searchPortletPage())) {
 			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
 		}
 		
-		Template template =
-			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
-
-		// Set namespace (a convenience alias for $id).
-
-		String portletNamespace = renderResponse.getNamespace();
-		template.put(GSearchMiniWebKeys.PORTLET_NAMESPACE, portletNamespace);
-
 		// Autocomplete on/off.
 		
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED, 
 			_moduleConfiguration.enableAutoComplete());
 
 		// Autocomplete request delay.
 		
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.AUTO_COMPLETE_REQUEST_DELAY, 
 			_moduleConfiguration.autoCompleteRequestDelay());
 		
 		// Set request timeout.
 		
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.REQUEST_TIMEOUT,
 			_moduleConfiguration.requestTimeout());
 		
 		// Set query min length.
 		
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.QUERY_MIN_LENGTH,
 			_moduleConfiguration.queryMinLength());
 				
 		// Set search page url.
 
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.SEARCHPAGE_URL, _portal.getPortalURL(renderRequest) +
 			  _moduleConfiguration.searchPortletPage());
 				
 		// Set autocomplete/suggestions resource url.
 
-		template.put(
+		renderRequest.setAttribute(
 			GSearchMiniWebKeys.SUGGESTIONS_URL,
 			createResourceURL(renderResponse, GSearchMiniResourceKeys.GET_SUGGESTIONS));
 		
-		return "GSearchMini";
+		return "/view.jsp";
 	}
 	
 	@Activate

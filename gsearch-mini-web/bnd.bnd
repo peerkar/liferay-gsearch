@@ -1,6 +1,6 @@
 Bundle-Name: Liferay GSearch Miniportlet
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.mini.web
-Bundle-Version: 3.0.0
+Bundle-Version: 3.0.1
 Provide-Capability:\
 	soy;\
 		type="gsearch-mini-web";\
@@ -8,8 +8,9 @@ Provide-Capability:\
 Require-Capability:\
 	soy;\
 		filter:="(type=metal)"
--includeresource: package.json
 Web-ContextPath: /gsearch-mini-web
+Liferay-JS-Config: /META-INF/resources/config.js
+
 
 	
 	

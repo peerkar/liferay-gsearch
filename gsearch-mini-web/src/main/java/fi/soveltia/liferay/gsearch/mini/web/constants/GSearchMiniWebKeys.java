@@ -1,9 +1,23 @@
 
 package fi.soveltia.liferay.gsearch.mini.web.constants;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+/**
+ * Web keys.
+ * 
+ * @author Petteri Karttunen
+ *
+ */
+public class GSearchMiniWebKeys {
+	
+	public static final String AUTO_COMPLETE_ENABLED = "miniAutoCompleteEnabled";
 
-public class GSearchMiniWebKeys extends GSearchWebKeys {
+	public static final String AUTO_COMPLETE_REQUEST_DELAY = "miniAutoCompleteRequestDelay";
 
-	public static final String SEARCHPAGE_URL = "searchPageURL";
+	public static final String QUERY_MIN_LENGTH = "miniQueryMinLength";
+
+	public static final String REQUEST_TIMEOUT = "miniRequestTimeout";
+
+	public static final String SEARCHPAGE_URL = "miniSearchPageURL";
+
+	public static final String SUGGESTIONS_URL = "miniSuggestionsURL";
 }
