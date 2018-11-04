@@ -85,22 +85,24 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		
 		Locale locale = portletRequest.getLocale();
 
-		String snippet = document.get(
+		String description = null;
+		
+		description = document.get(
 			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
 			Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
 		
-		if (Validator.isNull(snippet)) {
-			snippet = document.get(
+		if (Validator.isNull(description)) {
+			description = document.get(
 				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
 				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION);
 		}
-				
-		if (Validator.isNull(snippet)) {
-			snippet = getSummary(
-				portletRequest, portletResponse, document).getContent();
+
+		if (Validator.isNull(description)) {
+			description = getSummary(
+				portletRequest, portletResponse, document, true).getContent();
 		}
 		
-		return snippet;
+		return description;
 	}
 
 	/**
@@ -197,19 +199,27 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	@Override
 	public String getTitle(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
 		Locale locale = portletRequest.getLocale();
 
-		String snippet = document.get(
-				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+		String title = null;
+		
+		if (isHighlight) {
+			title = document.get(
+					locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+					Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
+		} else {
+			title = document.get(
+				locale, "localized" +  StringPool.UNDERLINE + Field.TITLE,
 				Field.TITLE);
-
-		if (Validator.isNull(snippet)) {
-			snippet = getSummary(portletRequest, portletResponse, document).getTitle();
 		}
-		return snippet;
+
+		if (Validator.isNull(title)) {
+			title = getSummary(portletRequest, portletResponse, document, isHighlight).getTitle();
+		}
+		return title;
 	}
 
 	/**
@@ -270,14 +280,19 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	}
 
 	/**
+	/**
 	 * Get document summary.
 	 * 
-	 * @return document summary object
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param isHighlight
+	 * @return
 	 * @throws SearchException
 	 */
 	protected Summary getSummary(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+		Document document, boolean isHighlight)
 		throws SearchException {
 
 		Indexer<?> indexer = getIndexer(document.get(Field.ENTRY_CLASS_NAME));
@@ -289,7 +304,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			Summary summary = indexer.getSummary(
 				document, snippet, portletRequest, portletResponse);
 
-			summary.setHighlight(true);
+			summary.setHighlight(isHighlight);
 
 			return summary;
 		}

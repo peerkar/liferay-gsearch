@@ -1,7 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results;
 
-import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -43,8 +42,6 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactor
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 import fi.soveltia.liferay.gsearch.core.api.results.layout.ResultLayoutService;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
-import fi.soveltia.liferay.gsearch.core.impl.results.layout.ImageListResultLayout;
-import fi.soveltia.liferay.gsearch.core.impl.results.layout.ThumbnailListResultLayout;
 
 /**
  * Results builder implementation. Localization is here local because of
@@ -250,15 +247,16 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				ResultItemBuilder resultItemBuilder = _resultsBuilderFactory.getResultBuilder(document);
 
-				// Title
+				// Title highlighted & raw 
 
-				jsonObject.put("title", resultItemBuilder.getTitle(portletRequest, portletResponse, document));
+				jsonObject.put("title", resultItemBuilder.getTitle(portletRequest, portletResponse, document, true));
+				jsonObject.put("title_raw", resultItemBuilder.getTitle(portletRequest, portletResponse, document, false));
 
 				// Date
 
 				jsonObject.put("date", resultItemBuilder.getDate(portletRequest, document));
 
-				// Description
+				// Description.
 
 				jsonObject.put("description", resultItemBuilder.getDescription(portletRequest, 
 					portletResponse, document));

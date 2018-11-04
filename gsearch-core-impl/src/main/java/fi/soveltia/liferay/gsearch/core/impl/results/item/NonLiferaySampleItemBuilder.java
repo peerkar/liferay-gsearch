@@ -68,7 +68,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getTitle(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
 		return document.get("title");

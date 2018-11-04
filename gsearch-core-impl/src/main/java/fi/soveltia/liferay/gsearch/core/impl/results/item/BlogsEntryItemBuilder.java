@@ -1,9 +1,9 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
-import com.liferay.blogs.kernel.model.BlogsEntry;
-import com.liferay.blogs.kernel.service.BlogsEntryService;
 
+import com.liferay.blogs.model.BlogsEntry;
+import com.liferay.blogs.service.BlogsEntryService;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 
@@ -54,5 +54,9 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 
 	private static BlogsEntryService _blogsEntryService;
 
-	private static final String NAME = BlogsEntry.class.getName();
+	// 7.1 
+
+	// private static final String NAME = BlogsEntry.class.getName();
+	
+	private static final String NAME = "com.liferay.blogs.model.BlogsEntry";
 }

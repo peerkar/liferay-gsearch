@@ -78,11 +78,11 @@ public class ResultLayoutServiceImpl implements ResultLayoutService {
 	 * @return
 	 */
 	@Override
-	public boolean isValidResultLayoutKey(String key) {
+	public boolean isValidResultLayoutKey(PortletRequest portletRequest, String key) {
 
 		for (ResultLayout resultLayout : _resultLayouts) {
 			if (resultLayout.getKey().equals(key)) {
-				return true;
+				return (checkResultLayoutFilters(portletRequest, resultLayout));
 			}
 		}
 		return false;
@@ -141,8 +141,10 @@ public class ResultLayoutServiceImpl implements ResultLayoutService {
 			showLayout = false;
 
 			for (Entry<String, String> entry : paramFiltersOR.entrySet()) {
+				
 				filterParam =
 					ParamUtil.getString(portletRequest, entry.getKey(), null);
+
 				if (entry.getValue().equals(filterParam)) {
 					showLayout = true;
 					break;

@@ -85,7 +85,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getTitle(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
 		long classNameId =
@@ -112,7 +112,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 				return title;
 			}
 		}
-		return super.getTitle(portletRequest, portletResponse, document);
+		return super.getTitle(portletRequest, portletResponse, document, isHighlight);
 	}
 
 	protected String getDLFileEntryCommentLink() {

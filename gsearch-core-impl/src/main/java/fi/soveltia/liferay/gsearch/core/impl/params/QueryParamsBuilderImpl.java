@@ -338,7 +338,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String resultsLayoutParam =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
 		
-		if (_resultLayoutService.isValidResultLayoutKey(resultsLayoutParam)) {
+		if (_resultLayoutService.isValidResultLayoutKey(portletRequest, resultsLayoutParam)) {
 			queryParams.setResultsLayout(resultsLayoutParam);
 		} else {
 			queryParams.setResultsLayout(_resultLayoutService.getDefaultResultLayoutKey());
