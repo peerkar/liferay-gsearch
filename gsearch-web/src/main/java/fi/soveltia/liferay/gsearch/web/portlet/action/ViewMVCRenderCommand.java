@@ -53,9 +53,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	@Override
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
-
- 		_log.info("ViewMVCRenderCommand.render()");
-
 		
 		if (_log.isDebugEnabled()) {
 			_log.debug("ViewMVCRenderCommand.render()");			
