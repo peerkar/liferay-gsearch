@@ -40,5 +40,5 @@ public interface ResultLayoutService {
 	 * @param key
 	 * @return
 	 */
-	public boolean isValidResultLayoutKey(String key);
+	public boolean isValidResultLayoutKey(PortletRequest portletRequest, String key);
 }

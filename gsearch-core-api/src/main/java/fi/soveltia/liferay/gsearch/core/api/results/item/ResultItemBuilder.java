@@ -97,12 +97,13 @@ public interface ResultItemBuilder {
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document
+	 * @param isHighlight
 	 * @return item title
 	 * @throws Exception
 	 */
 	public String getTitle(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+		Document document, boolean isHighlight)
 		throws Exception;
 
 	/**
