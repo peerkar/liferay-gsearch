@@ -62,6 +62,10 @@ Place the GSearch portlet on some page and test.
 
 For full installation guide, including add-ons, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
 
+## Note About a Soy Bug
+
+There's currently a bug in 7.1 Soy framework generating lots of log data. For now please set a logging level for  com.liferay.portal.portlet.bridge.soy.internal.SoyPortlet to "OFF". Issue can be found here: https://issues.liferay.com/browse/LPS-85186 
+ 
 ## Important Note About Permissions
 
 This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index.
