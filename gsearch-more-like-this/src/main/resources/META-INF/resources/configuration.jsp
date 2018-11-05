@@ -35,10 +35,10 @@
 		<aui:input label="classnames-configuration-name" name="preferences--classNames--" type="textarea" value="<%=classNames %>" />
 
 		<aui:select label="result-layout-name" name="preferences--resultLayout--" >
-		    <aui:option value="list">Plain list</aui:option>
-		    <aui:option value="thumbnailList">List with thumbnails</aui:option>
-		    <aui:option value="userImageList">List with user images</aui:option>
-		    <aui:option value="image">Image</aui:option> 
+		    <aui:option selected='<%=resultLayout.equals("list") ? true : false %>' value="list">Plain list</aui:option>
+		    <aui:option selected='<%=resultLayout.equals("thumbnailList") ? true : false %>' value="thumbnailList">List with thumbnails</aui:option>
+		    <aui:option selected='<%=resultLayout.equals("userImageList") ? true : false %>' value="userImageList">List with user images</aui:option>
+		    <aui:option selected='<%=resultLayout.equals("image") ? true : false %>' value="image">Image</aui:option> 
 		</aui:select>
 		
 		<aui:input label="items-to-show" name="preferences--itemsToShow--" type="text" value="<%=itemsToShow %>" />
