@@ -82,17 +82,17 @@
 		<div class="item">
 
 			{if $item.imageSrc}
-				<div class="item-icon hidden-xs">
-					{if $item.imageSrc != ''}
-						<a href="{$item.link}">
-							<div class="file-icon">
-								<svg role="img">
-									<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
-								</svg>
-                			</div>
-						</a>
-					{/if}
-				</div>
+                <div class="item-icon hidden-xs">
+					<a href="{$item.link}">
+						<div class="{$item.typeKey}-icon">
+							<svg role="img">
+								<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
+							</svg>
+						</div>
+					</a>
+                </div>
+			{/if}
+			{if ($item.typeKey == 'file')}
 				<div class="document-content">
 			{else}
 				<div class="web-content">

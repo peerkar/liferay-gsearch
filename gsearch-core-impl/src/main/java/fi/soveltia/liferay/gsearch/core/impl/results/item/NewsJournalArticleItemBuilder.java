@@ -10,6 +10,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.PortletRequest;
 import java.util.List;
 
 @Component(
@@ -32,6 +33,11 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
         }
         return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEYS.contains(document.get("ddmStructureKey"));
     }
+
+    @Override
+    public String getImageSrc(PortletRequest portletRequest, long entryClassPK) {
+        return "icon-file-text";
+    } // TODO add correct icon
 
     @Override
     public String getType() {

@@ -283,10 +283,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Image src
 
-				if (document.get(Field.ENTRY_CLASS_NAME).equals(
-					DLFileEntry.class.getName())) {
-
-					jsonObject.put("imageSrc", resultItemBuilder.getImageSrc(portletRequest, entryClassPK));
+				String imageSrc = resultItemBuilder.getImageSrc(portletRequest, entryClassPK);
+				if (imageSrc != null) {
+					jsonObject.put("imageSrc", imageSrc);
 				}
 
 				// Type
