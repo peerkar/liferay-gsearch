@@ -50,7 +50,7 @@ class GSearchUtils {
 		
 		let item = $(html);
 		$('#' + component.portletNamespace + 'facet-selections ul').append(item);
-		$(item).on('click', function() {
+		$(item).on('click', function(event) {
 			GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, $(anchor).attr('data-value'));		
 			event.preventDefault();
 		});
