@@ -96,7 +96,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		setUnitParam(portletRequest, queryParams);
 
 		setStartEndParams(portletRequest, queryParams);
-		setPageSizeParam(queryParams);
+		setPageSizeParam(portletRequest, queryParams);
 
 		return queryParams;
 	}
@@ -246,9 +246,9 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set page size parameter.
 	 */
-	protected void setPageSizeParam(QueryParams queryParams) {
-
-		queryParams.setPageSize(_moduleConfiguration.pageSize());
+	protected void setPageSizeParam(PortletRequest portletRequest, QueryParams queryParams) {
+		int pageSize = ParamUtil.getInteger(portletRequest, GSearchWebKeys.PAGE_SIZE, _moduleConfiguration.pageSize());
+		queryParams.setPageSize(pageSize);
 	}
 
 	@Reference(unbind = "-")
