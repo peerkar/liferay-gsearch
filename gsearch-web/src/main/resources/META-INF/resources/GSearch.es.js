@@ -189,7 +189,7 @@ class GSearch extends Component {
 
 				// Store the facets for the initial query (and allow selecting multiple single value facets)
 
-				if (!this.components.facetComponent.facets) {
+				if (!this.components.facetComponent.facets || this.query.needsFacetsUpdate) {
 					this.components.facetComponent.facets = results.facets;
 					this.originalFacets = results.facets;
 				} else if (!results.facets || results.facets.length == 0) {

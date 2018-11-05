@@ -104,6 +104,12 @@ class GSearchQuery extends State {
 					this.setParameter(oldParameter.key, oldParameter.value);
 				}
 			}
+			
+			this.needsFacetsUpdate = true;
+			
+		} else {
+
+			this.needsFacetsUpdate = false;
 		}
 
 		// Persist current values
@@ -397,6 +403,9 @@ GSearchQuery.STATE = {
 		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
 	},
 	isInitialQuery: {
+		value: false
+	},
+	needsFacetsUpdate: {
 		value: false
 	},
 	transparentParameters: {
