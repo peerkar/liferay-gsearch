@@ -31,13 +31,12 @@ public class BasicJournalArticleItemBuilder extends JournalArticleItemBuilder im
     @Reference
     private ConfigurationHelper _configurationHelperService;
 
-    @Activate
-    protected void activate() {
-        DDM_STRUCTURE_KEYS = _configurationHelperService.getDDMStructureKeys(getType());
-    }
-
     @Override
     public boolean canBuild(Document document) {
+        if (DDM_STRUCTURE_KEYS == null) {
+            DDM_STRUCTURE_KEYS = _configurationHelperService.getDDMStructureKeys(getType());
+        }
+
         return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEYS.contains(document.get("ddmStructureKey"));
     }
 
