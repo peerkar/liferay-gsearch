@@ -9,6 +9,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
@@ -22,7 +23,9 @@ import javax.portlet.ResourceResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
  * Resource command for getting keyword suggestions (autocomplete).
@@ -46,35 +49,71 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONObject responseObject = _gSearch.getSearchResults(resourceRequest, resourceResponse);
 
-
-
-
-		// Write response to the output stream.
-		List<QuerySuggestion> results = new ArrayList<>();
-
-
 		JSONArray items = responseObject.getJSONArray("items");
 
+		List<QuerySuggestion> results =	mapGSearchResultsToSuggestions(resourceRequest, items);
+
+		Map<String, Object> suggestionsJson = new HashMap<>();
+		suggestionsJson.put("suggestions", results);
+		JSONPortletResponseUtil.writeJSON(
+			resourceRequest, resourceResponse, new Gson().toJson(suggestionsJson));
+
+	}
+
+	private List<QuerySuggestion> mapGSearchResultsToSuggestions(ResourceRequest resourceRequest, JSONArray items) {
+		List<QuerySuggestion> querySuggestions = new ArrayList<>();
 		for (int i = 0; i < items.length(); i++) {
 			JSONObject searchResult = items.getJSONObject(i);
-			results.add(
+			String originalTypeKey = searchResult.getString("typeKey");
+			String typeKey = getSuggestionTypeKey(originalTypeKey);
+			String icon = getIcon(originalTypeKey);
+			String localizedType = getLocalization("suggestion-result-group-" + typeKey, resourceRequest.getLocale());
+			String url = searchResult.getString("link");
+			String description = searchResult.getString("breadcrumbs");
+			String date = originalTypeKey.equals("news") ? searchResult.getString("date") : "";
+			String title = searchResult.getString("title");
+			querySuggestions.add(
 				QuerySuggestion.newBuilder()
-					.value(searchResult.getString("title"))
+					.value(title)
 					.data(QuerySuggestionData.newBuilder()
-						.type(searchResult.getString("type"))
-						.url(searchResult.getString("link"))
-						.description(searchResult.getString("breadcrumbs"))
+						.type(localizedType)
+						.typeKey(typeKey)
+						.icon(icon)
+						.url(url)
+						.description(description)
+						.date(date)
 						.build())
 					.build()
 			);
 		}
+		return querySuggestions;
+	}
 
-		Map<String, Object> j = new HashMap<>();
-		Gson gson = new Gson();
-		j.put("suggestions", results);
-		JSONPortletResponseUtil.writeJSON(
-			resourceRequest, resourceResponse, gson.toJson(j));
+	private String getIcon(String typeKey) {
+		// TODO set icon classes as specified in FXP-385
+		switch (typeKey) {
+			case "news":
+				return "file-text";
+			case "content":
+				return "file-text";
+			case "file":
+				return "file-text";
+			case "person":
+				return "person";
+			default:
+				return "";
+		}
+	}
 
+	private String getSuggestionTypeKey(String typeKey) {
+		switch (typeKey) {
+			case "person":
+				return "person";
+			case "tool":
+				return "tool";
+			default:
+				return "content";
+		}
 	}
 
 	@Reference(unbind = "-")
@@ -82,6 +121,23 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		_gSearch = gSearch;
 	}
+
+	private String getLocalization(String key, Locale locale) {
+
+		if (_resourceBundle == null) {
+			_resourceBundle = ResourceBundleUtil.getBundle(
+				"content.Language", locale, GetSuggestionsMVCResourceCommand.class);
+		}
+		try {
+			return _resourceBundle.getString(key);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+		return key;
+	}
+
+	private ResourceBundle _resourceBundle;
 
 	@Reference
 	protected GSearch _gSearch;

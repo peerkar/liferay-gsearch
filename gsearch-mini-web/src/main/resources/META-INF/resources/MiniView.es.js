@@ -82,12 +82,64 @@ class MiniView extends Component {
 			serviceUrl: _self.suggestionsURL,
 			groupBy: "type",
 			triggerSelectOnValidInput: false,
+            transformResult: function(response) {
+                if (response) {
+                	let resultObject = {};
+					let suggestionsArray = [];
+                    let content = [];
+                    let persons = [];
+                    let tools = [];
+
+                    for (let i = 0; i < response.suggestions.length; i++) {
+						let result = response.suggestions[i];
+						if (result.data.typeKey === 'person') {
+							persons.push(result);
+						} else if (result.data.typeKey === 'tool') {
+                            tools.push(result);
+						} else {
+							content.push(result);
+						}
+					}
+                    suggestionsArray = suggestionsArray.concat(content, persons, tools);
+                    resultObject.suggestions = suggestionsArray;
+					return resultObject;
+                } else {
+                    return {
+                        suggestions: []
+                    }
+                }
+            },
 			formatResult: function(suggestion, currentValue) {
-				let title = $('<div/>').html(suggestion.value);
-				title.addClass('search-suggestion-item-title');
-				let description = $('<div/>').html(suggestion.data.description);
-				description.addClass('search-suggestion-item-description');
-				return $('<div/>').addClass('search-suggestion-item').append(title).append(description).prop('outerHTML');
+				let iconDiv = $('<div/>');
+				iconDiv.addClass('item-icon');
+				if (suggestion.data.typeKey !== 'tool') {
+                    let svg = $('<svg/>');
+                    svg.attr('role', 'img');
+                    let use = $('<use/>');
+                    use.attr('xlink:href', '/o/flamma-theme/images/flamma/svg/svg.svg#icon-' + suggestion.data.icon);
+                    svg.append(use);
+                    iconDiv.append(svg);
+				} else {
+					let span = $('<span/>');
+					iconDiv.addClass('tool');
+					span.html(suggestion.value.trim().substring(0,1).toUpperCase());
+					iconDiv.append(span);
+				}
+
+				let dataDiv = $('<div/>');
+				dataDiv.addClass('item-data');
+				let titleDiv = $('<div/>').html(suggestion.value);
+				titleDiv.addClass('search-suggestion-item-title');
+				let breadcrumbSpan = $('<span/>').addClass('breadcrumb').html(suggestion.data.description);
+                let descriptionDiv = $('<div/>').append(breadcrumbSpan);
+                if (suggestion.data.date !== '') {
+                    let dateSpan = $('<span/>').addClass('date').html(suggestion.data.date);
+                	descriptionDiv.append(dateSpan)
+				}
+				descriptionDiv.addClass('search-suggestion-item-description');
+                dataDiv.append(titleDiv);
+                dataDiv.append(descriptionDiv);
+				return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 			},
 			formatGroup: function (suggestion, category) {
 				return $('<div/>').addClass('search-suggestion-category').html(category).prop('outerHTML');
