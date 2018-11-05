@@ -2,8 +2,10 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard search portlet available.
 
-## News
+![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
+## News
+* __(2018-11-05)__ New More Like This portlet using Elasticsearch MLT query. Google Maps result view. New facet selections bar.
 * __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest).
 * __(2018-09-17)__ Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
 
@@ -34,7 +36,7 @@ Check that all the modules are deployed correctly.
 
 ### Step 2
 
-Download the default core configuration for your core version from [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/core-config) file and put it into osgi/configs. 
+Download the module default configurations portal version. You can find the latest in [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/configs). Copy thos into LIFERAY_HOME/osgi/configs. 
 
 ### Step 3 
 
