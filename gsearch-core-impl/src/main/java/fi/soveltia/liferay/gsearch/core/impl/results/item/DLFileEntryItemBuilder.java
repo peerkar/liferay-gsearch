@@ -2,39 +2,33 @@
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
-import com.liferay.document.library.kernel.service.DLAppService;
-import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
-import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
+import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.liferay.portal.kernel.util.Validator;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import javax.portlet.WindowState;
 
 /**
  * DLFileEntry item type result builder.
@@ -80,6 +74,17 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 		sb.append(document.get("path"));
 
 		return sb.toString();
+	}
+
+	private Layout getDocumentLayout(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long groupId, long entryClassPK)
+		throws Exception {
+
+		// TODO this should probably parse journal articles of type Dokumenttinosto to find the correct layout
+
+		String link = getLink(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, entryClassPK);
+
+		return _resultItemCommonService.getAssetLayout(groupId, link);
+
 	}
 
 	/**
@@ -130,6 +135,28 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 	@Override
 	public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception {
+
+		long groupId = getAssetRenderer(DLFileEntry.class.getName(), entryClassPK).getGroupId();
+		Locale locale = portletRequest.getLocale();
+
+		final List<String> breadcrumbs = new ArrayList<>();
+
+		Layout layout = getDocumentLayout(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, groupId, entryClassPK);
+		if (layout != null) {
+			breadcrumbs.add(layout.getName(locale));
+			List<Layout> ancestors = layout.getAncestors();
+			ancestors.forEach(a -> breadcrumbs.add(a.getName(locale)));
+		}
+		breadcrumbs.add(_resultItemCommonService.getGroupName(groupId, locale));
+
+		Collections.reverse(breadcrumbs);
+
+		return String.join(" / ", breadcrumbs);
+	}
+
+
+	@Override
+	public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale) throws SearchException {
 		return "";
 	}
 
@@ -266,6 +293,15 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 
 		_ddmStructureLocalService = ddmStructureLocalService;
 	}
+
+	@Reference(unbind = "-")
+	protected void setResultItemCommonService(
+		ResultItemCommonService resultItemCommonService) {
+
+		_resultItemCommonService = resultItemCommonService;
+	}
+
+	private static ResultItemCommonService _resultItemCommonService;
 
 	private static Map<String, String> mimeTypes;
 
