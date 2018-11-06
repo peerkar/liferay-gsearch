@@ -7,11 +7,9 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
-import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -19,8 +17,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.service.GroupLocalService;
-import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -39,12 +35,9 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * JournalArticle item type result builder.
@@ -153,7 +146,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 			List<Layout> ancestors = layout.getAncestors();
 			ancestors.forEach(a -> breadcrumbs.add(a.getName(locale)));
 		}
-		breadcrumbs.add(getGroupName(groupId, locale));
+		breadcrumbs.add(_resultItemCommonService.getGroupName(groupId, locale));
 
 		Collections.reverse(breadcrumbs);
 
@@ -161,34 +154,8 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	private Layout getJournalArticleLayout(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long groupId, long entryClassPK) throws Exception {
-
 		String link = getLink(portletRequest, portletResponse, document, assetPublisherPageFriendlyURL, entryClassPK);
-
-		if (link != null) {
-			String regex = ".*https?://[\\w\\.]+(/.*?)(?:/-/.*|)";
-
-			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(link);
-
-			if (matcher.matches()) {
-				String fullPath = matcher.group(1);
-
-				String friendlyURL = "";
-				if (fullPath.startsWith("/group/")) {
-					List<String> path = Arrays.asList(fullPath.split("/"));
-					friendlyURL = "/" + String.join("/", path.subList(3, path.size()));
-				} else {
-					friendlyURL = fullPath;
-				}
-
-				try {
-					return _layoutLocalService.getFriendlyURLLayout(groupId, true, friendlyURL);
-				} catch (NoSuchLayoutException e) {
-					// do nothing
-				}
-			}
-		}
-		return null;
+		return _resultItemCommonService.getAssetLayout(groupId, link);
 
 	}
 
@@ -244,18 +211,6 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		return super.getDescription(portletRequest, portletResponse, document, locale);
 	}
 
-
-	private String getGroupName(long groupId, Locale locale) {
-		String groupName = "";
-		try {
-			Group group = _groupLocalService.getGroup(groupId);
-			groupName = group.getDescriptiveName(locale);
-		} catch (PortalException e) {
-			log.warn(String.format("Group with id %s not found", groupId));
-		}
-		return groupName;
-	}
-
 	/**
 	 * Get journal article.
 	 *
@@ -276,31 +231,23 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	@Reference(unbind = "-")
-	protected void setLayoutLocalService(
-		LayoutLocalService layoutLocalService) {
-
-		_layoutLocalService = layoutLocalService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(
-		GroupLocalService groupLocalService) {
-
-		_groupLocalService = groupLocalService;
-	}
-
-	@Reference(unbind = "-")
 	protected void setAssetCategoryLocalService(
 		AssetCategoryLocalService assetCategoryLocalService) {
 
 		_assetCategoryLocalService = assetCategoryLocalService;
 	}
 
+
+	@Reference(unbind = "-")
+	protected void setResultItemCommonService(
+		ResultItemCommonService resultItemCommonService) {
+
+		_resultItemCommonService = resultItemCommonService;
+	}
+
+	private static ResultItemCommonService _resultItemCommonService;
+
 	private static JournalArticleService _journalArticleService;
-
-	private static LayoutLocalService _layoutLocalService;
-
-	private static GroupLocalService _groupLocalService;
 
 	private static AssetCategoryLocalService _assetCategoryLocalService;
 
