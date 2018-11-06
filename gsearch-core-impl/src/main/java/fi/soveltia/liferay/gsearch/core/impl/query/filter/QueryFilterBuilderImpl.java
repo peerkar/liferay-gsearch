@@ -309,13 +309,13 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 */
 	protected void removePermissionFilterQueryBuilder(
 		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
-
+		
 		_permissionFilterQueryBuilder = null;
 	}
 
 	protected void setPermissionFilterQueryBuilder(
 		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
-
+		
 		_permissionFilterQueryBuilder = permissionFilterQueryBuilder;
 	}
 
@@ -332,10 +332,10 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	}
 
 	private static final int MAX_FACET_VALUES = 20;
-
+ 
 	@Reference(
 		bind = "setPermissionFilterQueryBuilder", 
-		policy = ReferencePolicy.DYNAMIC, 
+		policy = ReferencePolicy.STATIC, 
 		policyOption = ReferencePolicyOption.GREEDY, 
 		service = PermissionFilterQueryBuilder.class, 
 		unbind = "removePermissionFilterQueryBuilder"
