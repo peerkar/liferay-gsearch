@@ -92,7 +92,7 @@ class GSearchFilters extends Component {
 
 			html += '<li><a data-value="' + item.key + '" href="#">';
 			html += '<span class="text">' + item.localization + '</span>';
-            html += '&nbsp;'
+            html += '&nbsp;';
 			html += '<span class="count"></span>';
 			html += '</a></li>';
 		}

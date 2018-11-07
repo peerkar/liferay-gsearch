@@ -63,7 +63,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String typeFilter =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE, "");
 
-		// todo add also time filter as in setTimeParam()
 		return buildQueryParamsWithType(portletRequest, typeFilter);
 
 	}
