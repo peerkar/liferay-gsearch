@@ -189,6 +189,9 @@ class GSearch extends Component {
 
 				// Store the facets for the initial query (and allow selecting multiple single value facets)
 
+				/* Code in comments below allows to persist the facet options for original query.*/
+				 
+				/*
 				if (!this.components.facetComponent.facets || this.query.needsFacetsUpdate) {
 					this.components.facetComponent.facets = results.facets;
 					this.originalFacets = results.facets;
@@ -197,7 +200,10 @@ class GSearch extends Component {
 				} else {
 					this.components.facetComponent.facets = this.originalFacets;
 				}
-				
+				*/
+
+				this.components.facetComponent.facets = results.facets;
+
 				this.components.statsComponent.results = results;
 				this.components.resultsComponent.results = results;
 				this.components.pagingComponent.paging = results.paging;

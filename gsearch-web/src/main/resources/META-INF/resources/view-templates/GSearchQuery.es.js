@@ -105,6 +105,8 @@ class GSearchQuery extends State {
 				}
 			}
 			
+			// This flags the facet menus to be updated (of use only if menus are persisted).
+			
 			this.needsFacetsUpdate = true;
 			
 		} else {
