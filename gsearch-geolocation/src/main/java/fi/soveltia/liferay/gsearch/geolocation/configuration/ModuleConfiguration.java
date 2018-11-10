@@ -103,7 +103,7 @@ public interface ModuleConfiguration {
 	public String indexField();
 
 	@Meta.AD(
-		deflt = "193.166.186.254", 
+		deflt = "", 
 		description = "test-ip-desc",
 	    name = "test-ip-name",
 		required = false
