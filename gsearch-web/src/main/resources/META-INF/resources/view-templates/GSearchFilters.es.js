@@ -133,10 +133,14 @@ class GSearchFilters extends Component {
         	dateRangeDiv.removeClass('hidden');
             let rangeStart = queryParamGetter('timeStart', true);
             let rangeEnd = queryParamGetter('timeEnd', true);
-            rangeStart = rangeStart.replace(/-/g, '.');
-            rangeEnd = rangeEnd.replace(/-/g, '.');
-            dateRangeDiv.find('#' + portletNamespace + 'timeRangeStart').val(rangeStart);
-            dateRangeDiv.find('#' + portletNamespace + 'timeRangeEnd').val(rangeEnd);
+            if ((rangeStart !== undefined) && (rangeStart !== null) && (rangeStart !== '')) {
+                rangeStart = rangeStart.replace(/-/g, '.');
+                dateRangeDiv.find('#' + portletNamespace + 'timeRangeStart').val(rangeStart);
+            }
+            if ((rangeEnd !== undefined) && (rangeEnd !== null) && (rangeEnd !== '')) {
+                rangeEnd = rangeEnd.replace(/-/g, '.');
+                dateRangeDiv.find('#' + portletNamespace + 'timeRangeEnd').val(rangeEnd);
+            }
         }
     }
 

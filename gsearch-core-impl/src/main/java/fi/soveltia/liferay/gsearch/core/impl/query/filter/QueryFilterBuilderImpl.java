@@ -21,13 +21,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 
@@ -35,7 +33,6 @@ import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
-import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 
 /**
  * QueryFilterBuilder implementation. Notice that if you use BooleanQuery type
@@ -258,27 +255,26 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		// Set modified from limit.
 
-		Date from = queryParams.getTimeFrom();
+		Date fromDate = queryParams.getTimeFrom();
+		Date toDate = queryParams.getTimeTo();
+		long fromTime = Long.MIN_VALUE;
+		long toTime = Long.MAX_VALUE;
 
-		if (from != null) {
-			BooleanQuery query = new BooleanQueryImpl();
-			query.addRangeTerm(
-				"modified_sortable", from.getTime(), Long.MAX_VALUE);
+		if (fromDate != null) {
+			fromTime = fromDate.getTime();
+		}
 
-			addAsQueryFilter(query, booleanFilter);
+		if (toDate != null) {
+			toTime = toDate.getTime();
 		}
 
 		// Set modified to limit.
 
-		Date to = queryParams.getTimeTo();
+		BooleanQuery query = new BooleanQueryImpl();
+		query.addRangeTerm(
+			"modified_sortable", fromTime, toTime);
 
-		if (to != null) {
-			BooleanQuery query = new BooleanQueryImpl();
-			query.addRangeTerm(
-				"modified_sortable", to.getTime(), Long.MAX_VALUE);
-
-			addAsQueryFilter(query, booleanFilter);
-		}
+		addAsQueryFilter(query, booleanFilter);
 	}
 
 	/**
