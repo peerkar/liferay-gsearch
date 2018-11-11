@@ -14,10 +14,15 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +58,8 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
 )
 public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
+	private static final DateTimeFormatter rangeDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -63,7 +70,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String typeFilter =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE, "");
 
-		// todo add also time filter as in setTimeParam()
 		return buildQueryParamsWithType(portletRequest, typeFilter);
 
 	}
@@ -279,6 +285,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME);
 
 		Date timeFrom = null;
+		Date timeTo = null;
 
 		if ("last-day".equals(timeFilter)) {
 
@@ -315,10 +322,36 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			timeFrom = calendar.getTime();
 
 		}
+		else if ("range".equals(timeFilter)) {
+			String timeStartParameter =
+				ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME_START, "");
+			String timeEndParameter =
+				ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME_END, "");
+			timeFrom = getDateFromString(timeStartParameter, false);
+			timeTo = getDateFromString(timeEndParameter, true);
+		}
 
 		if (timeFrom != null) {
 			queryParams.setTimeFrom(timeFrom);
 		}
+		if (timeTo != null) {
+			queryParams.setTimeTo(timeTo);
+		}
+	}
+
+	private Date getDateFromString(String dateString, boolean isRangeEnd) {
+		if (!dateString.isEmpty()) {
+			try {
+				LocalDate localDate = LocalDate.parse(dateString, rangeDateFormatter);
+				if (isRangeEnd) { // use the beginning of next day as the range end date
+					localDate = localDate.plusDays(1);
+				}
+				return GregorianCalendar.from(localDate.atStartOfDay(ZoneId.systemDefault())).getTime();
+			} catch (NullPointerException | IllegalArgumentException | DateTimeParseException e) {
+				log.warn(String.format("Cannot get date from '%s'", dateString));
+			}
+		}
+		return null;
 	}
 
 	/**

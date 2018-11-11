@@ -24,6 +24,8 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String FILTER_SCOPE = "scope";
 
 	public static final String FILTER_TIME = "time";
+	public static final String FILTER_TIME_START = "timeStart";
+	public static final String FILTER_TIME_END = "timeEnd";
 
 	public static final String FILTER_TYPE = "type";
 
@@ -70,4 +72,5 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String SUGGESTIONS_MODE = "suggestions";
 
+	public static final String LANGUAGE = "language";
 }

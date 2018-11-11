@@ -86,6 +86,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		String portletNamespace = renderResponse.getNamespace();
 		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
 
+		template.put(GSearchWebKeys.LANGUAGE, renderRequest.getLocale().getLanguage());
+
 		// Autocomplete on/off.
 
 		template.put(
@@ -267,6 +269,8 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		String scopeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_SCOPE);
 		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME);
+		String timeStartFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_START);
+		String timeEndFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_END);
 		String typeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TYPE);
 
 		String sortField = ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
@@ -289,6 +293,14 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		if (Validator.isNotNull(timeFilter)) {
 			initialParameters.put(GSearchWebKeys.FILTER_TIME, new String[]{timeFilter});
+		}
+
+		if (Validator.isNotNull(timeStartFilter)) {
+			initialParameters.put(GSearchWebKeys.FILTER_TIME_START, new String[]{timeStartFilter});
+		}
+
+		if (Validator.isNotNull(timeEndFilter)) {
+			initialParameters.put(GSearchWebKeys.FILTER_TIME_END, new String[]{timeEndFilter});
 		}
 
 		if (Validator.isNotNull(typeFilter)) {
