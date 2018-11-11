@@ -93,9 +93,9 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		// TODO set icon classes as specified in FXP-385
 		switch (typeKey) {
 			case "news":
-				return "file-text";
+				return "news";
 			case "content":
-				return "file-text";
+				return "content";
 			case "file":
 				return "file-text";
 			case "person":
