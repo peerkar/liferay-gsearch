@@ -26,6 +26,8 @@ class GSearchFilters extends Component {
 
 		this.portletNamespace = opt_config.portletNamespace;
 
+		this.language = opt_config.language;
+
 		this.assetTypeOptions = opt_config.assetTypeOptions;
 
 		this.unitFilters = opt_config.unitFilters;
@@ -39,8 +41,6 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.attached()");
 		}
-
-		// Setup asset type options
 
 		this.setupAssetTypeOptions();
 
@@ -65,6 +65,8 @@ class GSearchFilters extends Component {
         // Add results callback
 
 		this.addResultsCallback(this.updateAssetTypeFacetCounts);
+
+        this.setupTimeFilterRanges(this.portletNamespace, this.language, this.setQueryParam, this.getQueryParam, this.getDateStringForUrlParam);
 	}
 
 	/**
@@ -76,6 +78,67 @@ class GSearchFilters extends Component {
 			console.log("GSearchFilters.rendered()");
 		}
 	}
+
+	getDateStringForUrlParam(date) {
+        let day = '' + date.getDate();
+        day.length === 1 ? day = '0' + day : day;
+        let month = '' + (date.getMonth() + 1);
+        month.length === 1 ? month = '0' + month : month;
+        let year = date.getFullYear();
+        return day + '-' + month + '-' + year;
+    }
+
+
+    setupTimeFilterRanges(portletNamespace, language, queryParamSetter, queryParamGetter, getDateString) {
+
+		AUI({lang: language}).use('aui-datepicker', function(A) {
+            new A.DatePicker(
+                {
+                    trigger: '#' + portletNamespace + 'timeRangeStart',
+                    mask: '%d.%m.%Y',
+					popover: {
+                    	zIndex: 10000
+					},
+                    popoverCssClass: 'datepicker-popover',
+                    on: {
+                        selectionChange: function(event) {
+							queryParamSetter('timeStart', getDateString(new Date(event.newSelection)), true, false);
+                        }
+                    }
+                }
+            );
+		});
+
+        AUI({lang: language}).use('aui-datepicker', function(A) {
+            new A.DatePicker(
+                {
+                    trigger: '#' + portletNamespace + 'timeRangeEnd',
+                    mask: '%d.%m.%Y',
+                    popover: {
+                        zIndex: 10000
+                    },
+                    popoverCssClass: 'datepicker-popover',
+                    on: {
+                        selectionChange: function(event) {
+                            queryParamSetter('timeEnd', getDateString(new Date(event.newSelection)), true, false);
+                        }
+                    }
+                }
+            );
+        });
+
+        let timeParam = queryParamGetter('time', true);
+        if ((timeParam !== undefined) && (timeParam !== null) && (timeParam === 'range')) {
+            let dateRangeDiv = $('#' + portletNamespace + 'TimeFilterOptions div.time-range');
+        	dateRangeDiv.removeClass('hidden');
+            let rangeStart = queryParamGetter('timeStart', true);
+            let rangeEnd = queryParamGetter('timeEnd', true);
+            rangeStart = rangeStart.replace(/-/g, '.');
+            rangeEnd = rangeEnd.replace(/-/g, '.');
+            dateRangeDiv.find('#' + portletNamespace + 'timeRangeStart').val(rangeStart);
+            dateRangeDiv.find('#' + portletNamespace + 'timeRangeEnd').val(rangeEnd);
+        }
+    }
 
 	/**
 	 * Setup asset type options
@@ -175,7 +238,7 @@ GSearchFilters.STATE = {
 		validator: core.isFunction
 	},
 	templateParameters: {
-		value: ['type','scope','time','unit']
+		value: ['type','scope','time','unit', 'timeStart', 'timeEnd']
 	}
 };
 

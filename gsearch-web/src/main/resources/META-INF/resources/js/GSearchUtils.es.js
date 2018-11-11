@@ -45,7 +45,13 @@ class GSearchUtils {
 	 */
 	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
 
-		$('#' + menuWrapperElementId + ' .' + menuClass).each(function() {
+		$('#' + menuWrapperElementId + ' div.filter-dropdowns button.dropdown-toggle').each(function() {
+			$(this).on('click', function(event) {
+				$(event.currentTarget.parentNode).toggleClass('open');
+			});
+		});
+
+        $('#' + menuWrapperElementId + ' .' + menuClass).each(function() {
 
 			let options = $(this).find('.dropdown-menu').attr('id');
 			if (!options) {
@@ -139,12 +145,6 @@ class GSearchUtils {
 		GSearchUtils.setOptionListSelectedItems(optionElementId,
 				triggerElementId, values, isMultiValued);
 
-		// Set text
-
-//		if (selectedItems.length > 0) {
-//			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-//		}
-
 		// Set click events
 		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId,
 				queryParamGetter, queryParamSetter, queryParam, isMultiValued, isClearDisabled)
@@ -166,14 +166,17 @@ class GSearchUtils {
 		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').on('click', function(event) {
 
 			let isClickDisabled = false;
-			if (isClearDisabled) {
+            let parent = event.currentTarget.parentElement;
+
+            if (isClearDisabled) {
                 // disable clearing current filter when it is clicked again
-                let parent = event.currentTarget.parentElement;
                 isClickDisabled = $(parent).hasClass('selected');
 			}
 
             let currentValues = queryParamGetter(queryParam);
             let value = $(this).attr('data-value');
+
+            let clickTarget = $(event.currentTarget);
 
             // when default is clicked:
 			//    - clear all filters of this type
@@ -199,20 +202,32 @@ class GSearchUtils {
                 }
 				if (currentValues.indexOf(value) < 0) {
 
-					queryParamSetter(queryParam, value, true, isMultiValued);
+					let isRefresh = true;
+                    if (clickTarget.hasClass('time-range')) {
+                        $(parent).find('div.time-range').removeClass('hidden');
+						isRefresh = false;
+                    } else if (clickTarget.hasClass('time')) {
+                        $('#' + optionElementId + ' div.time-range').addClass('hidden');
+                        $('#' + optionElementId + ' input.time-range').val('');
+                        queryParamSetter('timeStart', '', false, false);
+                        queryParamSetter('timeEnd', '', false, false);
+
+                    }
+					queryParamSetter(queryParam, value, isRefresh, isMultiValued);
 
 					GSearchUtils.setOptionListSelectedItems(optionElementId,
 						triggerElementId, [value], isMultiValued);
 
-					// if (selectedItems.length > 0) {
-					//     GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
-					// }
 
 				} else {
 
 					queryParamSetter(queryParam, null, true, isMultiValued, value);
 
 					GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+
+					if (clickTarget.hasClass('time-range')) {
+                        $(parent).find('div.time-range').addClass('hidden');
+                    }
 				}
 
 			}

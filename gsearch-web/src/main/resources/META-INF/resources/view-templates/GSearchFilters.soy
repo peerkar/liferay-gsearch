@@ -25,7 +25,7 @@
         <div class="filter-dropdowns">
             <div class="dropdown gsearch-dropdown optionmenu unitmenu" data-paramname="unit" data-ismultivalued="true">
                 <button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
-                        data-toggle="dropdown" id="{$portletNamespace}UnitFilter" type="button">
+                        id="{$portletNamespace}UnitFilter" type="button">
                     <span class="text selection">{msg desc=""}by-unit{/msg}</span>
                     <svg class="navi-arrow" role="img">
                         <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
@@ -36,22 +36,27 @@
                 </div>
             </div>
 
-            <div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false">
-    			<button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
-    			data-toggle="dropdown" id="{$portletNamespace}TimeFilter" type="button">
+            <div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false" data-isclearonclickdisabled="true">
+    			<button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle" id="{$portletNamespace}TimeFilter" type="button">
     				<span class="selection text">{msg desc=""}by-time{/msg}</span>
                     <svg class="navi-arrow" role="img">
                         <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
                     </svg>
     			</button>
     			<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
-    				<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
-                    <li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
-                    <li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
-    				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+    				<li class="selected default"><a class="time" href="#">{msg desc=""}anytime{/msg}</a></li>
+                    <li><a class="time" data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+                    <li><a class="time" data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+    				<li><a class="time" data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+                    <li>
+                        <a class="time-range" data-value="range" id="{$portletNamespace}filterByTimeRange" href="#">{msg desc=""}select-time-range{/msg}</a>
+                        <div class="time-range hidden">
+                            <input class="time-range" type="text" id="{$portletNamespace}timeRangeStart" />&ndash;
+                            <input class="time-range" type="text" id="{$portletNamespace}timeRangeEnd" />
+                        </div>
+                    </li>
     			</ul>
     		</div>
-
         </div>
 	</div>
 {/template}
