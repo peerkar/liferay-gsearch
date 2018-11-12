@@ -208,4 +208,38 @@ public class QueryParams {
 			.equals(categories, that.categories);
 	}
 
+	@Override
+	public String toString() {
+		return "QueryParams{" + "companyId=" + companyId +
+
+			", groupIds=" + Arrays.toString(groupIds) +
+
+			", locale=" + locale +
+
+			", userId=" + userId +
+
+			", classNames=" + classNames +
+
+			", facetParams=" + facetParams +
+
+			", keywords='" + keywords + '\'' +
+
+			", originalKeywords='" + originalKeywords + '\'' +
+
+			", resultsLayout='" + resultsLayout + '\'' +
+
+			", timeFrom=" + timeFrom +
+
+			", timeTo=" + timeTo +
+
+			", start=" + start +
+
+			", end=" + end +
+
+			", pageSize=" + pageSize +
+
+			", sorts=" + Arrays.toString(sorts) +
+
+			", categories=" + categories + '}';
+	}
 }

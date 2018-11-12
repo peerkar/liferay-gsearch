@@ -66,7 +66,14 @@ class GSearchFilters extends Component {
 
 		this.addResultsCallback(this.updateAssetTypeFacetCounts);
 
-        this.setupTimeFilterRanges(this.portletNamespace, this.language, this.setQueryParam, this.getQueryParam, this.getDateStringForUrlParam);
+        this.setupTimeFilterRanges(
+        	this.portletNamespace,
+			this.language,
+			this.setQueryParam,
+			this.getQueryParam,
+			this.getDateStringForUrlParam,
+			this.updateTimeRangeQuery,
+			this.bindTimeRangeInput);
 	}
 
 	/**
@@ -89,9 +96,12 @@ class GSearchFilters extends Component {
     }
 
 
-    setupTimeFilterRanges(portletNamespace, language, queryParamSetter, queryParamGetter, getDateString) {
+    setupTimeFilterRanges(portletNamespace, language, queryParamSetter, queryParamGetter, getDateString, updateTimeRangeQuery, bindTimeRangeInput) {
 
-		AUI({lang: language}).use('aui-datepicker', function(A) {
+        bindTimeRangeInput('timeRangeStart', 'timeStart', portletNamespace, queryParamSetter, getDateString, updateTimeRangeQuery);
+        bindTimeRangeInput('timeRangeEnd', 'timeEnd', portletNamespace, queryParamSetter, getDateString, updateTimeRangeQuery);
+
+        AUI({lang: language}).use('aui-datepicker', function(A) {
             new A.DatePicker(
                 {
                     trigger: '#' + portletNamespace + 'timeRangeStart',
@@ -100,9 +110,10 @@ class GSearchFilters extends Component {
                     	zIndex: 10000
 					},
                     popoverCssClass: 'datepicker-popover',
-                    on: {
-                        selectionChange: function(event) {
-							queryParamSetter('timeStart', getDateString(new Date(event.newSelection)), true, false);
+                    on:
+					{
+                        selectionChange: function (event) {
+                            queryParamSetter('timeStart', getDateString(new Date(event.newSelection)), true, false);
                         }
                     }
                 }
@@ -122,7 +133,7 @@ class GSearchFilters extends Component {
                         selectionChange: function(event) {
                             queryParamSetter('timeEnd', getDateString(new Date(event.newSelection)), true, false);
                         }
-                    }
+					}
                 }
             );
         });
@@ -144,6 +155,34 @@ class GSearchFilters extends Component {
         }
     }
 
+    bindTimeRangeInput(inputId, parameter, portletNamespace, queryParamSetter, getDateString, updateTimeRangeQuery) {
+        $('#' + portletNamespace + inputId).on('blur keyup', function(event) {
+            if (event.type === 'blur' || event.which === 13) {
+                let dateString = $('#' + portletNamespace + inputId).val();
+                updateTimeRangeQuery(parameter, dateString, queryParamSetter, getDateString);
+            }
+        });
+
+    }
+    updateTimeRangeQuery(parameter, dateString, queryParamSetter, getDateString) {
+        let matches = dateString.match(/\d{1,2}\.\d{1,2}\.\d\d\d\d/);
+		if (matches != null) {
+            let date = dateString.split('.');
+            let day = date[0];
+            let month = date[1] - 1;
+            let year = date[2];
+            if ((day >= 1) &&
+                (day <= 31) &&
+                (month >= 0) &&
+                (month <= 11) &&
+                (year >= 1970) &&
+                (year <= 2100)) {
+                let selection = new Date(year, month, day);
+                queryParamSetter(parameter, getDateString(selection), true, false);
+            }
+        }
+
+    }
 	/**
 	 * Setup asset type options
 	 */

@@ -78,6 +78,9 @@ public class GSearchImpl implements GSearch {
 
 			// fetch unfiltered results only if there is a filter applied
 			if (!queryParams.equals(unfilteredQueryParams)) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(String.format("Getting unfiltered results, query: %s", unfilteredQueryParams.toString()));
+				}
 				unfilteredResponseObject = getResults(portletRequest, portletResponse, unfilteredQueryParams);
 			}
 
@@ -98,6 +101,10 @@ public class GSearchImpl implements GSearch {
 
 	private void updateTypeCountsToResponse(JSONObject responseObject, JSONObject responseObjectWithTypeCounts) {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(String.format("Response: %s", responseObject.toJSONString()));
+			_log.debug(String.format("Response with type counts: %s", responseObjectWithTypeCounts.toJSONString()));
+		}
 		JSONObject typeCounts = null;
 		if (responseObjectWithTypeCounts.has("meta") &&
 			responseObjectWithTypeCounts.getJSONObject("meta") != null) {

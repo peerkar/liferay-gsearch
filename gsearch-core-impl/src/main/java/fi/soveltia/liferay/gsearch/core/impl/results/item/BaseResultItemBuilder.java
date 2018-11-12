@@ -186,11 +186,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			if (indexer != null) {
 				String snippet = document.get(Field.SNIPPET);
 
-				summary = indexer.getSummary(
-					document, snippet, portletRequest, portletResponse);
-
-				summary.setHighlight(true);
-				summary.setMaxContentLength(300);
+				try {
+					summary = indexer.getSummary(
+						document, snippet, portletRequest, portletResponse);
+					summary.setHighlight(true);
+					summary.setMaxContentLength(300);
+				} catch (Exception e) {
+					_log.error(String.format("Cannot get summary for '%s'", document.get(Field.ENTRY_CLASS_PK)));
+				}
 			}
 
 		return summary;
