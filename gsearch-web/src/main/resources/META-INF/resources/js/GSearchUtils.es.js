@@ -47,7 +47,12 @@ class GSearchUtils {
 
 		$('#' + menuWrapperElementId + ' div.filter-dropdowns button.dropdown-toggle').each(function() {
 			$(this).on('click', function(event) {
-				$(event.currentTarget.parentNode).toggleClass('open');
+				let clickedDropdown = $(event.currentTarget.parentNode);
+				let doOpenClickedDropdown = !clickedDropdown.hasClass('open');
+                $('#' + menuWrapperElementId + ' div.filter-dropdowns div.gsearch-dropdown').removeClass('open');
+				if (doOpenClickedDropdown) {
+                    clickedDropdown.addClass('open');
+				}
 			});
 		});
 
