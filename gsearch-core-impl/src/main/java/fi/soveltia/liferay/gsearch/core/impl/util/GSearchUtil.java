@@ -26,14 +26,14 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 
 /**
  * GSearch utility class.
- * 
+ *
  * @author Petteri Karttunen
  */
 public class GSearchUtil {
 
 	/**
 	 * Try to find an asset publisher instance id on a layout
-	 * 
+	 *
 	 * @param layout
 	 * @return portlet instance id
 	 * @throws PortalException
@@ -60,34 +60,8 @@ public class GSearchUtil {
 	}
 
 	/**
-	 * Get layout by friendlyurl.
-	 * 
-	 * @param resourceRequest
-	 * @return layout
-	 * @throws PortalException
-	 *             if layout is not found
-	 */
-	public static Layout getLayoutByFriendlyURL(
-		PortletRequest portletRequest, String layoutFriendlyURL)
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		if (layoutFriendlyURL != null) {
-			return LayoutLocalServiceUtil.getFriendlyURLLayout(
-				themeDisplay.getScopeGroupId(),
-				themeDisplay.getLayout().isPrivateLayout(), layoutFriendlyURL);
-		}
-
-		throw new PortalException(
-			"Couldn't find asset publisher layout for " + layoutFriendlyURL +
-				". Please check configuration.");
-	}
-
-	/**
 	 * Get current layout friendly URL
-	 * 
+	 *
 	 * @return String friendly URL for the current layout
 	 * @throws PortalException
 	 */
@@ -105,7 +79,7 @@ public class GSearchUtil {
 
 	/**
 	 * Get redirect url.
-	 * 
+	 *
 	 * @return redirect url
 	 * @throws PortalException
 	 */
@@ -136,7 +110,7 @@ public class GSearchUtil {
 
 	/**
 	 * Get group ids available for current user.
-	 * 
+	 *
 	 * @param themeDisplay
 	 * @return array of possible groupIds for a user
 	 * @throws PortalException

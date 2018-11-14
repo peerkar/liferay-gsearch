@@ -10,6 +10,7 @@ import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -17,6 +18,8 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -50,6 +53,8 @@ import java.util.Locale;
 )
 public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
+
+	private static final String FLAMMA_GROUP_FRIENDLY_URL = "/flamma";
 
 	@Override
 	public boolean canBuild(Document document) {
@@ -107,7 +112,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
+		Layout layout = getLayoutByFriendlyURL(
 			portletRequest, assetPublisherPageFriendlyURL);
 
 		String assetPublisherInstanceId =
@@ -223,6 +228,32 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		return _journalArticleService.getLatestArticle(entryClassPK);
 	}
 
+	/**
+	 * Get layout by friendlyurl.
+	 *
+	 * @return layout
+	 * @throws PortalException
+	 *             if layout is not found
+	 */
+	private Layout getLayoutByFriendlyURL(
+		PortletRequest portletRequest, String layoutFriendlyURL)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		if (layoutFriendlyURL != null) {
+			Group flammaGroup = _groupLocalService.getFriendlyURLGroup(themeDisplay.getCompanyId(), FLAMMA_GROUP_FRIENDLY_URL);
+
+			return LayoutLocalServiceUtil.getFriendlyURLLayout(
+				flammaGroup.getGroupId(),
+				true, layoutFriendlyURL);
+		}
+
+		throw new PortalException(
+			"Couldn't find asset publisher layout for " + layoutFriendlyURL +
+				". Please check configuration.");
+	}
+
 	@Reference(unbind = "-")
 	protected void setJournalArticleService(
 		JournalArticleService journalArticleService) {
@@ -235,6 +266,13 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		AssetCategoryLocalService assetCategoryLocalService) {
 
 		_assetCategoryLocalService = assetCategoryLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(
+		GroupLocalService groupLocalService) {
+
+		_groupLocalService = groupLocalService;
 	}
 
 
@@ -250,6 +288,8 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	private static JournalArticleService _journalArticleService;
 
 	private static AssetCategoryLocalService _assetCategoryLocalService;
+
+	private static GroupLocalService _groupLocalService;
 
 	static final String NAME = JournalArticle.class.getName();
 
