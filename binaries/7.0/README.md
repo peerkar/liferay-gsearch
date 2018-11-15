@@ -1,0 +1,1 @@
+See the compatibility matrix at [https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix)
