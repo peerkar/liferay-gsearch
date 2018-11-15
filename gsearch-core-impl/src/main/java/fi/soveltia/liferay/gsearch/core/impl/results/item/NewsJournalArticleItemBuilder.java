@@ -40,8 +40,8 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
     @Override
     public String getImageSrc(PortletRequest portletRequest, long entryClassPK) {
-        return "icon-file-text";
-    } // TODO add correct icon
+        return "icon-news";
+    }
 
     @Override
     public String getType() {
