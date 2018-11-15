@@ -1,5 +1,7 @@
 package fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+
 import aQute.bnd.annotation.metatype.Meta;
 
 /**
@@ -8,8 +10,11 @@ import aQute.bnd.annotation.metatype.Meta;
  * @author Petteri Karttunen
  *
  */
+@ExtendedObjectClassDefinition(
+	category = "GSearch"
+)
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration.GSearchAudienceTargeting",
+	id = "fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration.ModuleConfiguration",
 	localization = "content/Language",
 	name = "GSearch Audience Targeting Query Contributor"
 )

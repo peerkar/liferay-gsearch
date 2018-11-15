@@ -29,7 +29,7 @@ import fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configurat
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration.GSearchAudienceTargeting", 
+	configurationPid = "fi.soveltia.liferay.gsearch.querycontributor.audiencetargeting.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = QueryContributor.class
 )
