@@ -25,6 +25,7 @@ public class QueryParams {
 
 	private List<String> classNames;
 	private Map<FacetParam, BooleanClauseOccur> facetParams;
+	private List<String> ddmStructureKeys;
 	private String keywords;
 	private String originalKeywords;
 	private String resultsLayout;
@@ -195,6 +196,14 @@ public class QueryParams {
 		this.categories = categories;
 	}
 
+	public List<String> getDdmStructureKeys() {
+		return ddmStructureKeys;
+	}
+
+	public void setDdmStructureKeys(List<String> ddmStructureKeys) {
+		this.ddmStructureKeys = ddmStructureKeys;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
@@ -205,7 +214,7 @@ public class QueryParams {
 			.equals(facetParams, that.facetParams) && Objects.equals(keywords, that.keywords) && Objects
 			.equals(originalKeywords, that.originalKeywords) && Objects.equals(resultsLayout, that.resultsLayout) && Objects
 			.equals(timeFrom, that.timeFrom) && Objects.equals(timeTo, that.timeTo) && Arrays.equals(sorts, that.sorts) && Objects
-			.equals(categories, that.categories);
+			.equals(categories, that.categories) && Objects.equals(ddmStructureKeys, that.ddmStructureKeys);
 	}
 
 	@Override
@@ -221,6 +230,8 @@ public class QueryParams {
 			", classNames=" + classNames +
 
 			", facetParams=" + facetParams +
+
+			", ddmStructureKeys=" + ddmStructureKeys +
 
 			", keywords='" + keywords + '\'' +
 

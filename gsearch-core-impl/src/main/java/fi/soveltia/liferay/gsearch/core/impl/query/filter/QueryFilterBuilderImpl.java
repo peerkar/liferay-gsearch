@@ -70,8 +70,6 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		buildStatusCondition(booleanFilter);
 
-		buildFacetConditions(queryParams, booleanFilter);
-
 		buildCategoryConditions(queryParams, booleanFilter);
 
 		buildViewPermissionCondition(queryParams, booleanFilter);
@@ -99,7 +97,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	 * @param query
 	 * @throws ParseException
 	 */
-	protected void addJournalArticleClassCondition(BooleanQuery query)
+	protected void addJournalArticleClassCondition(BooleanQuery query, QueryParams queryParams)
 		throws ParseException {
 
 		BooleanQuery journalArticleQuery = new BooleanQueryImpl();
@@ -126,7 +124,19 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			new TermQueryImpl("head", Boolean.TRUE.toString());
 		journalArticleQuery.add(versionQuery, BooleanClauseOccur.MUST);
 
+
+		List<String> ddmStructureKeys = queryParams.getDdmStructureKeys();
+		if (ddmStructureKeys != null) {
+			BooleanQuery ddmStructureQuery = new BooleanQueryImpl();
+			for (String ddmStructureKey : ddmStructureKeys) {
+				TermQuery ddmStructureCondition = new TermQueryImpl("ddmStructureKey", ddmStructureKey);
+				ddmStructureQuery.add(ddmStructureCondition, BooleanClauseOccur.SHOULD);
+			}
+			journalArticleQuery.add(ddmStructureQuery, BooleanClauseOccur.MUST);
+		}
+
 		query.add(journalArticleQuery, BooleanClauseOccur.SHOULD);
+
 	}
 
 	/**
@@ -146,7 +156,7 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			// Handle journal article separately.
 
 			if (className.equals(JournalArticle.class.getName())) {
-				addJournalArticleClassCondition(query);
+				addJournalArticleClassCondition(query, queryParams);
 			}
 			else {
 

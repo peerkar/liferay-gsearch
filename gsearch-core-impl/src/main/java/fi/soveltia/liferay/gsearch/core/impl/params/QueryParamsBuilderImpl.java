@@ -391,22 +391,9 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		queryParams.setClassNames(classNames);
 
 		if (ddmStructureKeys.size() > 0) {
-			setDDMStructureParams(ddmStructureKeys, queryParams);
+			queryParams.setDdmStructureKeys(ddmStructureKeys);
 		}
 
-	}
-
-	private void setDDMStructureParams(List<String> ddmStructureKeys, QueryParams queryParams) {
-
-		String[] values = ddmStructureKeys.toArray(new String[0]);
-
-		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<>();
-
-		FacetParam facetParam = new FacetParam(
-			"ddmStructureKey", values, BooleanClauseOccur.SHOULD);
-		facetParams.put(facetParam, BooleanClauseOccur.MUST);
-
-		queryParams.setFacetsParams(facetParams);
 	}
 
 	/**
