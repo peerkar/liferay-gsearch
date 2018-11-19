@@ -11,14 +11,21 @@
 
 		// Type filter
 
-		<div class="gsearch-tabs optionmenu" data-paramname="type" data-ismultivalued="false" data-isclearonclickdisabled="true">
+		<div class="gsearch-tabs optionmenu" data-paramname="type" data-ismultivalued="true">
 			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle hidden"
 				data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
 				<span class="selection"></span>
 				<span class="caret"></span>
 			</button>
 			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="nav nav-tabs tabs-menu" id="{$portletNamespace}TypeFilterOptions">
-				<li class="selected default"><a data-value="everything" href="#"><span class="text">{msg desc=""}search-everything{/msg}</span>&nbsp;<span class="count"></span></a></li>
+				<li class="selected default">
+                    <label for="{$portletNamespace}type-everything" class="type-selection checkbox">
+                        <span class="text">{msg desc=""}search-everything{/msg}</span>
+                        &nbsp;
+                        <span class="count"></span>
+                        <input type="checkbox" id="{$portletNamespace}type-everything" value="everything" data-value="everything" />
+                    </label>
+                </li>
 			</ul>
 		</div>
 
