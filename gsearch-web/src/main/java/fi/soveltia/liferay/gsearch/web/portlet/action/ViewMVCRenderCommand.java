@@ -271,7 +271,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME);
 		String timeStartFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_START);
 		String timeEndFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_END);
-		String typeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TYPE);
+		String[] typeFilter = ParamUtil.getStringValues(request, GSearchWebKeys.FILTER_TYPE, new String[] {});
 
 		String sortField = ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
 		String sortDirection = ParamUtil.getString(request, GSearchWebKeys.SORT_DIRECTION);
@@ -304,7 +304,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		}
 
 		if (Validator.isNotNull(typeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TYPE, new String[]{typeFilter});
+			initialParameters.put(GSearchWebKeys.FILTER_TYPE, typeFilter);
 		}
 
 		if (Validator.isNotNull(sortDirection)) {

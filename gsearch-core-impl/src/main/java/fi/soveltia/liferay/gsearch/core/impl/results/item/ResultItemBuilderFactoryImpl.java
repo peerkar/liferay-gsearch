@@ -52,7 +52,8 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 
 		if (resultItemBuilder == null) {
 			String entryClassPK = document.get(Field.ENTRY_CLASS_PK);
-			throw new NullPointerException(String.format("No result item builder found for '%s', entryClassPK %s ", entryClassName, entryClassPK));
+			String ddmStructureKey = document.get("ddmStructureKey");
+			_log.error(String.format("No result item builder found for '%s', entryClassPK %s, document ddmStructureKey '%s'", entryClassName, entryClassPK, ddmStructureKey));
 		}
 
 		return resultItemBuilder;

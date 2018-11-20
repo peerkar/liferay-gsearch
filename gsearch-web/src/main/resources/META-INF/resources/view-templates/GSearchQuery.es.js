@@ -405,6 +405,6 @@ GSearchQuery.STATE = {
 	clearPaging: {
 		value: false
 	}
-}
+};
 
 export default GSearchQuery;

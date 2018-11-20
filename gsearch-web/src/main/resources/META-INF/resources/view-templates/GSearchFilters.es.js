@@ -196,11 +196,13 @@ class GSearchFilters extends Component {
 
 			let item = this.assetTypeOptions[i];
 
-			html += '<li><a data-value="' + item.key + '" href="#">';
+			html += '<li>';
+			html += '<label for="' + this.portletNamespace + 'type-' + item.key + '" class="type-selection checkbox">';
 			html += '<span class="text">' + item.localization + '</span>';
-            html += '&nbsp;';
 			html += '<span class="count"></span>';
-			html += '</a></li>';
+			html += '<input type="checkbox" id="' + this.portletNamespace + 'type-' + item.key + '" value="' + item.key + '" data-value="' + item.key + '" />';
+            html += '<span class="checkmark"></span>';
+			html += '</li>';
 		}
 		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
 	}
@@ -212,19 +214,17 @@ class GSearchFilters extends Component {
 
 		// Clear current values
 
-		$('#' + portletNamespace + 'TypeFilterOptions li .count').html('');
+		$('#' + portletNamespace + 'TypeFilterOptions li label span.count').html('');
 
 		if (results && results.meta.typeCounts) {
 
-            $('#' + portletNamespace + 'TypeFilterOptions li a').each(function(element) {
+            $('#' + portletNamespace + 'TypeFilterOptions li label input').each(function(element) {
                 let key = $(this).attr('data-value');
             	if (key in results.meta.typeCounts) {
 					let frequency = results.meta.typeCounts[key];
-                    $(this).find('.count').html('(' + frequency + ')');
+                    $(this).parent().find('.count').html('(' + frequency + ')');
 				}
 			});
-
-
 		}
 	}
 

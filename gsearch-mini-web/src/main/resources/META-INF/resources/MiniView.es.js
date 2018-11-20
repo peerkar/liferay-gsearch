@@ -69,6 +69,8 @@ class MiniView extends Component {
 
 		let _self = this;
 
+		let suggestionGroups = {};
+
 		$('#' + this.portletNamespace + 'MiniSearchField').devbridgeAutocomplete({
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
@@ -94,6 +96,7 @@ class MiniView extends Component {
 						let result = response.suggestions[i];
 						if (result.data.typeKey === 'person') {
 							persons.push(result);
+
 						} else if (result.data.typeKey === 'tool') {
                             tools.push(result);
 						} else {
@@ -102,6 +105,7 @@ class MiniView extends Component {
 					}
                     suggestionsArray = suggestionsArray.concat(content, persons, tools);
                     resultObject.suggestions = suggestionsArray;
+                    suggestionGroups = response.groups;
 					return resultObject;
                 } else {
                     return {
@@ -142,7 +146,27 @@ class MiniView extends Component {
 				return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 			},
 			formatGroup: function (suggestion, category) {
-				return $('<div/>').addClass('search-suggestion-category').html(category).prop('outerHTML');
+				let div = $('<div/>').addClass('search-suggestion-group-header');
+				let categorySpan = $('<span/>');
+				categorySpan.addClass('search-suggestion-category');
+				categorySpan.html(category);
+				categorySpan.appendTo(div);
+				let typeKey = suggestion.data.typeKey;
+				let searchPage = _self.searchPageURL;
+				if (suggestionGroups[typeKey].count >= suggestionGroups[typeKey].group.maxSuggestions) {
+                    let q = $('#' + _self.portletNamespace + 'MiniSearchField').val();
+					let href = searchPage + '?q=' + q;
+					for (let i = 0; i < suggestionGroups[typeKey].group.types.length; i++) {
+						href += '&type=' + suggestionGroups[typeKey].group.types[i];
+					}
+					let showMoreA = $('<a/>', {
+						href: href
+					});
+                    showMoreA.addClass('right search-suggestion-show-more');
+                    showMoreA.html(Liferay.Language.get('suggestions-show-more'));
+                    showMoreA.appendTo(div);
+				}
+                return div.prop('outerHTML');
 			},
             showNoSuggestionNotice: true,
             noSuggestionNotice: _self.noSuggestionsNotice,

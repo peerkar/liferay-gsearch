@@ -67,8 +67,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	public QueryParams buildQueryParams(PortletRequest portletRequest)
 		throws Exception {
 
-		String typeFilter =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE, "");
+		String[] typeFilter =
+			ParamUtil.getStringValues(portletRequest, GSearchWebKeys.FILTER_TYPE, new String[]{});
 
 		return buildQueryParamsWithType(portletRequest, typeFilter);
 
@@ -79,10 +79,10 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 */
 	@Override
 	public QueryParams buildUnfilteredQueryParams(PortletRequest portletRequest) throws Exception {
-		return buildQueryParamsWithType(portletRequest, "everything");
+		return buildQueryParamsWithType(portletRequest, new String[] {"everything"});
 	}
 
-	private QueryParams buildQueryParamsWithType(PortletRequest portletRequest, String type)
+	private QueryParams buildQueryParamsWithType(PortletRequest portletRequest, String[] types)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
@@ -97,7 +97,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		setKeywordsParam(portletRequest, queryParams);
 		setTimeParam(portletRequest, queryParams);
-		setTypeParam(queryParams, type);
+		setTypeParam(queryParams, types);
 
 		setUnitParam(portletRequest, queryParams);
 
@@ -118,29 +118,29 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Parse asset class name and other type related params corresponding the key.
 	 *
-	 * @param key
+	 * @param keys
 	 *            search key
 	 * @return corresponding query type object.
 	 * @throws JSONException
 	 */
-	protected QueryType parseQueryType(String key)
+	protected List<QueryType> parseQueryTypes(String[] keys)
 		throws JSONException, ClassNotFoundException {
 
 		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
 			_moduleConfiguration.typeConfiguration());
 
-		QueryType queryType = QueryType.newBuilder().build();
-		for (int i = 0; i < configurationArray.length(); i++) {
-
-			JSONObject item = configurationArray.getJSONObject(i);
-
-			if (key.equals(item.getString("key"))) {
-				queryType = getQueryType(item);
-				break;
+		List<QueryType> queryTypes = new ArrayList<>();
+		Arrays.asList(keys).forEach(key -> {
+			for (int i = 0; i < configurationArray.length(); i++) {
+				JSONObject item = configurationArray.getJSONObject(i);
+				if (key.equals(item.getString("key"))) {
+					queryTypes.add(getQueryType(item));
+					break;
+				}
 			}
-		}
+		});
 
-		return queryType;
+		return queryTypes;
 	}
 
 	private QueryType getQueryType(JSONObject item) {
@@ -361,24 +361,27 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * @throws PatternSyntaxException
 	 * @throws JSONException
 	 */
-	protected void setTypeParam(QueryParams queryParams, String type)
+	protected void setTypeParam(QueryParams queryParams, String[] types)
 		throws PatternSyntaxException, ClassNotFoundException, JSONException {
 
 		List<String> classNames = new ArrayList<>();
 		List<String> ddmStructureKeys = new ArrayList<>();
 
-		QueryType queryType = parseQueryType(type);
+		List<QueryType> queryTypes = parseQueryTypes(types);
 
-		if (queryType.getEntryClassName() != null) {
-			classNames.add(queryType.getEntryClassName());
-			if (queryType.getDDMStructureKeys() != null) {
-				ddmStructureKeys.addAll(queryType.getDDMStructureKeys());
-			}
-		}
-		else {
-			List<QueryType> queryTypes = parseDefaultQueryTypes();
+		if (queryTypes.size() > 0) {
+			queryTypes.forEach(queryType -> {
+				if (queryType.getEntryClassName() != null) {
+					classNames.add(queryType.getEntryClassName());
+					if (queryType.getDDMStructureKeys() != null) {
+						ddmStructureKeys.addAll(queryType.getDDMStructureKeys());
+					}
+				}
+			});
+		} else {
+			List<QueryType> defaultQueryTypes = parseDefaultQueryTypes();
 			classNames.addAll(
-				queryTypes
+				defaultQueryTypes
 					.stream()
 					.map(QueryType::getEntryClassName)
 					.collect(Collectors.toList())
@@ -388,22 +391,9 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		queryParams.setClassNames(classNames);
 
 		if (ddmStructureKeys.size() > 0) {
-			setDDMStructureParams(ddmStructureKeys, queryParams);
+			queryParams.setDdmStructureKeys(ddmStructureKeys);
 		}
 
-	}
-
-	private void setDDMStructureParams(List<String> ddmStructureKeys, QueryParams queryParams) {
-
-		String[] values = ddmStructureKeys.toArray(new String[0]);
-
-		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<>();
-
-		FacetParam facetParam = new FacetParam(
-			"ddmStructureKey", values, BooleanClauseOccur.SHOULD);
-		facetParams.put(facetParam, BooleanClauseOccur.MUST);
-
-		queryParams.setFacetsParams(facetParams);
 	}
 
 	/**
