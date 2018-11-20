@@ -196,11 +196,20 @@ class GSearchFilters extends Component {
 
 			let item = this.assetTypeOptions[i];
 
+            let checked = this.initialQueryParameters !== null && this.initialQueryParameters.type !== null && this.initialQueryParameters.type.indexOf(item.key) > -1;
+
 			html += '<li>';
 			html += '<label for="' + this.portletNamespace + 'type-' + item.key + '" class="type-selection checkbox">';
 			html += '<span class="text">' + item.localization + '</span>';
 			html += '<span class="count"></span>';
-			html += '<input type="checkbox" id="' + this.portletNamespace + 'type-' + item.key + '" value="' + item.key + '" data-value="' + item.key + '" />';
+			html += '<input type="checkbox" id="' + this.portletNamespace + 'type-' + item.key + '" value="' + item.key + '" data-value="' + item.key + '"';
+			if (checked) {
+                if (item.key !== 'everything') {
+                    $('#' + this.portletNamespace + 'TypeFilterOptions' + ' li.default :checkbox').prop('checked', false);
+                }
+				html += 'checked="checked"';
+			}
+			html += '/>';
             html += '<span class="checkmark"></span>';
 			html += '</li>';
 		}
