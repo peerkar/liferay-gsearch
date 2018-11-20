@@ -146,9 +146,9 @@ class MiniView extends Component {
 				return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 			},
 			formatGroup: function (suggestion, category) {
-				let div = $('<div/>').addClass('search-suggestion-category');
+				let div = $('<div/>').addClass('search-suggestion-group-header');
 				let categorySpan = $('<span/>');
-				categorySpan.addClass('suggestion-category');
+				categorySpan.addClass('search-suggestion-category');
 				categorySpan.html(category);
 				categorySpan.appendTo(div);
 				let typeKey = suggestion.data.typeKey;
@@ -162,7 +162,7 @@ class MiniView extends Component {
 					let showMoreA = $('<a/>', {
 						href: href
 					});
-                    showMoreA.addClass('suggestion-show-more');
+                    showMoreA.addClass('right search-suggestion-show-more');
                     showMoreA.html(Liferay.Language.get('suggestions-show-more'));
                     showMoreA.appendTo(div);
 				}

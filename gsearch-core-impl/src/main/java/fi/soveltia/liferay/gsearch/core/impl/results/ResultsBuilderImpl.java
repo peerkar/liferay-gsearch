@@ -268,6 +268,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 					_resultsBuilderFactory.getResultBuilder(
 						portletRequest, portletResponse, document);
 
+				if (resultItemBuilder == null) {
+					continue;
+				}
+
 				// Title
 
 				jsonObject.put("title", resultItemBuilder.getTitle(portletRequest, portletResponse, document, locale, entryClassPK));

@@ -35,6 +35,11 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
         if (DDM_STRUCTURE_KEYS == null) {
             DDM_STRUCTURE_KEYS = _configurationHelperService.getDDMStructureKeys(getType());
         }
+        if (log.isDebugEnabled()) {
+            String configuredDDMStructureKeys = String.join(",", DDM_STRUCTURE_KEYS);
+            log.debug(String.format("Document ddmStructureKey '%s', entryClassName '%s', NAME '%s', ddmStructureKeys '%s'",
+                document.get("ddmStructureKey"), document.get(Field.ENTRY_CLASS_NAME), NAME, configuredDDMStructureKeys));
+        }
         return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && DDM_STRUCTURE_KEYS.contains(document.get("ddmStructureKey"));
     }
 
