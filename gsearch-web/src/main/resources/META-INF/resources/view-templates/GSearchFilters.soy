@@ -20,10 +20,9 @@
 			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="nav nav-tabs tabs-menu" id="{$portletNamespace}TypeFilterOptions">
 				<li class="selected default">
                     <label for="{$portletNamespace}type-everything" class="type-selection checkbox">
-                        <span class="text">{msg desc=""}search-everything{/msg}</span>
-                        &nbsp;
-                        <span class="count"></span>
+                        <span class="text">{msg desc=""}search-everything{/msg}</span><span class="count"></span>
                         <input type="checkbox" id="{$portletNamespace}type-everything" value="everything" data-value="everything" />
+                        <span class="checkmark"></span>
                     </label>
                 </li>
 			</ul>
@@ -43,7 +42,7 @@
                 </div>
             </div>
 
-            <div class="dropdown gsearch-dropdown optionmenu" data-paramname="time" data-ismultivalued="false" data-isclearonclickdisabled="true">
+            <div class="dropdown gsearch-dropdown optionmenu timespanmenu" data-paramname="time" data-ismultivalued="false" data-isclearonclickdisabled="true">
     			<button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle" id="{$portletNamespace}TimeFilter" type="button">
     				<span class="selection text">{msg desc=""}by-time{/msg}</span>
                     <svg class="navi-arrow" role="img">

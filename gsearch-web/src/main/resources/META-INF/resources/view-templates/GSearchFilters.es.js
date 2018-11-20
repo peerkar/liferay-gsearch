@@ -199,9 +199,9 @@ class GSearchFilters extends Component {
 			html += '<li>';
 			html += '<label for="' + this.portletNamespace + 'type-' + item.key + '" class="type-selection checkbox">';
 			html += '<span class="text">' + item.localization + '</span>';
-            html += '&nbsp;';
 			html += '<span class="count"></span>';
 			html += '<input type="checkbox" id="' + this.portletNamespace + 'type-' + item.key + '" value="' + item.key + '" data-value="' + item.key + '" />';
+            html += '<span class="checkmark"></span>';
 			html += '</li>';
 		}
 		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
