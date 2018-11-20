@@ -4,6 +4,10 @@ public final class QuerySuggestion {
     private final String value;
     private final QuerySuggestionData data;
 
+    public QuerySuggestionData getData() {
+        return data;
+    }
+
     private QuerySuggestion(Builder builder) {
         value = builder.value;
         data = builder.data;

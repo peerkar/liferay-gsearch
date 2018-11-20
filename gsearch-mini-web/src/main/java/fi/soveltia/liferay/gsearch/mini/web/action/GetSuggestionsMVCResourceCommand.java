@@ -15,6 +15,9 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
 import fi.soveltia.liferay.gsearch.mini.web.suggestions.QuerySuggestion;
 import fi.soveltia.liferay.gsearch.mini.web.suggestions.QuerySuggestionData;
+import fi.soveltia.liferay.gsearch.mini.web.suggestions.QuerySuggestionGroup;
+import fi.soveltia.liferay.gsearch.mini.web.suggestions.QuerySuggestionGroupData;
+import fi.soveltia.liferay.gsearch.mini.web.suggestions.QuerySuggestionsResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -51,21 +54,32 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONArray items = responseObject.getJSONArray("items");
 
-		List<QuerySuggestion> results =	mapGSearchResultsToSuggestions(resourceRequest, items);
+		QuerySuggestionsResponse querySuggestions = mapGSearchResultsToSuggestions(resourceRequest, items);
 
-		Map<String, Object> suggestionsJson = new HashMap<>();
-		suggestionsJson.put("suggestions", results);
 		JSONPortletResponseUtil.writeJSON(
-			resourceRequest, resourceResponse, new Gson().toJson(suggestionsJson));
+			resourceRequest, resourceResponse, new Gson().toJson(querySuggestions));
 
 	}
 
-	private List<QuerySuggestion> mapGSearchResultsToSuggestions(ResourceRequest resourceRequest, JSONArray items) {
+	private QuerySuggestionsResponse mapGSearchResultsToSuggestions(ResourceRequest resourceRequest, JSONArray items) {
 		List<QuerySuggestion> querySuggestions = new ArrayList<>();
+		Map<String, QuerySuggestionGroupData> groups = new HashMap<>();
+
 		for (int i = 0; i < items.length(); i++) {
 			JSONObject searchResult = items.getJSONObject(i);
 			String originalTypeKey = searchResult.getString("typeKey");
 			String typeKey = getSuggestionTypeKey(originalTypeKey);
+
+			QuerySuggestionGroup group = QuerySuggestionGroup.getGroupForTypeKey(typeKey);
+			if (!groups.containsKey(typeKey)) {
+				groups.put(typeKey, QuerySuggestionGroupData.newBuilder().group(group.getAsMap()).build());
+			} else {
+				groups.get(typeKey).addOneCount();
+			}
+			// prevent returning excess results
+			if (groups.get(typeKey).getCount() > (group.getMaxSuggestions())) {
+				continue;
+			}
 			String icon = getIcon(originalTypeKey);
 			String localizedType = getLocalization("suggestion-result-group-" + typeKey, resourceRequest.getLocale());
 			String url = searchResult.getString("link");
@@ -86,7 +100,7 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 					.build()
 			);
 		}
-		return querySuggestions;
+		return QuerySuggestionsResponse.newBuilder().groups(groups).suggestions(querySuggestions).build();
 	}
 
 	private String getIcon(String typeKey) {

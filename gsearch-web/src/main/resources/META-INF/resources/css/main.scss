@@ -4,9 +4,9 @@
 @import "grow";
 */
 .gsearch-portlet {
-	
+
 	/* Highlighting (Mark.js) */
-	
+
 	mark,
 	.mark {
 		background: transparent;
@@ -15,24 +15,24 @@
 		font-weight: bold;
 		padding: 0;
 	}
-	
+
 	mark:before, .mark:before {
 	    background: transparent;
 	    display: none;
 	}
-	
+
 	/* Modal styles */
-	
+
 	/* Fix LR TWBS modal issue */
-	
+
 	.modal {
 		display: none;
 	}
-	
+
 	.modal-dialog {
     	overflow-y: initial !important;
 		position: relative;
-		
+
 		@include media-query(null, $screen-xs-max) {
 			position: inherit;
 		}
@@ -43,48 +43,48 @@
 	    max-height: 75vh;
 		min-height: 70px;
 	    overflow-y: auto;
-		
+
 		h1 {
 			font-size: 1.8em;
 			margin: 15px 0 5px 0;
 		}
-		
+
 		h2 {
 			font-size: 1.6em;
 			margin: 15px 0 5px 0;
-		}		
-		
+		}
+
 		h3 {
 			font-size: 1em;
 			font-weight: 600;
 			margin: 15px 0 5px 0;
 		}
-		
+
 		p {
 			margin-bottom: 10px;
 		}
-		
+
 		.example {
 			color: #69b5b9;
 		}
 	}
-	
+
 	.modal-footer {
-		border-top: 1px solid #eceeef;	
+		border-top: 1px solid #eceeef;
 		box-shadow: none;
 		text-align: right;
-	}	
-		
+	}
+
 	/* Common classes / styles */
-	
+
 	.gsearch-container {
 		margin-bottom: 30px;
 	}
-	
+
 	.autocomplete-field {
 		position: absolute;
 	}
-	
+
 	.ajax-loader-placeholder {
 		background:	url("../images/ajax-loader.gif") 50% 50% no-repeat;
 		min-height: 50px;
@@ -92,43 +92,43 @@
 	}
 
 	.gsearch-dropdown {
-	
+
 		button {
 
 		}
-	
+
 		margin-right: 10px;
-	
+
 		li.selected a {
 			color: #000;
 		}
 
 		li.selected a:before {
     		content: '• ';
-		}	
+		}
 	}
-	
+
 	.btn .caret {
 		margin-left: 5px;
 	}
-	
+
 	.gsearch-centered {
 		margin: 0 auto;
 		float: none;
 	}
-		
+
 	/* Help */
-	
+
 	.gsearch-help {
 	    margin-top: 30px;
 	    text-align: right;
 	    margin-bottom: 10px;
-	    
+
 	    .btn-link {
 		    font-size: 95%;
 		    padding-right: 0;
 	    }
-	    
+
 	    .btn-link,
 	    .btn-link:active,
 	    .btn-link:focus,
@@ -136,45 +136,45 @@
 			color: #337ab7;
 	    }
   	}
-	
+
 	/* Searchfield  */
-	
+
 	.gsearch-searchfield {
 		margin-top: 0px;
-		
+
 		.message-wrapper {
 			float: left;
 			height: 1px;
 			width: 100%;
 			visibility: hidden;
 		}
-		
+
 		input {
 			font-size: 1em;
 		}
 	}
-	
+
 	/* Facets */
 
 	.gsearch-facets {
-	
+
 		margin-top: 15px;
-	
+
 		.facets {
 			background: #f9f9f9;
 		}
 	}
-	
+
 	/* Filters */
-	
+
 	.gsearch-filters {
-	
-		margin-top: 10px; 
+
+		margin-top: 10px;
 
 		@include media-query(null, $screen-xs-max) {
 			margin-top: 20px;
 		}
-		
+
 		a {
 			color: #888;
 		}
@@ -183,42 +183,42 @@
 			@include media-query(null, $screen-xs-max) {
 			    padding: 8px 12px;
 			}
-		}		
-	 
+		}
+
 		.btn-link {
 			color: #888;
 		}
-		
-		.gsearch-dropdown { 
+
+		.gsearch-dropdown {
 			display: inline-block;
 
 			@include media-query(null, $screen-xs-max) {
 				margin-left: 0;
 				margin-right: 0;
 			}
-			
+
 			.count {
 				margin-left: 10px;
 			}
-			
+
 			.groupname {
 				font-size: 60%;
 				margin-left: 10px;
 			}
 		}
-		
-		.item::first-child {
+
+		.item:first-child {
 			margin-left: 0px;
 		}
-		
+
 		.dropdown.facet li,
 		.dropdown.facet span.selection {
-			text-transform: capitalize;			
+			text-transform: capitalize;
 		}
 	}
-		
+
 	/* Stats  */
-	
+
 	.gsearch-stats {
 		color: #ccc;
 		margin-top: 10px;
@@ -226,15 +226,15 @@
 	}
 
 	/* Sort */
-	
+
 	.gsearch-sort {
-	
+
 		float: left;
-		
+
 		@include media-query(null, $screen-xs-max) {
 			padding-left: 0;
 		}
-	
+
 		.btn-link {
 			padding-left: 0px;
 		}
@@ -243,73 +243,73 @@
 	    	text-decoration: underline;
 	    }
 
-		.btn-link,	    		
+		.btn-link,
 	    .btn-link:active,
 	    .btn-link:focus,
 	    .btn-link:hover {
 			color: #337ab7;
 	    }
-		
-		.gsearch-dropdown { 
+
+		.gsearch-dropdown {
 			float: left;
 		}
 	}
 
 	/* Results layout */
-	
+
 	.gsearch-results-layout {
-	
+
 		float: right;
 		padding-right: 0;
 		text-align: right;
-		
+
 		.options {
 			float: right;
 			list-style-type: none;
-			
+
 			li {
 				display: inline-block;
-				
+
 				@include media-query(null, $screen-xs-max) {
 					margin-bottom: 10px;
 				}
 			}
-			
+
 			a {
 				display: inline-block;
 				margin-right: 15px;
 				border: 1px solid #1a0dab;
 				box-shadow: 4px 4px 1px -1px #b8bcc1;
-				
+
 				@include media-query(null, 467px) {
 					margin-right: 0;
 				}
 			}
-				
+
 			.selected a,
 			.a:hover {
 			    background: #a6dfd8;
 			    box-shadow: none !important;
 			}
-			
+
 			img {
 				max-width: 30px;
 				padding: 4px;
 			}
 		}
 	}
-	
+
 	/* Results */
-	
+
 	.gsearch-results {
-	
+
 		margin-top: 20px;
-		
+
 		.suggestions {
 			font-size: 120%;
 			margin: 20px 0;
 		}
-		
+
 		.card {
 			.sticker {
 				font-size: 12px;
@@ -317,31 +317,31 @@
 				width: auto;
 				padding: 0 5px
 			}
-			
+
 			.date,
 			.dimensions,
 			.size {
 				color: #000;
 			}
-			
+
 			.dimensions {
 				min-height: 32px;
 			}
 		}
-		
+
 		.item {
 			margin: 20px 0;
-		
+
 			.smallimage {
 				object-fit: cover;
-   			
+
    				img {
    					max-width: 100%;
    				}
 			}
-   	
+
 			.content {
-		
+
 				.heading {
 					 h1 {
 						display: inline-block;
@@ -352,23 +352,23 @@
 						max-width: 93%;
 						overflow: hidden;
 						text-overflow: ellipsis;
-						vertical-align: bottom;						
+						vertical-align: bottom;
 						white-space: nowrap;
 					}
 
 					.type {
 						font-size: 77%;
-						margin-right: 10px;	
+						margin-right: 10px;
 						vertical-align: super;
 					}
-					
+
 					.glyphicon {
 						color: green;
 						font-size: 1.2em;
 						margin-left: 15px;
 					}
 				}
-		
+
 				.link {
 					margin-bottom: 5px;
 					overflow: hidden;
@@ -376,33 +376,33 @@
 					white-space: nowrap;
 					width: 100%;
 				}
-		
+
 				.link a {
 				}
-		
+
 				.description {
-					
+
 					@include media-query(null, $screen-xs-max) {
 						word-break: break-all;
 					}
 				}
 			}
 		}
-		
+
 		.tags {
-			
+
 			color: #aaa;
 			font-size: 0.9em;
 			margin-top: 4px;
-					
+
 			span {
 				margin-right: 10px;
 			}
-			
+
 			.tag {
 				word-break: break-word;
 			}
-			
+
 			.tag.active {
 				color: #222;
 			}
@@ -411,24 +411,24 @@
 				cursor: pointer;
 			}
 		}
-		
+
 		.no-results {
 			margin-top: 30px;
 
 		}
 	}
-	
+
 	/* Paging */
-	
+
 	.gsearch-paging {
-	
+
 		margin-bottom: 30px;
 		margin-top: 30px;
-	
+
 		.page a {
 			padding: 10px;
 		}
-	
+
 		.page.selected a {
 			background: #ccc;
 			color: #fff;
@@ -444,11 +444,11 @@
 }
 
 .gsearch-autocomplete-list {
-	position: absolute;	
-	
+	position: absolute;
+
 	.list-group-item.active,
 	.list-group-item.active:hover,
-	.list-group-item.active:focus,
+	.list-group-item.active:focus
 	 {
 		background: #f1f5f8;
 		border-color: #6b8b8d;
@@ -458,32 +458,32 @@
 /* Devbridge Autocomplete */
 
 
-.autocomplete-suggestions { 
-	background: #FFF; 
-	border: 1px solid #999; 
-	overflow: auto; 
+.autocomplete-suggestions {
+	background: #FFF;
+	border: 1px solid #999;
+	overflow: auto;
 }
 
-.autocomplete-suggestion { 
-	overflow: hidden; 
-	padding: 2px 5px; 
-	white-space: nowrap; 
+.autocomplete-suggestion {
+	overflow: hidden;
+	padding: 2px 5px;
+	white-space: nowrap;
 }
-.autocomplete-selected { 
-	background: #F0F0F0; 
-}
-
-.autocomplete-suggestions strong { 
-	font-weight: bold; 
-	color: #000; 
+.autocomplete-selected {
+	background: #F0F0F0;
 }
 
-.autocomplete-group { 
-	padding: 2px 5px; 
+.autocomplete-suggestions strong {
+	font-weight: bold;
+	color: #000;
 }
 
-.autocomplete-group strong { 
-	display: block; 
-	border-bottom: 1px solid #000; 
+.autocomplete-group {
+	padding: 2px 5px;
 }
-    
+
+.autocomplete-group strong {
+	display: block;
+	border-bottom: 1px solid #000;
+}
+
