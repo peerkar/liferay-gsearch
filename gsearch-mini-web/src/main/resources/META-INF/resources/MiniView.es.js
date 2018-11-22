@@ -153,7 +153,7 @@ class MiniView extends Component {
 				categorySpan.appendTo(div);
 				let typeKey = suggestion.data.typeKey;
 				let searchPage = _self.searchPageURL;
-				if (suggestionGroups[typeKey].count >= suggestionGroups[typeKey].group.maxSuggestions) {
+				if (suggestionGroups.hasOwnProperty(typeKey) && (suggestionGroups[typeKey].count >= suggestionGroups[typeKey].group.maxSuggestions)) {
                     let q = $('#' + _self.portletNamespace + 'MiniSearchField').val();
 					let href = searchPage + '?q=' + q;
 					for (let i = 0; i < suggestionGroups[typeKey].group.types.length; i++) {
