@@ -56,7 +56,7 @@ public class ResultItemCommonService {
     Layout getAssetLayout(long groupId, String link) throws Exception {
 
         if (link != null) {
-            String regex = ".*https?://[\\w\\.]+(/.*?)(?:/-/.*|)";
+            String regex = ".*https?://[\\w.-]+(/.*?)(?:/-/.*|)";
 
             Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(link);
@@ -77,6 +77,8 @@ public class ResultItemCommonService {
                 } catch (NoSuchLayoutException e) {
                     // do nothing
                 }
+            } else {
+                log.warn(String.format("Link '%s' does not match with regex '%s", link, regex));
             }
         }
         return null;
