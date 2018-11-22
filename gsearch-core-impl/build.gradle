@@ -18,5 +18,7 @@ dependencies {
 
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-api")
 	compileOnly project(":modules:liferay-gsearch:gsearch-query-api")
+
+	compileOnly project(":modules:news")
 }
 

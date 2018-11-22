@@ -222,7 +222,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	 * @return
 	 * @throws PortalException
 	 */
-	private JournalArticle getJournalArticle(long entryClassPK)
+	protected JournalArticle getJournalArticle(long entryClassPK)
 		throws PortalException {
 
 		return _journalArticleService.getLatestArticle(entryClassPK);
