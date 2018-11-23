@@ -391,16 +391,16 @@ GSearchQuery.STATE = {
 		value: []
 	},
 	queryClearingParameters: {
-		value: ['q']
+		value: []
 	},
 	basicParameters: {
-		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
+		value: ['q', 'type', 'unit', 'time', 'timeStart', 'timeEnd']
 	},
 	isInitialQuery: {
 		value: false
 	},
 	transparentParameters: {
-		value: ['resultsLayout', 'sortField', 'sortDirection']
+		value: []
 	},
 	clearPaging: {
 		value: false
