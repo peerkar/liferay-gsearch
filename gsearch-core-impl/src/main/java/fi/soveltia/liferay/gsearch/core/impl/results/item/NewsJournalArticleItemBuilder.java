@@ -60,13 +60,6 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
     }
 
     @Override
-    public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale)
-        throws SearchException {
-
-        return HtmlUtil.stripHtml(getSummary(portletRequest, portletResponse, document).getContent());
-    }
-
-    @Override
     public String getLink(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) {
         try {
             JournalArticle article = getJournalArticle(entryClassPK);
