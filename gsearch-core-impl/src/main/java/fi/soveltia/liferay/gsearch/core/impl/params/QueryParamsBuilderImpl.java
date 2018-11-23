@@ -233,14 +233,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		boolean suggestions = Boolean.valueOf(ParamUtil.getString(portletRequest, GSearchWebKeys.SUGGESTIONS_MODE, "false"));
 
-		// to make autocomplete search find results starting with given string
-		if (suggestions &&
-			!keywords.isEmpty() &&
-			!keywords.endsWith("*") &&
-			!keywords.matches("\\W$")) {
-			keywords += "*";
-		}
-
 		// Validate keywords.
 
 		if (!_requestParamValidator.validateKeywords(keywords)) {

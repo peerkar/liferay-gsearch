@@ -19,7 +19,7 @@ class MiniView extends Component {
 
 		this.autoCompleteEnabled = opt_config.autoCompleteEnabled;
 
-		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay
+		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay;
 
 		this.portletNamespace = opt_config.portletNamespace;
 
@@ -75,7 +75,7 @@ class MiniView extends Component {
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
 			minChars: _self.queryMinLength,
-			noCache: false,
+			noCache: true,
 		    onSelect: function (suggestion) {
 		    	window.location.href = suggestion.data.url;
 		    },
