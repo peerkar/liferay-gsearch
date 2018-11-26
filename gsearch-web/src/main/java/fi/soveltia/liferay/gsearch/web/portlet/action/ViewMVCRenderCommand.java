@@ -188,7 +188,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 	}
 
 	private List<CategoryDTO> getUnitCategories(long companyId, Locale locale) {
-		List<AssetCategory> facultyAssetCategories = flammaAssetCategoryService.getSelectableAssetCategories(companyId);
+		List<AssetCategory> facultyAssetCategories = flammaAssetCategoryService.getSelectableUnitCategories(companyId);
 
 		List<CategoryDTO> categories = new ArrayList<>();
 		categories.add(CategoryDTO.newBuilder()
