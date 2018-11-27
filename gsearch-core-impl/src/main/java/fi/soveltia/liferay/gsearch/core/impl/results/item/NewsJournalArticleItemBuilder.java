@@ -8,6 +8,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import fi.helsinki.flamma.common.url.ViewNewsURLService;
 import fi.helsinki.flamma.news.util.NewsURLService;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
@@ -34,7 +35,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
     private ConfigurationHelper _configurationHelperService;
 
     @Reference
-    private NewsURLService newsUrlService;
+    private ViewNewsURLService newsUrlService;
 
     @Override
     public boolean canBuild(Document document) {
