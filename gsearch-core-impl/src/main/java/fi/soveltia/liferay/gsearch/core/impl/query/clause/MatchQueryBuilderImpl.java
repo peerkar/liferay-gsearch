@@ -120,7 +120,7 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 			GetterUtil.getString(configurationObject.get("operator"), "and");
 
 		if ("or".equals(operator)) {
-			matchQuery.setOperator(Operator.AND);
+			matchQuery.setOperator(Operator.OR);
 		}
 		else {
 			matchQuery.setOperator(Operator.AND);
