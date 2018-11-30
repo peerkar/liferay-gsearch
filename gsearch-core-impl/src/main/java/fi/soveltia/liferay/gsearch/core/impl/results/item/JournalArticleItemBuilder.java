@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.portal.kernel.util.WebKeys;
+import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -165,25 +166,8 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	@Override
-	public String[] getCategories(Document document, Locale locale) {
-		String[] categoryIds = document.getValues(Field.ASSET_CATEGORY_IDS);
-
-		List<String> categories = new ArrayList<>();
-
-		if (categoryIds != null) {
-			for (String id : categoryIds) {
-				try {
-					AssetCategory category = _assetCategoryLocalService.getCategory(Long.valueOf(id));
-					categories.add(category.getTitle(locale));
-				} catch (PortalException e) {
-					log.error(String.format("Cannot get asset category for id %s", id));
-				} catch (NumberFormatException e) {
-					// do nothing
-				}
-			}
-
-		}
-		return categories.toArray(new String[] {});
+	public SearchResultCategory[] getCategories(Document document, Locale locale) {
+		return _resultItemCommonService.getCategories(document, locale);
 	}
 
 	@Override

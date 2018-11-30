@@ -2,6 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.api.results.item;
 
 import com.liferay.portal.kernel.search.Document;
+import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 
 import java.util.Locale;
 import java.util.Map;
@@ -91,6 +92,6 @@ public interface ResultItemBuilder {
 
 	public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception;
 
-	public String[] getCategories(Document document, Locale locale) throws Exception;
+	public SearchResultCategory[] getCategories(Document document, Locale locale) throws Exception;
 
 }

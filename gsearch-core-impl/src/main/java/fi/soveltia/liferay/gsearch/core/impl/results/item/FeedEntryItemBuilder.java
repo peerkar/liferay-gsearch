@@ -13,7 +13,7 @@ import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
 import fi.helsinki.flamma.feed.util.FeedUrlService;
 import fi.helsinki.flamma.feed.util.ListFeedEntryService;
 import fi.helsinki.flamma.feed.util.ListableFeedEntry;
-import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -33,14 +33,10 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
 
     private static final Log log = LogFactoryUtil.getLog(FeedEntryItemBuilder.class);
 
-    private static final String NAME = "fi.helsinki.flamma.feed.model.FeedEntry";
+    private static final String NAME = FeedEntry.class.getName();
     private static final String TYPE = "feed-entry";
-    private static final int TITLE_SNIPPET_LENGTH = 20;
 
     private static Map<Locale, ResourceBundle> resourceBundles = new HashMap<>();
-
-    @Reference
-    private ConfigurationHelper _configurationHelperService;
 
     @Reference
     private FeedUrlService feedUrlService;
@@ -50,6 +46,9 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
 
     @Reference
     private FeedEntryLocalService feedEntryLocalService;
+
+    @Reference
+    private ResultItemCommonService resultItemCommonService;
 
     @Override
     public boolean canBuild(Document document) {
@@ -76,6 +75,11 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
             log.error(String.format("Cannot parse '%s' as long.", document.get(Field.ENTRY_CLASS_PK)));
         }
         return url;
+    }
+
+    @Override
+    public SearchResultCategory[] getCategories(Document document, Locale locale) {
+        return resultItemCommonService.getCategories(document, locale);
     }
 
     @Override

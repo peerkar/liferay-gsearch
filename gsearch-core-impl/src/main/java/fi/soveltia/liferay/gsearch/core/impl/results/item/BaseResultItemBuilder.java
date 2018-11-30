@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
+import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 import javax.portlet.PortletRequest;
@@ -134,8 +135,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getCategories(Document document, Locale locale) throws Exception {
-		return new String[] {};
+	public SearchResultCategory[] getCategories(Document document, Locale locale) throws Exception {
+		return new SearchResultCategory[] {};
 	}
 
 	/**

@@ -1,7 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results;
 
-import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -29,6 +28,7 @@ import java.util.ResourceBundle;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -316,9 +316,9 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 					jsonObject.put("tags", tags);
 				}
 
-				String[] categories = resultItemBuilder.getCategories(document, locale);
+				SearchResultCategory[] categories = resultItemBuilder.getCategories(document, locale);
 
-				if (categories != null && categories.length > 0 && categories[0].length() > 0) {
+				if (categories != null && categories.length > 0 && categories[0].getName().length() > 0) {
 
 					jsonObject.put("categories", categories);
 				}
