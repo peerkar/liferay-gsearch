@@ -126,7 +126,7 @@
 				{if $item.categories}
 					<div class="categories">
 						{foreach $cat in $item.categories}
-							<span class="category">{$cat}</span>
+							<span class="category" {if $cat.colorCode != ''} style="background: {$cat.colorCode}" {/if}>{$cat.name}</span>
 						{/foreach}
 					</div>
 				{/if}
