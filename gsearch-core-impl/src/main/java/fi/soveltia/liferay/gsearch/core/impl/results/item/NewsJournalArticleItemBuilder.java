@@ -6,20 +6,15 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.SearchException;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import fi.helsinki.flamma.common.url.ViewNewsURLService;
-import fi.helsinki.flamma.news.util.NewsURLService;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import java.util.List;
-import java.util.Locale;
 
 @Component(
     immediate = true,
@@ -35,7 +30,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
     private ConfigurationHelper _configurationHelperService;
 
     @Reference
-    private ViewNewsURLService newsUrlService;
+    private ViewNewsURLService viewNewsUrlService;
 
     @Override
     public boolean canBuild(Document document) {
@@ -64,7 +59,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
     public String getLink(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) {
         try {
             JournalArticle article = getJournalArticle(entryClassPK);
-            return newsUrlService.getSingleArticleUrl(portletRequest, article);
+            return viewNewsUrlService.getSingleArticleUrl(portletRequest, article);
         } catch (PortalException e) {
             log.error(String.format("Cannot get journal article for entryClassPK %s", entryClassPK));
         }
