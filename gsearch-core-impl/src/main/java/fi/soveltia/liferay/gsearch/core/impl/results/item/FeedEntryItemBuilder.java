@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import fi.helsinki.flamma.feed.model.FeedEntry;
 import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
@@ -19,7 +20,10 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 @Component(
     immediate = true,
@@ -32,6 +36,8 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
     private static final String NAME = "fi.helsinki.flamma.feed.model.FeedEntry";
     private static final String TYPE = "feed-entry";
     private static final int TITLE_SNIPPET_LENGTH = 20;
+
+    private static Map<Locale, ResourceBundle> resourceBundles = new HashMap<>();
 
     @Reference
     private ConfigurationHelper _configurationHelperService;
@@ -74,15 +80,15 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
 
     @Override
     public String getTitle(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale, long entryClassPK) throws NumberFormatException, PortalException {
-        String content = document.get(Field.CONTENT);
-        String title = "";
-        if ((content != null) && !content.isEmpty()) {
-            if (content.length() <= TITLE_SNIPPET_LENGTH) {
-                title = content;
-            } else {
-                title = content.substring(0, TITLE_SNIPPET_LENGTH) + "...";
-            }
+        String userName = document.get(Field.USER_NAME);
+        String titlePrefix = getLocalization(locale, "feed-entry-title");
+        return String.format("%s: %s", titlePrefix, userName);
+    }
+
+    private String getLocalization(Locale locale, String key) {
+        if (resourceBundles.get(locale) == null) {
+            resourceBundles.put(locale, ResourceBundleUtil.getBundle("content.Language", locale, FeedEntryItemBuilder.class));
         }
-        return title;
+        return resourceBundles.get(locale).getString(key);
     }
 }
