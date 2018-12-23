@@ -15,8 +15,8 @@
 		
 				// Wider layout for images.
 				
-				{let $widthlg: $results.meta.resultsLayout == 'image' ? '12' : '10' /}
-				{let $widthsm: $results.meta.resultsLayout == 'image' ? '12' : '12' /}
+				{let $widthlg: $results.resultsLayout == 'image' ? '12' : '10' /}
+				{let $widthsm: $results.resultsLayout == 'image' ? '12' : '12' /}
 				
 				<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-centered gsearch-results" id="{$portletNamespace}SearchResults">
 		
@@ -30,13 +30,13 @@
 					
 					// Result layout
 										
-					{if $results.meta.resultsLayout == 'image'}
+					{if $results.resultsLayout == 'image'}
 					
 						{call GSearchImageResultLayout.render}
 							{param results: $results /}
 						{/call}
 									
-					{elseif $results.meta.resultsLayout == 'maps'}	
+					{elseif $results.resultsLayout == 'maps'}	
 
 						// Maps layout
 
@@ -99,7 +99,7 @@
 			
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					<span class="user-avatar-image"> 
-						<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default">
+						<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
 							<span>{$item.userInitials}</span>
 						</div> 
 					</span>
@@ -111,7 +111,7 @@
 			
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					<a href="{$item.link}">
-						<img alt="{$item.title}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.title}" />
+						<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
 					</a>
 				</div>
 
@@ -158,10 +158,10 @@
 				
 				// Tags.
 				
-				{if $item.tags}
+				{if $item.assetTagNames}
 					<div class="tags">
 						<span>{msg desc=""}tags{/msg}:</span>
-						{foreach $tag in $item.tags}
+						{foreach $tag in $item.assetTagNames}
 							<span class="tag">{$tag}</span>
 						{/foreach}
 					</div>							

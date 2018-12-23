@@ -7,8 +7,6 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
@@ -27,7 +25,8 @@ import javax.portlet.ResourceResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
@@ -57,7 +56,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-		
+
 		_helpText = null;
 	}
 
@@ -72,7 +71,9 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONObject helpObject = JSONFactoryUtil.createJSONObject();
 
-		helpObject.put(GSearchWebKeys.HELP_TEXT, getHelpText(resourceRequest, resourceResponse));
+		helpObject.put(
+			GSearchWebKeys.HELP_TEXT,
+			getHelpText(resourceRequest, resourceResponse));
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, helpObject);
@@ -85,12 +86,13 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @param resourceResponse
 	 * @return
 	 */
-	protected String getHelpText(ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
+	protected String getHelpText(
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse) {
 
 		if (_helpText != null) {
 			return _helpText;
 		}
-		
+
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
@@ -103,39 +105,37 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 			try {
 
-				 JournalArticle journalArticle =
-				 _journalArticleService.getLatestArticle(groupId, articleId,
-				 WorkflowConstants.STATUS_APPROVED);
-				 
-				_helpText = _journalArticleService.getArticleContent(groupId, articleId, journalArticle.getVersion(), 
-						themeDisplay.getLanguageId(), new PortletRequestModel(resourceRequest, resourceResponse),
-						themeDisplay);
+				JournalArticle journalArticle =
+					_journalArticleService.getLatestArticle(
+						groupId, articleId, WorkflowConstants.STATUS_APPROVED);
+
+				_helpText = _journalArticleService.getArticleContent(
+					groupId, articleId, journalArticle.getVersion(),
+					themeDisplay.getLanguageId(),
+					new PortletRequestModel(resourceRequest, resourceResponse),
+					themeDisplay);
 			}
 			catch (Exception e) {
-				_log.error(e, e);
+				_log.error(e.getMessage(), e);
 			}
 		}
 
-		// Fall back to default help text from
+		// Fall back to default help text from localization file.
 
 		if (_helpText == null) {
 
 			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 				"content.Language", resourceRequest.getLocale(),
 				GSearchPortlet.class);
-	
+
 			_helpText = LanguageUtil.get(resourceBundle, "helptext");
 		}
-		
+
 		return _helpText;
 	}
 
-	@Reference(unbind = "-")
-	protected void setJournalArticleService(
-		JournalArticleService journalArticleService) {
-
-		_journalArticleService = journalArticleService;
-	}
+	private static final Logger _log =
+					LoggerFactory.getLogger(GetHelpTextMVCResourceCommand.class);
 
 	private volatile ModuleConfiguration _moduleConfiguration;
 
@@ -143,6 +143,4 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 	private JournalArticleService _journalArticleService;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(GetHelpTextMVCResourceCommand.class);
 }

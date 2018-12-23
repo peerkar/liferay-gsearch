@@ -2,8 +2,6 @@
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
@@ -13,13 +11,15 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
-import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 
 /**
- * Resource command for getting keyword suggestions (autocomplete).
+ * Resource command for keyword suggestions (autocomplete).
  * 
  * @author Petteri Karttunen
  */
@@ -49,7 +49,7 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 		catch (Exception e) {
 
-			_log.error(e, e);
+			_log.error(e.getMessage(), e);
 
 			return;
 		}
@@ -60,16 +60,10 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, response);
 	}
 
-	@Reference(unbind = "-")
-	protected void setGSearchKeywordSuggester(
-		GSearchKeywordSuggester gSearchSuggester) {
-
-		_gSearchSuggester = gSearchSuggester;
-	}
+	private static final Logger _log =
+					LoggerFactory.getLogger(GetSuggestionsMVCResourceCommand.class);
 
 	@Reference
 	protected GSearchKeywordSuggester _gSearchSuggester;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(GetSuggestionsMVCResourceCommand.class);
 }
