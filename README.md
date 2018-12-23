@@ -9,11 +9,11 @@ This application gives you full control over query configuration and relevance a
 ## News
 * __(2018-12-23)__ Major version update, including:
 	* Streamlined custom Elasticsearch adapter installation: no more flooding to log
-	* Added a possibility to override facets, query and assettypes configuration from  client callin the core
-	* New a basic default item builder. Now most asset types can be added in the search without a need to write a new result item builder.
+	* Added a possibility to override facets, query and assettypes configuration from  client calling the core
+	* New default item builder. Now most asset types can be added in the search without a need to write a new result item builder.
 	* Added more query type specific configuration options
 	* New extensible query condition support. In the first phase there's support for keyword matches and Audience Targeting segment conditions.
-	* New content suggestions mode to Mini web portlet
+	* New content suggestions mode for Mini web portlet
 	* Added more configuration option for More Like This portlet
 	* New Audience Targeting functionality. Now it's possible to use pure use segmenting as query conditions.
 	* Changed configuration syntax more Elasticsearch configuration like.
