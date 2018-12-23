@@ -18,11 +18,6 @@ This application gives you full control over query configuration and relevance a
 	* New Audience Targeting functionality. Now it's possible to use pure use segmenting as query conditions.
 	* Changed configuration syntax more Elasticsearch configuration like.
 	* Default configurations are now applied automatically on new install.
-
-* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
-
-* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
-	
 * __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
 * __(2018-11-05)__ New More Like This portlet using Elasticsearch MLT query. Google Maps result view. New facet selections bar.
 * __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
