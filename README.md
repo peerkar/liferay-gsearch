@@ -5,9 +5,9 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
 ## News
-* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest)
+* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
 * __(2018-11-05)__ New More Like This portlet using Elasticsearch MLT query. Google Maps result view. New facet selections bar.
-* __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest).
+* __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 * __(2018-09-17)__ Custom adapter for __Elasticsearch 6.1.3__ on DXP 7.1 is now available.
 
 ## Documentation
@@ -20,13 +20,13 @@ Liferay GSearch is a modular and highly configurable, Google-like search applica
 
 ## Quick Installation Guide
 
-__Important!__: The master branch and binaries in the *binaries/latest* folder (module major version 3) are __for Liferay 7.1 only__. 
+__Important!__: The master branch (module major version 3) are __for Liferay 7.1 only__. 
 
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
 ### Step 1 
 
-Download and deploy the mandatory modules from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+Download and deploy the mandatory modules for your portal version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 * fi.soveltia.liferay.gsearch.core-api-VERSION.jar
 * fi.soveltia.liferay.gsearch.core-impl-VERSION.jar
@@ -37,7 +37,7 @@ Check that all the modules are deployed correctly.
 
 ### Step 2
 
-Download the module default configurations for your portal version. You can find the latest in [configs folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest/configs). Copy those into LIFERAY_HOME/osgi/configs. 
+Download the module default configurations for your portal version. You can find those in the *configs* subfolder in the binaries folder (https://github.com/peerkar/liferay-gsearch/tree/master/binaries). Copy those into LIFERAY_HOME/osgi/configs. 
 
 ### Step 3 
 
@@ -51,7 +51,7 @@ Find out the compatible adapter version for your portal versions in [compatibili
 
 Notice, that when using custom adapter on __7.1__, a __standalone Elasticsearch server has to be used__ as the analyzers use stemmer filter which is not supported in the embedded server.
 
-Download and deploy the jar from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
+Download and deploy the jar compatible for your portal version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 Check that module installs correctly. When installing, this module tries to disable the standard adapter and might cause errors to log. Give it a minute to finish the process.
 
