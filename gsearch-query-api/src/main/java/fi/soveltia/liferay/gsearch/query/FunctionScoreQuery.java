@@ -4,7 +4,7 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.generic.StringQuery;
 
 /**
- *  Function Score Query for GSearch.
+ *  Function Score Query.
  * 
  * This is made as an example and as an extension of StringQuery to avoid customizations
  * to the portal search API (QueryVisitor interface should be overridden).
@@ -111,8 +111,8 @@ public abstract class FunctionScoreQuery extends StringQuery implements Query {
 		_scoreMode = scoreMode;
 	}	
 
-	private String _boostMode;
-	private Float _maxBoost;
-	private Float _minScore;
-	private String _scoreMode;
+	protected String _boostMode;
+	protected Float _maxBoost;
+	protected Float _minScore;
+	protected String _scoreMode;
 }
