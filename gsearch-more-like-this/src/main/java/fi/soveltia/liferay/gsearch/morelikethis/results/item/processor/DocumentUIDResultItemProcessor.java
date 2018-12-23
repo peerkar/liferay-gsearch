@@ -13,7 +13,7 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 
 /**
- * Add geolocation properties required for the maps result layout.
+ * Adds index document uid to results for use in More Like This query.
  * 
  * @author Petteri Karttunen
  */
@@ -40,10 +40,10 @@ public class DocumentUIDResultItemProcessor implements ResultItemProcessor {
 		Document document, ResultItemBuilder resultItemBuilder, JSONObject resultItem)
 		throws Exception {
 		
-		if (queryParams.getExtraParams() == null ||
-			queryParams.getExtraParams().get("includeDocUID") == null) {
+		if (queryParams.getExtraParams().get("includeDocUID") == null) {
 			return;
 		}
+		
 		resultItem.put("uid", document.get("uid"));
 	}
 }

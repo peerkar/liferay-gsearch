@@ -9,7 +9,9 @@ import org.osgi.service.component.annotations.Component;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
 
 /**
- * @author liferay
+ * Liferay GSearch More Like This.
+ * 
+ * @author Petteri Karttunen
  */
 @Component(
 	immediate = true,

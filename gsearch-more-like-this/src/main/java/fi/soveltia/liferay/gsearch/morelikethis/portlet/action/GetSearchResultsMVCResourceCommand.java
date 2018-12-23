@@ -11,8 +11,10 @@ import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -20,15 +22,27 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.wiki.model.WikiPage;
+import com.liferay.wiki.service.WikiNodeLocalService;
+import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.portlet.PortletPreferences;
+import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +51,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
 
@@ -67,6 +82,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		AssetEntry assetEntry =
 			getAssetEntry(resourceRequest, resourceResponse);
 
+		System.out.println(assetEntry);
+
 		if (assetEntry == null) {
 			return;
 		}
@@ -75,7 +92,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			getMoreLikeThis(resourceRequest, resourceResponse, assetEntry);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			_log.error(e, e);
 		}
 	}
 
@@ -107,7 +124,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		String currentFriendlyURL = resourceRequest.getParameter("currentURL");
 
 		String assetUrlOrId = null;
-
+		
 		if (currentFriendlyURL.indexOf(layoutURL) < 0) {
 
 			int pos = currentFriendlyURL.indexOf("/-/");
@@ -143,8 +160,24 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 				BlogsEntry blogsEntry = getBlogsEntry(assetUrlOrId);
 				assetEntry = _assetEntryLocalService.getEntry(BlogsEntry.class.getName(), blogsEntry.getPrimaryKey());
 			}
-		}
+		} else {
+			
+			// Try to get wiki page resourcePrimKey.
+	
+			String[] urlParts = currentFriendlyURL.split("&");
+			
+			for (String s : urlParts) {
+				
+				if (s.startsWith("_com_liferay_wiki_web_portlet_WikiPortlet_pageResourcePrimKey")) {
+					
+					String[] valueParts = s.split("=");
+					assetEntry = _assetEntryLocalService.getEntry(WikiPage.class.getName(), Long.valueOf(valueParts[1]));
 
+					break;
+				}
+				
+			}
+		}
 		return assetEntry;
 
 	}
@@ -186,7 +219,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
         }
         return null;
 	}
-	
+
 	/**
 	 * Try to find the Elasticsearch document uid value for a single contents
 	 * being shown.
@@ -204,32 +237,37 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
+		PortletPreferences preferences = resourceRequest.getPreferences();
+		
 		// Build query parameters object.
 
 		QueryParams queryParams = new QueryParams();
+
+		queryParams.setAssetTypeConfiguration(new String[0]);
+		queryParams.setClauseConfiguration(getResolveUIDClauseConfiguration(preferences));
+		queryParams.setFacetConfiguration(new String[0]);
+		queryParams.setSortConfiguration(new String[0]);
+		
 		queryParams.setCompanyId(themeDisplay.getCompanyId());
+		queryParams.setGroupIds(new long[] {assetEntry.getGroupId()});
 		queryParams.setLocale(themeDisplay.getLocale());
+	
 		queryParams.setStart(0);
 		queryParams.setEnd(1);
 		queryParams.setPageSize(1);
 
+		List<String> entryClassNames = new ArrayList<String>();
+		entryClassNames.add(assetEntry.getClassName());
+		queryParams.setEntryClassNames(entryClassNames);
+		
+		queryParams.setAssetPublisherPageURL(preferences.getValue("assetPublisherPage", ""));
+
 		queryParams.setKeywords("entryClassPK: " + assetEntry.getClassPK());
-
-		List<String> classNames = new ArrayList<String>();
-		classNames.add(assetEntry.getClassName());
-		queryParams.setClassNames(classNames);
-
-		queryParams.setGroupIds(
-			new long[] {
-				assetEntry.getGroupId()
-			});
 
 		// This extra param adds docUID to the response.
 		// We won't share the UID publicly.
-
-		Map<String, Object> extraParams = new HashMap<String, Object>();
-		extraParams.put("includeDocUID", true);
-		queryParams.setExtraParams(extraParams);
+		
+		queryParams.addExtraParam("includeDocUID", true);
 
 		// Try to get search results.
 
@@ -243,6 +281,9 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 				responseObject.getJSONArray("items").getJSONObject(0);
 			docUID = item.getString("uid");
 		}
+
+		System.out.println(docUID);
+		
 		return docUID;
 	}
 
@@ -264,6 +305,27 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
         }
         return null;
 	}	
+	
+	/**
+	 * Get localization.
+	 * 
+	 * @param key
+	 * @param locale
+	 * @param objects
+	 * @return
+	 */
+	private String getLocalization(
+		String key, Locale locale, Object... objects) {
+
+		if (_resourceBundle == null) {
+			_resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
+		}
+
+		String value =
+			ResourceBundleUtil.getString(_resourceBundle, key, objects);
+
+		return value == null ? _language.format(locale, key, objects) : value;
+	}
 	
 	/**
 	 * Get more like this list.
@@ -290,50 +352,69 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		PortletPreferences preferences = resourceRequest.getPreferences();
 
-		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
-			preferences.getValue("queryConfiguration", null));
-
 		// Build query parameters object.
 
 		QueryParams queryParams = new QueryParams();
-
-		int itemsToShow =
-			GetterUtil.getInteger(preferences.getValue("itemsToShow", "5"));
-		int end = itemsToShow - 1;
-
+		
+		// Set configurations.
+		
+		queryParams.setClauseConfiguration(getMoreLikeThisClauseConfiguration(preferences));
+		queryParams.setFacetConfiguration(new String[0]);
+		
 		queryParams.setCompanyId(themeDisplay.getCompanyId());
+		queryParams.setGroupIds(new long[0]);
 		queryParams.setLocale(themeDisplay.getLocale());
 		queryParams.setStart(0);
-		queryParams.setEnd(end);
+		
+		queryParams.setStatus(WorkflowConstants.STATUS_APPROVED);
+
+		int itemsToShow = GetterUtil.getInteger(preferences.getValue("itemsToShow", "5"));
+		queryParams.setEnd(itemsToShow - 1);
 		queryParams.setPageSize(itemsToShow);
-		queryParams.setResultsLayout(
-			preferences.getValue("resultLayout", "list"));
+
+		queryParams.setViewResultsInContext(true);
+		queryParams.setAssetPublisherPageURL(preferences.getValue("assetPublisherPage", ""));
 
 		JSONArray classNameArray = JSONFactoryUtil.createJSONArray(preferences.getValue("classNames", ""));
 
-		List<String> classNames = new ArrayList<String>();
+		List<String> entryClassNames = new ArrayList<String>();
 
 		for (Object item : classNameArray) {
-			classNames.add((String) item);
+			entryClassNames.add((String) item);
 		}
-		queryParams.setClassNames(classNames);
+		queryParams.setEntryClassNames(entryClassNames);
 		
-		queryParams.setGroupIds(new long[] {});
-
 		// This extra param adds docUID to the response.
 		// We won't share the UID publicly.
 
-		Map<String, Object> extraParams = new HashMap<String, Object>();
-		extraParams.put("docUID", docUID);
-		queryParams.setExtraParams(extraParams);
+		queryParams.addExtraParam("docUID", docUID);
 
+		String resultLayout = preferences.getValue("resultLayout", "list");
+		
+		// Include thumbnail?
+		
+		if (resultLayout.equals("thumbnailList") ||
+			resultLayout.equals("image")) {
+
+			queryParams.addExtraParam("includeThumbnail", true);	
+		}
+
+		// Include user initials?
+		
+		if (resultLayout.equals("userImageList") ||
+			resultLayout.equals("image")) {
+
+			queryParams.addExtraParam("includeUserPortrait", true);	
+		}
+		
 		// Try to get search results.
 
 		JSONObject responseObject = null;
 
 		try {
-			responseObject = _gSearch.getSearchResults(
-				resourceRequest, resourceResponse, queryParams, queryConfiguration, true, false);
+			responseObject = _gSearch.getSearchResults(resourceRequest, resourceResponse, queryParams);
+
+			setResultTypeLocalizations(resourceRequest, responseObject);
 		}
 		catch (Exception e) {
 
@@ -341,12 +422,105 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			return;
 		}
-
+		
 		// Write response to output stream.
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
 	}
+	
+	/**
+	 * Get query clause configuration for MLT query.
+	 * 
+	 * @param preferences
+	 * @return
+	 * @throws JSONException
+	 */
+	private String[] getMoreLikeThisClauseConfiguration(PortletPreferences preferences) throws JSONException {
+		
+		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
+			preferences.getValue("moreLikeThisClauses", null));
+
+		if (queryConfiguration == null || queryConfiguration.length() == 0) {
+			return new String[0];
+		}
+
+		String[] configuration = new String[queryConfiguration.length()];
+		
+		for (int i = 0; i < queryConfiguration.length(); i++) {
+			configuration[i] = queryConfiguration.getString(i);
+		}
+		
+		return configuration;
+	}
+
+	/**
+	 * Get query clause configuration for resolving document UID.
+	 * 
+	 * @param preferences
+	 * @return
+	 * @throws JSONException
+	 */
+	private String[] getResolveUIDClauseConfiguration(PortletPreferences preferences) throws JSONException {
+		
+		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
+			preferences.getValue("resolveUIDClauses", null));
+
+		if (queryConfiguration == null || queryConfiguration.length() == 0) {
+			return new String[0];
+		}
+
+		String[] configuration = new String[queryConfiguration.length()];
+		
+		for (int i = 0; i < queryConfiguration.length(); i++) {
+			configuration[i] = queryConfiguration.getString(i);
+		}
+		
+		return configuration;
+	}	
+	
+	/**
+	 * Localize result types.
+	 * 
+	 * @param portletRequest
+	 * @param responseObject
+	 * @throws JSONException 
+	 */
+	private void setResultTypeLocalizations(PortletRequest portletRequest, JSONObject responseObject) throws JSONException {
+		
+		String[]configuration = _configurationHelper.getAssetTypeConfiguration();
+		
+		Locale locale = portletRequest.getLocale();
+		
+		JSONArray items = responseObject.getJSONArray("items");
+		
+		if (items == null || items.length() == 0) {
+			return;
+		}
+		
+		for (int i = 0; i < items.length(); i++) {
+			
+			JSONObject resultItem = items.getJSONObject(i);
+
+			for (int j = 0; j < configuration.length; j++) {
+				
+				JSONObject configurationItem = JSONFactoryUtil.createJSONObject(configuration[i]);
+				
+				if (configurationItem.getString("entry_class_name").equalsIgnoreCase(resultItem.getString("type"))) {
+					resultItem.put("key", configurationItem.getString("key"));
+					break;
+				}
+			}
+			
+			resultItem.put(
+				"type", getLocalization(
+					resultItem.getString("type").toLowerCase(), locale));
+		}
+	}		
+		
+	
+	private static final Log _log =
+					LogFactoryUtil.getLog(GetSearchResultsMVCResourceCommand.class);
 	
 	private static final String JOURNAL_KEY = "/content/";
 	private static final String DL_KEY = "/document/id/";
@@ -358,13 +532,28 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 	@Reference
 	BlogsEntryLocalService _blogsEntryLocalService;
-	
+
+	@Reference
+	private ConfigurationHelper _configurationHelper;
+
 	@Reference
 	private JournalArticleLocalService _journalArticleLocalService;
 
 	@Reference
 	private GSearch _gSearch;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(GetSearchResultsMVCResourceCommand.class);
+	@Reference
+	private Language _language;
+	
+	private ResourceBundle _resourceBundle;
+
+	@Reference(
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", 
+		unbind = "-"
+	)
+	private ResourceBundleLoader _resourceBundleLoader;
+	
+	@Reference
+	private WikiPageLocalService _wikiPageLocalService;
 }
+

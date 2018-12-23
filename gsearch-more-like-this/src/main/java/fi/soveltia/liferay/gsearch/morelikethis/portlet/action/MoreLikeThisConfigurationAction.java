@@ -8,6 +8,11 @@ import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
 
+/**
+ * 
+ * @author Petteri Karttunen
+ *
+ */
 @Component(
 	immediate = true,
 	property = "javax.portlet.name=" + GSearchMoreLikeThisPortletKeys.MORE_LIKE_THIS_PORTLET,

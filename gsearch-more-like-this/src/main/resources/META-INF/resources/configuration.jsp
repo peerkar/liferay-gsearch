@@ -1,16 +1,14 @@
-<%@page import="javax.portlet.PortletPreferences"%>
-<%@page import="com.liferay.portal.kernel.util.Constants"%>
-
 <%@ include file="/init.jsp" %>
 
 <%
 	
 	PortletPreferences preferences = renderRequest.getPreferences();
-	String queryConfiguration = preferences.getValue("queryConfiguration", "");
+	String resolveUIDClauses = preferences.getValue("resolveUIDClauses", "");
+	String moreLikeThisClauses = preferences.getValue("moreLikeThisClauses", "");
 	String resultLayout = preferences.getValue("resultLayout", "list");
 	String itemsToShow = preferences.getValue("itemsToShow", "5");
 	String classNames = preferences.getValue("classNames", "");
-
+	String assetPublisherPage = preferences.getValue("assetPublisherPage", "/viewasset");
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />
@@ -30,7 +28,11 @@
 	
 		<aui:input name="cmd" type="hidden" value="update" />
 		
-		<aui:input label="query-configuration-name" name="preferences--queryConfiguration--" type="textarea" value="<%=queryConfiguration %>" />
+		<aui:input label="asset-publisher-page" name="preferences--assetPublisherPage--" type="text" value="<%=assetPublisherPage %>" />
+
+		<aui:input label="resolve-uid-clause-configuration-name" name="preferences--resolveUIDClauses--" type="textarea" value="<%=resolveUIDClauses %>" />
+
+		<aui:input label="more-like-this-clause-configuration-name" name="preferences--moreLikeThisClauses--" type="textarea" value="<%=moreLikeThisClauses %>" />
 
 		<aui:input label="classnames-configuration-name" name="preferences--classNames--" type="textarea" value="<%=classNames %>" />
 
