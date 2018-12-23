@@ -5,6 +5,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Sort;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -16,26 +17,110 @@ import java.util.Map;
  */
 public class QueryParams {
 
+	// Configurations
+
+	private String[] clauseConfiguration;
+	private String[] facetConfiguration;
+	private String[] assetTypeConfiguration;
+	private String[] sortConfiguration;
+
+	// Basic filter params
+
 	private long companyId;
 	private long[] groupIds;
 	private Locale locale;
-	long userId;
+	private long userId;
 
-	private List<String> classNames;
+	// Query params
+
+	private List<String> entryClassNames;
 	private Map<FacetParam, BooleanClauseOccur> facetParams;
 	private String keywords;
 	private String originalKeywords;
-	private String resultsLayout;
 	private Integer status;
 	private Date timeFrom = null;
 	private Date timeTo = null;
+
+	// Paging and sorting
 
 	private int start;
 	private int end;
 	private int pageSize;
 	private Sort[] sorts;
 
-	private Map<String, Object> extraParams;
+	// Other parameters
+
+	private String assetPublisherPageURL = null;
+	private boolean viewResultsInContext = false;
+
+	// Additional index fields to be included in the
+	// result items.
+
+	private Map<String, Class<?>> additionalResultFields =
+		new HashMap<String, Class<?>>();
+
+	// Any extra parameters.
+
+	private Map<String, Object> extraParams = new HashMap<String, Object>();
+
+	public void addAdditionalResultField(String key, Class<?> value) {
+
+		additionalResultFields.put(key, value);
+	}
+
+	public Map<String, Class<?>> getAdditionalResultFields() {
+
+		return additionalResultFields;
+	}
+
+	/**
+	 * These fields are added (as such) to the result items. Map value can be
+	 * used for typing the field.
+	 * 
+	 * @param additionalResultFields
+	 */
+	public void setAdditionalResultFields(
+		Map<String, Class<?>> additionalResultFields) {
+
+		this.additionalResultFields = additionalResultFields;
+	}
+
+	public String getAssetPublisherPageURL() {
+
+		return assetPublisherPageURL;
+	}
+
+	/**
+	 * Set Asset Publisher page URL. A friendly URL to a page having an asset
+	 * publisher for showing assets (Web Contents) which are not bound to any
+	 * layout.
+	 * 
+	 * @param assetPublisherPageURL
+	 */
+	public void setAssetPublisherPageURL(String assetPublisherPageURL) {
+
+		this.assetPublisherPageURL = assetPublisherPageURL;
+	}
+
+	public String[] getAssetTypeConfiguration() {
+
+		return assetTypeConfiguration;
+	}
+
+	public void setAssetTypeConfiguration(String[] assetTypeConfiguration) {
+
+		this.assetTypeConfiguration = assetTypeConfiguration;
+	}
+
+	public String[] getClauseConfiguration() {
+
+		return clauseConfiguration;
+	}
+
+	public void setClauseConfiguration(String[] clauseConfiguration) {
+
+		this.clauseConfiguration = clauseConfiguration;
+	}
 
 	public long getCompanyId() {
 
@@ -45,6 +130,71 @@ public class QueryParams {
 	public void setCompanyId(long companyId) {
 
 		this.companyId = companyId;
+	}
+
+	public int getEnd() {
+
+		return end;
+	}
+
+	public void setEnd(int end) {
+
+		this.end = end;
+	}
+
+	public List<String> getEntryClassNames() {
+
+		return entryClassNames;
+	}
+
+	public void setEntryClassNames(List<String> entryClassNames) {
+
+		this.entryClassNames = entryClassNames;
+	}
+
+	public void addExtraParam(String key, Object value) {
+
+		extraParams.put(key, value);
+	}
+
+	public Map<String, Object> getExtraParams() {
+
+		return extraParams;
+	}
+
+	/**
+	 * Set extra parameters. These parameters can include any instructions from
+	 * the calling client to the backend. By default these are used to indicate
+	 * whether thumbnail or user portrait should be included in the results. As
+	 * they are not indexed fields we cannot use additionalResultFields for the
+	 * purpose.
+	 * 
+	 * @param extraParams
+	 */
+	public void setExtraParams(Map<String, Object> extraParams) {
+
+		this.extraParams = extraParams;
+	}
+
+	public String[] getFacetConfiguration() {
+
+		return facetConfiguration;
+	}
+
+	public void setFacetConfiguration(String[] facetConfiguration) {
+
+		this.facetConfiguration = facetConfiguration;
+	}
+
+	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
+
+		return facetParams;
+	}
+
+	public void setFacetParams(
+		Map<FacetParam, BooleanClauseOccur> facetParams) {
+
+		this.facetParams = facetParams;
 	}
 
 	public long[] getGroupIds() {
@@ -77,37 +227,6 @@ public class QueryParams {
 		this.userId = userId;
 	}
 
-	public List<String> getClassNames() {
-
-		return classNames;
-	}
-
-	public void setClassNames(List<String> classNames) {
-
-		this.classNames = classNames;
-	}
-
-	public Map<String, Object> getExtraParams() {
-
-		return extraParams;
-	}
-
-	public void setExtraParams(Map<String, Object> extraParams) {
-
-		this.extraParams = extraParams;
-	}
-
-	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
-
-		return facetParams;
-	}
-
-	public void setFacetsParams(
-		Map<FacetParam, BooleanClauseOccur> facetParams) {
-
-		this.facetParams = facetParams;
-	}
-
 	public String getKeywords() {
 
 		return keywords;
@@ -128,14 +247,34 @@ public class QueryParams {
 		this.originalKeywords = originalKeywords;
 	}
 
-	public String getResultsLayout() {
+	public int getPageSize() {
 
-		return resultsLayout;
+		return pageSize;
 	}
 
-	public void setResultsLayout(String resultsLayout) {
+	public void setPageSize(int pageSize) {
 
-		this.resultsLayout = resultsLayout;
+		this.pageSize = pageSize;
+	}
+
+	public String[] getSortConfiguration() {
+
+		return sortConfiguration;
+	}
+
+	public void setSortConfiguration(String[] sortConfiguration) {
+
+		this.sortConfiguration = sortConfiguration;
+	}
+
+	public Sort[] getSorts() {
+
+		return sorts;
+	}
+
+	public void setSorts(Sort[] sorts) {
+
+		this.sorts = sorts;
 	}
 
 	public Integer getStatus() {
@@ -178,33 +317,19 @@ public class QueryParams {
 		this.start = start;
 	}
 
-	public int getEnd() {
+	public boolean isViewResultsInContext() {
 
-		return end;
+		return viewResultsInContext;
 	}
 
-	public void setEnd(int end) {
+	/**
+	 * Should we show the results in context?
+	 * 
+	 * @param viewResultsInContext
+	 */
+	public void setViewResultsInContext(boolean viewResultsInContext) {
 
-		this.end = end;
+		this.viewResultsInContext = viewResultsInContext;
 	}
 
-	public int getPageSize() {
-
-		return pageSize;
-	}
-
-	public void setPageSize(int pageSize) {
-
-		this.pageSize = pageSize;
-	}
-
-	public Sort[] getSorts() {
-
-		return sorts;
-	}
-
-	public void setSorts(Sort[] sort) {
-
-		this.sorts = sort;
-	}
 }

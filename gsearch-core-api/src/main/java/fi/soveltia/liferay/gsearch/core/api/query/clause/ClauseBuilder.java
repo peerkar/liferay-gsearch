@@ -4,6 +4,8 @@ package fi.soveltia.liferay.gsearch.core.api.query.clause;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Query;
 
+import javax.portlet.PortletRequest;
+
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
@@ -19,13 +21,14 @@ public interface ClauseBuilder {
 	/**
 	 * Build clause.
 	 * 
-	 * @param configurationObject
+	 * @param portletRequest
+	 * @param configuration
 	 * @param queryParams
 	 * @return Query object
 	 * @throws Exception
 	 */
-	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+	public Query buildClause(PortletRequest portletRequest,
+		JSONObject configuration, QueryParams queryParams)
 		throws Exception;	
 
 	/**

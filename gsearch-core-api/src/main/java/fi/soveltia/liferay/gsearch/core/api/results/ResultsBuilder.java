@@ -11,7 +11,9 @@ import javax.portlet.PortletResponse;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Results builder interface. Implementations of this interface build the search
+ * Results builder interface. 
+ * 
+ * Implementations of this interface build a search
  * results object.
  * 
  * @author Petteri Karttunen
@@ -23,11 +25,10 @@ public interface ResultsBuilder {
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
+	 * @param queryParams
+	 * @param searchContext
 	 * @param hits
-	 *            hits object
-	 * @param GSearchConfiguration
-	 *            portlet configuration object
-	 * @return search results as a JSON array
+	 * @return
 	 */
 	public JSONObject buildResults(
 		PortletRequest portletRequest, PortletResponse portletResponse,

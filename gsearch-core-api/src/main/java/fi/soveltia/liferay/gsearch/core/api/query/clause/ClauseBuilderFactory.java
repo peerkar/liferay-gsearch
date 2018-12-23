@@ -2,7 +2,9 @@
 package fi.soveltia.liferay.gsearch.core.api.query.clause;
 
 /**
- * Clause builder factory. This service return a clause builder specific for the
+ * Clause builder factory. 
+ * 
+ * This service return a clause builder specific for the
  * query type (MatchQuery, QueryStrinQuery etc.)
  * 
  * @author Petteri Karttunen

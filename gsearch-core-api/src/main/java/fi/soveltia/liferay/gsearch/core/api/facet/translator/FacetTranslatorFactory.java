@@ -2,9 +2,10 @@
 package fi.soveltia.liferay.gsearch.core.api.facet.translator;
 
 /**
- * Facet translator factory. {@see FacetTranslator}
+ * Facet translator factory.
  * 
  * @author Petteri Karttunen
+ * 
  */
 public interface FacetTranslatorFactory {
 

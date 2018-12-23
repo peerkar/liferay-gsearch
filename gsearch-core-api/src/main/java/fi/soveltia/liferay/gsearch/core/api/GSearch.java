@@ -1,7 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.api;
 
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import javax.portlet.PortletRequest;
@@ -10,7 +9,7 @@ import javax.portlet.PortletResponse;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * GSearch service. This service is responsible for getting the search results.
+ * GSearch service.
  * 
  * @author Petteri Karttunen
  */
@@ -29,23 +28,24 @@ public interface GSearch {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryParams queryParams)
 		throws Exception;
-	
+
 	/**
 	 * Get search results.
+	 * 
+	 * This overload gives a possibility to override 
+	 * the system wide core configuration.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param queryParams
-	 * @param queryConfiguration
 	 * @param executeQueryPostProcessors
 	 * @param processQueryContributors
-	 * @return search results JSON object
+	 * @return
 	 * @throws Exception
 	 */
 	public JSONObject getSearchResults(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams, JSONArray queryConfiguration, 
-		boolean executeQuerypostProcessors, boolean processQueryContributors)
+		QueryParams queryParams, boolean executeQueryPostProcessors, 
+		boolean processQueryContributors)
 		throws Exception;
-	
 }

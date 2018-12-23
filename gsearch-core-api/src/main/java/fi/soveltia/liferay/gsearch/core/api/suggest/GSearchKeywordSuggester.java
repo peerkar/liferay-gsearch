@@ -13,7 +13,7 @@ import javax.portlet.PortletRequest;
 public interface GSearchKeywordSuggester {
 
 	/**
-	 * Get keyword suggestions as JSON Array
+	 * Get keyword suggestions as JSON array.
 	 * 
 	 * @param portletRequest
 	 * @return suggestions JSON array
@@ -24,7 +24,7 @@ public interface GSearchKeywordSuggester {
 		throws Exception;
 
 	/**
-	 * Get keyword suggestions as string Array
+	 * Get keyword suggestions as string array.
 	 * 
 	 * @param portletRequest
 	 * @return suggestions JSON array

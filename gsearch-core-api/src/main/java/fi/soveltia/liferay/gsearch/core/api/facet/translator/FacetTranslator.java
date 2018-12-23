@@ -22,11 +22,12 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 public interface FacetTranslator {
 
 	/**
-	 * Set translators facet name.
+	 * Check if this translator can handle the facet.
 	 * 
-	 * @param facetName
+	 * @param queryType
+	 * @return
 	 */
-	public void setFacetName(String facetName);
+	public boolean canTranslate(String facetName);
 	
 	/**
 	 * Translate search result values for UI.

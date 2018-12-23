@@ -27,7 +27,7 @@ public class GSearchWebKeys implements WebKeys {
 	
 	public static final String FILTER_TYPE = "type";
 
-	public static final String GMAP_API_KEY = "googleMapAPIKey";
+	public static final String GMAPS_API_KEY = "googleMapsAPIKey";
 
 	public static final String HELP_TEXT = "helpText";
 
