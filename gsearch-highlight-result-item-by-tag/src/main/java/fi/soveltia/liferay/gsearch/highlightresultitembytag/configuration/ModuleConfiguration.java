@@ -10,7 +10,7 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.highlightresultitembytag.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "GSearch Highlight Result Item by Tag"
+	name = "Highlight Result Item by Tag"
 )
 public interface ModuleConfiguration {
 		
