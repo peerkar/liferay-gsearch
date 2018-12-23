@@ -7,7 +7,7 @@ This application gives you full control over query configuration and relevance a
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
 ## News
-* __(2018-11-15)__ Major version update, including:
+* __(2018-12-23)__ Major version update, including:
 	* Streamlined custom Elasticsearch adapter installation: no more flooding to log
 	* Added a possibility to override facets, query and assettypes configuration from  client callin the core
 	* New a basic default item builder. Now most asset types can be added in the search without a need to write a new result item builder.
