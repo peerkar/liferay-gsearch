@@ -33,7 +33,9 @@ This application gives you full control over query configuration and relevance a
 
 ## Quick Full Installation Guide
 
-__Important!__: The master branch (module major version 3) are __for Liferay 7.1 only__. These instructions apply only for __DXP Fixpack 2 and above__.
+__Important!__: The master branch (module major version 3) are __for Liferay 7.1 only__. 
+
+Instructions below only apply for __7.1 DXP Fixpack 2 and above__.
 
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
