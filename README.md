@@ -70,7 +70,7 @@ Place the GSearch portlet on some page and test.
 
 ## Known Issues
 
-For keyword suggester to work, you have to update the custom Elasticsearch adapter. Run "update BUNDLE_ID" in Gogo shell and you're good.
+For keyword suggester to work, you have to update the custom Elasticsearch adapter OSGi bundle. Run "update BUNDLE_ID" in Gogo shell and you're good.
 
 There's currently a bug in 7.1 Soy framework generating lots of log data. For now please set a logging level for  com.liferay.portal.portlet.bridge.soy.internal.SoyPortlet to "OFF". Issue can be found here: https://issues.liferay.com/browse/LPS-85186 
  
