@@ -8,6 +8,8 @@ package fi.soveltia.liferay.gsearch.mini.web.constants;
  */
 public class GSearchMiniResourceKeys {
 
-	public static final String GET_SUGGESTIONS = "get_suggestions";
+	public static final String GET_CONTENT_SUGGESTIONS = "get_content_suggestions";
+
+	public static final String GET_KEYWORD_SUGGESTIONS = "get_keyword_suggestions";
 
 }

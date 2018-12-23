@@ -23,4 +23,6 @@
 	Integer requestTimeout = (Integer)request.getAttribute(GSearchMiniWebKeys.REQUEST_TIMEOUT);
 	String searchPageURL = (String)request.getAttribute(GSearchMiniWebKeys.SEARCHPAGE_URL);
 	String suggestionsURL = (String)request.getAttribute(GSearchMiniWebKeys.SUGGESTIONS_URL);
+	
+	String suggestMode = (String)request.getAttribute(GSearchMiniWebKeys.SUGGEST_MODE);
 %>

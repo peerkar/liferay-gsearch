@@ -10,7 +10,7 @@ import org.osgi.service.component.annotations.Component;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 
 /**
- * GSearch miniportlet class.
+ * Liferay GSearch miniportlet class.
  * 
  * @author Petteri Karttunen
  */
@@ -25,8 +25,6 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 		"com.liferay.portlet.instanceable=true",
 		"com.liferay.portlet.layout-cacheable=true",
 		"com.liferay.portlet.preferences-owned-by-group=true",
-		"com.liferay.portlet.private-request-attributes=false",
-		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
 		"com.liferay.portlet.requires-namespaced-parameters=false",
 		"com.liferay.portlet.scopeable=false",

@@ -141,13 +141,17 @@
 
         var pattern = '(' + utils.escapeRegExChars(currentValue) + ')';
 
+        // Gsearch modified (--BR--, --H1---)
+        
         return suggestion.value
             .replace(new RegExp(pattern, 'gi'), '<strong>$1<\/strong>')
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
-            .replace(/&lt;(\/?strong)&gt;/g, '<$1>');
+            .replace(/&lt;(\/?strong)&gt;/g, '<$1>')
+        	.replace(/---H1--/g, '<h1>')
+        	.replace(/--H1---/g, '</h1>');
     };
 
     function _formatGroup(suggestion, category) {
@@ -168,7 +172,11 @@
             // https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion
             // some browsers e.g. Google Chrome ignore autocomplete=off but autocomplete=nope
             // will provide the correct behaviour
-            that.element.setAttribute('autocomplete', 'nope');
+            
+            // GSearch modified. This doesn't work on some browsers.
+
+            //that.element.setAttribute('autocomplete', 'nope');
+            that.element.setAttribute('autocomplete', 'off');
 
             // html() deals with many types: htmlString or Element or Array or jQuery
             that.noSuggestionsContainer = $('<div class="autocomplete-no-suggestion"></div>')

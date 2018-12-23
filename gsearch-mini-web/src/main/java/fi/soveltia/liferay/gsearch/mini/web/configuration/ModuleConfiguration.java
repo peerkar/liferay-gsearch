@@ -17,9 +17,27 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "GSearch Mini Portlet"
+	name = "Mini Portlet"
 )
 public interface ModuleConfiguration {
+
+	@Meta.AD(
+		deflt = "keywords", 
+	    description = "suggest-mode-desc",
+	    name = "suggest-mode-name",
+	    optionLabels = {"Keywords", "Contents"},
+	    optionValues = {"keywords", "contents"},
+		required = false
+	)
+	public String suggestMode();
+
+	@Meta.AD(
+		deflt = "7", 
+	    name = "content-suggestions-count-name",
+		required = false
+	)
+	public int contentSuggestionsCount();
+	
 	
 	@Meta.AD(
 		deflt = "/search", 
@@ -28,6 +46,30 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public String searchPortletPage();
+
+	@Meta.AD(
+		deflt = "/viewasset", 
+	    name = "asset-publisher-page-name",
+	    description = "asset-publisher-page-desc",
+		required = false
+	)
+	public String assetPublisherPage();	
+	
+	@Meta.AD(
+		deflt = "/search", 
+	    name = "hide-on-pages-name",
+	    description = "hide-on-pages-desc",
+		required = false
+	)
+	public String[] hideOnPages();
+	
+	@Meta.AD(
+		deflt = "false", 
+		description = "view-in-context-desc",
+	    name = "view-in-context-name",
+		required = false
+	)
+	public boolean isViewResultsInContext();	
 	
 	@Meta.AD(
 		deflt = "3", 

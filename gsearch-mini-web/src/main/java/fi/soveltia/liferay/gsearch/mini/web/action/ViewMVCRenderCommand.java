@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.mini.web.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -28,7 +29,6 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniWebKeys;
  * 
  * @author Petteri Karttunen
  */
-
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
 	immediate = true, 
@@ -47,78 +47,106 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		if (_log.isDebugEnabled()) {
 			_log.debug("ViewMVCRenderCommand.render()");
 		}
-				
-		// Hide portlet if we are on the search page
 
-		if (getCurrentFriendlyURL(renderRequest).equals(_moduleConfiguration.searchPortletPage())) {
-			renderRequest.setAttribute(WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
+		// Hide portlet on defined pages
+
+		String[] hiddenPages = _moduleConfiguration.hideOnPages();
+
+		for (String page : hiddenPages) {
+
+			if (getCurrentFriendlyURL(renderRequest).equals(page)) {
+				renderRequest.setAttribute(
+					WebKeys.PORTLET_CONFIGURATOR_VISIBILITY, false);
+			}
 		}
-		
+
 		// Autocomplete on/off.
-		
+
 		renderRequest.setAttribute(
-			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED, 
+			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED,
 			_moduleConfiguration.enableAutoComplete());
 
 		// Autocomplete request delay.
-		
+
 		renderRequest.setAttribute(
-			GSearchMiniWebKeys.AUTO_COMPLETE_REQUEST_DELAY, 
+			GSearchMiniWebKeys.AUTO_COMPLETE_REQUEST_DELAY,
 			_moduleConfiguration.autoCompleteRequestDelay());
-		
+
 		// Set request timeout.
-		
+
 		renderRequest.setAttribute(
 			GSearchMiniWebKeys.REQUEST_TIMEOUT,
 			_moduleConfiguration.requestTimeout());
-		
+
 		// Set query min length.
-		
+
 		renderRequest.setAttribute(
 			GSearchMiniWebKeys.QUERY_MIN_LENGTH,
 			_moduleConfiguration.queryMinLength());
-				
+
 		// Set search page url.
 
 		renderRequest.setAttribute(
-			GSearchMiniWebKeys.SEARCHPAGE_URL, _portal.getPortalURL(renderRequest) +
-			  _moduleConfiguration.searchPortletPage());
-				
+			GSearchMiniWebKeys.SEARCHPAGE_URL,
+			_portal.getPortalURL(renderRequest) +
+				_moduleConfiguration.searchPortletPage());
+
 		// Set autocomplete/suggestions resource url.
 
-		renderRequest.setAttribute(
-			GSearchMiniWebKeys.SUGGESTIONS_URL,
-			createResourceURL(renderResponse, GSearchMiniResourceKeys.GET_SUGGESTIONS));
-		
+		if (_moduleConfiguration.suggestMode().equals("contents")) {
+
+			renderRequest.setAttribute(
+				GSearchMiniWebKeys.SUGGESTIONS_URL,
+				createResourceURL(
+					renderResponse,
+					GSearchMiniResourceKeys.GET_CONTENT_SUGGESTIONS));
+			
+			renderRequest.setAttribute(
+				GSearchMiniWebKeys.SUGGEST_MODE, "contents");
+
+		}
+		else {
+
+			renderRequest.setAttribute(
+				GSearchMiniWebKeys.SUGGESTIONS_URL,
+				createResourceURL(
+					renderResponse,
+					GSearchMiniResourceKeys.GET_KEYWORD_SUGGESTIONS));
+			
+			renderRequest.setAttribute(
+				GSearchMiniWebKeys.SUGGEST_MODE, "keywords");
+		}
+
 		return "/view.jsp";
 	}
-	
+
 	@Activate
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
+
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
 	}
-	
+
 	/**
 	 * Create resource URL for a resourceId
 	 * 
 	 * @param renderResponse
 	 * @param resourceId
-	 * 
 	 * @return url string
 	 */
-	protected String createResourceURL(RenderResponse renderResponse, String resourceId) {
+	protected String createResourceURL(
+		RenderResponse renderResponse, String resourceId) {
 
 		ResourceURL portletURL = renderResponse.createResourceURL();
 
 		portletURL.setResourceID(resourceId);
 
 		return portletURL.toString();
-	}	
+	}
 
 	protected String getCurrentFriendlyURL(RenderRequest renderRequest) {
-		
+
 		String url = _portal.getCurrentURL(renderRequest);
 
 		if (url.length() > 0 && url.indexOf("?") > 0) {
@@ -126,16 +154,13 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		}
 		return url;
 	}
-	
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
-		_portal = portal;
-	}
-	
+
+	private static final Log _log =
+		LogFactoryUtil.getLog(ViewMVCRenderCommand.class);
+
 	private volatile ModuleConfiguration _moduleConfiguration;
 
+	@Reference
 	private Portal _portal;
-	
-	private static final Log _log = LogFactoryUtil.getLog(
-		ViewMVCRenderCommand.class);
+
 }

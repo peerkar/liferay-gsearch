@@ -19,5 +19,7 @@ public class GSearchMiniWebKeys {
 
 	public static final String SEARCHPAGE_URL = "miniSearchPageURL";
 
+	public static final String SUGGEST_MODE = "miniSuggestMode";
+
 	public static final String SUGGESTIONS_URL = "miniSuggestionsURL";
 }
