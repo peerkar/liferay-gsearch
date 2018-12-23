@@ -8,13 +8,17 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import org.osgi.service.component.annotations.Component;
+import javax.portlet.PortletRequest;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
- * MatchQuery clause builder service implementation.
+ * Term query builder.
  * 
  * @author Petteri Karttunen
  */
@@ -29,30 +33,38 @@ public class TermQueryClauseBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryParams queryParams)
 		throws Exception {
 
-		String fieldName = configurationObject.getString("fieldName");
+		String fieldName = configuration.getString("field_name");
 
 		if (fieldName == null) {
 			return null;
 		}
 
-		// If there's a predefined value in the configuration, use that
+		String keywords = null;
 
-		String value = configurationObject.getString("value");
+		if (Validator.isNotNull(configuration.get("query"))) {
 
-		if (Validator.isNull(value)) {
-			value = queryParams.getKeywords();
+			keywords = configuration.getString("query");
+
+			keywords = _configurationHelper.parseConfigurationVariables(
+				portletRequest, queryParams, keywords);
 		}
 
-		TermQuery termQuery = new TermQueryImpl(fieldName, value);
+		if (Validator.isNull(keywords)) {
+			keywords = queryParams.getKeywords();
+		}
+		
+		TermQuery termQuery = new TermQueryImpl(fieldName, keywords);
 
 		// Boost
-
-		float boost =
-			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-		termQuery.setBoost(boost);
+		
+		if (Validator.isNotNull(configuration.get("boost"))) {
+			termQuery.setBoost(
+				GetterUtil.getFloat(configuration.get("boost")));
+		}
 
 		return termQuery;
 	}
@@ -67,4 +79,7 @@ public class TermQueryClauseBuilderImpl implements ClauseBuilder {
 	}
 
 	private static final String QUERY_TYPE = "term";
+	
+	@Reference
+	private ConfigurationHelper _configurationHelper;	
 }

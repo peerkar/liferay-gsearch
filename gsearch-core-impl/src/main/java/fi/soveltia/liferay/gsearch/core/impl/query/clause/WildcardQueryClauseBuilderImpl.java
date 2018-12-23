@@ -12,13 +12,17 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
-import org.osgi.service.component.annotations.Component;
+import javax.portlet.PortletRequest;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
- * WildcardQuery clause builder service implementation.
+ * Wildcard query builder.
  * 
  * @author Petteri Karttunen
  */
@@ -33,52 +37,61 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryParams queryParams)
 		throws Exception {
 
-		// If there's a predefined value in the configuration, use that
+		String keywords = null;
 
-		String value = configurationObject.getString("value");
+		if (Validator.isNotNull(configuration.get("query"))) {
 
-		if (Validator.isNull(value)) {
-			value = queryParams.getKeywords();
+			keywords = configuration.getString("query");
+
+			keywords = _configurationHelper.parseConfigurationVariables(
+				portletRequest, queryParams, keywords);
+		}
+
+		if (Validator.isNull(keywords)) {
+			keywords = queryParams.getKeywords();
 		}
 
 		// Splitter?
 
 		String keywordSplitter =
-			configurationObject.getString("keywordSplitter");
+			configuration.getString("keyword_splitter_regexp");
 
 		if (keywordSplitter != null && keywordSplitter.length() > 0) {
 
 			BooleanQuery query = new BooleanQueryImpl();
 
-			String[] keywords = value.split(keywordSplitter);
+			String[] keywordArray = keywords.split(keywordSplitter);
 
-			for (String keyword : keywords) {
-				WildcardQuery q = buildClause(configurationObject, keyword);
+			for (String keyword : keywordArray) {
+
+				WildcardQuery q = buildClause(configuration, keyword);
+
 				query.add(q, BooleanClauseOccur.SHOULD);
 			}
 
 			// Boost
 
-			float boost =
-				GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-			query.setBoost(boost);
+			if (Validator.isNotNull(configuration.get("boost"))) {
+				query.setBoost(GetterUtil.getFloat(configuration.get("boost")));
+			}
 
 			return query;
 
 		}
 		else {
 
-			WildcardQuery wildcardQuery =
-				buildClause(configurationObject, value);
+			WildcardQuery wildcardQuery = buildClause(configuration, keywords);
 
 			// Boost
 
-			float boost =
-				GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-			wildcardQuery.setBoost(boost);
+			if (Validator.isNotNull(configuration.get("boost"))) {
+				wildcardQuery.setBoost(
+					GetterUtil.getFloat(configuration.get("boost")));
+			}
 
 			return wildcardQuery;
 		}
@@ -87,14 +100,14 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 	/**
 	 * Build single clause
 	 * 
-	 * @param configurationObject
+	 * @param configuration
 	 * @param keywords
 	 * @return
 	 */
 	protected WildcardQuery buildClause(
-		JSONObject configurationObject, String keyword) {
+		JSONObject configuration, String keyword) {
 
-		String fieldName = configurationObject.getString("fieldName");
+		String fieldName = configuration.getString("field_name");
 
 		if (fieldName == null) {
 			return null;
@@ -102,14 +115,14 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 
 		StringBundler sb = new StringBundler();
 
-		String prefix = configurationObject.getString("valuePrefix");
+		String prefix = configuration.getString("value_prefix");
 		if (Validator.isNotNull(prefix)) {
 			sb.append(prefix);
 		}
 
 		sb.append(keyword);
 
-		String suffix = configurationObject.getString("valueSuffix");
+		String suffix = configuration.getString("value_suffix");
 		if (Validator.isNotNull(suffix)) {
 			sb.append(suffix);
 		}
@@ -130,4 +143,7 @@ public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
 	}
 
 	private static final String QUERY_TYPE = "wildcard";
+
+	@Reference
+	private ConfigurationHelper _configurationHelper;
 }

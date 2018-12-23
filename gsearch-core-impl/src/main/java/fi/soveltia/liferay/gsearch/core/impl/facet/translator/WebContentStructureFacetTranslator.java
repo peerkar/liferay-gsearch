@@ -24,12 +24,14 @@ import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Facet translator for web content structures. {@see FacetTranslator}
+ * Facet translator for web content structures.
  * 
  * @author Petteri Karttunen
+ * 
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
 public class WebContentStructureFacetTranslator implements FacetTranslator {
 
@@ -37,9 +39,9 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canTranslate(String facetName) {
 
-		_facetName = facetName;
+		return (facetName.equals(FACET_NAME));
 	}
 
 	/**
@@ -108,22 +110,11 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 		return item;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDDMStructureLocalService(
-		DDMStructureLocalService ddmStructureLocalService) {
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
-		_ddmStructureLocalService = ddmStructureLocalService;
-	}
+	@Reference
+	private GroupLocalService _groupLocalService;
 
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-
-		_groupLocalService = groupLocalService;
-	}
-
-	protected String _facetName;
-
-	private static DDMStructureLocalService _ddmStructureLocalService;
-
-	private static GroupLocalService _groupLocalService;
+	private static final String FACET_NAME = "ddmStructureKey";
 }

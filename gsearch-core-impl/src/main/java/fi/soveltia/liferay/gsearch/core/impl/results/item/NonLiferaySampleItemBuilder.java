@@ -11,6 +11,7 @@ import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -47,7 +48,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getImageSrc(PortletRequest portletRequest, Document document)
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		return DEFAULT_IMAGE;
@@ -59,7 +60,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL)
+		Document document, QueryParams queryParams)
 		throws Exception {
 
 		return document.get("treePath");

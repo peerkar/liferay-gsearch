@@ -1,14 +1,11 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
-import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.search.generic.MatchQuery;
 import com.liferay.portal.kernel.search.generic.MatchQuery.Operator;
-import com.liferay.portal.kernel.search.generic.MatchQuery.Type;
+import com.liferay.portal.kernel.search.generic.MultiMatchQuery;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -20,9 +17,10 @@ import org.osgi.service.component.annotations.Reference;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
+import fi.soveltia.liferay.gsearch.query.GSearchMultiMatchQuery;
 
 /**
- * Match query builder.
+ * Match all query builder.
  * 
  * @author Petteri Karttunen
  */
@@ -30,7 +28,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class MatchQueryBuilderImpl implements ClauseBuilder {
+public class MultiMatchQueryBuilderImpl implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
@@ -41,11 +39,7 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 		QueryParams queryParams)
 		throws Exception {
 
-		String fieldName = configuration.getString("field_name");
-
-		if (fieldName == null) {
-			return null;
-		}
+		// Keywords
 
 		String keywords = null;
 
@@ -61,93 +55,84 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 			keywords = queryParams.getKeywords();
 		}
 
-		MatchQuery matchQuery =
-			buildClause(configuration, queryParams, fieldName, keywords);
+		GSearchMultiMatchQuery multiMatchQuery =
+			new GSearchMultiMatchQuery(keywords);
 
-		// Is localized
+		// Fields
 
-		boolean isLocalized = configuration.getBoolean("localized");
+		JSONArray fields = configuration.getJSONArray("fields");
 
-		if (isLocalized) {
+		for (int i = 0; i < fields.length(); i++) {
 
-			String localizedFieldName =
-				fieldName + "_" + queryParams.getLocale().toString();
+			JSONObject field = fields.getJSONObject(i);
 
-			MatchQuery localizedQuery = buildClause(
-				configuration, queryParams, localizedFieldName, keywords);
+			// Add non translated version
 
-			// Boost for localized version
+			String fieldName = field.getString("field_name");
 
-			if (Validator.isNotNull(
-				configuration.get("boost_localized_version"))) {
-				localizedQuery.setBoost(
-					GetterUtil.getFloat(
-						configuration.get("boost_localized_version")));
+			float boost = GetterUtil.getFloat(field.getString("boost"), 1.0f);
+
+			multiMatchQuery.addField(fieldName, boost);
+
+			// Add translated version
+
+			boolean isLocalized =
+				GetterUtil.getBoolean(field.get("localized"), false);
+
+			if (isLocalized) {
+
+				String localizedFieldName =
+					fieldName + "_" + queryParams.getLocale().toString();
+				float localizedBoost = GetterUtil.getFloat(
+					field.getString("boost_localized_version"), 1f);
+
+				multiMatchQuery.addField(localizedFieldName, localizedBoost);
 			}
-
-			// Add subqueries to the query
-
-			BooleanQuery booleanQuery = new BooleanQueryImpl();
-
-			booleanQuery.add(matchQuery, BooleanClauseOccur.SHOULD);
-			booleanQuery.add(localizedQuery, BooleanClauseOccur.SHOULD);
-
-			return booleanQuery;
 		}
-
-		return matchQuery;
-	}
-
-	protected MatchQuery buildClause(
-		JSONObject configuration, QueryParams queryParams, String fieldName,
-		String query)
-		throws Exception {
-
-		MatchQuery matchQuery = new MatchQuery(fieldName, query);
 
 		// Analyzer
 
 		if (Validator.isNotNull(configuration.get("analyzer"))) {
-			matchQuery.setAnalyzer(configuration.getString("analyzer"));
+			multiMatchQuery.setAnalyzer(configuration.getString("analyzer"));
 		}
 
 		// Boost
 
 		if (Validator.isNotNull(configuration.get("boost"))) {
-			matchQuery.setBoost(
+			multiMatchQuery.setBoost(
 				GetterUtil.getFloat(configuration.get("boost")));
 		}
 
 		// Cut off frequency
 
 		if (Validator.isNotNull(configuration.get("cut_off_frequency"))) {
-			matchQuery.setCutOffFrequency(
+			multiMatchQuery.setCutOffFrequency(
 				GetterUtil.getFloat(configuration.get("cut_off_frequency")));
 		}
 
 		// Fuzziness
 
 		if (Validator.isNotNull(configuration.get("fuzziness"))) {
-			matchQuery.setFuzziness(
-				GetterUtil.getFloat(configuration.get("fuzziness")));
+			multiMatchQuery.setFuzziness(configuration.getString("fuzziness"));
 		}
 
 		// Lenient
 
 		if (Validator.isNotNull(configuration.get("lenient"))) {
-			matchQuery.setLenient(configuration.getBoolean(("lenient")));
+			multiMatchQuery.setLenient(configuration.getBoolean(("lenient")));
 		}
 
 		// Max expansions
 
 		if (Validator.isNotNull(configuration.get("max_expansions"))) {
-			matchQuery.setMaxExpansions(configuration.getInt("max_expansions"));
+			multiMatchQuery.setMaxExpansions(
+				configuration.getInt("max_expansions"));
 		}
 
 		// Minimum should match expansions
 
 		if (Validator.isNotNull(configuration.get("minimum_should_match"))) {
-			matchQuery.setMinShouldMatch(
+			multiMatchQuery.setMinShouldMatch(
 				configuration.getString("minimum_should_match"));
 		}
 
@@ -156,17 +141,17 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 		if (Validator.isNotNull(configuration.get("operator"))) {
 
 			if ("or".equalsIgnoreCase(configuration.getString("operator"))) {
-				matchQuery.setOperator(Operator.OR);
+				multiMatchQuery.setOperator(Operator.OR);
 			}
 			else {
-				matchQuery.setOperator(Operator.AND);
+				multiMatchQuery.setOperator(Operator.AND);
 			}
 		}
 
 		// Slop
 
 		if (Validator.isNotNull(configuration.get("slop"))) {
-			matchQuery.setSlop(configuration.getInt("slop"));
+			multiMatchQuery.setSlop(configuration.getInt("slop"));
 		}
 
 		// Type
@@ -175,17 +160,28 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 
 			String type = configuration.getString("type");
 
-			if (Type.BOOLEAN.name().equalsIgnoreCase(type)) {
-				matchQuery.setType(Type.BOOLEAN);
+			if (MultiMatchQuery.Type.BEST_FIELDS.name().equalsIgnoreCase(
+				type)) {
+				multiMatchQuery.setType(MultiMatchQuery.Type.BEST_FIELDS);
 			}
-			else if (Type.PHRASE.name().equalsIgnoreCase(type)) {
-				matchQuery.setType(Type.PHRASE);
+			else if (MultiMatchQuery.Type.CROSS_FIELDS.name().equalsIgnoreCase(
+				type)) {
+				multiMatchQuery.setType(MultiMatchQuery.Type.CROSS_FIELDS);
 			}
-			else if (Type.PHRASE_PREFIX.name().equalsIgnoreCase(type)) {
-				matchQuery.setType(Type.PHRASE_PREFIX);
+			else if (MultiMatchQuery.Type.MOST_FIELDS.name().equalsIgnoreCase(
+				type)) {
+				multiMatchQuery.setType(MultiMatchQuery.Type.MOST_FIELDS);
+			}
+			else if (MultiMatchQuery.Type.PHRASE.name().equalsIgnoreCase(
+				type)) {
+				multiMatchQuery.setType(MultiMatchQuery.Type.PHRASE);
+			}
+			else if (MultiMatchQuery.Type.PHRASE_PREFIX.name().equalsIgnoreCase(
+				type)) {
+				multiMatchQuery.setType(MultiMatchQuery.Type.PHRASE_PREFIX);
 			}
 		}
-		return matchQuery;
+		return multiMatchQuery;
 	}
 
 	/**
@@ -197,7 +193,7 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 		return (querytype.equals(QUERY_TYPE));
 	}
 
-	private static final String QUERY_TYPE = "match";
+	private static final String QUERY_TYPE = "multi_match";
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;

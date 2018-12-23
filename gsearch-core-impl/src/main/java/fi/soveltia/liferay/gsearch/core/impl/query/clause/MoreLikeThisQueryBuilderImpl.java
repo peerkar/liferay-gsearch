@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONArray;
@@ -5,10 +6,13 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.generic.MoreLikeThisQuery;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -16,7 +20,7 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 
 /**
- * More Like This query builder service implementation.
+ * More Like This query builder.
  * 
  * @author Petteri Karttunen
  */
@@ -31,37 +35,40 @@ public class MoreLikeThisQueryBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryParams queryParams)
 		throws Exception {
 
-		MoreLikeThisQuery moreLikeThisQuery = new MoreLikeThisQuery(queryParams.getCompanyId());
-		
-		// Doc UID 
-		
-		Map<String, Object>extraParams = queryParams.getExtraParams();
+		MoreLikeThisQuery moreLikeThisQuery =
+			new MoreLikeThisQuery(queryParams.getCompanyId());
+
+		// Doc UID
+
+		Map<String, Object> extraParams = queryParams.getExtraParams();
+
 		if (extraParams == null || extraParams.get("docUID") == null) {
 			return null;
 		}
 
-		// Add single like document.
-		
-		String docUID = (String)extraParams.get("docUID");
-		
+		// Add a single like -document.
+
+		String docUID = (String) extraParams.get("docUID");
+
 		moreLikeThisQuery.addDocumentUID(docUID);
 
 		// Fields configuration
-		
-		JSONArray fieldsConfig = configurationObject.getJSONArray("fields");
+
+		JSONArray fieldsConfig = configuration.getJSONArray("fields");
 
 		List<String> fields = new ArrayList<String>();
-		
+
 		for (int i = 0; i < fieldsConfig.length(); i++) {
 
 			JSONObject item = fieldsConfig.getJSONObject(i);
 
 			// Add non translated version
 
-			String fieldName = item.getString("fieldName");
+			String fieldName = item.getString("field_name");
 
 			fields.add(fieldName);
 
@@ -78,93 +85,99 @@ public class MoreLikeThisQueryBuilderImpl implements ClauseBuilder {
 				fields.add(localizedFieldName);
 			}
 		}
-		
+
 		moreLikeThisQuery.addFields(fields);
 
-		// Max query terms.
-		
-		if (configurationObject.getString("maxQueryTerms") != null) {
-			int maxQueryTerms = GetterUtil.getInteger(
-				configurationObject.getString("maxQueryTerms"), 12);
-			moreLikeThisQuery.setMaxQueryTerms(maxQueryTerms);
+		// Analyzer
+
+		if (Validator.isNotNull(configuration.get("analyzer"))) {
+			moreLikeThisQuery.setAnalyzer(configuration.getString("analyzer"));
 		}
 
-		// Min term freq.
-		
-		if (configurationObject.getString("minTermFreq") != null) {
-			int minTermFreq = GetterUtil.getInteger(
-				configurationObject.getString("minTermFreq"), 2);
-			moreLikeThisQuery.setMinTermFrequency(minTermFreq);
-		}
+		// Boost
 
-		// Min doc freq.
-		
-		if (configurationObject.getString("minDocFreq") != null) {
-			int minDocFreq = GetterUtil.getInteger(
-				configurationObject.getString("minDocFreq"), 3);
-			moreLikeThisQuery.setMinDocFrequency(minDocFreq);
-		}
-
-		// Max doc freq.
-		
-		if (configurationObject.getString("maxDocFreq") != null) {
-			int maxDocFreq = GetterUtil.getInteger(
-				configurationObject.getString("maxDocFreq"), 0);
-			moreLikeThisQuery.setMaxDocFrequency(maxDocFreq);
-		}
-
-		// Min word length.
-		
-		if (configurationObject.getString("minWordLength") != null) {
-			int minWordLength = GetterUtil.getInteger(
-				configurationObject.getString("minWordLength"), 0);
-			moreLikeThisQuery.setMinWordLength(minWordLength);
-		}
-
-		// Max word length.
-		
-		if (configurationObject.getString("maxWordLength") != null) {
-			int maxWordLength = GetterUtil.getInteger(
-				configurationObject.getString("maxWordLength"), 0);
-			moreLikeThisQuery.setMaxWordLength(maxWordLength);
-		}
-
-		// Min should match.
-		
-		if (configurationObject.getString("minimumShouldMatch") != null) {
-			String minimumShouldMatch = 
-					configurationObject.getString("minimumShouldMatch", "30%");
-			moreLikeThisQuery.setMinShouldMatch(minimumShouldMatch);
+		if (Validator.isNotNull(configuration.get("boost"))) {
+			moreLikeThisQuery.setBoost(
+				GetterUtil.getFloat(configuration.get("boost")));
 		}
 
 		// Include input
-		
-		moreLikeThisQuery.setIncludeInput(configurationObject.getBoolean("includeInput", false));
-		
+
+		if (Validator.isNotNull(configuration.get("include"))) {
+			moreLikeThisQuery.setIncludeInput(
+				configuration.getBoolean("include"));
+		}
+
+		// Like text.
+
+		if (Validator.isNotNull(configuration.get("like_text"))) {
+			moreLikeThisQuery.setLikeText(configuration.getString("like_text"));
+		}
+
+		// Max doc frequency.
+
+		if (Validator.isNotNull(configuration.get("max_doc_freq"))) {
+			moreLikeThisQuery.setMaxDocFrequency(
+				configuration.getInt("max_doc_freq"));
+		}
+
+		// Max query terms.
+
+		if (Validator.isNotNull(configuration.get("max_query_terms"))) {
+			moreLikeThisQuery.setMaxQueryTerms(
+				configuration.getInt("max_query_terms"));
+		}
+
+		// Max word length.
+
+		if (Validator.isNotNull(configuration.get("max_word_length"))) {
+			moreLikeThisQuery.setMaxWordLength(
+				configuration.getInt("max_word_length"));
+		}
+
+		// Min doc frequency.
+
+		if (Validator.isNotNull(configuration.get("min_doc_freq"))) {
+			moreLikeThisQuery.setMinDocFrequency(
+				configuration.getInt("min_doc_freq"));
+		}
+
+		// Min should match.
+
+		if (Validator.isNotNull(configuration.get("minimum_should_match"))) {
+			moreLikeThisQuery.setMinShouldMatch(
+				configuration.getString("minimum_should_match"));
+		}
+
+		// Min term freq.
+
+		if (Validator.isNotNull(configuration.get("min_term_freq"))) {
+			moreLikeThisQuery.setMinTermFrequency(
+				configuration.getInt("min_term_freq"));
+		}
+
+		// Min word length.
+
+		if (Validator.isNotNull(configuration.get("min_word_length"))) {
+			moreLikeThisQuery.setMinWordLength(
+				configuration.getInt("min_word_length"));
+		}
+
 		// Stopwords.
 
-		if (configurationObject.getJSONArray("stopWords") != null) {
-			 JSONArray stopWords = 
-					configurationObject.getJSONArray("stopWords");
-			 
-			 List<String> list = new ArrayList<String>();
-			 
-			 for (int i=0; i< stopWords.length(); i++) {
-			     list.add(stopWords.getString(i) );
-			 }
-			 
-			 moreLikeThisQuery.addStopWords(list);
+		if (Validator.isNotNull(configuration.get("stop_words"))) {
+
+			JSONArray stopWords = configuration.getJSONArray("stop_words");
+
+			List<String> list = new ArrayList<String>();
+
+			for (int i = 0; i < stopWords.length(); i++) {
+				list.add(stopWords.getString(i));
+			}
+
+			moreLikeThisQuery.addStopWords(list);
 		}
-		
-		// Boost
-		
-		if (configurationObject.getString("boost") != null) {
-			float boost =
-				GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-			moreLikeThisQuery.setBoost(boost);
-		}
-		
-		return moreLikeThisQuery;		
+		return moreLikeThisQuery;
 	}
 
 	/**

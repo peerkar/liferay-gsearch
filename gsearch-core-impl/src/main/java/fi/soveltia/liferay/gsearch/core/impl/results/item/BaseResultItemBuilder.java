@@ -6,10 +6,12 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -20,7 +22,6 @@ import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -34,6 +35,7 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
@@ -82,18 +84,19 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document)
 		throws SearchException {
-		
+
 		Locale locale = portletRequest.getLocale();
 
 		String description = null;
-		
+
 		description = document.get(
 			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
 			Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
-		
+
 		if (Validator.isNull(description)) {
 			description = document.get(
-				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
+				locale,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
 				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION);
 		}
 
@@ -101,20 +104,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			description = getSummary(
 				portletRequest, portletResponse, document, true).getContent();
 		}
-		
+
 		return description;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * 
-	 * @throws Exception
-	 */
-	@Override
-	public String getImageSrc(PortletRequest portletRequest, Document document)
-		throws Exception {
-
-		return null;
 	}
 
 	/**
@@ -123,15 +114,25 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL)
-		throws Exception {
+		Document document, QueryParams queryParams)
+		throws Exception { 
 
 		StringBundler sb = new StringBundler();
-		sb.append(
-			getAssetRenderer(document).getURLView(
-				(LiferayPortletResponse) portletResponse,
-				WindowState.MAXIMIZED));
-
+			
+		if (queryParams.isViewResultsInContext()) {
+			
+			sb.append(getAssetRenderer(document).getURLViewInContext(
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, ""));
+		} else {
+			sb.append(
+				getAssetRenderer(document).getURLView(
+					(LiferayPortletResponse) portletResponse,
+					WindowState.MAXIMIZED));
+		}
+		
+		// Add redirect etc here.
+		
 		return sb.toString();
 	}
 
@@ -139,7 +140,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, String> getMetadata(PortletRequest portletRequest, Document document)
+	public Map<String, String> getMetadata(
+		PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		return null;
@@ -184,13 +186,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String[] getTags(Document document) {
+	public String getThumbnail(PortletRequest portletRequest, Document document)
+		throws Exception {
 
-		String[] tags = document.getValues(Field.ASSET_TAG_NAMES);
-
-		return tags;
+		return null;
 	}
 
 	/**
@@ -205,19 +208,22 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		Locale locale = portletRequest.getLocale();
 
 		String title = null;
-		
+
 		if (isHighlight) {
 			title = document.get(
-					locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
-					Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
-		} else {
+				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
+		}
+		else {
 			title = document.get(
-				locale, "localized" +  StringPool.UNDERLINE + Field.TITLE,
+				locale, "localized" + StringPool.UNDERLINE + Field.TITLE,
 				Field.TITLE);
 		}
 
 		if (Validator.isNull(title)) {
-			title = getSummary(portletRequest, portletResponse, document, isHighlight).getTitle();
+			title = getSummary(
+				portletRequest, portletResponse, document,
+				isHighlight).getTitle();
 		}
 		return title;
 	}
@@ -280,8 +286,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	}
 
 	/**
-	/**
-	 * Get document summary.
+	 * /** Get document summary.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -308,10 +313,10 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 			return summary;
 		}
-		
+
 		return null;
 	}
-	
+
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
 }

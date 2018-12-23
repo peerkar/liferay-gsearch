@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -24,9 +22,7 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.portlet.PortletRequest;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
@@ -37,8 +33,6 @@ import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
 import fi.soveltia.liferay.gsearch.core.api.params.RequestParamValidator;
-import fi.soveltia.liferay.gsearch.core.api.results.layout.ResultLayoutService;
-import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
 
 /**
@@ -47,7 +41,6 @@ import fi.soveltia.liferay.gsearch.core.impl.exception.KeywordsException;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = QueryParamsBuilder.class
 )
@@ -57,11 +50,31 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public QueryParams buildQueryParams(PortletRequest portletRequest)
+	public QueryParams buildQueryParams(
+		PortletRequest portletRequest, int pageSize)
+		throws Exception {
+
+		return buildQueryParams(portletRequest, null, null, null, null, pageSize);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public QueryParams buildQueryParams(
+		PortletRequest portletRequest, String[] assetTypeConfiguration,
+		String[] clauseConfiguration, String[] facetConfiguration,
+		String[] sortConfiguration, int pageSize)
 		throws Exception {
 
 		QueryParams queryParams = new QueryParams();
 
+		queryParams.setPageSize(pageSize);
+
+		setConfigurations(queryParams, 
+			assetTypeConfiguration, clauseConfiguration, facetConfiguration,
+			sortConfiguration);
+		
 		setCompanyParam(portletRequest, queryParams);
 		setGroupsParam(portletRequest, queryParams);
 		setLocaleParam(portletRequest, queryParams);
@@ -69,52 +82,39 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 		setKeywordsParam(portletRequest, queryParams);
 		setTimeParam(portletRequest, queryParams);
-		setTypeParam(portletRequest, queryParams);
+		setAssetTypeParam(portletRequest, queryParams);
+		setFacetParams(portletRequest, queryParams);
 		setStatusParam(portletRequest, queryParams);
 
-		setFacetParams(portletRequest, queryParams);
-
-		setResultsLayoutParam(portletRequest, queryParams);
-
 		setStartEndParams(portletRequest, queryParams);
-		setPageSizeParam(portletRequest, queryParams);
 
 		setSortParam(portletRequest, queryParams);
 
 		return queryParams;
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
-	}
-	
 	/**
-	 * Parse asset class name corresponding the key.
+	 * Parse entry classname corresponding the key.
 	 * 
 	 * @param key
-	 *            search key
-	 * @return corresponding class name.
+	 * @param configuration
+	 * @return
 	 * @throws JSONException
+	 * @throws ClassNotFoundException
 	 */
-	protected String parseAssetClass(String key)
+	protected String parseEntryClass(String key, String[] configuration)
 		throws JSONException, ClassNotFoundException {
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.typeConfiguration());
 
 		String className = null;
 
-		for (int i = 0; i < configurationArray.length(); i++) {
+		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject item = configurationArray.getJSONObject(i);
+			JSONObject item =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
 
 			if (key.equals(item.getString("key"))) {
 
-				className = item.getString("entryClassName");
+				className = item.getString("entry_class_name");
 				break;
 			}
 		}
@@ -125,31 +125,67 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Parse default set of asset class names to search for.
 	 * 
-	 * @return list of class names
+	 * @param configuration
+	 * @return
+	 * @throws ClassNotFoundException
 	 * @throws JSONException
 	 */
-	protected List<String> parseDefaultAssetClasses()
+	protected List<String> parseDefaultEntryClasses(String[] configuration)
 		throws ClassNotFoundException, JSONException {
-
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.typeConfiguration());
 
 		List<String> classNames = new ArrayList<String>();
 
-		for (int i = 0; i < configurationArray.length(); i++) {
+		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject item = configurationArray.getJSONObject(i);
+			JSONObject item =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			classNames.add(item.getString("entryClassName"));
+			classNames.add(item.getString("entry_class_name"));
 		}
 
 		return classNames;
 	}
 
 	/**
-	 * Set company parameter.
+	 * Set asset types (entryClassName).
+	 * 
+	 * @param portletRequest
+	 * @param queryParams
+	 * @param assetTypeConfiguration
+	 * @throws PatternSyntaxException
+	 * @throws ClassNotFoundException
+	 * @throws JSONException
 	 */
-	protected void setCompanyParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setAssetTypeParam(
+		PortletRequest portletRequest, QueryParams queryParams)
+		throws PatternSyntaxException, ClassNotFoundException, JSONException {
+
+		String typeFilter =
+			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE);
+
+		List<String> entryClassNames = new ArrayList<String>();
+
+		String className = parseEntryClass(typeFilter, queryParams.getAssetTypeConfiguration());
+
+		if (className != null) {
+			entryClassNames.add(className);
+		}
+		else {
+			entryClassNames.addAll(
+				parseDefaultEntryClasses(queryParams.getAssetTypeConfiguration()));
+		}
+
+		queryParams.setEntryClassNames(entryClassNames);
+	}
+
+	/**
+	 * Set company parameter.
+	 * 
+	 * @param portletRequest
+	 * @param queryParams
+	 */
+	protected void setCompanyParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -158,17 +194,49 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
+	 * Set configurations.
+	 * 
+	 * @param assetTypeConfiguration
+	 * @param clauseConfiguration
+	 * @param facetConfiguration
+	 * @param sortConfiguration
+	 */
+	protected void setConfigurations(QueryParams queryParams, 
+		String[] assetTypeConfiguration, String[] clauseConfiguration,
+		String[] facetConfiguration, String[] sortConfiguration) {
+
+		if (assetTypeConfiguration == null) {
+			queryParams.setAssetTypeConfiguration(
+				_configurationHelper.getAssetTypeConfiguration());
+		}
+
+		if (clauseConfiguration == null) {
+			queryParams.setClauseConfiguration(
+				_configurationHelper.getClauseConfiguration());
+		}
+
+		if (facetConfiguration == null) {
+			queryParams.setFacetConfiguration(
+				_configurationHelper.getFacetConfiguration());
+		}
+
+		if (sortConfiguration == null) {
+			queryParams.setSortConfiguration(
+				_configurationHelper.getSortConfiguration());
+		}
+	}
+
+	/**
 	 * Set facet parameters.
 	 * 
 	 * @throws JSONException
 	 */
-	protected void setFacetParams(PortletRequest portletRequest, QueryParams queryParams)
+	protected void setFacetParams(
+		PortletRequest portletRequest, QueryParams queryParams)
 		throws JSONException {
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.facetConfiguration());
-
-		Map<FacetParam, BooleanClauseOccur> facetParams = new HashMap<FacetParam, BooleanClauseOccur>();
+		Map<FacetParam, BooleanClauseOccur> facetParams =
+			new HashMap<FacetParam, BooleanClauseOccur>();
 
 		String fieldParam;
 		String fieldName;
@@ -176,33 +244,38 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		boolean isMultiValued;
 		String multiValueOperator;
 		BooleanClauseOccur multiValueOccur = null;
+		
+		String[] configuration = queryParams.getFacetConfiguration();
 
-		for (int i = 0; i < configurationArray.length(); i++) {
+		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject facetConfiguration = configurationArray.getJSONObject(i);
+			JSONObject facetConfiguration =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
 
 			isMultiValued = GetterUtil.getBoolean(
-				facetConfiguration.getString("isMultiValued"), false);
+				facetConfiguration.getString("is_multivalued"), false);
 
-			fieldParam = facetConfiguration.getString("paramName");
+			fieldParam = facetConfiguration.getString("param_name");
 
-			fieldName = facetConfiguration.getString("fieldName");
+			fieldName = facetConfiguration.getString("field_name");
 
-			multiValueOperator = facetConfiguration.getString("multiValueOperator");
-			
+			multiValueOperator =
+				facetConfiguration.getString("multivalue_operator");
+
 			if (Validator.isNotNull(multiValueOperator)) {
-				
+
 				if ("or".equalsIgnoreCase(multiValueOperator)) {
 					multiValueOccur = BooleanClauseOccur.SHOULD;
-				} else {
+				}
+				else {
 					multiValueOccur = BooleanClauseOccur.MUST;
 				}
-			} else {
+			}
+			else {
 				multiValueOccur = BooleanClauseOccur.SHOULD;
 			}
 
-			fieldValues =
-				ParamUtil.getStringValues(portletRequest, fieldParam);
+			fieldValues = ParamUtil.getStringValues(portletRequest, fieldParam);
 
 			if (Validator.isNotNull(fieldValues) && fieldValues.length > 0) {
 
@@ -219,7 +292,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 
 							FacetParam facetParam = new FacetParam(
 								fieldName, values, multiValueOccur);
-							facetParams.put(facetParam, BooleanClauseOccur.MUST);
+							facetParams.put(
+								facetParam, BooleanClauseOccur.MUST);
 						}
 					}
 					else {
@@ -234,7 +308,7 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 				else {
 
 					if (isMultiValued) {
-						
+
 						FacetParam facetParam = new FacetParam(
 							fieldName, fieldValues, multiValueOccur);
 						facetParams.put(facetParam, BooleanClauseOccur.SHOULD);
@@ -242,8 +316,8 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 					}
 					else {
 
-						FacetParam facetParam =
-							new FacetParam(fieldName, new String[] {
+						FacetParam facetParam = new FacetParam(
+							fieldName, new String[] {
 								fieldValues[0]
 							}, BooleanClauseOccur.MUST);
 						facetParams.put(facetParam, BooleanClauseOccur.MUST);
@@ -251,20 +325,17 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 				}
 			}
 		}
-		queryParams.setFacetsParams(facetParams);
-	}
-
-	@Reference(unbind = "-")
-	protected void setFacetTranslatorFactory(
-		FacetTranslatorFactory facetTranslatorFactory) {
-
-		_facetTranslatorFactory = facetTranslatorFactory;
+		queryParams.setFacetParams(facetParams);
 	}
 
 	/**
 	 * Set groups parameter.
+	 * 
+	 * @param portletRequest
+	 * @param queryParams
 	 */
-	protected void setGroupsParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setGroupsParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -288,9 +359,12 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	/**
 	 * Set keywords parameter.
 	 * 
+	 * @param portletRequest
+	 * @param queryParams
 	 * @throws KeywordsException
 	 */
-	protected void setKeywordsParam(PortletRequest portletRequest, QueryParams queryParams)
+	protected void setKeywordsParam(
+		PortletRequest portletRequest, QueryParams queryParams)
 		throws KeywordsException {
 
 		String keywords =
@@ -301,13 +375,22 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		if (!_requestParamValidator.validateKeywords(keywords)) {
 			throw new KeywordsException();
 		}
+		
+		// Lowercase
+		
+		keywords = keywords.toLowerCase();
+		
 		queryParams.setKeywords(keywords);
 	}
 
 	/**
 	 * Set locale parameter.
+	 * 
+	 * @param portletRequest
+	 * @param queryParams
 	 */
-	protected void setLocaleParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setLocaleParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -315,43 +398,13 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Set page size parameter.
-	 */
-	protected void setPageSizeParam(PortletRequest portletRequest, QueryParams queryParams) {
-
-		queryParams.setPageSize(_moduleConfiguration.pageSize());
-	}
-
-	@Reference(unbind = "-")
-	protected void setRequestParamValidator(
-		RequestParamValidator requestParamValidator) {
-
-		_requestParamValidator = requestParamValidator;
-	}
-
-	/**
-	 * Set search type (normal / image search). Search type is determined from
-	 * typefilter value
-	 */
-	protected void setResultsLayoutParam(PortletRequest portletRequest, QueryParams queryParams) {
-
-		String resultsLayoutParam =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
-		
-		if (_resultLayoutService.isValidResultLayoutKey(portletRequest, resultsLayoutParam)) {
-			queryParams.setResultsLayout(resultsLayoutParam);
-		} else {
-			queryParams.setResultsLayout(_resultLayoutService.getDefaultResultLayoutKey());
-		}
-	}
-
-	/**
 	 * Set sort. Default sort field equals to score.
 	 * 
 	 * @throws JSONException
 	 */
-	protected void setSortParam(PortletRequest portletRequest, QueryParams queryParams)
-		throws JSONException {
+	protected void setSortParam(
+		PortletRequest portletRequest, QueryParams queryParams)
+		throws Exception {
 
 		String sortField =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_FIELD);
@@ -377,29 +430,32 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String fieldName = null;
 		Integer fieldType = null;
 
-		JSONArray configurationArray = JSONFactoryUtil.createJSONArray(
-			_moduleConfiguration.sortFieldConfiguration());
+		String[] configuration = queryParams.getSortConfiguration();
+		
+		for (int i = 0; i < configuration.length; i++) {
 
-		for (int i = 0; i < configurationArray.length(); i++) {
-
-			JSONObject item = configurationArray.getJSONObject(i);
+			JSONObject item =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
 
 			if (item.getString("key").equals(sortField)) {
 
-				fieldName = _configurationHelper.parseConfigurationKey(
-					portletRequest, item.getString("fieldName"));
+				fieldName = _configurationHelper.parseConfigurationVariables(
+					portletRequest, queryParams, item.getString("field_name"));
 
-				fieldType = Integer.valueOf(item.getString("fieldType"));
+				fieldType = Integer.valueOf(item.getString("field_type"));
 
 				break;
 
 			}
 			else if (item.getBoolean("default")) {
 
-				defaultFieldName = _configurationHelper.parseConfigurationKey(
-					portletRequest, item.getString("fieldName"));
+				defaultFieldName =
+					_configurationHelper.parseConfigurationVariables(
+						portletRequest, queryParams,
+						item.getString("field_name"));
 
-				defaultFieldType = Integer.valueOf(item.getString("fieldType"));
+				defaultFieldType =
+					Integer.valueOf(item.getString("field_type"));
 			}
 		}
 
@@ -424,36 +480,41 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
 		}
 
-		queryParams.setSorts(new Sort[] {
-			sort1, sort2
-		});
+		queryParams.setSorts(
+			new Sort[] {
+				sort1, sort2
+			});
 	}
 
 	/**
 	 * Set start and end parameter.
 	 */
-	protected void setStartEndParams(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setStartEndParams(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		int start =
 			ParamUtil.getInteger(portletRequest, GSearchWebKeys.START, 0);
 		queryParams.setStart(start);
-		queryParams.setEnd(start + _moduleConfiguration.pageSize());
+
+		queryParams.setEnd(start + queryParams.getPageSize());
 	}
 
 	/**
 	 * Set start and end parameter.
 	 */
-	protected void setStatusParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setStatusParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		int status =
 			ParamUtil.getInteger(portletRequest, GSearchWebKeys.STATUS, 0);
 		queryParams.setStatus(status);
 	}
-	
+
 	/**
 	 * Set time parameter (modification date between).
 	 */
-	protected void setTimeParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setTimeParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		String timeFilter =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME);
@@ -493,7 +554,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			Calendar calendar = Calendar.getInstance();
 			calendar.add(Calendar.YEAR, -1);
 			timeFrom = calendar.getTime();
-
 		}
 
 		if (timeFrom != null) {
@@ -502,56 +562,27 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 	}
 
 	/**
-	 * Set types (asset types to search for).
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws PatternSyntaxException
-	 * @throws JSONException
-	 */
-	protected void setTypeParam(PortletRequest portletRequest, QueryParams queryParams)
-		throws PatternSyntaxException, ClassNotFoundException, JSONException {
-
-		String typeFilter =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE);
-
-		List<String> classNames = new ArrayList<String>();
-
-		String className = parseAssetClass(typeFilter);
-		
-		if (className != null) {
-			classNames.add(className);
-		}
-		else {
-			classNames.addAll(parseDefaultAssetClasses());
-		}
-
-		queryParams.setClassNames(classNames);
-	}
-
-	/**
 	 * Set user parameter.
 	 */
-	protected void setUserParam(PortletRequest portletRequest, QueryParams queryParams) {
+	protected void setUserParam(
+		PortletRequest portletRequest, QueryParams queryParams) {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		queryParams.setUserId(themeDisplay.getUserId());
 	}
-	
-	@Reference
-	private ConfigurationHelper _configurationHelper;
-	
-	@Reference
-	private ResultLayoutService _resultLayoutService;
 
 	// Modification date field name in the index.
 
 	private static final String MODIFIED_SORT_FIELD = "modified_sortable";
 
+	@Reference
+	private ConfigurationHelper _configurationHelper;
+
+	@Reference
 	private FacetTranslatorFactory _facetTranslatorFactory;
 
-	private volatile ModuleConfiguration _moduleConfiguration;
-
+	@Reference
 	private RequestParamValidator _requestParamValidator;
 }

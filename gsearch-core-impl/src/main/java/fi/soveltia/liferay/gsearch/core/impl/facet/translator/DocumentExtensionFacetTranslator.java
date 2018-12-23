@@ -24,7 +24,8 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
 public class DocumentExtensionFacetTranslator implements FacetTranslator {
 
@@ -32,9 +33,9 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canTranslate(String facetName) {
 
-		_facetName = facetName;
+		return (facetName.equals(FACET_NAME));
 	}
 
 	/**
@@ -140,5 +141,5 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 		return values;
 	}
 
-	protected String _facetName;
+	private static final String FACET_NAME = "extension";
 }

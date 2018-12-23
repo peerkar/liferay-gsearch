@@ -30,7 +30,5 @@ public class RequestParamValidatorImpl implements RequestParamValidator {
 		return false;
 	}
 
-	// Maximum length of keywords. Could be put in the configuration.
-
 	public static final int KEYWORDS_MAX_LENGTH = 100;
 }

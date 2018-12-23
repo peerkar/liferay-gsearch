@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -52,7 +53,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL)
+		Document document, QueryParams queryParams)
 		throws Exception {
 
 		long classNameId =
@@ -66,17 +67,18 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 
 			if (JournalArticle.class.getName().equals(className)) {
 				return getJournalArticleCommentLink(
-					portletRequest, portletResponse,
-					assetPublisherPageFriendlyURL, classPK);
+					portletRequest, portletResponse, queryParams,
+					queryParams.getAssetPublisherPageURL(), classPK);
 			}
 			else if (WikiPage.class.getName().equals(className)) {
-				return getWikiPageCommentLink(portletResponse, classPK);
+				return getWikiPageCommentLink(
+					portletRequest, portletResponse, queryParams, classPK);
 			}
 		}
 
-		return getAssetRenderer(document).getURLViewInContext(
-			(LiferayPortletRequest) portletRequest,
-			(LiferayPortletResponse) portletResponse, "");
+		return super.getLink(
+			portletRequest, portletResponse, document, queryParams);
+
 	}
 
 	/**
@@ -112,7 +114,8 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 				return title;
 			}
 		}
-		return super.getTitle(portletRequest, portletResponse, document, isHighlight);
+		return super.getTitle(
+			portletRequest, portletResponse, document, isHighlight);
 	}
 
 	protected String getDLFileEntryCommentLink() {
@@ -129,15 +132,21 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 */
 	protected String getJournalArticleCommentLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		String assetPublisherPageFriendlyURL, long classPK)
+		QueryParams queryParams, String assetPublisherPageFriendlyURL,
+		long classPK)
 		throws Exception {
 
 		AssetRenderer<?> assetRenderer =
 			getAssetRenderer(JournalArticle.class.getName(), classPK);
 
-		String link = assetRenderer.getURLViewInContext(
-			(LiferayPortletRequest) portletRequest,
-			(LiferayPortletResponse) portletResponse, null);
+		String link = null;
+
+		if (queryParams.isViewResultsInContext()) {
+
+			link = assetRenderer.getURLViewInContext(
+				(LiferayPortletRequest) portletRequest,
+				(LiferayPortletResponse) portletResponse, null);
+		}
 
 		if (Validator.isNull(link)) {
 
@@ -157,14 +166,25 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 * @throws Exception
 	 */
 	protected String getWikiPageCommentLink(
-		PortletResponse portletResponse, long classPK)
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryParams queryParams, long classPK)
 		throws Exception {
 
 		AssetRenderer<?> assetRenderer =
 			getAssetRenderer(WikiPage.class.getName(), classPK);
 
-		return assetRenderer.getURLView(
-			(LiferayPortletResponse) portletResponse, WindowState.MAXIMIZED);
+		if (queryParams.isViewResultsInContext()) {
+
+			return assetRenderer.getURLViewInContext(
+				(LiferayPortletRequest) portletRequest,
+				(LiferayPortletResponse) portletResponse, "");
+
+		}
+		else {
+			return assetRenderer.getURLView(
+				(LiferayPortletResponse) portletResponse,
+				WindowState.MAXIMIZED);
+		}
 	}
 
 	@Reference(unbind = "-")

@@ -3,8 +3,6 @@ package fi.soveltia.liferay.gsearch.core.impl.query.filter;
 
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
@@ -28,6 +26,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParam;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
@@ -135,11 +135,11 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	protected void buildClassesCondition(BooleanFilter filter, QueryParams queryParams)
 		throws ParseException {
 
-		if (queryParams.getClassNames() == null) {
+		if (queryParams.getEntryClassNames() == null) {
 			return;
 		}
 		
-		List<String> classNames = queryParams.getClassNames();
+		List<String> classNames = queryParams.getEntryClassNames();
 
 		BooleanQuery query = new BooleanQueryImpl();
 
@@ -184,12 +184,6 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (int i = 0; i < facetParam.getKey().getValues().length; i++) {
-
-				// Limit max values just in case.
-
-				if (i > MAX_FACET_VALUES) {
-					break;
-				}
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
@@ -330,9 +324,10 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 
 		filter.add(queryFilter, BooleanClauseOccur.MUST);
 	}
+	
+	private static final Logger _log =
+					LoggerFactory.getLogger(QueryFilterBuilderImpl.class);
 
-	private static final int MAX_FACET_VALUES = 20;
- 
 	@Reference(
 		bind = "setPermissionFilterQueryBuilder", 
 		policy = ReferencePolicy.STATIC, 
@@ -342,6 +337,4 @@ public class QueryFilterBuilderImpl implements QueryFilterBuilder {
 	)
 	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(QueryFilterBuilderImpl.class);
 }

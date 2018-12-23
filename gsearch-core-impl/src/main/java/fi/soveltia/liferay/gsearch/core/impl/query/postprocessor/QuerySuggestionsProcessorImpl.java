@@ -2,8 +2,6 @@
 package fi.soveltia.liferay.gsearch.core.impl.query.postprocessor;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
@@ -21,6 +19,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
@@ -29,6 +29,8 @@ import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
+ * Query suggestions post processor.
+ * 
  * This class populates hits object with query suggestions and does an
  * alternative search, depending on the configuration. Original
  * com.liferay.portal.search.internal.hits.QuerySuggestionHitsProcessor
@@ -55,7 +57,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 			_log.debug("Processing QuerySuggestions");
 		}
 
-		if (!_moduleConfiguration.enableQuerySuggestions()) {
+		if (!_moduleConfiguration.isQuerySuggestionsEnabled()) {
 			return true;
 		}
 
@@ -88,7 +90,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 		// Get suggestions
 
 		String[] querySuggestions =
-			_gSearchSuggester.getSuggestionsAsStringArray(portletRequest);
+			_gSearchKeywordSuggester.getSuggestionsAsStringArray(portletRequest);
 
 		querySuggestions =
 			ArrayUtil.remove(querySuggestions, searchContext.getKeywords());
@@ -115,7 +117,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 
 			queryParams.setKeywords(querySuggestions[0]);
 
-			Query query = _queryBuilder.buildQuery(portletRequest, queryParams, null, true);
+			Query query = _queryBuilder.buildQuery(portletRequest, queryParams, true);
 
 			BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 				query, BooleanClauseOccur.MUST.getName());
@@ -142,34 +144,17 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 			ModuleConfiguration.class, properties);
 	}
 
-	@Reference(unbind = "-")
-	protected void setGSearchKeywordSuggester(
-		GSearchKeywordSuggester gSearchSuggester) {
-
-		_gSearchSuggester = gSearchSuggester;
-	}
-
-	@Reference(unbind = "-")
-	protected void setIndexSearchHelper(
-		IndexSearcherHelper indexSearcherHelper) {
-
-		_indexSearcherHelper = indexSearcherHelper;
-	}
-
-	@Reference(unbind = "-")
-	protected void setQueryBuilder(QueryBuilder queryBuilder) {
-
-		_queryBuilder = queryBuilder;
-	}
-
+	private static final Logger _log =
+		LoggerFactory.getLogger(QuerySuggestionsProcessorImpl.class);
+	
 	private volatile ModuleConfiguration _moduleConfiguration;
 
-	private GSearchKeywordSuggester _gSearchSuggester;
+	@Reference
+	private GSearchKeywordSuggester _gSearchKeywordSuggester;
 
+	@Reference
 	private IndexSearcherHelper _indexSearcherHelper;
 
+	@Reference
 	private QueryBuilder _queryBuilder;
-
-	private static final Log _log =
-		LogFactoryUtil.getLog(QuerySuggestionsProcessorImpl.class);
 }

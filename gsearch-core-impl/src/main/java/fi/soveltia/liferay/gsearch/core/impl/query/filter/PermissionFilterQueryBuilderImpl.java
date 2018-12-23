@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query.filter;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
@@ -22,6 +20,8 @@ import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
@@ -127,23 +127,12 @@ public class PermissionFilterQueryBuilderImpl
 
 	}
 
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
-
-		_portal = portal;
-	}
-
-	@Reference(unbind = "-")
-	protected void setRoleLocalService(RoleLocalService roleLocalService) {
-
-		_roleLocalService = roleLocalService;
-	}
-
+	private static final Logger _log =
+					LoggerFactory.getLogger(PermissionFilterQueryBuilderImpl.class);
+	@Reference
 	private Portal _portal;
 
+	@Reference
 	private RoleLocalService _roleLocalService;
-
-	private static final Log _log =
-		LogFactoryUtil.getLog(PermissionFilterQueryBuilderImpl.class);
 
 }

@@ -2,7 +2,6 @@
 package fi.soveltia.liferay.gsearch.core.impl.facet;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -18,10 +17,13 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
 import fi.soveltia.liferay.gsearch.core.api.facet.FacetsBuilder;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
- * Facets builder implementation. This service sets the configured facets
+ * Facets builder implementation. 
+ * 
+ * This service sets the configured facets
  * (aggregations) to searchcontext.
  * 
  * @author Petteri Karttunen
@@ -37,17 +39,16 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacets(SearchContext searchContext)
+	public void setFacets(SearchContext searchContext, QueryParams queryParams)
 		throws JSONException {
+		
+		String[] configuration = queryParams.getFacetConfiguration();
 
-		JSONArray configuration = JSONFactoryUtil.createJSONArray(
-			_gSearchConfiguration.facetConfiguration());
+		for (int i = 0; i < configuration.length; i++) {
 
-		for (int i = 0; i < configuration.length(); i++) {
+			JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			JSONObject item = configuration.getJSONObject(i);
-
-			String fieldName = item.getString("fieldName");
+			String fieldName = item.getString("field_name");
 
 			Facet facet = new SimpleFacet(searchContext);
 
@@ -57,7 +58,7 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 			facetConfiguration.setStatic(false);
 
 			JSONObject dataObject = JSONFactoryUtil.createJSONObject();
-			dataObject.put("maxTerms", MAX_TERMS);
+			dataObject.put("maxTerms", _moduleConfiguration.maxFacetTerms());
 
 			facetConfiguration.setDataJSONObject(dataObject);
 
@@ -71,11 +72,9 @@ public class FacetsBuilderImpl implements FacetsBuilder {
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
 	}
 
-	private volatile ModuleConfiguration _gSearchConfiguration;
-
-	private int MAX_TERMS = 20;
+	private volatile ModuleConfiguration _moduleConfiguration;
 }

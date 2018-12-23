@@ -21,12 +21,14 @@ import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 
 /**
- * Facet translator implementation for document type. {@see FacetTranslator}
+ * Facet translator implementation for document type. 
  * 
  * @author Petteri Karttunen
+ * 
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
 public class DocumentTypeFacetTranslator implements FacetTranslator {
 
@@ -34,9 +36,9 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canTranslate(String facetName) {
 
-		_facetName = facetName;
+		return (facetName.equals(FACET_NAME));
 	}
 
 	/**
@@ -107,22 +109,11 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 		return item;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLFileEntryTypeService(
-		DLFileEntryTypeService dLFileEntryTypeService) {
+	@Reference
+	private DLFileEntryTypeService _dLFileEntryTypeService;
 
-		_dLFileEntryTypeService = dLFileEntryTypeService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-
-		_groupLocalService = groupLocalService;
-	}
-
-	protected String _facetName;
-
-	private static DLFileEntryTypeService _dLFileEntryTypeService;
-
-	private static GroupLocalService _groupLocalService;
+	@Reference
+	private GroupLocalService _groupLocalService;
+	
+	private static final String FACET_NAME = "fileEntryTypeId";
 }

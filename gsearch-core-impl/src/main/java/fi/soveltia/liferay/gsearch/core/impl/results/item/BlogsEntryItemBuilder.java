@@ -36,7 +36,7 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getImageSrc(PortletRequest portletRequest, Document document)
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
@@ -46,13 +46,8 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 		return blogsEntry.getSmallImageURL();
 	}
 
-	@Reference(unbind = "-")
-	protected void setBlogsEntryService(BlogsEntryService blogsEntryService) {
-
-		_blogsEntryService = blogsEntryService;
-	}
-
-	private static BlogsEntryService _blogsEntryService;
+	@Reference
+	private BlogsEntryService _blogsEntryService;
 
 	// 7.1 
 

@@ -2,8 +2,6 @@
 package fi.soveltia.liferay.gsearch.core.impl.query.postprocessor;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.SearchContext;
@@ -19,6 +17,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
@@ -57,7 +57,7 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			_log.debug("Processing QueryIndexer");
 		}
 
-		if (!_moduleConfiguration.enableQuerySuggestions()) {
+		if (!_moduleConfiguration.isQuerySuggestionsEnabled()) {
 			return true;
 		}
 
@@ -94,17 +94,11 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			locale);
 	}
 
-	@Reference(unbind = "-")
-	protected void setIndexWriterHelper(IndexWriterHelper indexWriterHelper) {
+	private static final Logger _log =
+		LoggerFactory.getLogger(QueryIndexerProcessorImpl.class);
 
-		_indexWriterHelper = indexWriterHelper;
-	}
-
+	@Reference
 	private IndexWriterHelper _indexWriterHelper;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
-
-	private static final Log _log =
-		LogFactoryUtil.getLog(QueryIndexerProcessorImpl.class);
-
 }

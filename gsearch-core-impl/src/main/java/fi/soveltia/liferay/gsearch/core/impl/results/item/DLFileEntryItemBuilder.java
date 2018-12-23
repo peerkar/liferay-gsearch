@@ -28,6 +28,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -49,7 +50,7 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	}
 	
 	@Override
-	public String getImageSrc(PortletRequest portletRequest, Document document)
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
@@ -65,9 +66,13 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL)
+		Document document, QueryParams queryParams)
 		throws Exception {
 
+		if (queryParams.isViewResultsInContext()) {
+			return super.getLink(portletRequest, portletResponse, document, queryParams);
+		}
+		
 		StringBundler sb = new StringBundler();
 		sb.append(PortalUtil.getPortalURL(portletRequest));
 		sb.append("/documents/");

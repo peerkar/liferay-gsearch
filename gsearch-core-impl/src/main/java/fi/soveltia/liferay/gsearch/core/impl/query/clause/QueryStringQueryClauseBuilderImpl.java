@@ -5,11 +5,14 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
-import org.osgi.service.component.annotations.Component;
+import javax.portlet.PortletRequest;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 import fi.soveltia.liferay.gsearch.query.Operator;
@@ -31,94 +34,172 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryParams queryParams)
 		throws Exception {
 
-		// If there's a predefined value in the configuration, use that
+		String keywords = null;
 
-		String value = configurationObject.getString("value");
+		if (Validator.isNotNull(configuration.get("query"))) {
 
-		if (Validator.isNull(value)) {
+			keywords = configuration.getString("query");
 
-			StringBundler sb = new StringBundler();
-
-			String prefix = configurationObject.getString("valuePrefix");
-			if (Validator.isNotNull(prefix)) {
-				sb.append(prefix);
-			}
-
-			sb.append(queryParams.getKeywords());
-
-			String suffix = configurationObject.getString("valueSuffix");
-			if (Validator.isNotNull(suffix)) {
-				sb.append(suffix);
-			}
-			value = sb.toString();
+			keywords = _configurationHelper.parseConfigurationVariables(
+				portletRequest, queryParams, keywords);
 		}
 
-		QueryStringQuery queryStringQuery = new QueryStringQuery(value);
+		if (Validator.isNull(keywords)) {
+			keywords = queryParams.getKeywords();
+		}
 
-		JSONArray fields = configurationObject.getJSONArray("fields");
+		QueryStringQuery queryStringQuery = new QueryStringQuery(keywords);
+		
+		JSONArray fields = configuration.getJSONArray("fields");
 
 		for (int i = 0; i < fields.length(); i++) {
 
-			JSONObject item = fields.getJSONObject(i);
+			JSONObject field = fields.getJSONObject(i);
 
 			// Add non translated version
 
-			String fieldName = item.getString("fieldName");
-			float boost = GetterUtil.getFloat(item.getString("boost"), 1f);
+			String fieldName = field.getString("field_name");
+
+			float boost = GetterUtil.getFloat(field.getString("boost"), 1.0f);
 
 			queryStringQuery.addField(fieldName, boost);
-
+			
 			// Add translated version
 
 			boolean isLocalized =
-				GetterUtil.getBoolean(item.get("localized"), false);
+				GetterUtil.getBoolean(field.get("localized"), false);
 
 			if (isLocalized) {
 
 				String localizedFieldName =
 					fieldName + "_" + queryParams.getLocale().toString();
 				float localizedBoost = GetterUtil.getFloat(
-					item.getString("boostForLocalizedVersion"), 1f);
+					field.getString("boost_localized_version"), 1.0f);
 
 				queryStringQuery.addField(localizedFieldName, localizedBoost);
 			}
 		}
 
-		// Operator
+		// Allow leading wildcard
 
-		String operator =
-			GetterUtil.getString(configurationObject.get("operator"), "and");
-
-		if (operator.equals("or")) {
-			queryStringQuery.setDefaultOperator(Operator.OR);
-		}
-		else {
-			queryStringQuery.setDefaultOperator(Operator.AND);
+		if (Validator.isNotNull(configuration.get("allow_leading_wildcard"))) {
+			queryStringQuery.setAllowLeadingWildcard(
+				configuration.getBoolean("allow_leading_wildcard"));
 		}
 
-		// Fuzziness
+		// Analyze wildcard
 
-		if (Validator.isNotNull(configurationObject.get("fuzziness"))) {
-			float fuzziness =
-				GetterUtil.getFloat(configurationObject.get("fuzziness"), 0.0f);
-			queryStringQuery.setFuzziness(fuzziness);
+		if (Validator.isNotNull(configuration.get("analyze_wildcard"))) {
+			queryStringQuery.setAnalyzeWildcard(
+				configuration.getBoolean("analyze_wildcard"));
+		}
+
+		// Analyzer
+
+		if (Validator.isNotNull(configuration.get("analyzer"))) {
+			queryStringQuery.setAnalyzer(configuration.getString("analyzer"));
 		}
 
 		// Boost
 
-		float boost =
-			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-		queryStringQuery.setBoost(boost);
+		if (Validator.isNotNull(configuration.get("boost"))) {
+			queryStringQuery.setBoost(
+				GetterUtil.getFloat(configuration.get("boost")));
+		}
 
-		// Analyzer
+		// Default operator
 
-		String analyzer = configurationObject.getString("analyzer");
+		if (Validator.isNotNull(configuration.get("default_operator"))) {
 
-		if (Validator.isNotNull(analyzer)) {
-			queryStringQuery.setAnalyzer(analyzer);
+			String operator =
+				GetterUtil.getString(configuration.get("default_operator"), "and");
+
+			if (operator.equalsIgnoreCase("or")) {
+				queryStringQuery.setDefaultOperator(Operator.OR);
+			}
+			else {
+				queryStringQuery.setDefaultOperator(Operator.AND);
+			}
+		}
+
+		// Enable position increments
+
+		if (Validator.isNotNull(
+			configuration.get("enable_position_increments"))) {
+			queryStringQuery.setEnablePositionIncrements(
+				configuration.getBoolean("enable_position_increments"));
+		}
+
+		// Fuzziness
+
+		if (Validator.isNotNull(configuration.get("fuzziness"))) {
+			queryStringQuery.setFuzziness(
+				GetterUtil.getFloat(configuration.get("fuzziness")));
+		}
+
+		// Fuzzy max expansions
+
+		if (Validator.isNotNull(configuration.get("fuzzy_max_expansions"))) {
+			queryStringQuery.setFuzzyMaxExpansions(
+				configuration.getInt("fuzzy_max_expansions"));
+		}
+
+		// Fuzzy prefix length
+
+		if (Validator.isNotNull(configuration.get("fuzzy_prefix_length"))) {
+			queryStringQuery.setFuzzyPrefixLength(
+				configuration.getInt("fuzzy_prefix_length"));
+		}
+
+		// Lenient
+
+		if (Validator.isNotNull(configuration.get("lenient"))) {
+			queryStringQuery.setLenient(configuration.getBoolean("lenient"));
+		}
+
+		// Max determined states
+
+		if (Validator.isNotNull(configuration.get("max_determinized_states"))) {
+			queryStringQuery.setMaxDeterminizedStates(
+				configuration.getInt("max_determinized_states"));
+		}
+
+		// Minimum should match expansions
+
+		if (Validator.isNotNull(configuration.get("minimum_should_match"))) {
+			queryStringQuery.setMinimumShouldMatch(
+				configuration.getString("minimum_should_match"));
+		}
+
+		// Phrase slop
+
+		if (Validator.isNotNull(configuration.get("phrase_slop"))) {
+			queryStringQuery.setPhraseSlop(configuration.getInt("phrase_slop"));
+		}
+
+		// Quote analyzer
+
+		if (Validator.isNotNull(configuration.get("quote_analyzer"))) {
+			queryStringQuery.setQuoteAnalyzer(
+				configuration.getString("quote_analyzer"));
+		}
+		
+		// Quote analyzer
+
+		if (Validator.isNotNull(configuration.get("quote_field_suffix"))) {
+			queryStringQuery.setQuoteFieldSuffix(
+				configuration.getString("quote_field_suffix"));
+		}
+
+		// Tie breaker
+
+		if (Validator.isNotNull(configuration.get("tie_breaker"))) {
+			queryStringQuery.setTieBreaker(
+				GetterUtil.getFloat(configuration.getString("tie_breaker")));
 		}
 
 		return queryStringQuery;
@@ -135,4 +216,6 @@ public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
 
 	private static final String QUERY_TYPE = "query_string";
 
+	@Reference
+	private ConfigurationHelper _configurationHelper;
 }

@@ -18,6 +18,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -39,7 +40,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	@Override
-	public String getImageSrc(PortletRequest portletRequest, Document document)
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
@@ -51,19 +52,22 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL)
+		Document document, QueryParams queryParams)
 		throws Exception {
 
 		String link = null;
+		
+		if (queryParams.isViewResultsInContext()) {
 
-		link = getAssetRenderer(document).getURLViewInContext(
-			(LiferayPortletRequest) portletRequest,
-			(LiferayPortletResponse) portletResponse, null);
-
+			link = getAssetRenderer(document).getURLViewInContext(
+				(LiferayPortletRequest) portletRequest,
+				(LiferayPortletResponse) portletResponse, null);
+		}
+		
 		if (Validator.isNull(link)) {
 			link = getNotLayoutBoundJournalArticleUrl(
 				portletRequest, getJournalArticle(document),
-				assetPublisherPageFriendlyURL);
+				queryParams.getAssetPublisherPageURL());
 		}
 
 		return link;

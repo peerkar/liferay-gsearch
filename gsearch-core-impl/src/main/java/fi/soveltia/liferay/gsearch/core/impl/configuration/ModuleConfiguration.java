@@ -15,50 +15,25 @@ import aQute.bnd.annotation.metatype.Meta;
 	name = "GSearch Core"
 )
 public interface ModuleConfiguration {
-
-	@Meta.AD(
-		deflt = "10", 
-		description = "page-size-desc",
-		name = "page-size-name",
-		required = false
-	)
-	public int pageSize();
-
-	@Meta.AD(
-		deflt = "/viewasset", 
-	    name = "asset-publisher-page-name",
-	    description = "asset-publisher-page-desc",
-		required = false
-	)
-	public String assetPublisherPage();
-		
-	@Meta.AD(
-		deflt = "[Please get the default configuration from project README page.",
-		description = "suggest-configuration-desc",
-	    name = "suggest-configuration-name",
-		required = false
-	)
-	public String suggestConfiguration();
-
 	@Meta.AD(
 		deflt = "true", 
 	    description = "enable-query-suggestions-name-desc",
 	    name = "enable-query-suggestions-name",
 		required = false
 	)
-	public boolean enableQuerySuggestions();
+	public boolean isQuerySuggestionsEnabled();
 
 	@Meta.AD(
 		deflt = "1", 
 		description = "query-suggestions-hits-threshold-desc",
-	    name = "Query Suggestion hits threshold.",
+	    name = "query-suggestions-hits-threshold-name",
 		required = false
 	)
 	public int querySuggestionsHitsThreshold();
 
 	@Meta.AD(
 		deflt = "1", 
-	    name = "query-suggestions-max",
+	    name = "query-suggestions-max-name",
 		required = false
 	)
 	public int querySuggestionsMax();
@@ -70,44 +45,20 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public int queryIndexingThreshold();
-	
-	@Meta.AD(
-		deflt = "list",
-	    description = "default-result-layout-desc",
-	    name = "default-result-layout-name",
-		required = false
-	)
-	public String defaultResultLayout();
-		
-	@Meta.AD(
-		deflt = "[Please get the default configuration from project README page.",
-		description = "type-configuration-desc",
-	    name = "type-configuration-name",
-		required = false
-	)
-	public String typeConfiguration();
-	
-	@Meta.AD(
-		deflt = "[Please get the default configuration from project README page.",
-	    description = "facet-configuration-desc",
-	    name = "facet-configuration-name",
-		required = false
-	)
-	public String facetConfiguration();
 
 	@Meta.AD(
-		deflt = "[Please get the default configuration from project README page.",
-		description = "query-configuration-desc",
-	    name = "query-configuration-name",
+		deflt = "50", 
+		description = "highlight-fragment-size-desc",
+	    name = "highlight-fragment-size-name",
 		required = false
 	)
-	public String queryConfiguration();
-
+	public int highlightFragmentSize();	
+	
 	@Meta.AD(
-		deflt = "[Please get the default configuration from project README page.",
-	    description = "sortfield-configuration-desc",
-	    name = "sortfield-configuration-name",
+		deflt = "20", 
+		description = "max-facet-terms-desc",
+	    name = "max-facet-terms-name",
 		required = false
 	)
-	public String sortFieldConfiguration();
+	public int maxFacetTerms();	
 }
