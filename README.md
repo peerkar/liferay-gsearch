@@ -2,7 +2,7 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many of the [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard Liferay search portlet available. 
 
-This application gives you full control over query configuration and relevance and makes it possible to contextual information like user segmenting in constructing the query. Its query rule engine makes it possible to build and stack conditions for clauses to be applied. It also has multiple extension points for customization 
+This application gives you full control over query configuration and relevance and makes it possible to leverage contextual information like user segmenting in constructing the query. Its query rule engine makes it possible to build and stack conditions for clauses to be applied. It has multiple extension points for customization 
 
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
