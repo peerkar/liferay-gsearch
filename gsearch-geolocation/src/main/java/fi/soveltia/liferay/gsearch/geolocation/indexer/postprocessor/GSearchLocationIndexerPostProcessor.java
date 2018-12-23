@@ -38,6 +38,7 @@ import fi.soveltia.liferay.gsearch.geolocation.service.GeoLocationService;
 		"indexer.class.name=com.liferay.blogs.model.BlogsEntry",
 		"indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 		"indexer.class.name=com.liferay.journal.model.JournalArticle",
+		"indexer.class.name=com.liferay.knowledge.base.model.KBArticle",
 		"indexer.class.name=import com.liferay.message.boards.kernel.model.MBMessage",
 		"indexer.class.name=com.liferay.wiki.model.WikiPage"
 	},

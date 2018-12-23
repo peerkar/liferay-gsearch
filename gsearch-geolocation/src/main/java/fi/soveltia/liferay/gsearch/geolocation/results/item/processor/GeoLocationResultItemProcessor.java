@@ -38,7 +38,7 @@ public class GeoLocationResultItemProcessor implements ResultItemProcessor {
 	@Override
 	public boolean isEnabled() {
 
-		return _moduleConfiguration.enableMapsLayout();
+		return true;
 	}
 
 	/**

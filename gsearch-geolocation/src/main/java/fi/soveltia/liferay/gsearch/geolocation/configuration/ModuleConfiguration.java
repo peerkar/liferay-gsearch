@@ -17,7 +17,7 @@ import fi.soveltia.liferay.gsearch.geolocation.query.contributor.DecayFunction;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "GSearch Geolocation Module"
+	name = "Geolocation"
 )
 public interface ModuleConfiguration {
 
@@ -36,15 +36,6 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public boolean enableIndexerPostProcessor();
-
-	@Meta.AD(
-		deflt = "false", 
-	    description = "enable-maps-layout-desc",
-	    name = "enable-maps-layout-name",
-		required = false
-	)
-	public boolean enableMapsLayout();
-
 	
 	@Meta.AD(
 		deflt = "2000km", 
