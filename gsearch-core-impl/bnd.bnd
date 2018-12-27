@@ -1,4 +1,3 @@
-Bundle-Activator: fi.soveltia.liferay.gsearch.core.bundle.CoreBundleActivator
 Bundle-Name: Liferay GSearch Core Implementation
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.core.impl
 Bundle-Version: 5.0.0
