@@ -2,27 +2,24 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many of the [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard Liferay search portlet available. 
 
-This application gives you full control over query configuration and relevance and makes it possible to contextual information like user segmenting in constructing the query. Its query rule engine makes it possible to build and stack conditions for clauses to be applied. It also has multiple extension points for customization 
+This application gives you full control over queries sent from Liferay to Elasticsearch and makes it possible to use user's contextual information in constructing the query as well as create conditional subqueries, with the help of a rule engine. For example, you might create a Audience Targeting segmenting rule for users having a certain portal role and then, in GSearch, configure a query that is injected in the main query only for that user segment. 
+
+The application has multiple extension points for customization and you can just choose to use the backend modules and create your own UI implementation.
 
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
 ## News
-* __(2018-11-15)__ Major version update, including:
+* __(2018-12-23)__ Major version update, including:
 	* Streamlined custom Elasticsearch adapter installation: no more flooding to log
-	* Added a possibility to override facets, query and assettypes configuration from  client callin the core
-	* New a basic default item builder. Now most asset types can be added in the search without a need to write a new result item builder.
-	* Added more query type specific configuration options
-	* New extensible query condition support. In the first phase there's support for keyword matches and Audience Targeting segment conditions.
-	* New content suggestions mode to Mini web portlet
-	* Added more configuration option for More Like This portlet
-	* New Audience Targeting functionality. Now it's possible to use pure use segmenting as query conditions.
+	* Configuration modularization. Added a possibility to override facets, query and assettypes configuration from  client calling the core
+	* New default item builder. Now support for most asset types can added just by adding a configuration entry without a need to write a new result item builder.
+	* More query type specific configuration options
+	* New, extensible query condition rule support. In the first phase there's support for keyword matches and Audience Targeting segment conditions.
+	* New content suggestions mode for Mini web portlet
+	* Added more configuration options for More Like This portlet
+	* New Audience Targeting integration. Now it's possible to use just the user segmenting as query conditions.
 	* Changed configuration syntax more Elasticsearch configuration like.
-	* Default configurations are now applied automatically on new install.
-
-* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
-
-* __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
-	
+	* Default configurations with examples are now set automatically on new install. Copying configuration files is not more needed
 * __(2018-11-15)__ Audience Targeting query contributor for 7.1 now [available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries)
 * __(2018-11-05)__ New More Like This portlet using Elasticsearch MLT query. Google Maps result view. New facet selections bar.
 * __(2018-10-20)__ [Geolocation query contributor for 7.1 is now available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
@@ -38,30 +35,31 @@ This application gives you full control over query configuration and relevance a
 
 ## Quick Full Installation Guide
 
-__Important!__: The master branch (module major version 3) are __for Liferay 7.1 only__. These instructions apply only for __DXP Fixpack 2 and above__.
+__Important!__: The master branch (module major version 3) are __for Liferay 7.1 only__. 
+
+Instructions below only apply for __7.1 DXP Fixpack 2 and above__.
 
 Find out the compatible module versions for your older portal versions in [compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility-Matrix).
 
-For more detailed installation guide, including add-ons, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
+For more detailed installation guide, see [Installation Instructions](https://github.com/peerkar/liferay-gsearch/wiki/Installation-Instructions).
 
 ### Step 1 
 
-Install standalone Elasticsearch server and configure the portal to use that. This is optional but without it most of the features and configuration won't be available because of limitations of embedded server.
+Install standalone Elasticsearch server and configure the portal to use that. This is optional but without it most of the features and configuration won't be available because of limitations of embedded server. See installation instructions at https://dev.liferay.com/en/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch
 
 ### Step 2
 
 __Do full reindex__ to create custom analyzers, mappings and settings. 
 
-
 ### Step 3
 
-Install Audience Targeting plugin. This is optional but highly recommended to leverage usage of user context in query building.
+Install Audience Targeting plugin. This is optional but allows to use integrate Audience Targeting user segmenting in query conditions as well as automatically boost segmented content.
 
 ### Step 4
 
 Download and deploy all the modules for your portal version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
-Check that all the modules are deployed correctly.
+Check that all the modules are deployed correctly. Some modules, like geolocation and web need additional configuration, like Google Maps API key and IPStack key but those can be added later.
 
 ### Step 5
 
@@ -69,11 +67,11 @@ Add a page with friendly URL "/viewasset" and add Asset Publisher on it. You can
  
 ### Step 6
 
-Place the GSearch portlet on some page and test.
+Place the GSearch portlet on some page and test. Take a look at the many configuration options and some query configuration examples in Control Panel -> System Settings -> GSearch.
 
-## Known Issues
+## Known Issues (important)
 
-For keyword suggester to work, you have to update the custom Elasticsearch adapter. Run "update BUNDLE_ID" in Gogo shell and you're good.
+For keyword suggester to work, you have to update the custom Elasticsearch adapter OSGi bundle. Run "update BUNDLE_ID" in Gogo shell and you're good.
 
 There's currently a bug in 7.1 Soy framework generating lots of log data. For now please set a logging level for  com.liferay.portal.portlet.bridge.soy.internal.SoyPortlet to "OFF". Issue can be found here: https://issues.liferay.com/browse/LPS-85186 
  
