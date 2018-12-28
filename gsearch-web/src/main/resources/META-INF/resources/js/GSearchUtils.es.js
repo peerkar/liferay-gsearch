@@ -201,9 +201,13 @@ class GSearchUtils {
 
             	if (isMultiValued) {
                     $('#' + optionElementId + ' li.default').removeClass('selected');
-                    $('#' + optionElementId + ' li.default :checkbox').prop('checked', false);
-                    let defaultValue = $('#' + optionElementId + ' li.default :checkbox').attr('data-value');
-                    queryParamSetter(queryParam, null, false, isMultiValued, defaultValue);
+                    let checkbox = $('#' + optionElementId + ' li.default :checkbox');
+                    checkbox.prop('checked', false);
+                    let previousValue = checkbox.attr('data-value');
+                    if ((typeof previousValue === 'undefined') && (currentValues.length > 0)) {
+                    	previousValue = '0'; // use dummy default value if it is not explicitly set for this type of filter
+					}
+                    queryParamSetter(queryParam, null, false, isMultiValued, previousValue);
                 }
 				if (currentValues.indexOf(value) < 0) {
 
@@ -218,7 +222,7 @@ class GSearchUtils {
                         queryParamSetter('timeEnd', '', false, false);
 
                     }
-					queryParamSetter(queryParam, value, isRefresh, isMultiValued);
+                    queryParamSetter(queryParam, value, isRefresh, isMultiValued);
 
 					GSearchUtils.setOptionListSelectedItems(optionElementId,
 						triggerElementId, [value], isMultiValued);
@@ -226,7 +230,7 @@ class GSearchUtils {
 
 				} else {
 
-					queryParamSetter(queryParam, null, true, isMultiValued, value);
+                    queryParamSetter(queryParam, null, true, isMultiValued, value);
 
 					GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
 
