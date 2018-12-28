@@ -28,6 +28,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.portal.kernel.util.WebKeys;
+import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 import org.osgi.service.component.annotations.Component;
@@ -54,8 +55,6 @@ import java.util.Locale;
 )
 public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	implements ResultItemBuilder {
-
-	private static final String FLAMMA_GROUP_FRIENDLY_URL = "/flamma";
 
 	@Override
 	public boolean canBuild(Document document) {
@@ -226,7 +225,7 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		if (layoutFriendlyURL != null) {
-			Group flammaGroup = _groupLocalService.getFriendlyURLGroup(themeDisplay.getCompanyId(), FLAMMA_GROUP_FRIENDLY_URL);
+			Group flammaGroup = _flammaGroupService.getFlammaGroup();
 
 			return LayoutLocalServiceUtil.getFriendlyURLLayout(
 				flammaGroup.getGroupId(),
@@ -266,6 +265,15 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 
 		_resultItemCommonService = resultItemCommonService;
 	}
+
+	@Reference(unbind = "-")
+	protected void setFlammaGroupService(
+		FlammaGroupService flammaGroupService) {
+
+		_flammaGroupService = flammaGroupService;
+	}
+
+	private static FlammaGroupService _flammaGroupService;
 
 	private static ResultItemCommonService _resultItemCommonService;
 
