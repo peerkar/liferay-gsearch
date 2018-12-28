@@ -67,9 +67,6 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 )
 public class ViewMVCRenderCommand implements MVCRenderCommand{
 
-	private static final String FLAMMA_GROUP_FRIENDLY_URL = "/flamma";
-	private static final String UNIT_VOCABULARY_NAME = "Yksikkö";
-
 	@Override
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
