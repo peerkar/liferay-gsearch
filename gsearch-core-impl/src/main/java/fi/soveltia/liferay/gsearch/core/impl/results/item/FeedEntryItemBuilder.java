@@ -3,11 +3,14 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import fi.helsinki.flamma.feed.model.FeedEntry;
 import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
 import fi.helsinki.flamma.feed.util.FeedUrlService;
@@ -50,6 +53,9 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
     @Reference
     private ResultItemCommonService resultItemCommonService;
 
+    @Reference
+    private UserLocalService userLocalService;
+
     @Override
     public boolean canBuild(Document document) {
         return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
@@ -58,6 +64,45 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
     @Override
     public String getType() {
         return TYPE;
+    }
+
+    @Override
+    public String getImageSrc(PortletRequest portletRequest, long entryClassPK)
+        throws Exception {
+
+        String userPortraitUrl = "";
+        try {
+            FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
+            long userId = feedEntry.getUserId();
+            ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+            userPortraitUrl = getUserPortraitUrl(userId, themeDisplay);
+        } catch (PortalException e) {
+            log.error(String.format("Cannot get feed entry for '%s'", entryClassPK));
+        } catch (NumberFormatException e) {
+            log.error(String.format("Cannot parse '%s' as long.", entryClassPK));
+        }
+        return userPortraitUrl;
+    }
+
+    @Override
+    public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception {
+        try {
+            FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
+            User user = getUser(feedEntry.getUserId());
+            if (user != null) {
+                return String.format("%s / %s.%s / %s", "VIRTA", user.getFirstName().toUpperCase(), user.getLastName().toUpperCase(), entryClassPK);
+            }
+        } catch (PortalException e) {
+            log.error(String.format("Cannot get feed entry for '%s'", entryClassPK));
+        } catch (NumberFormatException e) {
+            log.error(String.format("Cannot parse '%s' as long.", entryClassPK));
+        }
+        return "";
+    }
+
+    @Override
+    public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale) throws SearchException {
+        return super.getDescription(portletRequest, portletResponse, document, locale);
     }
 
     @Override
@@ -84,15 +129,37 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
 
     @Override
     public String getTitle(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale, long entryClassPK) throws NumberFormatException, PortalException {
-        String userName = document.get(Field.USER_NAME);
-        String titlePrefix = getLocalization(locale, "feed-entry-title");
-        return String.format("%s: %s", titlePrefix, userName);
+        return document.get(Field.USER_NAME);
     }
 
-    private String getLocalization(Locale locale, String key) {
-        if (resourceBundles.get(locale) == null) {
-            resourceBundles.put(locale, ResourceBundleUtil.getBundle("content.Language", locale, FeedEntryItemBuilder.class));
+    private User getUser(long userId) {
+        try {
+            User user = userLocalService.getUser(userId);
+            if (user.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+                return user;
+            }
+        } catch (PortalException e) {
+            log.error(String.format("Cannot get user with userId %s", userId));
         }
-        return resourceBundles.get(locale).getString(key);
+        return null;
+
     }
+
+    private String getUserPortraitUrl(long userId, ThemeDisplay themeDisplay) {
+        String url = "";
+        User user = getUser(userId);
+        if (user != null) {
+            try {
+                url = user.getPortraitURL(themeDisplay);
+            } catch (PortalException e) {
+                log.error(String.format("Cannot get user portrait url for user %s", userId));
+            }
+        }
+
+        if (url == null) {
+            url = "/image/user_male_portrait";
+        }
+        return url;
+    }
+
 }

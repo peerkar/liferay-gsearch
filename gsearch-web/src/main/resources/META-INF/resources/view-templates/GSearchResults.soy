@@ -85,9 +85,13 @@
                 <div class="item-icon hidden-xs">
 					<a href="{$item.link}">
 						<div class="{$item.typeKey}-icon">
-							<svg role="img">
-								<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
-							</svg>
+							{if ($item.typeKey == 'feed-entry')}
+								<img src="{$item.imageSrc}"/>
+							{else}
+                                <svg role="img">
+                                    <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
+                                </svg>
+							{/if}
 						</div>
 					</a>
                 </div>
