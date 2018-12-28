@@ -287,7 +287,7 @@ GSearchFilters.STATE = {
 		validator: core.isFunction
 	},
 	templateParameters: {
-		value: ['type','scope','time','unit', 'timeStart', 'timeEnd']
+		value: ['type', 'scope', 'time', 'unit', 'timeStart', 'timeEnd']
 	}
 };
 

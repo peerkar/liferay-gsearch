@@ -288,19 +288,19 @@ class GSearchQuery extends State {
 
 			// Add other parameters
 
-			if (parameter.key != key && this.isValueNotNull(parameter.value)) {
+			if (parameter.key !== key && this.isValueNotNull(parameter.value)) {
 
 				newValues.push(parameter)
 
-			} else 	if (parameter.key == key && this.isValueNotNull(value) && parameter.value != value) {
+			} else 	if (parameter.key === key && this.isValueNotNull(value) && parameter.value !== value) {
 
 				// Add other values for the same parameter
 
 				newValues.push(parameter)
 
 
-			} else 	if (parameter.key == key && !this.isValueNotNull(value) && this.isValueNotNull(previousValue) &&
-					parameter.value != previousValue) {
+			} else 	if (parameter.key === key && !this.isValueNotNull(value) && this.isValueNotNull(previousValue) &&
+					parameter.value !== previousValue) {
 
 				// Add other values for the same parameter
 
