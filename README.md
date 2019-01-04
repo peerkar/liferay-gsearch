@@ -45,21 +45,23 @@ For more detailed installation guide, see [Installation Instructions](https://gi
 
 ### Step 1 
 
-Install standalone Elasticsearch server and configure the portal to use that. This is optional but without it most of the features and configuration won't be available because of limitations of embedded server. See installation instructions at https://dev.liferay.com/en/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch
+Install standalone Elasticsearch server and configure the portal to use that. This is optional but without it many features  won't be available because of limitations of embedded server. See installation instructions at https://dev.liferay.com/en/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch
 
 ### Step 2
 
-__Do full reindex__ to create custom analyzers, mappings and settings. 
+Install Liferay Audience Targeting plugin from Liferay Marketplace. This is optional but allows to use integrate Audience Targeting user segmenting in query conditions as well as automatically boost segmented content.
 
 ### Step 3
-
-Install Audience Targeting plugin. This is optional but allows to use integrate Audience Targeting user segmenting in query conditions as well as automatically boost segmented content.
-
-### Step 4
 
 Download and deploy all the modules for your portal version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
 Check that all the modules are deployed correctly. Some modules, like geolocation and web need additional configuration, like Google Maps API key and IPStack key but those can be added later.
+
+### Step 4
+
+If you installed the custom Elasticsearch adapter in the previous step, __do full reindex__ to create custom analyzers, mappings and settings. 
+
+Installing custom adapter is not mandatory but highly recommended. Without it Elasticsearch QueryString or FunctionScore query configurations won't work as the query translators are in the custom adapter. Also, keyword suggester has only limited functionality and needs extra configuration.
 
 ### Step 5
 
