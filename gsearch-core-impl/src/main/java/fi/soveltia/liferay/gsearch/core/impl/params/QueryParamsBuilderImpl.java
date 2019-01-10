@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
+import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
@@ -375,7 +376,15 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 			classNames.addAll(
 				defaultQueryTypes
 					.stream()
-					.map(QueryType::getEntryClassName)
+					.map(queryType -> {
+						String entryClassName = queryType.getEntryClassName();
+						if (entryClassName.equals(JournalArticle.class.getName())) {
+							if (queryType.getDDMStructureKeys() != null) {
+								ddmStructureKeys.addAll(queryType.getDDMStructureKeys());
+							}
+						}
+						return entryClassName;
+					})
 					.collect(Collectors.toList())
 			);
 		}

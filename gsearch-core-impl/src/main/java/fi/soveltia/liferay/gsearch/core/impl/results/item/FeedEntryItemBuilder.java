@@ -85,6 +85,27 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
     }
 
     @Override
+    public Map<String, String> getMetadata(Document document, Locale locale, long companyId) {
+        String initials = "";
+        try {
+            long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+            FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
+            long userId = feedEntry.getUserId();
+            User user = getUser(userId);
+            if (user != null) {
+                initials = user.getInitials();
+            }
+        } catch (PortalException e) {
+            log.error(String.format("Cannot get feed entry for '%s'", document.get(Field.ENTRY_CLASS_PK)));
+        } catch (NumberFormatException e) {
+            log.error(String.format("Cannot parse '%s' as long.", document.get(Field.ENTRY_CLASS_PK)));
+        }
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("initials", initials);
+        return metadata;
+    }
+
+    @Override
     public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception {
         try {
             FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
@@ -149,16 +170,18 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder implements Resul
         String url = "";
         User user = getUser(userId);
         if (user != null) {
-            try {
-                url = user.getPortraitURL(themeDisplay);
-            } catch (PortalException e) {
-                log.error(String.format("Cannot get user portrait url for user %s", userId));
+            if (user.getPortraitId() != 0) {
+                try {
+                    url = user.getPortraitURL(themeDisplay);
+                    if (url == null) {
+                        url = "";
+                    }
+                } catch (PortalException e) {
+                    log.error(String.format("Cannot get user portrait url for user %s", userId));
+                }
             }
         }
 
-        if (url == null) {
-            url = "/image/user_male_portrait";
-        }
         return url;
     }
 
