@@ -81,12 +81,18 @@
 
 		<div class="item">
 
-			{if $item.imageSrc}
+			{if ($item.typeKey == 'feed-entry') or $item.imageSrc}
                 <div class="item-icon hidden-xs">
 					<a href="{$item.link}">
 						<div class="{$item.typeKey}-icon">
 							{if ($item.typeKey == 'feed-entry')}
-								<img src="{$item.imageSrc}"/>
+								{if ($item.imageSrc == '')}
+									<div class="user-icon">
+										<span>{$item?.metadata?.initials}</span>
+									</div>
+								{else}
+                                    <img src="{$item.imageSrc}"/>
+								{/if}
 							{else}
                                 <svg role="img">
                                     <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
