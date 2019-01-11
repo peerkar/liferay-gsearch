@@ -232,8 +232,6 @@ public class QueryParamsBuilderImpl implements QueryParamsBuilder {
 		String keywords =
 			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS, "");
 
-		boolean suggestions = Boolean.valueOf(ParamUtil.getString(portletRequest, GSearchWebKeys.SUGGESTIONS_MODE, "false"));
-
 		// Validate keywords.
 
 		if (!_requestParamValidator.validateKeywords(keywords)) {
