@@ -70,7 +70,5 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String UNIT_FILTERS = "unitFilters";
 	public static final String UNIT_PARAM = "unit";
 
-	public static final String SUGGESTIONS_MODE = "suggestions";
-
 	public static final String LANGUAGE = "language";
 }

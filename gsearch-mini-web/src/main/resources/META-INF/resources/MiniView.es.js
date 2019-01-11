@@ -80,7 +80,6 @@ class MiniView extends Component {
 		    	window.location.href = suggestion.data.url;
 		    },
 			paramName: 'q',
-			params: {'suggestions': true},
 			serviceUrl: _self.suggestionsURL,
 			groupBy: "type",
 			triggerSelectOnValidInput: false,
