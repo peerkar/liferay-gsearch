@@ -1,6 +1,8 @@
 # Liferay GSearch Geolocation Query Contributor
 
-Allows to index content editing users coordinates to content asset (based on the IP address) and in searching, to boost contents geographically closer to the searching user.
+Allows to index content editing users coordinates to content asset (based on the IP address) and in searching, to boost contents geographically closer to the searching user. 
+
+It also enables using the Google Maps result layout. Sample configuration is provided in the GSearch Portlet configuration.
 
 Module consist of geolocation indexer postprocessor and a geolocation query contributor, using Liferay GSearch QueryContributor API.
 
