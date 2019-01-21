@@ -22,11 +22,11 @@ public interface ModuleConfiguration {
 	
 	@Meta.AD(
 		deflt = "false", 
-	    description = "enable-query-contributor-desc",
-	    name = "enable-query-contributor-name",
+	    description = "enable-feature-desc",
+	    name = "enable-feature-name",
 		required = false
 	)
-	public boolean enableQueryContributor();
+	public boolean enableFeature();
 	
 	@Meta.AD(
 		deflt = "2.0f", 
