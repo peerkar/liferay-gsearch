@@ -1,0 +1,53 @@
+[
+	{
+		"description": "More Like This query.",
+		"conditions": [],
+		"clauses": [
+			{
+				"query_type": "more_like_this",
+				"occur": "must",
+				"query_configuration": {
+					"boost": 1,
+					"fields": [
+						{
+							"field_name": "title",
+							"localized": true
+						},
+						{
+							"field_name": "content",
+							"localized": true
+						},
+						{
+							"field_name": "assetTagNames.raw",
+							"localized": false
+						}
+					],
+					"include" : false,
+					"max_doc_freq" : 100,
+					"max_query_terms" : 25,
+					"max_word_length" : 0,
+					"min_doc_freq" : 4,
+					"min_term_freq" : 3,
+					"min_word_length" : 0,
+					"minimum_should_match" : "30%",
+					"stop_words" : []
+				}
+			}
+		]
+	},
+	{
+		"description": "As an example of clause stacking, as in GSearch clause configuration, boost additionally results having tag official.",
+		"conditions": [],
+		"clauses": [
+			{
+				"query_type": "term",
+				"occur": "should",
+				"query_configuration": {
+					"boost": "5",
+					"field_name": "assetTagNames.raw",
+					"query": "official"
+				}
+			}
+		]
+	}
+]
