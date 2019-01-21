@@ -1,9 +1,10 @@
 package fi.soveltia.liferay.gsearch.query;
 
 import com.liferay.portal.kernel.search.Query;
+import com.liferay.portal.kernel.util.StringBundler;
 
 /**
- * Decay Function Score Query for GSearch.
+ * Decay Function Score Query.
  * 
  * Please see https://www.elastic.co/guide/en/elasticsearch/guide/current/decay-functions.html 
  * for more information.
@@ -50,7 +51,7 @@ public class DecayFunctionScoreQuery extends FunctionScoreQuery implements Query
 	 */
 	public String getFieldName() {
 	
-		return fieldName;
+		return _fieldName;
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class DecayFunctionScoreQuery extends FunctionScoreQuery implements Query
 	 */
 	public void setFieldName(String fieldName) {
 	
-		this.fieldName = fieldName;
+		_fieldName = fieldName;
 	}
 
 	/**
@@ -82,6 +83,32 @@ public class DecayFunctionScoreQuery extends FunctionScoreQuery implements Query
 	public void setFunctionType(String functionType) {
 	
 		_functionType = functionType;
+	}
+	
+	/**
+	 * Get multivalue mode
+	 * 
+	 * @return
+	 */
+	public String getMultiValueMode() {
+	
+		return _multiValueMode;
+	}
+
+	/**
+	 * Set multivalue mode
+	 * 
+	 * Possible values:
+	 * 		min: Distance is the minimum distance
+	 * 		max: Distance is the maximum distance
+	 * 		avg: Distance is the average distance
+	 * 		sum: Distance is the sum of all distances
+	 * 
+	 * @param multiValueMode
+	 */
+	public void setMultiValueMode(String multiValueMode) {
+	
+		_multiValueMode = multiValueMode;
 	}
 
 	/**
@@ -160,10 +187,44 @@ public class DecayFunctionScoreQuery extends FunctionScoreQuery implements Query
 	
 		_weight = weight;
 	}
+	
+	@Override
+	public String toString() {
+		StringBundler sb = new StringBundler(29);
+
+		sb.append(", boost=");
+		sb.append(super.getBoost());
+		sb.append(", boostMode=");
+		sb.append(super.getBoostMode());
+		sb.append(", decay=");
+		sb.append(_decay);
+		sb.append(", field_name=");
+		sb.append(_fieldName);
+		sb.append(", function_type=");
+		sb.append(_functionType);
+		sb.append(", multivalue_mode=");
+		sb.append(_multiValueMode);
+		sb.append(", offset=");
+		sb.append(_offSet);
+		sb.append(", origin=");
+		sb.append(_origin);
+		sb.append(", scale=");
+		sb.append(_scale);
+		sb.append(", weight=");
+		sb.append(_weight);
+		sb.append(", max_boost=");
+		sb.append(super.getMaxBoost());
+		sb.append(", min_score=");
+		sb.append(super.getMinScore());
+		sb.append("}");
+
+		return sb.toString();
+	}
 
 	private Double _decay;
-	private String fieldName;
+	private String _fieldName;
 	private String _functionType;
+	private String _multiValueMode;
 	private Object _origin;
 	private String _offSet;
 	private String _scale;
