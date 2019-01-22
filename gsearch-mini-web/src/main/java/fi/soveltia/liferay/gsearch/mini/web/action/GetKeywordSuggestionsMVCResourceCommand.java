@@ -2,8 +2,6 @@
 package fi.soveltia.liferay.gsearch.mini.web.action;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
@@ -13,13 +11,15 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
-import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
+import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
 
 /**
- * Resource command for getting keyword suggestions (autocomplete).
+ * Resource command for getting suggestions (autocomplete).
  * 
  * @author Petteri Karttunen
  */
@@ -27,11 +27,12 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
-		"mvc.command.name=" + GSearchMiniResourceKeys.GET_SUGGESTIONS
+		"mvc.command.name=" + GSearchMiniResourceKeys.GET_KEYWORD_SUGGESTIONS
 	}, 
 	service = MVCResourceCommand.class
 )
-public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
+public class GetKeywordSuggestionsMVCResourceCommand
+	extends BaseMVCResourceCommand {
 
 	@Override
 	protected void doServeResource(
@@ -49,7 +50,7 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 		catch (Exception e) {
 
-			_log.error(e, e);
+			_log.error(e.getMessage(), e.getCause());
 
 			return;
 		}
@@ -60,16 +61,10 @@ public class GetSuggestionsMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, response);
 	}
 
-	@Reference(unbind = "-")
-	protected void setGSearchKeywordSuggester(
-		GSearchKeywordSuggester gSearchSuggester) {
-
-		_gSearchSuggester = gSearchSuggester;
-	}
-
 	@Reference
 	protected GSearchKeywordSuggester _gSearchSuggester;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(GetSuggestionsMVCResourceCommand.class);
+	private static final Logger _log =
+		LoggerFactory.getLogger(GetKeywordSuggestionsMVCResourceCommand.class);
+
 }
