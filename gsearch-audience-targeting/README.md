@@ -56,11 +56,11 @@ Example configuration:
 ```
 
 
-## Module Prerequisites
+## Prerequisites
 
 Liferay Audience Targeting plugin installed.
 
-## Module Configuration
+## Configuration
 
 After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> Liferay GSearch -> GSearch Audience Targeting.
 
