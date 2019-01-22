@@ -6,11 +6,11 @@ It also enables using the Google Maps result layout. Sample configuration is pro
 
 Module consist of geolocation indexer postprocessor and a geolocation query contributor, using Liferay GSearch QueryContributor API.
 
-## Module Prerequisites
+## Prerequisites
 
 Internet connection for both having and resolving IP addresses.
 
-## Module Configuration
+## Configuration
 
 After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> Liferay GSearch -> Geolocation
 
