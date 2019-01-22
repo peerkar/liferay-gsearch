@@ -12,13 +12,20 @@ import com.liferay.portal.kernel.search.generic.MatchQuery.Type;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import org.osgi.service.component.annotations.Component;
+import java.util.Locale;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import javax.portlet.PortletRequest;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * MatchQuery builder service implementation.
+ * Match query builder.
  * 
  * @author Petteri Karttunen
  */
@@ -33,43 +40,55 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		JSONObject configurationObject, QueryParams queryParams)
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryContext queryContext)
 		throws Exception {
+		
+		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
 
-		String fieldName = configurationObject.getString("fieldName");
+		String fieldName = configuration.getString("field_name");
 
 		if (fieldName == null) {
 			return null;
 		}
 
-		// If there's a predefined value in the configuration, use that
+		String keywords = null;
 
-		String value = configurationObject.getString("value");
+		if (Validator.isNotNull(configuration.get("query"))) {
 
-		if (Validator.isNull(value)) {
-			value = queryParams.getKeywords();
+			keywords = configuration.getString("query");
+
+			keywords = _configurationHelper.parseConfigurationVariables(
+				portletRequest, queryContext, keywords);
+		}
+
+		if (Validator.isNull(keywords)) {
+			keywords = queryContext.getKeywords();
 		}
 
 		MatchQuery matchQuery =
-			buildClause(configurationObject, queryParams, fieldName, value);
+			buildClause(configuration, queryContext, fieldName, keywords);
 
 		// Is localized
 
-		boolean isLocalized = configurationObject.getBoolean("localized");
+		boolean isLocalized = configuration.getBoolean("localized");
 
 		if (isLocalized) {
+			
 			String localizedFieldName =
-				fieldName + "_" + queryParams.getLocale().toString();
+				fieldName + "_" + locale.toString();
 
 			MatchQuery localizedQuery = buildClause(
-				configurationObject, queryParams, localizedFieldName, value);
+				configuration, queryContext, localizedFieldName, keywords);
 
-			// Boost for localized
+			// Boost for localized version
 
-			float localizedBoost = GetterUtil.getFloat(
-				configurationObject.getString("boostForLocalizedVersion"), 1f);
-
-			localizedQuery.setBoost(localizedBoost);
+			if (Validator.isNotNull(
+				configuration.get("boost_localized_version"))) {
+				localizedQuery.setBoost(
+					GetterUtil.getFloat(
+						configuration.get("boost_localized_version")));
+			}
 
 			// Add subqueries to the query
 
@@ -85,17 +104,81 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 	}
 
 	protected MatchQuery buildClause(
-		JSONObject configurationObject, QueryParams queryParams,
-		String fieldName, String value)
+		JSONObject configuration, QueryContext queryContext, String fieldName,
+		String query)
 		throws Exception {
 
-		MatchQuery matchQuery = new MatchQuery(fieldName, value);
+		MatchQuery matchQuery = new MatchQuery(fieldName, query);
+
+		// Analyzer
+
+		if (Validator.isNotNull(configuration.get("analyzer"))) {
+			matchQuery.setAnalyzer(configuration.getString("analyzer"));
+		}
+
+		// Boost
+
+		if (Validator.isNotNull(configuration.get("boost"))) {
+			matchQuery.setBoost(
+				GetterUtil.getFloat(configuration.get("boost")));
+		}
+
+		// Cut off frequency
+
+		if (Validator.isNotNull(configuration.get("cut_off_frequency"))) {
+			matchQuery.setCutOffFrequency(
+				GetterUtil.getFloat(configuration.get("cut_off_frequency")));
+		}
+
+		// Fuzziness
+
+		if (Validator.isNotNull(configuration.get("fuzziness"))) {
+			matchQuery.setFuzziness(
+				GetterUtil.getFloat(configuration.get("fuzziness")));
+		}
+
+		// Lenient
+
+		if (Validator.isNotNull(configuration.get("lenient"))) {
+			matchQuery.setLenient(configuration.getBoolean(("lenient")));
+		}
+
+		// Max expansions
+
+		if (Validator.isNotNull(configuration.get("max_expansions"))) {
+			matchQuery.setMaxExpansions(configuration.getInt("max_expansions"));
+		}
+
+		// Minimum should match expansions
+
+		if (Validator.isNotNull(configuration.get("minimum_should_match"))) {
+			matchQuery.setMinShouldMatch(
+				configuration.getString("minimum_should_match"));
+		}
+
+		// Operator
+
+		if (Validator.isNotNull(configuration.get("operator"))) {
+
+			if ("or".equalsIgnoreCase(configuration.getString("operator"))) {
+				matchQuery.setOperator(Operator.OR);
+			}
+			else {
+				matchQuery.setOperator(Operator.AND);
+			}
+		}
+
+		// Slop
+
+		if (Validator.isNotNull(configuration.get("slop"))) {
+			matchQuery.setSlop(configuration.getInt("slop"));
+		}
 
 		// Type
 
-		String type = configurationObject.getString("type");
+		if (Validator.isNotNull(configuration.get("type"))) {
 
-		if (Validator.isNotNull(type)) {
+			String type = configuration.getString("type");
 
 			if (Type.BOOLEAN.name().equalsIgnoreCase(type)) {
 				matchQuery.setType(Type.BOOLEAN);
@@ -107,59 +190,6 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 				matchQuery.setType(Type.PHRASE_PREFIX);
 			}
 		}
-
-		// Boost
-
-		float boost =
-			GetterUtil.getFloat(configurationObject.get("boost"), 1.0f);
-		matchQuery.setBoost(boost);
-
-		// Operator
-
-		String operator =
-			GetterUtil.getString(configurationObject.get("operator"), "and");
-
-		if ("or".equals(operator)) {
-			matchQuery.setOperator(Operator.AND);
-		}
-		else {
-			matchQuery.setOperator(Operator.AND);
-		}
-
-		// Analyzer
-
-		String analyzer =
-			GetterUtil.getString(configurationObject.get("analyzer"));
-
-		if (Validator.isNotNull(analyzer)) {
-			matchQuery.setAnalyzer(analyzer);
-		}
-
-		// Cut off frequency
-
-		if (Validator.isNotNull(configurationObject.get("cutoffFrequency"))) {
-			float cutOffFrequency = GetterUtil.getFloat(
-				configurationObject.get("cutoffFrequency"), 0.0f);
-			matchQuery.setCutOffFrequency(cutOffFrequency);
-		}
-
-		// Fuzziness
-
-		if (Validator.isNotNull(configurationObject.get("fuzziness"))) {
-			float fuzziness =
-				GetterUtil.getFloat(configurationObject.get("fuzziness"), 0.0f);
-			matchQuery.setFuzziness(fuzziness);
-		}
-
-		// Minimum should match
-
-		String minShouldMatch =
-			GetterUtil.getString(configurationObject.get("minShouldMatch"));
-
-		if (Validator.isNotNull(minShouldMatch)) {
-			matchQuery.setMinShouldMatch(minShouldMatch);
-		}
-
 		return matchQuery;
 	}
 
@@ -173,4 +203,7 @@ public class MatchQueryBuilderImpl implements ClauseBuilder {
 	}
 
 	private static final String QUERY_TYPE = "match";
+
+	@Reference
+	private ConfigurationHelper _configurationHelper;
 }

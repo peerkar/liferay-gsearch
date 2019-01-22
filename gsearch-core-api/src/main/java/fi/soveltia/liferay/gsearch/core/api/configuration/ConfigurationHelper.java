@@ -1,12 +1,9 @@
 
 package fi.soveltia.liferay.gsearch.core.api.configuration;
 
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-
-import java.util.Locale;
-
 import javax.portlet.PortletRequest;
+
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * A configuration helper interface.
@@ -16,42 +13,52 @@ import javax.portlet.PortletRequest;
 public interface ConfigurationHelper {
 
 	/**
-	 * Get asset type options localized. Should be deprecated when
-	 * https://issues.liferay.com/browse/LPS-75141 is solved.
-	 *
-	 * @param locale
-	 * @return
-	 * @throws JSONException
-	 */
-	public JSONArray getAssetTypeOptions(Locale locale)
-		throws JSONException;
-	
-	/**
-	 * Get facets configuration
+	 * Get asset type configuration.
 	 * 
-	 * @return JSONArray
+	 * @return String[]
+	 */
+	public String[] getAssetTypeConfiguration();
+
+	/**
+	 * Get clause configuration.
+	 * 
+	 * @return String[]
+	 */
+	public String[] getClauseConfiguration();
+
+	/**
+	 * Get facet configuration.
+	 * 
+	 * @return String[]
 	 * @throws Exception
 	 */
-	public JSONArray getFacetConfiguration() throws JSONException;
-	
-	/**
-	 * Get sort options localized. Should be deprecated when
-	 * https://issues.liferay.com/browse/LPS-75141 is solved.
-	 * 
-	 * @param locale
-	 * @return
-	 * @throws JSONException
-	 */
-	public JSONArray getSortOptions(Locale locale)
-		throws JSONException;
-	
-	/**
-	 * Parse configuration field name which might have variables in it.
-	 * 
-	 * @param portletRequest
-	 * @param fieldName
-	 * @return
-	 */
-	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName);
+	public String[] getFacetConfiguration();
 
+	/**
+	 * Get keyword suggester configuration
+	 * 
+	 * @return
+	 */
+	public String[] getKeywordSuggesterConfiguration();
+
+	/**
+	 * Get sort configuration.
+	 * 
+	 * @return String[]
+	 * @throws Exception
+	 */
+	public String[] getSortConfiguration();
+	
+	/**
+	 * Parse known variables in configuration key or value.
+	 * 
+	 * For example $_language_id_$ could be translated to current language id.
+	 *  
+	 * @param portletRequest
+	 * @param queryParams
+	 * @param input
+	 * @return
+	 */
+	public String parseConfigurationVariables(
+		PortletRequest portletRequest, QueryContext queryParams, String input);
 }

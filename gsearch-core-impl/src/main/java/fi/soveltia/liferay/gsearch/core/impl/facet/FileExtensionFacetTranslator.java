@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.facet.translator;
+package fi.soveltia.liferay.gsearch.core.impl.facet;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -15,8 +15,8 @@ import java.util.Map.Entry;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Facet translator for document extension. {@see FacetTranslator}
@@ -24,25 +24,26 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
-public class DocumentExtensionFacetTranslator implements FacetTranslator {
+public class FileExtensionFacetTranslator implements FacetTranslator {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canProcess(String translatorName) {
 
-		_facetName = facetName;
+		return NAME.equals(translatorName);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray translateValues(
-		QueryParams queryParams, FacetCollector facetCollector,
+	public JSONArray fromResults(
+		QueryContext queryParams, FacetCollector facetCollector,
 		JSONObject configuration)
 		throws Exception {
 
@@ -115,7 +116,7 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] translateParams(String value, JSONObject configuration) {
+	public String[] toQuery(String value, JSONObject configuration) {
 
 		String[] values = null;
 
@@ -140,5 +141,5 @@ public class DocumentExtensionFacetTranslator implements FacetTranslator {
 		return values;
 	}
 
-	protected String _facetName;
+	private static final String NAME = "file_extension";
 }

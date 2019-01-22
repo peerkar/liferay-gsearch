@@ -1,9 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,14 +8,17 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilderFactory;
 
 /**
- * Clause builder service implementation.
+ * Clause builder factory implementation.
  * 
  * @author Petteri Karttunen
+ * 
  */
 @Component(
 	immediate = true, 
@@ -33,6 +33,9 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 	public ClauseBuilder getClauseBuilder(String queryType) {
 
 		if (_clauseBuilders == null) {
+			
+			_log.error("No clause builders found.");
+			
 			return null;
 		}
 
@@ -42,9 +45,8 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 			}
 		}
 
-		if (_log.isDebugEnabled()) {
-			_log.debug("No clause builder found for " + queryType);
-		}
+		_log.error("No clause builder found for " + queryType + ". Check configuration.");
+
 
 		return null;
 	}
@@ -72,6 +74,9 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		_clauseBuilders.remove(clauseBuilder);
 	}
 
+	private static final Logger _log =
+		LoggerFactory.getLogger(ClauseBuilderFactoryImpl.class);
+	
 	@Reference(
 		bind = "addClauseBuilder", 
 		cardinality = ReferenceCardinality.MULTIPLE, 
@@ -80,7 +85,4 @@ public class ClauseBuilderFactoryImpl implements ClauseBuilderFactory {
 		unbind = "removeClauseBuilder"
 	)
 	private volatile List<ClauseBuilder> _clauseBuilders;
-
-	private static final Log _log =
-		LogFactoryUtil.getLog(ClauseBuilderFactoryImpl.class);
 }

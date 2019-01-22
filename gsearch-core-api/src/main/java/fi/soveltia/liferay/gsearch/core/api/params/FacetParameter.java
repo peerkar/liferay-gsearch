@@ -1,53 +1,83 @@
+
 package fi.soveltia.liferay.gsearch.core.api.params;
 
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import java.util.List;
 
 /**
- * Facet parameter pojo
+ * Facet parameter pojo.
  * 
  * @author Petteri Karttunen
- *
  */
-public class FacetParam {
+public class FacetParameter {
 
-	String fieldName;
-	String[] values;
-	BooleanClauseOccur occur;
-	
-	public FacetParam(String fieldName, String[]values, BooleanClauseOccur occur) {
-		this.fieldName = fieldName;
-		this.values = values;
-		this.occur = occur;
+	public FacetParameter(
+		String fieldName, List<String> values, boolean allowMultipleValues,
+		String multiValueOperator, String filterMode) {
+
+		_fieldName = fieldName;
+		_values = values; 
+		_allowMultipleValues = allowMultipleValues;
+		_multiValueOperator = multiValueOperator;
+		_filterMode = filterMode;
 	}
-	
+
+	public boolean isAllowMultipleValues() {
+
+		return _allowMultipleValues;
+	}
+
+	public void setAllowMultipleValues(boolean allowMultipleValues) {
+
+		_allowMultipleValues = allowMultipleValues;
+	}
+
 	public String getFieldName() {
-	
-		return fieldName;
+
+		return _fieldName;
 	}
-	
+
 	public void setFieldName(String fieldName) {
-	
-		this.fieldName = fieldName;
+
+		_fieldName = fieldName;
 	}
-	
-	public String[] getValues() {
-	
-		return values;
+
+	public String getFilterMode() {
+
+		return _filterMode;
 	}
-	
-	public void setValues(String[] values) {
-	
-		this.values = values;
+
+	public void setFilterMode(String filterMode) {
+
+		_filterMode = filterMode;
 	}
-	
-	public BooleanClauseOccur getOccur() {
-	
-		return occur;
+
+	public String getMultiValueOperator() {
+
+		return _multiValueOperator;
 	}
-	
-	public void setOccur(BooleanClauseOccur occur) {
-	
-		this.occur = occur;
+
+	public void setMultiValueOperator(String multiValueOperator) {
+
+		_multiValueOperator = multiValueOperator;
 	}
-	
+
+	public List<String>getValues() {
+
+		return _values;
+	}
+
+	public void setValues(List<String> values) {
+
+		_values = values;
+	}
+
+	boolean _allowMultipleValues;
+
+	String _fieldName;
+
+	String _filterMode;
+
+	String _multiValueOperator;
+
+	List<String> _values;
 }

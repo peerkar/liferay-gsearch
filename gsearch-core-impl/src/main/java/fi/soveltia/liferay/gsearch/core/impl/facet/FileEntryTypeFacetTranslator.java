@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.facet.translator;
+package fi.soveltia.liferay.gsearch.core.impl.facet;
 
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeService;
@@ -17,37 +17,42 @@ import java.util.Locale;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Facet translator implementation for document type. {@see FacetTranslator}
+ * Facet translator implementation for document type. 
  * 
  * @author Petteri Karttunen
+ * 
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
-public class DocumentTypeFacetTranslator implements FacetTranslator {
+public class FileEntryTypeFacetTranslator implements FacetTranslator {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canProcess(String translatorName) {
 
-		_facetName = facetName;
+		return NAME.equals(translatorName);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray translateValues(
-		QueryParams queryParams, FacetCollector facetCollector,
+	public JSONArray fromResults(
+		QueryContext queryContext, FacetCollector facetCollector,
 		JSONObject configuration)
 		throws Exception {
 
+		Locale locale  = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
+		
 		JSONArray facetArray = JSONFactoryUtil.createJSONArray();
 
 		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
@@ -55,7 +60,7 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 		for (TermCollector tc : termCollectors) {
 
 			JSONObject item =
-				parseDocumentTypeData(tc, queryParams.getLocale());
+				parseDocumentTypeData(tc, locale);
 
 			if (item != null) {
 				facetArray.put(item);
@@ -69,7 +74,7 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] translateParams(String value, JSONObject configuration) {
+	public String[] toQuery(String value, JSONObject configuration) {
 
 		return new String[] {
 			value
@@ -99,7 +104,7 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 
 		item.put("frequency", tc.getFrequency());
 		item.put(
-			"groupName", _groupLocalService.getGroup(type.getGroupId()).getName(
+			"group_name", _groupLocalService.getGroup(type.getGroupId()).getName(
 				locale, true));
 		item.put("name", type.getName(locale, true));
 		item.put("term", fileEntryTypeId);
@@ -107,22 +112,11 @@ public class DocumentTypeFacetTranslator implements FacetTranslator {
 		return item;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDLFileEntryTypeService(
-		DLFileEntryTypeService dLFileEntryTypeService) {
+	@Reference
+	private DLFileEntryTypeService _dLFileEntryTypeService;
 
-		_dLFileEntryTypeService = dLFileEntryTypeService;
-	}
-
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-
-		_groupLocalService = groupLocalService;
-	}
-
-	protected String _facetName;
-
-	private static DLFileEntryTypeService _dLFileEntryTypeService;
-
-	private static GroupLocalService _groupLocalService;
+	@Reference
+	private GroupLocalService _groupLocalService;
+	
+	private static final String NAME = "file_entry_type";
 }

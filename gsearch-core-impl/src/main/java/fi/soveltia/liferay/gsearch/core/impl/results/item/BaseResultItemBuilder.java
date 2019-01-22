@@ -10,6 +10,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
@@ -18,9 +19,11 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -34,6 +37,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
@@ -49,19 +54,23 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDate()
+	public String getDate(PortletRequest portletRequest, Document document)
 		throws ParseException {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
 
 		String dateString = "";
 
 		try {
-			if (Validator.isNotNull(_document.get(Field.MODIFIED_DATE))) {
+			if (Validator.isNotNull(document.get(Field.MODIFIED_DATE))) {
 
 				Date lastModified = QueryBuilderImpl.INDEX_DATE_FORMAT.parse(
-					_document.get(Field.MODIFIED_DATE));
+					document.get(Field.MODIFIED_DATE));
 
 				DateFormat dateFormat =
-					DateFormat.getDateInstance(DateFormat.SHORT, _locale);
+					DateFormat.getDateInstance(DateFormat.SHORT, locale);
 				dateString = dateFormat.format(lastModified);
 			}
 		}
@@ -76,36 +85,80 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDescription()
+	public String getDescription(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws SearchException {
 
-		return HtmlUtil.stripHtml(getSummary().getContent());
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
+
+		String description = null;
+
+		description = document.get(
+			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
+			Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
+
+		if (Validator.isNull(description)) {
+			description = document.get(
+				locale, Field.CONTENT,
+				Field.CONTENT);
+			
+			// Limit description length in case we needed to grab the content.
+			
+			if(description.length() > DESCRIPTION_MAX_LENGTH) {
+				description = description.substring(0, DESCRIPTION_MAX_LENGTH);
+			}
+		}
+
+		if (Validator.isNull(description)) {
+			
+			description = getSummary(
+				portletRequest, portletResponse, document, true).getContent();
+		}
+				
+		// Be sure to remove html tags. This should be fixed in adapter.
+		
+		description = description.replaceAll("<liferay-hl>", "---LR-HL-START---");
+		description = description.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
+		description = HtmlUtil.stripHtml(description);
+		description = description.replaceAll("---LR-HL-START---", "<liferay-hl>");
+		description = description.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
+		
+		return description;
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @throws Exception
 	 */
 	@Override
-	public String getImageSrc()
-		throws Exception {
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, QueryContext queryContext)
+		throws Exception { 
+		
+		boolean appendRedirect = isAppendRedirect(queryContext);
 
-		return null;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getLink()
-		throws Exception {
+		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		StringBundler sb = new StringBundler();
-		sb.append(
-			getAssetRenderer().getURLView(
-				(LiferayPortletResponse) _portletResponse,
-				WindowState.MAXIMIZED));
+			
+		if (viewResultsInContext) {
+			
+			sb.append(getAssetRenderer(document).getURLViewInContext(
+			(LiferayPortletRequest) portletRequest,
+			(LiferayPortletResponse) portletResponse, ""));
+		} else {
+			sb.append(
+				getAssetRenderer(document).getURLView(
+					(LiferayPortletResponse) portletResponse,
+					WindowState.MAXIMIZED));
+		}
+		
+		if (appendRedirect) {
+			return GSearchUtil.appendRedirectToURL(portletRequest, sb.toString());
+		}
 
 		return sb.toString();
 	}
@@ -114,7 +167,8 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(
+		PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		return null;
@@ -128,14 +182,15 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @throws PortalException
 	 */
 	public String getNotLayoutBoundJournalArticleUrl(
-		JournalArticle journalArticle)
+		PortletRequest portletRequest, JournalArticle journalArticle,
+		String assetPublisherPageFriendlyURL)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
-			(ThemeDisplay) _portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		Layout layout = GSearchUtil.getLayoutByFriendlyURL(
-			_portletRequest, _assetPublisherPageFriendlyURL);
+			portletRequest, assetPublisherPageFriendlyURL);
 
 		String assetPublisherInstanceId =
 			GSearchUtil.findDefaultAssetPublisherInstanceId(layout);
@@ -158,78 +213,89 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @throws Exception
 	 */
 	@Override
-	public String[] getTags() {
+	public String getThumbnail(PortletRequest portletRequest, Document document)
+		throws Exception {
 
-		String[] tags = _document.getValues(Field.ASSET_TAG_NAMES);
-
-		return tags;
+		return null;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getTitle()
+	public String getTitle(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
-		String title = getSummary().getTitle();
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
+
+		String title = null;
+		
+		if (isHighlight) {
+			
+			title = document.get(
+				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
+				Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
+		}
+		
+		if (Validator.isNull(title)) {
+
+			title = document.get(
+				locale, Field.TITLE,
+				Field.TITLE);
+		}
 
 		if (Validator.isNull(title)) {
-			title = getAssetRenderer().getTitle(_locale);
+
+			title = document.get(
+				locale, "localized" + StringPool.UNDERLINE + Field.TITLE,
+				Field.TITLE);
 		}
-		return HtmlUtil.stripHtml(title);
+
+		if (Validator.isNull(title)) {
+			title = getSummary(
+				portletRequest, portletResponse, document,
+				isHighlight).getTitle();
+		}
+		return title;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getType() {
+	public String getType(Document document) {
 
-		return _entryClassName;
+		return document.get(Field.ENTRY_CLASS_NAME);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setProperties(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherPageFriendlyURL) {
+	protected String getAssetPublisherPageURL(QueryContext queryContext) {
 
-		_assetPublisherPageFriendlyURL = assetPublisherPageFriendlyURL;
-		_portletRequest = portletRequest;
-		_portletResponse = portletResponse;
-		_document = document;
-		_locale = _portletRequest.getLocale();
-		_entryClassName = _document.get(Field.ENTRY_CLASS_NAME);
-		_entryClassPK = Long.valueOf(_document.get(Field.ENTRY_CLASS_PK));
-		_assetRenderer = null;
-		_summary = null;
+		return (String)queryContext.getParameter(
+			ParameterNames.ASSET_PUBLISHER_URL);
 	}
-
+	
 	/**
-	 * s Get AssetRenderer
+	 * Get asset renderer.
 	 * 
 	 * @return asset renderer object specific for the item type
 	 * @throws PortalException
 	 * @throws NumberFormatException
 	 */
-	protected AssetRenderer<?> getAssetRenderer()
+	protected AssetRenderer<?> getAssetRenderer(Document document)
 		throws NumberFormatException, PortalException {
 
-		if (_assetRenderer == null) {
+		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
+		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
 
-			AssetRendererFactory<?> assetRendererFactory =
-				AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(
-					_entryClassName);
-			_assetRenderer =
-				assetRendererFactory.getAssetRenderer(_entryClassPK);
-		}
-
-		return _assetRenderer;
+		return getAssetRenderer(entryClassName, entryClassPK);
 	}
 
 	/**
@@ -267,43 +333,49 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	/**
 	 * Get document summary.
 	 * 
-	 * @return document summary object
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param isHighlight
+	 * @return
 	 * @throws SearchException
 	 */
-	protected Summary getSummary()
+	protected Summary getSummary(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, boolean isHighlight)
 		throws SearchException {
 
-		if (_summary == null) {
+		Indexer<?> indexer = getIndexer(document.get(Field.ENTRY_CLASS_NAME));
 
-			Indexer<?> indexer =
-				getIndexer(_document.get(Field.ENTRY_CLASS_NAME));
+		if (indexer != null) {
 
-			if (indexer != null) {
-				String snippet = _document.get(Field.SNIPPET);
+			String snippet = document.get(Field.CONTENT);
 
-				_summary = indexer.getSummary(
-					_document, snippet, _portletRequest, _portletResponse);
+			Summary summary = indexer.getSummary(
+				document, snippet, portletRequest, portletResponse);
 
-				_summary.setHighlight(true);
+			summary.setHighlight(isHighlight);
 
-				return _summary;
-			}
+			return summary;
 		}
 
-		return _summary;
+		return null;
 	}
+	
+	protected boolean isAppendRedirect(QueryContext queryContext) {
 
-	protected String _assetPublisherPageFriendlyURL;
-	protected Document _document;
-	protected String _entryClassName;
-	protected long _entryClassPK;
-	protected Locale _locale;
-	protected PortletRequest _portletRequest;
-	protected PortletResponse _portletResponse;
-
-	private AssetRenderer<?> _assetRenderer;
-	private Summary _summary = null;
-
+		return GetterUtil.getBoolean(queryContext.getParameter(
+			ParameterNames.APPEND_REDIRECT), false);
+	}
+	
+	protected boolean isViewInContext(QueryContext queryContext) {
+		
+		return GetterUtil.getBoolean(queryContext.getParameter(
+			ParameterNames.VIEW_RESULTS_IN_CONTEXT), true);
+	}
+	
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
+	
+	private static final int DESCRIPTION_MAX_LENGTH = 400;
 }

@@ -1,5 +1,5 @@
 
-package fi.soveltia.liferay.gsearch.core.impl.facet.translator;
+package fi.soveltia.liferay.gsearch.core.impl.facet;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -20,36 +20,41 @@ import java.util.Locale;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.facet.translator.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Facet translator for web content structures. {@see FacetTranslator}
+ * Facet translator for web content structures.
  * 
  * @author Petteri Karttunen
+ * 
  */
 @Component(
-	immediate = true
+	immediate = true,
+	service = FacetTranslator.class
 )
-public class WebContentStructureFacetTranslator implements FacetTranslator {
+public class DDMStructureFacetTranslator implements FacetTranslator {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void setFacetName(String facetName) {
+	public boolean canProcess(String translatorName) {
 
-		_facetName = facetName;
+		return NAME.equals(translatorName);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray translateValues(
-		QueryParams queryParams, FacetCollector facetCollector,
+	public JSONArray fromResults(
+		QueryContext queryContext, FacetCollector facetCollector,
 		JSONObject configuration)
 		throws Exception {
+
+		Locale locale  = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
 
 		JSONArray facetArray = JSONFactoryUtil.createJSONArray();
 
@@ -57,7 +62,8 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 
 		for (TermCollector tc : termCollectors) {
 
-			JSONObject item = parseStructureData(tc, queryParams.getLocale());
+			JSONObject item = parseStructureData(tc, locale);
+			
 			facetArray.put(item);
 		}
 
@@ -68,7 +74,7 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] translateParams(String value, JSONObject configuration) {
+	public String[] toQuery(String value, JSONObject configuration) {
 
 		return new String[] {
 			value
@@ -99,7 +105,7 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 
 		item.put("frequency", tc.getFrequency());
 		item.put(
-			"groupName",
+			"group_name",
 			_groupLocalService.getGroup(structure.getGroupId()).getName(
 				locale, true));
 		item.put("name", structure.getName(locale, true));
@@ -108,22 +114,11 @@ public class WebContentStructureFacetTranslator implements FacetTranslator {
 		return item;
 	}
 
-	@Reference(unbind = "-")
-	protected void setDDMStructureLocalService(
-		DDMStructureLocalService ddmStructureLocalService) {
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
-		_ddmStructureLocalService = ddmStructureLocalService;
-	}
+	@Reference
+	private GroupLocalService _groupLocalService;
 
-	@Reference(unbind = "-")
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-
-		_groupLocalService = groupLocalService;
-	}
-
-	protected String _facetName;
-
-	private static DDMStructureLocalService _ddmStructureLocalService;
-
-	private static GroupLocalService _groupLocalService;
+	private static final String NAME = "ddm_structure";
 }

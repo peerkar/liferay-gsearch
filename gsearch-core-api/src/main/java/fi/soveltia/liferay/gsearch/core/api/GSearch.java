@@ -6,10 +6,10 @@ import com.liferay.portal.kernel.json.JSONObject;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * GSearch service. This service is responsible for getting the search results.
+ * GSearch service.
  * 
  * @author Petteri Karttunen
  */
@@ -20,12 +20,12 @@ public interface GSearch {
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
-	 * @param queryParams
+	 * @param queryContext
 	 * @return search results JSON object
 	 * @throws Exception
 	 */
 	public JSONObject getSearchResults(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams)
+		QueryContext queryContext)
 		throws Exception;
 }

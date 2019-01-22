@@ -1,186 +1,145 @@
 
-package fi.soveltia.liferay.gsearch.core.api.params;
+package fi.soveltia.liferay.gsearch.core.api.query.context;
 
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Sort;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Query parameters pojo.
+ * Query context.
  * 
  * @author Petteri Karttunen
  */
-public class QueryParams {
+public class QueryContext {
 
-	private long companyId;
-	private long[] groupIds;
-	private Locale locale;
-	long userId;
-
-	private List<String> classNames;
-	private Map<FacetParam, BooleanClauseOccur> facetParams;
-	private String keywords;
-	private String originalKeywords;
-	private String resultsLayout;
-	private Date timeFrom = null;
-	private Date timeTo = null;
-
-	private int start;
-	private int end;
-	private int pageSize;
-	private Sort[] sorts;
-
-	public long getCompanyId() {
-
-		return companyId;
-	}
-
-	public void setCompanyId(long companyId) {
-
-		this.companyId = companyId;
-	}
-
-	public long[] getGroupIds() {
-
-		return groupIds;
-	}
-
-	public void setGroupIds(long[] groupIds) {
-
-		this.groupIds = groupIds;
-	}
-
-	public Locale getLocale() {
-
-		return locale;
-	}
-
-	public void setLocale(Locale locale) {
-
-		this.locale = locale;
-	}
-
-	public long getUserId() {
-
-		return userId;
-	}
-
-	public void setUserId(long userId) {
-
-		this.userId = userId;
-	}
-
-	public List<String> getClassNames() {
-
-		return classNames;
-	}
-
-	public void setClassNames(List<String> classNames) {
-
-		this.classNames = classNames;
+	public String[] getConfiguration(String key) {
+		
+		if (_configurations != null) {
+			return _configurations.get(key);
+		}
+		return null;
 	}
 	
-	public Map<FacetParam, BooleanClauseOccur> getFacetParams() {
+	public void setConfiguration(String key, String[] value) {
 	
-		return facetParams;
-	}
-	
-	public void setFacetsParams(Map<FacetParam, BooleanClauseOccur> facetParams) {
-	
-		this.facetParams = facetParams;
-	}
-
-	public String getKeywords() {
-
-		return keywords;
-	}
-
-	public void setKeywords(String keywords) {
-
-		this.keywords = keywords;
-	}
-
-	public String getOriginalKeywords() {
-
-		return originalKeywords;
-	}
-
-	public void setOriginalKeywords(String originalKeywords) {
-
-		this.originalKeywords = originalKeywords;
-	}
-
-	public String getResultsLayout() {
-
-		return resultsLayout;
-	}
-
-	public void setResultsLayout(String resultsLayout) {
-
-		this.resultsLayout = resultsLayout;
-	}
-
-	public Date getTimeFrom() {
-
-		return timeFrom;
-	}
-
-	public void setTimeFrom(Date timeFrom) {
-
-		this.timeFrom = timeFrom;
-	}
-
-	public Date getTimeTo() {
-
-		return timeTo;
-	}
-
-	public void setTimeTo(Date timeTo) {
-
-		this.timeTo = timeTo;
-	}
-
-	public int getStart() {
-
-		return start;
-	}
-
-	public void setStart(int start) {
-
-		this.start = start;
+		if (_configurations == null) {
+			_configurations = new HashMap<String, String[]>();
+		}
+		_configurations.put(key, value);
 	}
 
 	public int getEnd() {
 
-		return end;
+		return _end;
 	}
 
 	public void setEnd(int end) {
 
-		this.end = end;
+		_end = end;
+	}
+
+	public String getKeywords() {
+
+		return _keywords;
+	}
+
+	public void setKeywords(String keywords) {
+
+		_keywords = keywords;
+	}
+
+	public String getOriginalKeywords() {
+
+		return _originalKeywords;
+	}
+
+	public void setOriginalKeywords(String originalKeywords) {
+
+		_originalKeywords = originalKeywords;
+	}
+	
+	public Object getParameter(String key) {
+
+		if (_parameters != null) {
+			return _parameters.get(key);
+		}
+		return null;
+	}
+
+	public void setParameter(String key, Object value) {
+
+		if (_parameters == null) {
+			_parameters = new HashMap<String, Object>();
+		}
+		_parameters.put(key, value);
 	}
 
 	public int getPageSize() {
 
-		return pageSize;
+		return _pageSize;
 	}
 
 	public void setPageSize(int pageSize) {
 
-		this.pageSize = pageSize;
+		_pageSize = pageSize;
+	}
+
+	public boolean isQueryContributorsEnabled() {
+
+		return _queryContributorsEnabled;
+	}
+
+	public void setQueryContributorsEnabled(boolean queryContributorsEnabled) {
+
+		_queryContributorsEnabled = queryContributorsEnabled;
+	}
+
+	public boolean isQueryPostProcessorsEnabled() {
+
+		return _queryPostProcessorsEnabled;
+	}
+
+	public void setQueryPostProcessorsEnabled(
+		boolean queryPostProcessorsEnabled) {
+
+		_queryPostProcessorsEnabled = queryPostProcessorsEnabled;
 	}
 
 	public Sort[] getSorts() {
 
-		return sorts;
+		return _sorts;
 	}
 
-	public void setSorts(Sort[] sort) {
+	public void setSorts(Sort[] sorts) {
 
-		this.sorts = sort;
+		_sorts = sorts;
 	}
+
+	public int getStart() {
+
+		return _start;
+	}
+
+	public void setStart(int start) {
+
+		_start = start;
+	}
+
+	private String _keywords;
+	private String _originalKeywords;
+	
+	private Map<String, String[]> _configurations;
+	private Map<String, Object> _parameters;
+	
+	private boolean _queryContributorsEnabled = true;
+	private boolean _queryPostProcessorsEnabled = true;
+
+	// Paging and sorting
+
+	private int _start;
+	private int _end;
+	private int _pageSize;
+	private Sort[] _sorts;
+	
 }

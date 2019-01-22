@@ -8,99 +8,108 @@ import java.util.Map;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+
 /**
- * Asset type specific result item builder. Implementations of this class build
- * a single result item.
+ * Asset type specific single result item builder. 
  * 
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
 
 	/**
-	 * Check if this builder can build the requested document.
+	 * Check if this builder can build the result item for the document.
+	 * 
+	 * @param document
+	 * @return
 	 */
 	public boolean canBuild(Document document);
-	
+
 	/**
-	 * Get item hit date.
+	 * Get item date. 
 	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
-	public String getDate()
+	public String getDate(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
 	 * Get item description.
 	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
 	 * @return item description
+	 * @throws Exception
 	 */
-	public String getDescription()
-		throws Exception;
-
-	/**
-	 * Get item image src i.e. src attribute for img tag.
-	 * 
-	 * @return item description
-	 */
-	public String getImageSrc()
+	public String getDescription(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws Exception;
 
 	/**
 	 * Get item link.
 	 * 
-	 * @return item link
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param queryContext
+	 * @return item url
 	 * @throws Exception
 	 */
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, QueryContext queryContext)
 		throws Exception;
 
 	/**
 	 * Get item additional metadata.
 	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return item metadata
 	 * @throws Exception
 	 */
-	public Map<String, String> getMetadata()
+	public Map<String, String> getMetadata(
+		PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
-	 * Get item tags.
+	 * Get thumbnail (src) for a result item.
 	 * 
-	 * @return item tags
+	 * @param portletRequest
+	 * @param document
+	 * @return thumbnail src
+	 * @throws Exception
 	 */
-	public String[] getTags()
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
 	 * Get item title.
 	 * 
-	 * @return item title
-	 */
-	public String getTitle()
-		throws Exception;
-
-	/**
-	 * Get item type
-	 * 
-	 * @return name of the item asset type
-	 */
-	public String getType()
-		throws Exception;
-
-	/**
-	 * Set item builder properties.
-	 * 
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document
-	 *            search document
-	 * @param assetPublisherFriendlyURL
-	 *            friendly url of the page where there is an assetpublisher for
-	 *            showing contents without any bound layout
+	 * @param highlight
+	 * @return item title
+	 * @throws Exception
 	 */
-	public void setProperties(
+	public String getTitle(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, String assetPublisherFriendlyURL);
+		Document document, boolean highlight)
+		throws Exception;
 
+	/**
+	 * Get item asset type.
+	 * 
+	 * @param document
+	 * @return name of the item asset type
+	 * @throws Exception
+	 */
+	public String getType(Document document)
+		throws Exception;
 }

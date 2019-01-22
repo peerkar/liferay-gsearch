@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -22,8 +21,6 @@ import java.util.List;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-
 /**
  * GSearch utility class.
  * 
@@ -31,6 +28,59 @@ import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
  */
 public class GSearchUtil {
 
+
+	/**
+	 * Append redirect to url.
+	 * 
+	 * @param portletRequest
+	 * @param url
+	 * @return
+	 * @throws PortalException
+	 */
+	public static String appendRedirectToURL(
+		PortletRequest portletRequest, String url)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		String currentURL = themeDisplay.getURLCurrent();
+
+		// Try to strip everything else but search parameters.
+
+		StringBundler sb = new StringBundler();
+
+		sb.append(url);
+
+		if (url.contains("?")) {
+			sb.append("&redirect=");
+		}
+		else {
+			sb.append("?redirect=");
+		}
+
+		if (currentURL.indexOf("?q=") > 0 || currentURL.indexOf("&q=") > 0) {
+		
+			sb.append(currentURL.substring(0, currentURL.indexOf("?")));
+	
+			String part2;
+	
+			if (currentURL.indexOf("?q=") > 0) {
+				part2 = currentURL.substring(currentURL.indexOf("?q="));
+			}
+			else {
+				part2 = currentURL.substring(currentURL.indexOf("&q="));
+				part2 = part2.replace("&q", "?q");
+			}
+	
+			sb.append(HtmlUtil.escapeURL(part2));
+		} else {
+			sb.append(HtmlUtil.escapeURL(currentURL));
+		}
+		
+		return sb.toString();
+	}
+	
 	/**
 	 * Try to find an asset publisher instance id on a layout
 	 * 
@@ -60,6 +110,24 @@ public class GSearchUtil {
 	}
 
 	/**
+	 * Get current layout friendly URL
+	 * 
+	 * @return String friendly URL for the current layout
+	 * @throws PortalException
+	 */
+	public static String getCurrentLayoutFriendlyURL(
+		PortletRequest portletRequest)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Layout selectedLayout =
+			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
+		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
+	}
+	
+	/**
 	 * Get layout by friendlyurl.
 	 * 
 	 * @param resourceRequest
@@ -83,55 +151,6 @@ public class GSearchUtil {
 		throw new PortalException(
 			"Couldn't find asset publisher layout for " + layoutFriendlyURL +
 				". Please check configuration.");
-	}
-
-	/**
-	 * Get current layout friendly URL
-	 * 
-	 * @return String friendly URL for the current layout
-	 * @throws PortalException
-	 */
-	public static String getCurrentLayoutFriendlyURL(
-		PortletRequest portletRequest)
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		Layout selectedLayout =
-			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
-		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
-	}
-
-	/**
-	 * Get redirect url.
-	 * 
-	 * @return redirect url
-	 * @throws PortalException
-	 */
-	public static String getRedirectURL(PortletRequest portletRequest)
-		throws PortalException {
-
-		StringBundler sb = new StringBundler();
-
-		sb.append(GSearchUtil.getCurrentLayoutFriendlyURL(portletRequest));
-		sb.append("?");
-		sb.append(GSearchWebKeys.KEYWORDS).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS));
-		sb.append("&").append(GSearchWebKeys.FILTER_SCOPE).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_SCOPE));
-		sb.append("&").append(GSearchWebKeys.FILTER_TIME).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME));
-		sb.append("&").append(GSearchWebKeys.FILTER_TYPE).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE));
-		sb.append("&").append(GSearchWebKeys.SORT_FIELD).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_FIELD));
-		sb.append("&").append(GSearchWebKeys.SORT_DIRECTION).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_DIRECTION));
-		sb.append("&").append(GSearchWebKeys.START).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.START));
-
-		return HtmlUtil.escapeURL(sb.toString());
 	}
 
 	/**

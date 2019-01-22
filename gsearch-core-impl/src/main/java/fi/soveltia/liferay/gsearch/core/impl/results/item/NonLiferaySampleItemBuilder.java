@@ -1,12 +1,17 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.results.item;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
 import org.osgi.service.component.annotations.Component;
 
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -31,39 +36,43 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDescription()
+	public String getDescription(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws SearchException {
 
-		return _document.get("description");
+		return document.get("description");
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getImageSrc()
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
 		return DEFAULT_IMAGE;
-
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getLink()
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, QueryContext queryContext)
 		throws Exception {
 
-		return _document.get("treePath");
+		return document.get("treePath");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getTitle() {
+	@Override
+	public String getTitle(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, boolean isHighlight)
+		throws NumberFormatException, PortalException {
 
-		return _document.get("title");
+		return document.get("title");
 	}
 
 	private static final String DEFAULT_IMAGE =

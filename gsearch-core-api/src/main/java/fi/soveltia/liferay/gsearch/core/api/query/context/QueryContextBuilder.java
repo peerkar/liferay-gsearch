@@ -1,26 +1,42 @@
 
-package fi.soveltia.liferay.gsearch.core.api.params;
-
-import com.liferay.portal.kernel.exception.PortalException;
+package fi.soveltia.liferay.gsearch.core.api.query.context;
 
 import javax.portlet.PortletRequest;
 
 /**
- * Query parameters builder. This service builds query params object from
- * request parameters.
+ * Builds query context object from and parses request parameters.
  * 
  * @author Petteri Karttunen
  */
-public interface QueryParamsBuilder {
+public interface QueryContextBuilder {
 
 	/**
-	 * Parse parameters from request and build a query params object.
+	 * Parse parameters from request and build a query context object.
+	 * 
+	 * @param portletRequest
+	 * @param pageSize
+	 * @return
+	 * @throws Exception
+	 */
+	public QueryContext buildQueryContext(
+		PortletRequest portletRequest, int pageSize)
+		throws Exception;
+
+	/**
+	 * Parse parameters from request and build a query context object.
 	 *
 	 * @param portletRequest
-	 * @return QueryParams object
-	 * @throws PortalException
+	 * @param assetTypeConfiguration
+	 * @param clauseConfiguration
+	 * @param facetConfiguration
+	 * @param sortConfiguration
+	 * @param pagesize
+	 * @return
+	 * @throws Exception
 	 */
-	public QueryParams buildQueryParams(
-		PortletRequest portletRequest)
+	public QueryContext buildQueryContext(
+		PortletRequest portletRequest, String[] assetTypeConfiguration,
+		String[] clauseConfiguration, String[] facetConfiguration,
+		String[] sortConfiguration, int pageSize)
 		throws Exception;
 }

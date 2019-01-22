@@ -1,18 +1,18 @@
 
-package fi.soveltia.liferay.gsearch.core.api.facet.translator;
+package fi.soveltia.liferay.gsearch.core.api.facet;
 
 /**
- * Facet translator factory. {@see FacetTranslator}
+ * Facet translator factory.
  * 
  * @author Petteri Karttunen
  */
 public interface FacetTranslatorFactory {
 
 	/**
-	 * Get translator by facet (aggregation) field name.
+	 * Get translator by name.
 	 * 
-	 * @param fieldName
+	 * @param translatorName
 	 * @return
 	 */
-	public FacetTranslator getTranslator(String fieldName);
+	public FacetTranslator getTranslator(String translatorName);
 }
