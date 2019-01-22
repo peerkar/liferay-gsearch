@@ -2,11 +2,11 @@
 
 Liferay GSearch recommendation engine enabling to show contents similar to content shown on Asset Publisher or to a manually defined content.
 
-## Module Prerequisites
+## Prerequisites
 
 None.
 
-## Module Configuration
+## Configuration
 
 This portlet has per instance configuration and you can access that from portlet's option menu.
 
