@@ -11,6 +11,6 @@ None.
 
 ## Configuration
 
-After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> Other -> GSearch Highlight Result Item By Tag. This feature is disabled by default.
+After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> GSearch -> GSearch Result Tagger. This feature is disabled by default.
 
 
