@@ -7,7 +7,7 @@ class GSearchUtils {
 	/**
 	 * Check if object is empty
 	 * 
- 	 * @param {Object} obj
+ 	 * @param {Object} component
 	 */
 	static isEmptyObject(obj) { 
 		
@@ -19,6 +19,41 @@ class GSearchUtils {
 			return false; 
 		}
 		return true;
+	}
+	
+	/**
+	 * Add an option item to list of selections 
+	 * 
+	 * @param {String} component
+	 * @param {String} optionMenu
+	 * @param {String} paramName
+	 * @param {String} isMultiValued
+	 * @param {String} value
+	 */
+	static addToSelections(component, optionMenu, paramName, isMultiValued, anchor) {
+
+		let text = null;
+		let textElement = $(anchor).find('.text');
+		
+		if (textElement.length > 0) {
+			text = $(textElement).html();
+		} else {
+			text = $(anchor).html();
+		}
+		
+		let html = '<li>';
+		html += text;
+		html += '<a href="#">';
+		html += '<span title="' + Liferay.Language.get('remove') + '" class="glyphicon glyphicon-remove-circle"></span>';
+		html += '</a>';
+		html += '</li>';
+		
+		let item = $(html);
+		$('#' + component.portletNamespace + 'facet-selections ul').append(item);
+		$(item).on('click', function(event) {
+			GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, $(anchor).attr('data-value'));		
+			event.preventDefault();
+		});
 	}
 	
 	/**
@@ -37,34 +72,36 @@ class GSearchUtils {
 	/**
 	 * Bulk setup option lists.
  	 *
-	 * @param {String} menuWrapperElementId
-	 * @param {String} triggerElementId
-	 * @param {Object} queryParamGetter
-	 * @param {Object} queryParamSetter
+	 * @param {String} menuWrapperName
+	 * @param {String} menuClass
+	 * @param {Object} component
  	 *
 	 */
-	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
+	static bulkSetupOptionLists(menuWrapperName, menuClass, component, bindToSelections=false) {
+		
+		let menuElement = $(component.element.querySelectorAll('#' + component.portletNamespace + menuWrapperName + ' .' + menuClass));
+		
+		if (menuElement.length === 0) {
+			return;
+		}
 
-		$('#' + menuWrapperElementId + ' .' + menuClass).each(function() {
-
-			let options = $(this).find('.dropdown-menu').attr('id');
-			let trigger = $(this).find('button').attr('id');
+		menuElement.each(function() {
+			
 			let paramName = $(this).attr('data-paramname');
 			let isMultiValued = $(this).attr('data-ismultivalued');
 			
 			// Convert to boolean
 			
 			let isMulti = (isMultiValued == 'true');
-					
+
 			GSearchUtils.setupOptionList(
-				options, 
-				trigger, 
-				queryParamGetter, 
-				queryParamSetter, 
+				component, 
+				this,
 				paramName,
-				isMulti
+				isMulti,
+				bindToSelections
 			);
-		
+
 			/*
 			 
 			// Dropdown animation  
@@ -88,8 +125,8 @@ class GSearchUtils {
 	 * @param {Object} queryParamSetter
 	 * 
 	 */
-	static setInitialQueryParameters(initialValues, keyArray, queryParamSetter) {
-
+	static setInitialQueryParameters(initialValues, keyArray, setQueryParam) {
+		
 		if (!(initialValues && keyArray)) {
 			return;
 		}
@@ -113,13 +150,13 @@ class GSearchUtils {
 				let value = values[j];			
 			
 				if (value) {
-					queryParamSetter(field, value, false);
+					setQueryParam(field, value, false);
 
 				} else {
 					
 					// Reset possibly cached state
 					
-					queryParamSetter(field, '', false);
+					setQueryParam(field, '', false);
 				}				
 			}
 		}
@@ -128,71 +165,60 @@ class GSearchUtils {
 	/**
 	 * Setup option list.
 	 *
-	 * @param {String} optionElementId
-	 * @param {String} triggerElementId
-	 * @param {Object} queryParamGetter
-	 * @param {Object} queryParamSetter
-	 * @param {String} queryParam
+	 * @param {Object} component
+	 * @param {String} optionMenu
+	 * @param {String} paramName
 	 * @param {String} initialValue
 	 */
-	static setupOptionList(optionElementId, triggerElementId, queryParamGetter, 
-			queryParamSetter, queryParam, isMultiValued = false) {
+	static setupOptionList(component, optionMenu, paramName, isMultiValued = false, bindToSelections = false) {
 
-		let values = queryParamGetter(queryParam);
+		let values = component.getQueryParam(paramName);
 
 		// Set initially selected item
 		
-		let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId, 
-				triggerElementId, values, isMultiValued);
+		let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, values, isMultiValued, bindToSelections);
 
 		// Set text
 		
 		if (selectedItems.length > 0) {
-			GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+			GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
 		}
 		
 		// Set click events
 		
-		GSearchUtils.setOptionListClickEvents(optionElementId, triggerElementId, 
-				queryParamGetter, queryParamSetter, queryParam, isMultiValued) 
+		GSearchUtils.setOptionListClickEvents(component, optionMenu, paramName, isMultiValued) 
 	}
 	
 	/**
 	 * Set click events for options list for setting query params.
 	 *
-	 * @param {String} optionElementId
-	 * @param {String} triggerElementId
-	 * @param {Object} queryParamGetter
-	 * @param {Object} queryParamSetter
-	 * @param {String} queryParam
+	 * @param {String} component
+	 * @param {String} optionMenu
+	 * @param {String} paramName
 	 * @param {Boolean} isMultiValued
 	 */
-	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter, 
-			queryParamSetter, queryParam, isMultiValued) {
+	static setOptionListClickEvents(component, optionMenu, paramName, isMultiValued) {
 		
-		$('#' + optionElementId + ' li a').on('click', function(event) {
+		$(optionMenu).find('li a').on('click', function(event) {
 
-			let currentValues = queryParamGetter(queryParam);
+			let currentValues = component.getQueryParam(paramName);
 			
 			let value = $(this).attr('data-value');
-			
-			if (currentValues.indexOf(value) < 0) {
-				
-				queryParamSetter(queryParam, value, true, isMultiValued);
 
-				let selectedItems = GSearchUtils.setOptionListSelectedItems(optionElementId, 
-						triggerElementId, [value], isMultiValued);
+			if (currentValues.indexOf(value) < 0) {
+
+				component.setQueryParam(paramName, value, true, isMultiValued);
+
+				let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, [value], isMultiValued);
 				
 				if (selectedItems.length > 0) {
 					
-					GSearchUtils.setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam);
+					GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
 				}
 				
 			} else {
 
-				queryParamSetter(queryParam, null, true, isMultiValued, value);
-
-				GSearchUtils.unsetOptionListSelectedItem(optionElementId, value);
+				GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value);
 			}
 			event.preventDefault();
 		});			
@@ -201,31 +227,35 @@ class GSearchUtils {
 	/**
 	 * Set selected option item.
 	 * 
-	 * @param {String} optionElementId
-	 * @param {String} value
+	 * @param {String} optionMenu
+	 * @param {Object} values
+	 * @param {Boolean} isMultiValued
 	 */
-	static setOptionListSelectedItems(optionElementId, triggerElementId, values, isMultiValued) {
+	static setOptionListSelectedItems(component, optionMenu, paramName, values, isMultiValued, bindToSelections) {
 
 		let selectedItems = [];
 
-		let defaultItem = $('#' + optionElementId + ' li.default a');
-		
+		let defaultItem = $(optionMenu).find('li.default a');
+				
 		let valueFound = false;
 		
-		$('#' + optionElementId + ' li a').each(function() {
-
+		$(optionMenu).find('li a').each(function() {
+			
 			if (!isMultiValued) {
 
 				if ($(this).attr('data-value') == values[0]) {
 					
 					valueFound = true;
 
-					$('#' + optionElementId + ' li').removeClass('selected');
+					$(optionMenu).find('li').removeClass('selected');
 					
 					$(this).parent().addClass('selected');
-					
+	
 					selectedItems.push(this);
 					
+					if (bindToSelections) {
+						GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
+					}
 					return false;
 				}
 
@@ -244,6 +274,10 @@ class GSearchUtils {
 						$(defaultItem).parent().removeClass('selected');
 
 						$(this).parent().addClass('selected');
+						
+						if (bindToSelections) {
+							GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
+						}
 						
 						selectedItems.push(this);
 					}
@@ -265,26 +299,27 @@ class GSearchUtils {
 	 * If there's a text element in the selected element, 
 	 * use contents of that as a source.
 	 * 
-	 * @param {String} triggerElementId
-	 * @param {Object} selectedItem
+	 * @param {String} optionMenu
+	 * @param {Object} selectedItems
+	 * @param {String} paramName
 	 */
-	static setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam) {
-		
+	static setOptionListTriggerElementText(optionMenu, selectedItems, paramName) {
+						
 		if (selectedItems.length > 1) {
-
-			let html = $('#' + triggerElementId ).parent().attr('data-multipleoption');
+			
+			let html = $(optionMenu).attr('data-multipleoption');
 
 			// Fallback translation. See ResultItemBuilder.
 			
 			if (!html) {
-				html = "multiple " + queryParam.toLowerCase();
+				html = "multiple " + paramName.toLowerCase();
 			}
 			
-			$('#' + triggerElementId + ' .selection').html('[<i> ' + html + ' </i>]');
+			$(optionMenu).find(' .selection').html('[<i> ' + html + ' </i>]');
 			
 			return;
 		}
-			
+
 		let textElement = $(selectedItems[0]).find('.text');
 		
 		let text = null;
@@ -294,22 +329,24 @@ class GSearchUtils {
 		} else {
 			text = $(selectedItems[0]).html();
 		}
-		
-		$('#' + triggerElementId + ' .selection').html(text);
+
+		$(optionMenu).find('.selection').html(text);
 	}
 	
 	/**
 	 * Unset selected option item.
 	 * 
-	 * @param {String} optionElementId
+	 * @param {String} optionMenu
 	 * @param {String} value
 	 */
-	static unsetOptionListSelectedItem(optionElementId, value) {
+	static unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value) {
 		
-		$('#' + optionElementId + ' li a').each(function() {
+		component.setQueryParam(paramName, null, true, isMultiValued, value);
 
-			if ($(this).attr('data-value') == value) {
+		$(optionMenu).find('li a').each(function() {
 				
+			if ($(this).attr('data-value') == value) {
+
 				$(this).parent().removeClass('selected');
 				
 				return false;
@@ -317,9 +354,9 @@ class GSearchUtils {
 		});
 
 		// If there are no more selections mark the default item ("any") as selected.
-		
-		if ($('#' + optionElementId + ' li.selected').length === 0) {
-			$('#' + optionElementId + ' li.default').addClass('selected');
+
+		if ($(optionMenu).find('li.selected').length === 0) {
+			$(optionMenu).find('li.default').addClass('selected');
 		}
 	}
 

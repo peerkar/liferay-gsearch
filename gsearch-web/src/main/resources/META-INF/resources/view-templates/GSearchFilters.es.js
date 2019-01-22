@@ -12,23 +12,7 @@ import templates from './GSearchFilters.soy';
  * GSearch filters component.
  */
 class GSearchFilters extends Component {
-
-	/**
-	 * @inheritDoc
-	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-
-		this.assetTypeOptions = opt_config.assetTypeOptions;
-	}
-
+			
 	/**
 	 * @inheritDoc
 	 */
@@ -37,10 +21,6 @@ class GSearchFilters extends Component {
 		if (this.debug) {
 			console.log("GSearchFilters.attached()");
 		}
-		
-		// Setup asset type options
-		
-		this.setupAssetTypeOptions()
 		
 		// Set initial query parameters from calling url.
 
@@ -53,17 +33,27 @@ class GSearchFilters extends Component {
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'BasicFilters', 
+			'BasicFilters', 
 			'optionmenu', 
-			this.getQueryParam, 
-			this.setQueryParam
+			this
 		);
 		
-		// Add results callback
+		// Setup time range filter.
 		
-		this.addResultsCallback(this.updateAssetTypeFacetCounts);
+		this.setupTimeRangeFilter();
+		
+		// Set initial range values.
+		
+		this.setInitialDateRangeParameters();
 	}
 	
+	created() {
+		
+		// Setup asset type options 
+		
+		this.setupAssetTypeOptions()
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -81,59 +71,132 @@ class GSearchFilters extends Component {
 		
 		let html = '';
 		
-		let length = this.assetTypeOptions.length;
+		let length = this.assetTypeOptionsJSON.length;
 		
 		for (let i = 0; i < length; i++) {
 
-			let item = this.assetTypeOptions[i];
+			let item = this.assetTypeOptionsJSON[i];
 
-			html += '<li><a data-facet="' + item.entryClassName + '" data-value="' + item.key + '" href="#">';
+			html += '<li><a data-facet="' + item.entry_class_name + '" data-value="' + item.key + '" href="#">';
 			html += '<span class="text">' + item.localization + '</span>';
 			html += '<span class="count"></span>';
 			html += '</a></li>';
 		}
-		$('#' + this.portletNamespace + 'TypeFilterOptions').append(html);
+		this.assetTypeOptions = html;
 	}
+
+	/**
+	 * Setup time range filters
+	 */
+	setupTimeRangeFilter() {
+
+		let language = Liferay.ThemeDisplay.getLanguageId().substring(0,2);
+
+		let _self = this;
+		
+		$('#' + this.portletNamespace + 'FilterByTimeRange').on('click', function(event) {
+			$('#' + _self.portletNamespace + 'RangeSelection').removeClass('hide');
+		});
+		
+		Liferay.Loader.require('bootstrap-datepicker', function() {
+
+			// Dateformat is crippled because of conflict between Java and JS yyyy-MM-dd.
+
+			$('#' + _self.portletNamespace + 'RangeSelection .start').datepicker({
+				autoclose: true,
+				calendarWeeks: true,
+			    format: _self.datePickerFormat.toLowerCase(),
+			    language: language,
+			    startDate: '',
+			    todayHighlight: true,
+			    toggleActive: true
+			}).on('changeDate', function(event) {
+
+				let timeFrom = $('#' + _self.portletNamespace + 'RangeSelection .start').val();
+				
+				if (_self.getQueryParam('timeTo', true)) {
+					
+					_self.setQueryParam('time', 'range', false, false);
+					_self.setQueryParam('timeFrom', timeFrom, true, false);
+
+					_self.setDateRangeSelected();
+					
+				} else {
+					_self.setQueryParam('timeFrom', timeFrom, false, false);
+				}
+			});
+			
+			$('#' + _self.portletNamespace + 'RangeSelection .end').datepicker({
+				autoclose: true,
+				calendarWeeks: true,
+			    format: _self.datePickerFormat.toLowerCase(),
+			    language: language,
+			    startDate: '',
+			    todayHighlight: true,
+			    toggleActive: true
+			}).on('changeDate', function(event) {
+
+				let timeTo = $('#' + _self.portletNamespace + 'RangeSelection .end').val();
+
+				if (_self.getQueryParam('timeFrom', true)) {
+					_self.setQueryParam('time', 'range', false, false);
+					_self.setQueryParam('timeTo', timeTo, true, false);
+
+					_self.setDateRangeSelected();
+					
+				} else {
+					_self.setQueryParam('timeTo', timeTo, false, false);
+				}
+			});
+		});
+		
+		// Set a listener to empty range values on other selection
+		
+		$('#' + this.portletNamespace + 'TimeFilterOptions').find('a').on('click', function(event) {
+			$('#' + _self.portletNamespace + 'RangeSelection .start').val('');
+			$('#' + _self.portletNamespace + 'RangeSelection .end').val('');
+
+			_self.setQueryParam('timeFrom', '', false, false);
+			_self.setQueryParam('timeTo', '', false, false);
+
+		});
+    }
 	
 	/**
-	 * Update asset type facet counts. 
+	 * Set initial parameters for date range selector.
 	 */
-	updateAssetTypeFacetCounts(portletNamespace, results) {		
-
-		// Clear current values
+	setInitialDateRangeParameters() {
 		
-		$('#' + portletNamespace + 'TypeFilterOptions li .count').html('');
+        let timeParam = this.getQueryParam('time', true);
+    	
+        if ('range' == timeParam) {
+        	
+            let rangeStart = this.getQueryParam('timeFrom', true);
+        	let rangeEnd = this.getQueryParam('timeTo', true);
+
+        	if (rangeStart != null) {
+        		this.setQueryParam('timeFrom', rangeStart, false, false);
+    			$('#' + this.portletNamespace + 'RangeSelection .start').val(rangeStart);
+        	}
+        
+        	if (rangeStart != null) {
+        		this.setQueryParam('timeTo', rangeEnd, false, false);
+    			$('#' + this.portletNamespace + 'RangeSelection .end').val(rangeEnd);
+        	}
+        	
+        	this.setDateRangeSelected();
+        }
+	}
+
+	/**
+	 * Set date range as selected menu option
+	 */
+	setDateRangeSelected() {
 		
-		if (results && results.facets) {
-			
-			let entryClassNameFacets = null;
-			
-			let length = results.facets.length;
-
-			for (let i = 0; i < length; i++) {
-
-				if(results.facets[i].paramName == 'entryClassName') {
-					entryClassNameFacets = results.facets[i].values;
-					break;
-				}
-			}
-			
-			if (entryClassNameFacets) {
-
-				let valueCount = entryClassNameFacets.length;
-				
-				for (let i = 0; i < valueCount; i++) {
-
-					let term =  entryClassNameFacets[i].term;
-					let frequency =  entryClassNameFacets[i].frequency;
-					let element = $('#' + portletNamespace + 'TypeFilterOptions li a[data-facet="' + term + '"]');
-				
-					if (element) {
-						$(element).find('.count').html('(' + frequency + ')');
-					}
-				}
-			}
-		}			
+		let selectedText = $('#' + this.portletNamespace + 'RangeSelectionTitle').html();
+		$('#' + this.portletNamespace + 'TimeFilter .selection').html(selectedText);
+		
+		$('#' + this.portletNamespace + 'TimeFilterOptions').find('li').removeClass('selected');
 	}
 }
 
@@ -145,16 +208,31 @@ class GSearchFilters extends Component {
 GSearchFilters.STATE = {
 	addResultsCallback: {
 		validator: core.isFunction
+	},		
+	assetTypeOptions: {
+		value: null
+	},
+	assetTypeOptionsJSON: {
+		value: null
+	},
+	datePickerFormat: {
+		value: 'dd-mm-yyyy'
+	},
+	debug: {
+		value: false
 	},
 	getQueryParam: {
 		validator: core.isFunction
+	},	
+	initialQueryParameters: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction
 	},
 	templateParameters: {
 		value: ['type','scope','time']
-	}	
+	}
 };
 
 // Register component

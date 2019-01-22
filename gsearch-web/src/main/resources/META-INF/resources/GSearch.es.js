@@ -2,40 +2,37 @@ import Component from 'metal-component/src/Component';
 import Ajax from 'metal-ajax/src/Ajax';
 import Soy from 'metal-soy/src/Soy';
 
-import GSearchUtils from './js/GSearchUtils.es';
 import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
 import GSearchFilters from './view-templates/GSearchFilters.es';
 import GSearchFacets from './view-templates/GSearchFacets.es';
+import GSearchFacetSelections from './view-templates/GSearchFacetSelections.es';
 import GSearchHelp from './view-templates/GSearchHelp.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
-import GSearchQuerySuggestions from './view-templates/GSearchQuerySuggestions.soy';
 import GSearchResults from './view-templates/GSearchResults.es';
-import GSearchResultsLayouts from './view-templates/GSearchResultsLayouts.es';
+import GSearchResultLayoutOptions from './view-templates/GSearchResultLayoutOptions.es';
 import GSearchSort from './view-templates/GSearchSort.es';
+import GSearchStats from './view-templates/GSearchStats.es';
 
-import templates from './View.soy';
+import templates from './GSearch.soy';
 
 /**
  * View component.
  */
-class View extends Component {
-
-	constructor(opt_config) {
+class GSearch extends Component {
+	
+	/**
+	 * @inheritDoc
+	 */
+	attached() {
 		
-		super(opt_config);		
+		if (this.debug) {
+			console.log("GSearch.attached()");
+		}
+				
+		// This component is hidden initially to get all the subcomponents to render fully before shown.
 		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.searchResultsURL = opt_config.searchResultsURL;
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.queryMinLength = opt_config.queryMinLength;
-
-		this.requestTimeout = opt_config.requestTimeout;
+		this.visible = true;
 
 		// If this was linked call i.e. if keyword parameter was present in the calling url, 
 		// then execute search. Notice that nested templates are processed before parent.
@@ -53,17 +50,6 @@ class View extends Component {
 			
 			this.query.oldParameters = [];
 			this.query.parameters = [];
-			
-		}
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	attached() {
-		
-		if (this.debug) {
-			console.log("View.attached()");
 		}
 	}
 
@@ -79,10 +65,6 @@ class View extends Component {
 	 * @inheritDoc
 	 */
 	created() {
-		
-		if (this.debug) {
-			console.log("View.created()");
-		}
 
 		// Create query object. 
 		// Need to create the query object here for that to be available 
@@ -176,7 +158,7 @@ class View extends Component {
 				
 				// Set results object.
 				
-				this.results =  JSON.parse(response.responseText);
+				let results =  JSON.parse(response.responseText);
 														
 				// Remove loading placeholder.
 
@@ -186,10 +168,6 @@ class View extends Component {
 
 				this.updateAddressBar(this.query.buildAddressBarURL());
 				
-				// Set result layout options
-				
-				this.setResultLayoutOptions();
-
 				// Run callbacks
 				
 				let length = this.resultsCallbacks.length;
@@ -198,7 +176,26 @@ class View extends Component {
 
 					let f = this.resultsCallbacks[i];
 									
-					f(this.portletNamespace, this.results);
+					f(this.portletNamespace, results);
+				}
+				
+				// Component updates
+
+				// Refresh the selections
+				
+				this.components.facetSelectionsComponent.update = Date.now();
+				this.components.facetComponent.facets = results.facets;
+
+				this.components.statsComponent.results = results;
+				this.components.resultsComponent.results = results;
+				this.components.pagingComponent.paging = results.paging;
+				
+				if (results.items && results.items.length > 0) {
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
+					this.components.sortComponent.visible = true;
+				} else {
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
+					this.components.sortComponent.visible = false;
 				}
 				
 			} else {
@@ -219,7 +216,7 @@ class View extends Component {
 	 */
 	rendered() {
 		if (this.debug) {
-			console.log("View.rendered()");
+			console.log("GSearch.rendered()");
 		}
 	}
 
@@ -241,35 +238,13 @@ class View extends Component {
 	}
 	
 	/**
-	 * @inheritDoc
-	 */
-	setResultLayoutOptions() {
-		
-		// Show image layout option if type filter is "file" or extension is "image".
-		
-		if (this.getQueryParam('type', true) == 'file' || this.getQueryParam('extension', true) == 'Image') {
-			
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').removeClass('hide');
-		} else {
-
-			$('#' + this.portletNamespace + 'LayoutOptions .image-layout').addClass('hide');
-		}
-		
-		// We might have a forced layout from results
-		
-		if (this.results) {
-			this.setQueryParam('resultsLayout', this.results.meta.resultsLayout, false, false);
-		}
-	}
-	
-	/**
 	 * Update address bar.
 	 * 
 	 * @param {address} key
 	 */
 	updateAddressBar(address) {
-		if (window.history.pushState) {
-			window.history.pushState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+		if (window.history.replaceState) {
+			window.history.replaceState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
 		} else {
 			document.location.hash = address;
 		}		
@@ -282,17 +257,35 @@ class View extends Component {
  * @type {!Object}
  * @static
  */
-View.STATE = {
-	query: {
+GSearch.STATE = {
+	debug: {
+		value: false
+	},
+	initialQueryParameters: {
 		value: null
+	},
+	portletNamespace: {
+		value: null
+	},
+	query: {
+		value: null 
+	},
+	queryMinLength: {
+		value: 3
+	},
+	requestTimeout: {
+		value: 10000
 	},
 	resultsCallbacks: {
 		value: [] 
+	},
+	searchResultsURL: {
+		value:null
 	}
 };
 
 // Register component
 
-Soy.register(View, templates);
+Soy.register(GSearch, templates);
 
-export default View;
+export default GSearch;

@@ -1,0 +1,16 @@
+{namespace GSearchStats}
+
+/**
+ * Print stats.
+ *
+ * @param? results
+ */
+{template .render}
+
+	<div class="row text-center">
+		{if $results and length($results.items) > 0}
+			{msg desc=""}page-{$results.paging.currentPage}-{$results.meta.totalPages}-of-{$results.meta.totalHits}-total-search-took-{$results.meta.executionTime}{/msg}
+		{/if}
+	</div>
+	
+{/template}

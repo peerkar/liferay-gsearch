@@ -13,45 +13,19 @@ import templates from './GSearchField.soy';
  * GSearch searchfield component.
  */
 class GSearchField extends Component {
-
-	/**
-	 * @inheritDoc
-	 */
-	constructor(opt_config, opt_parentElement) {
-				
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-		
-		this.autoCompleteEnabled = opt_config.autoCompleteEnabled;
-
-		this.autoCompleteRequestDelay = opt_config.autoCompleteRequestDelay
-		
-		this.portletNamespace = opt_config.portletNamespace;
-
-		this.suggestionsURL = opt_config.suggestionsURL;
-
-		this.queryMinLength = opt_config.queryMinLength;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	attached() {
-		
+				
 		if (this.debug) {
 			console.log("GSearchField.attached()");
 		}
-		
+
 		// Check if we are getting query parameters from initially calling URL.
 		
 		this.checkInitialQueryParameters();
-
-		// Set click events.
-			
-		this.setClickEvents();	
 
 		// Init autocomplete.
 
@@ -59,7 +33,7 @@ class GSearchField extends Component {
 			this.initAutocomplete();
 		}
 	}
-	
+		
 	/**
 	 * @inheritDoc
 	 */
@@ -82,15 +56,27 @@ class GSearchField extends Component {
 		if (q) {
 			keywords = q[0];
 		}
-		
-		if (keywords) {
 
+		if (keywords) { 
+ 			
 			if (this.validateKeywords(keywords)) {
-				$('#' + this.portletNamespace + 'SearchField').val(keywords);
+				this.element.querySelector('#' + this.portletNamespace + 'SearchField').value = keywords;
 				this.setQueryParam('q', keywords, false, false);
 			}
 		}
 	}
+	
+	/**
+	 * Handle keyup  events.
+	 */
+	handleKeyUp(event) {
+
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        
+        if(keycode === 13){
+			this.doSearch();
+	    }
+	}	
 	
 	/**
 	 * Init autocomplete / suggester.
@@ -98,8 +84,10 @@ class GSearchField extends Component {
 	initAutocomplete() {
 		
 		let _self = this;
-		 
-		$('#' + this.portletNamespace + 'SearchField').devbridgeAutocomplete({
+		
+		let searchFieldElement = this.element.querySelector('#' + this.portletNamespace + 'SearchField');
+				 
+		$(searchFieldElement).devbridgeAutocomplete({
 			dataType: 'json',
 			deferRequestBy: _self.autoCompleteRequestDelay,
 			minChars: _self.queryMinLength,
@@ -143,7 +131,9 @@ class GSearchField extends Component {
 		
 		this.isSearching = true;
 		
-		let keywords = $('#' + this.portletNamespace + 'SearchField').val().trim();
+		let searchFieldElement = this.element.querySelector('#' + this.portletNamespace + 'SearchField');
+
+		let keywords = $(searchFieldElement).val().trim();
 
 		// Validate keywords.
 		
@@ -158,7 +148,7 @@ class GSearchField extends Component {
 	 * @deprecated
 	 */
 	getSuggestions(keywords) {
-
+		
 		let _self = this;
 		
 		let params = new MultiMap();
@@ -182,29 +172,6 @@ class GSearchField extends Component {
 			console.log(error);
 		});
 	}
-
-	/**
-	 * Set click events.
-	 */
-	setClickEvents() {
-
-		let _self = this;
-
-		// Bind button click event
-
-		$('#' + this.portletNamespace + 'SearchButton').on('click', function (event) {
-			_self.doSearch();
-		});
-
-		// Bind search field keypress event.
-
-		$('#' + this.portletNamespace + 'SearchField').keypress(function (event) {
-	        var keycode = (event.keyCode ? event.keyCode : event.which);
-	        if(keycode === 13){
-				_self.doSearch();
-	        }
-	    });	
-	}
 		
 	/**
 	 * Show message
@@ -213,14 +180,14 @@ class GSearchField extends Component {
 	 */
 	showMessage(title) {
 		
-		let elementId = this.portletNamespace + 'SearchFieldMessage';
-
-		$('#' + elementId).tooltip({title: title}).tooltip('show');
+		let messageElement = this.element.querySelector('#' + this.portletNamespace + 'SearchFieldMessage');
+		
+		$(messageElement).tooltip({title: title}).tooltip('show');
 		
 		// Setting delay doesn't work on manual show
 		
 		setTimeout(function(){
-			$('#' + elementId).tooltip('hide');
+			$(messageElement).tooltip('hide');
 		}, 2000);		
 	}
 	
@@ -253,7 +220,20 @@ class GSearchField extends Component {
  * @static
  */
 GSearchField.STATE = {
+	autoCompleteEnabled: {
+		value: false
+	},
+	autoCompleteRequestDelay: {
+		value: 500
+	},
+	debug: {
+		value: false
+	},
+	initialQueryParameters: {
+		value: null
+	},
 	isSearching: {
+		internal: true,
 		value: false
 	},
 	getQueryParam: {
@@ -264,6 +244,9 @@ GSearchField.STATE = {
 	},
 	setQueryParam: {
 		validator: core.isFunction
+	},
+	suggestionsURL: {
+		value: null
 	}
 };
 

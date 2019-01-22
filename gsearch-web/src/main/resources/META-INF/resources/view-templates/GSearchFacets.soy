@@ -3,29 +3,31 @@
 /**
  * Print facets.
  *
- * @param? portletNamespace
- * @param? results
+ * @param portletNamespace
+ * @param? facets
  */
 {template .render}
 
-		{if $results and length($results.facets) > 0}
+	<div class="row text-center facets" id="{$portletNamespace}Facets">
 
-			<div class="row text-center facets" id="{$portletNamespace}Facets">
+		{if $facets and length($facets) > 0}
 			
-				{foreach $item in $results.facets}
-	
-					// Don't render entryClassName (is main menu)
-	
-					{if $item.paramName != 'entryClassName'}
-					
-						{call .dropdown}
-							{param portletNamespace: $portletNamespace /}
-							{param facet: $item /}
-						{/call}
-					{/if}
-				{/foreach}
-			</div>
+			{foreach $item in $facets}
+
+				// Don't render hidden items.
+				// These facets could be just for getting term counts for static filters.
+
+				{if not $item.hide}
+				
+					{call .dropdown}
+						{param portletNamespace: $portletNamespace /}
+						{param facet: $item /}
+					{/call}
+				{/if}
+			{/foreach}
 		{/if}
+	</div>
+		
 {/template}
 			
 /**
@@ -36,22 +38,20 @@
  */
 {template .dropdown}
 
-	{let $multiValued: $facet.isMultiValued  ? 'true' : 'false' /}
-
-	<div class="dropdown gsearch-dropdown optionmenu facet" data-paramname="{$facet.paramName}" data-ismultivalued="{$multiValued}" data-multipleoption="{$facet.multipleOption}">
+	<div class="dropdown gsearch-dropdown optionmenu facet" data-paramname="{$facet.param_name}" data-ismultivalued="true" data-multipleoption="{$facet.multipleOption}">
 	
 		<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
-			data-toggle="dropdown" id="{$portletNamespace}{$facet.paramName}" type="button">
+			data-toggle="dropdown" id="{$portletNamespace}{$facet.field_name}" type="button">
 			<span class="selection"></span>
 			<span class="caret"></span>
 		</button>
 
-		<ul aria-labelledby="{$portletNamespace}{$facet.paramName}" class="dropdown-menu" 
-				id="{$portletNamespace}{$facet.paramName}Options">
+		<ul aria-labelledby="{$portletNamespace}{$facet.field_name}" class="dropdown-menu" 
+				id="{$portletNamespace}{$facet.field_name}Options">
 
 			<li class="selected default"><a data-value="" href="#">{$facet.anyOption}</a></li>
 			{call .options}
-				{param facetName: $facet.paramName /}
+				{param facetName: $facet.field_name /}
 				{param options: $facet.values /}
 			{/call}
 		</ul>
@@ -73,7 +73,7 @@
 				<span class="text">{$item.name}</span>
 
 				{if $item.groupName}
-					<span class="groupname">({$item.groupName})</span>
+					<span class="groupname">({$item.group_name})</span>
 				{/if}				
 
 				<span class="count">{$item.frequency}</span>

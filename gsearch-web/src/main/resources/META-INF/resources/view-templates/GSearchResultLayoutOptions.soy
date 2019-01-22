@@ -1,0 +1,41 @@
+{namespace GSearchResultLayoutOptions}
+
+/**
+ * Print results layout options.
+ *
+ * @param portletNamespace
+ * @param? resultLayoutOptions
+ */
+{template .render}
+
+	<div class="row" id="{$portletNamespace}ResultLayouts">
+
+		{if $resultLayoutOptions and length($resultLayoutOptions) > 0}
+		
+			<ul class="options optionmenu" id="{$portletNamespace}LayoutOptions" data-ismultivalued="false" data-paramname="resultsLayout">
+				{foreach $item in $resultLayoutOptions}
+					{call .item}
+						{param item: $item /}
+					{/call}
+				{/foreach}
+			</ul>
+		{/if}
+	</div>
+	
+{/template}
+
+/**
+ * Print single result layout option.
+ *
+ * @param item
+ */
+{template .item}
+
+	{let $cssClasses: $item.default ? 'selected default' : ''/}
+
+	<li class="list-layout {$item.cssClasses} {$cssClasses}">
+		<a data-value="{$item.key}" href="#" title="{$item.title}">
+			<img src="/o/gsearch-web/images/result-layouts/{$item.icon}" />
+		</a>
+	</li>
+{/template}

@@ -10,22 +10,6 @@ import templates from './GSearchSort.soy';
  * GSearch sort component.
  */
 class GSearchSort extends Component {
-
-	/**
-	 * @inheritDoc
-	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-
-		this.sortOptions = opt_config.sortOptions;
-	}
 	
 	/**
 	 * @inheritDoc
@@ -36,10 +20,6 @@ class GSearchSort extends Component {
 			console.log("GSearchSort.attached()");
 		}
 
-		// Setup options.
-		
-		this.setupSortFieldOptions();
-		
 		// Set initial query parameters from calling url.
 
 		GSearchUtils.setInitialQueryParameters(
@@ -47,15 +27,25 @@ class GSearchSort extends Component {
 			this.templateParameters, 
 			this.setQueryParam
 		);		
-
+		
 		// Setup options lists.
 		
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'Sort', 
+			'Sort', 
 			'optionmenu', 
-			this.getQueryParam, 
-			this.setQueryParam
-		);
+			this
+		);		
+	}
+
+	created() {
+
+		// Setup options.
+		
+		this.setupSortFieldOptions();
+
+		// Hide initially
+		
+		this.visible = false;
 	}
 	
 	/**
@@ -66,7 +56,7 @@ class GSearchSort extends Component {
 		if (this.debug) {
 			console.log("GSearchSort.rendered()");
 		}
-	}	
+	}
 	
 	/**
 	 * Setup sortfield options.
@@ -89,7 +79,7 @@ class GSearchSort extends Component {
 			html += '</a></li>';
 		}
 
-		$('#' + this.portletNamespace + 'SortFieldOptions').html(html);			
+		this.sortFieldOptionsMenu = html;
 	}
 }
 
@@ -100,13 +90,22 @@ class GSearchSort extends Component {
  * @static
  */
 GSearchSort.STATE = {
+	debug: {
+		value: false
+	},
 	getQueryParam: {
 		validator: core.isFunction
+	},
+	initialQueryParameters: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction
 	},
 	sortOptions: {
+		value: null
+	},
+	sortFieldOptionsMenu: {
 		value: null
 	},
 	templateParameters: {

@@ -16,22 +16,6 @@ class GSearchFacets extends Component {
 	/**
 	 * @inheritDoc
 	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.templateParameters = opt_config.facetFields;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
 	attached() {
 
 		if (this.debug) {
@@ -42,7 +26,7 @@ class GSearchFacets extends Component {
 		
 		GSearchUtils.setInitialQueryParameters(
 			this.initialQueryParameters, 
-			this.templateParameters, 
+			this.facetFields, 
 			this.setQueryParam
 		);		
 	}
@@ -59,11 +43,16 @@ class GSearchFacets extends Component {
 		// Setup options lists.
 
 		GSearchUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'Facets', 
+			'Facets', 
 			'optionmenu', 
-			this.getQueryParam, 
-			this.setQueryParam
+			this,
+			true
 		);
+		
+		// Update (static) filter menu counts if necessary.
+		
+		this.updateFilterFacetCounts();
+				
 	}
 	
 	/**
@@ -75,11 +64,60 @@ class GSearchFacets extends Component {
 			console.log("GSearchFacets.shouldUpdate()");
 		}		
 
-		$('#' + this.portletNamespace + 'Facets').remove();
+		$('#' + this.portletNamespace + 'Facets .optionmenu').remove();
 
 		return true;
-    }	
+    }		
 	
+	
+	/**
+	 * Update (static) filter menu facet counts. 
+	 */
+	updateFilterFacetCounts() {		
+
+		let _self = this;
+		
+		// Clear current values. Notice that we have to reference by parent element.
+		
+		$('#' + this.portletNamespace + 'BasicFilters .countable-static-facets-list li .count').html('');
+
+		if (!this.facets || this.facets.length == 0) {
+			return;
+		}
+		
+		$('#' + this.portletNamespace + 'BasicFilters .countable-static-facets-list').each(function() {
+			
+			let values = null;
+			
+			let length = _self.facets.length;
+
+			for (let i = 0; i < length; i++) {
+
+				if(_self.facets[i].field_name == $(this).attr('data-facetname')) {
+					
+					values = _self.facets[i].values;
+					break;
+				}
+			}
+
+			if (values) {
+
+				let valueCount = values.length; 
+				
+				for (let i = 0; i < valueCount; i++) {
+
+					let term =  values[i].term;
+					let frequency =  values[i].frequency;
+
+					let element = $('#' + _self.portletNamespace + 'BasicFilters .countable-static-facets-list li a[data-facet="' + term + '"]');
+					
+					if (element) {
+						$(element).find('.count').html('(' + frequency + ')');
+					}
+				}
+			}
+		});
+	}
 }
 
 /**
@@ -88,17 +126,20 @@ class GSearchFacets extends Component {
  * @static
  */
 GSearchFacets.STATE = {
+	debug: {
+		value: false
+	},
+	facetFields: {
+		value: null
+	},
 	getQueryParam: {
 		validator: core.isFunction
 	},
-	results: {
+	initialQueryParameters: {
 		value: null
-	},	
+	},
 	setQueryParam: {
 		validator: core.isFunction
-	},
-	templateParameters: {
-		value: null
 	}
 };
 

@@ -29,14 +29,17 @@ class GSearchQuery extends State {
 				if (params.length > 0) {
 					params = params.concat('&');
 				}
-			
-				params = params.concat(parameter.key).concat('=').concat(parameter.value);
+
+				let value = parameter.value.replace(/ /g, '%20');
+				value = parameter.value.replace(/\"/g, '%22');
+				
+				params = params.concat(parameter.key).concat('=').concat(value);
 			}
 		}
 		
 		url = url.concat(params);
 		
-		return encodeURI(url);
+		return url;
 	}
 	
 	/**
@@ -104,6 +107,14 @@ class GSearchQuery extends State {
 					this.setParameter(oldParameter.key, oldParameter.value);
 				}
 			}
+			
+			// This flags the facet menus to be updated (of use only if menus are persisted).
+			
+			this.needsFacetsUpdate = true;
+			
+		} else {
+
+			this.needsFacetsUpdate = false;
 		}
 
 		// Persist current values
@@ -397,6 +408,9 @@ GSearchQuery.STATE = {
 		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
 	},
 	isInitialQuery: {
+		value: false
+	},
+	needsFacetsUpdate: {
 		value: false
 	},
 	transparentParameters: {
