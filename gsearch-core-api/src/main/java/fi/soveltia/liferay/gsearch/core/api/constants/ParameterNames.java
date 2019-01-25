@@ -10,8 +10,6 @@ public class ParameterNames {
 	
 	public static final String ADDITIONAL_RESULT_FIELDS = "additionalResultFields";
 
-	public static final String APPEND_REDIRECT = "appendRedirect";
-
 	public static final String ASSET_PUBLISHER_URL = "assetPublisherURL";
 	
 	public static final String ASSET_TYPE = "type";
