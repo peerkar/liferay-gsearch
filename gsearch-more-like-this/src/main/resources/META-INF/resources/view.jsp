@@ -100,24 +100,20 @@
 		html += '<div class="heading">';
 
 		if (item.type != '') {
-			html += '<span class="type"><a href="' + link + '">[' + item.type
-					+ ']</a></span>';
+			html += '<span class="type"><a href="' + link + '">[' + item.type + ']</a></span>';
 		}
 
 		html += '<h1>';
-		html += '<a class="highlightable" href="' + link + '" title="' + item.title + '">'
-				+ item.title + '</a>';
+		html += '<a class="highlightable" href="' + link + '" title="' + item.title + '">' + item.title + '</a>';
 		html += '</h1>';
 
 		if (item.highlight) {
-			html += '<span title="' + Liferay.Language.get('official-article')
-					+ '" class="glyphicon glyphicon-check"></span>';
+			html += '<span title="' + Liferay.Language.get('official-article') + '" class="glyphicon glyphicon-check"></span>';
 		}
 		html += '</div>';
 
 		html += '<div class="link">';
-		html += '<a class="highlightable" href="' + link + '">' + item.link
-				+ '</a>';
+		html += '<a class="highlightable" href="' + link + '">' + item.link + '</a>';
 		html += '</div>';
 
 		html += '<div class="description ">';
@@ -127,8 +123,7 @@
 		}
 
 		if (item.description != '') {
-			html += '<span class="highlightable">' + item.description
-					+ '</span>';
+			html += '<span class="highlightable">' + item.description	+ '</span>';
 		}
 		html += '</div>';
 
@@ -136,7 +131,7 @@
 			html += '<div class="tags">';
 			html += '<span>' + Liferay.Language.get('tags') + ':</span>';
 
-			for (tag in item.tags) {
+			for (var tag in item.tags) {
 				html += '<span class="tag">' + tag + '</span>';
 			}
 			html += '</div>';
@@ -157,8 +152,7 @@
 					url : '<%= getSearchResultsURL %>',
 					success : function(data) {
 
-						if (data.items
-								&& data.items.length > 0) {
+						if (data.items && data.items.length > 0) {
 
 							var resultLayout = '<%=currentResultLayout %>';
 

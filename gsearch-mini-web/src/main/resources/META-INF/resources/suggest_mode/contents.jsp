@@ -125,23 +125,23 @@
 					        	
 								var description = dataItem.description;
 				            	
-								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '')				            	
+								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '');
 								
 						        if (description.length > 75) {
 						        	description = description.substring(0, 75) + '...';
 						        }
 								
-								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';				            	
+								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';
 				            	
 				                return {
-				                	value: value, data: dataItem 
+				                	value: value, data: dataItem
 				                };
 				            })
 				        };						
 	    			} else {
 	    				return {
 	    					suggestions: []
-	    				}
+	    				};
 		    		}
 				},
 				triggerSelectOnValidInput: false
