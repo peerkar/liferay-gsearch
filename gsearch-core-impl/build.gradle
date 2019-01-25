@@ -2,7 +2,17 @@ dependencies {
 	compileOnly group: 'com.liferay', name: 'com.liferay.asset.publisher.web', version: '1.5.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.blogs.api', version: '3.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api', version: '3.0.0'
-	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '2.10.0'	
+	
+	// Journal API
+	
+	// Use this for CE 7.0 GA5
+		
+	// compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '2.8.0'
+	
+	// Use this for DXP 7.0 SP8, SP9
+
+	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '2.10.0'
+		
 	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0"
 	compileOnly group: 'com.liferay', name: 'com.liferay.wiki.api', version: '2.4.3'	
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.23.0"
