@@ -3,7 +3,6 @@
 Adds following fields into index:
 
 * gsearch_version_count: number of versions
-* gsearch_content_length: length of content field
 
 Using function score query these fields can be used to boost relevant results.
 
