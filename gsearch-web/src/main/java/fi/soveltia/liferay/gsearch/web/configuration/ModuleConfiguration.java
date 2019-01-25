@@ -133,13 +133,14 @@ public interface ModuleConfiguration {
 	public boolean isViewResultsInContext();
 
 	@Meta.AD(
-			deflt = "false", 
-			description = "append-redirect-desc",
-		    name = "append-redirect-name",
-			required = false
-		)
-		public boolean isRedirectAppended();
+		deflt = "false", 
+		description = "append-redirect-desc",
+	    name = "append-redirect-name",
+		required = false
+	)
+	public boolean isRedirectAppended();
 
+	
 	@Meta.AD(
 		deflt = "", 
 		description = "google-maps-api-key-desc",

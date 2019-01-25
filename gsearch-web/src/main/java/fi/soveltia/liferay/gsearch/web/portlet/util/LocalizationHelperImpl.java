@@ -39,6 +39,9 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 
 	private ResourceBundle _resourceBundle;
 
-	@Reference(target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.web)", unbind = "-")
+	@Reference(
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.web)", 
+		unbind = "-"
+	)
 	private ResourceBundleLoader _resourceBundleLoader;
 }

@@ -298,6 +298,12 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		String portletNamespace = renderResponse.getNamespace();
 		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
 
+		// Redirect
+		
+		template.put(
+			GSearchWebKeys.APPEND_REDIRECT,
+			_moduleConfiguration.isRedirectAppended());
+		
 		// Autocomplete on/off.
 
 		template.put(

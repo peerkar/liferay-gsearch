@@ -3,6 +3,7 @@
 /**
  * Print search results
  *
+ * @param appendRedirect
  * @param portletNamespace
  * @param? results
  */
@@ -33,6 +34,7 @@
 					{if $results.resultsLayout == 'image'}
 					
 						{call GSearchImageResultLayout.render}
+							{param appendRedirect: $appendRedirect /}
 							{param results: $results /}
 						{/call}
 									
@@ -41,6 +43,7 @@
 						// Maps layout
 
 						{call GSearchMapsResultLayout.render}
+							{param appendRedirect: $appendRedirect /}
 							{param results: $results /}
 						{/call}
 
@@ -50,6 +53,7 @@
 			
 						{foreach $item in $results.items}
 							{call .default}
+								{param appendRedirect: $appendRedirect /}
 								{param item: $item /}
 							{/call}
 						{/foreach}
@@ -71,9 +75,12 @@
 /**
  * Print one result item.
  *
+ * @param appendRedirect
  * @param item
  */
 {template .default}
+
+	{let $link: $appendRedirect == true ? ($item.link + $item.redirect) : $item.link /}
 
 	<div class="row">
 	
@@ -87,7 +94,7 @@
 
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
-						<a href="{$item.link}">
+						<a href="{$link}">
 							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
 						</a>
 					{/if}			
@@ -98,7 +105,7 @@
 			{elseif $item.userPortraitUrl}
 			
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<a href="{$item.link}">
+					<a href="{$link}">
 						<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
 					</a>
 				</div>
@@ -127,11 +134,11 @@
 					// Type.
 					
 					{if $item.type != ''}
-						<span class="type"><a href="{$item.link}">[{$item.type}]</a></span>
+						<span class="type"><a href="{$link}">[{$item.type}]</a></span>
 					{/if}		
 							
 					<h1>
-						<a class="highlightable" href="{$item.link}">{$item.title}</a>
+						<a class="highlightable" href="{$link}">{$item.title}</a>
 					</h1>
 					
 					// An example of item tagged by Result Item Tagger plugin.
@@ -142,7 +149,7 @@
 				</div>
 				
 				<div class="link">
-					<a class="highlightable" href="{$item.link}">{$item.link}</a>
+					<a class="highlightable" href="{$link}">{$item.link}</a>
 				</div>
 
 				// Description.

@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.HashMap;
@@ -237,12 +238,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			ParameterNames.VIEW_RESULTS_IN_CONTEXT,
 			_moduleConfiguration.isViewResultsInContext());
 
-		// Append redirect to URL.
-
-		queryContext.setParameter(
-			ParameterNames.APPEND_REDIRECT,
-			_moduleConfiguration.isRedirectAppended());
-
 		// Layout specific options
 
 		if (resultLayout.equals("thumbnailList") ||
@@ -250,7 +245,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
 
-		if (resultLayout.equals("userImageList")) {
+		if (resultLayout.equals("userImageList") ||
+			 resultLayout.equals("maps")) {
 
 			queryContext.setParameter(
 				ParameterNames.INCLUDE_USER_PORTRAIT, true);
@@ -344,7 +340,9 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			JSONObject configurationItem =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			if (!shouldShowResultLayout(portletRequest, configurationItem)) {
+			// Should we show the layout.
+			
+			if (!shouldShowResultLayout(portletRequest, resultLayout, configurationItem)) {
 				continue;
 			}
 			configurationItem.put(
@@ -390,7 +388,20 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	}
 
 	protected boolean shouldShowResultLayout(
-		PortletRequest portletRequest, JSONObject configurationItem) {
+		PortletRequest portletRequest, String resultLayout, JSONObject configurationItem) {
+
+		// Is enabled
+		
+		if (!configurationItem.getBoolean("enabled", true)) {
+			return false;
+		}
+		
+		// Don't show maps layout if Google Maps API key not defined.
+
+		if ("maps".equals(resultLayout) && 
+				Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
+			return false;
+		}
 
 		// Process filters
 

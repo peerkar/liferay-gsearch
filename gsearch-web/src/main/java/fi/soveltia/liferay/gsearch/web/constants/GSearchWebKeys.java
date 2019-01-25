@@ -9,7 +9,9 @@ import com.liferay.portal.kernel.util.WebKeys;
  *
  */
 public class GSearchWebKeys implements WebKeys {
-	
+
+	public static final String APPEND_REDIRECT = "appendRedirect";
+
 	public static final String ASSET_TYPE_OPTIONS = "assetTypeOptionsJSON";
 
 	public static final String ASSET_TAG_PARAM = "assetTagParam";

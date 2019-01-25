@@ -16,6 +16,12 @@
 		display: table;
 	}
 	
+	/* Maps layout */
+	
+	.maps-layout-map {
+		margin-bottom: 20px;
+	}
+	
 	/* Datepicker */
 	
 	.datepicker-title {
@@ -400,12 +406,27 @@
 		
 			.smallimage {
 				object-fit: cover;
+				transition: transform .2s; 
    			
    				img {
    					max-width: 100%;
-   				}
+    			}
+   				
+				img:hover {
+				}
 			}
-   	
+			
+			/* Image zoom */
+			
+			.smallimage:hover {
+				background-color: #fff;
+				border: 1px solid #eee;
+				border-radius: 5px;
+				margin-bottom: 1px;
+				transform: scale(1.7);
+				z-index: 10;
+			}
+
 			.content {
 		
 				.heading {
@@ -449,6 +470,7 @@
 		
 				.description {
 					color: #545454;
+					word-break: break-word;
 					
 					@include media-query(null, $screen-xs-max) {
 						word-break: break-all;
