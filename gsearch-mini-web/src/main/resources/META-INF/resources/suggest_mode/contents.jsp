@@ -54,7 +54,7 @@
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
 
-        let keycode = (event.keyCode ? event.keyCode : event.which);
+        var keycode = (event.keyCode ? event.keyCode : event.which);
         
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -66,7 +66,7 @@
 	 */
 	 function <portlet:namespace />initAutocomplete() {
 
-		let searchFieldElement = $('#<portlet:namespace />MiniSearchField');
+		var searchFieldElement = $('#<portlet:namespace />MiniSearchField');
 		 		
 		Liferay.Loader.require('devbridge-autocomplete', function() {
 
@@ -80,7 +80,7 @@
 				},
 				formatGroup: function(suggestion, category) {
 					
-					let link = '<%= searchPageURL %>' + '?type=' + 
+					var link = '<%= searchPageURL %>' + '?type=' + 
 						suggestion.data.key + '&q=' + 
 						$('#<portlet:namespace />MiniSearchField').val();
 
@@ -97,7 +97,7 @@
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
 			    	
-			    	let link = suggestion.data.link; 
+			    	var link = suggestion.data.link; 
 
 			    	if (<%=appendRedirect%>) {
 				    	link += suggestion.data.redirect;
@@ -123,7 +123,7 @@
 
 				            	// Shorten to (for now) fixed 75 chars.
 					        	
-								let description = dataItem.description;
+								var description = dataItem.description;
 				            	
 								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '')				            	
 								
@@ -131,7 +131,7 @@
 						        	description = description.substring(0, 75) + '...';
 						        }
 								
-								let value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';				            	
+								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';				            	
 				            	
 				                return {
 				                	value: value, data: dataItem 
@@ -154,7 +154,7 @@
 	 */
 	function <portlet:namespace />showMessage(title) {
 		
-		let elementId = '<portlet:namespace />MiniSearchFieldMessage';
+		var elementId = '<portlet:namespace />MiniSearchFieldMessage';
 		
 		$('#' + elementId).tooltip({title: title}).tooltip('show');
 		
