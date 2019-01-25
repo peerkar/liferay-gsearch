@@ -29,6 +29,8 @@ Example configuration:
 
 ```
 {
+        "description": "A sample query integrating to Audience Targeting segmentation.",
+        "enabled": true,
         "conditions": [
                 {
                         "handler_name": "audience_targeting_user_segments",
@@ -43,7 +45,7 @@ Example configuration:
         ],
         "clauses": [
                 {
-                        "query_type": "term",
+                        "query_type": "match",
                         "occur": "should",
                         "query_configuration": {
                                 "boost": "10",
