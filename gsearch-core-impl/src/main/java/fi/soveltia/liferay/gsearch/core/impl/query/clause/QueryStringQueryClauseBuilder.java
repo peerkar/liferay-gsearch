@@ -30,7 +30,7 @@ import fi.soveltia.liferay.gsearch.query.QueryStringQuery;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class QueryStringQueryClauseBuilderImpl implements ClauseBuilder {
+public class QueryStringQueryClauseBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}

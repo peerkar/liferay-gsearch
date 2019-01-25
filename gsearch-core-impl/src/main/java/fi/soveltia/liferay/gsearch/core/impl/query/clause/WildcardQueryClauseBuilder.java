@@ -30,7 +30,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class WildcardQueryClauseBuilderImpl implements ClauseBuilder {
+public class WildcardQueryClauseBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}

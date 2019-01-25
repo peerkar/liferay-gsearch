@@ -238,13 +238,19 @@ public class QueryBuilderImpl implements QueryBuilder {
 			JSONObject clauseObject =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			JSONArray conditionsArray =
-				clauseObject.getJSONArray("conditions");;
-
-			boolean applyClauses = false;
-
+			// Check if this clause is enabled
+				
+			if (!clauseObject.getBoolean("enabled", true)) {
+				continue;
+			}
+				
+			// Process conditions.
 			// Conditions are error prone for editing.
 			// Just log the error to be able to recover.
+
+			JSONArray conditionsArray = clauseObject.getJSONArray("conditions");
+
+			boolean applyClauses = false;
 
 			try {
 
@@ -312,6 +318,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 				}
 			}
 		}
+		
 		return query;
 	}
 

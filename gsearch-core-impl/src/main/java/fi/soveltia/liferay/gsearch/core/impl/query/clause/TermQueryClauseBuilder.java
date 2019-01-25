@@ -26,7 +26,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class TermQueryClauseBuilderImpl implements ClauseBuilder {
+public class TermQueryClauseBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}

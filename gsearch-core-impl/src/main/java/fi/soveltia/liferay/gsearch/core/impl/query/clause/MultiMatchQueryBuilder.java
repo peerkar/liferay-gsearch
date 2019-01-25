@@ -31,7 +31,7 @@ import fi.soveltia.liferay.gsearch.query.GSearchMultiMatchQuery;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class MultiMatchQueryBuilderImpl implements ClauseBuilder {
+public class MultiMatchQueryBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}

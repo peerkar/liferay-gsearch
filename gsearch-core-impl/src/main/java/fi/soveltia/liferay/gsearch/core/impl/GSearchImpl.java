@@ -149,14 +149,17 @@ public class GSearchImpl implements GSearch {
 			});
 
 		Hits hits = _indexSearcherHelper.search(searchContext, query);
-
+		
 		if (_log.isDebugEnabled()) {
-			_log.debug("Query: " + hits.getQuery());
-			_log.debug("Hits: " + hits.getLength());
-			_log.debug("Returned: " + hits.getDocs().length);
-			_log.debug("Time:" + hits.getSearchTime());
-			_log.debug(
-				"Suggestions size: " + hits.getQuerySuggestions().length);
+			
+			if (hits != null) {
+				_log.debug("Query: " + hits.getQuery());
+				_log.debug("Hits: " + hits.getLength());
+				_log.debug("Returned: " + hits.getDocs().length);
+				_log.debug("Time:" + hits.getSearchTime());
+				_log.debug(
+					"Suggestions size: " + hits.getQuerySuggestions().length);
+			}
 		}
 		return hits;
 	}

@@ -76,8 +76,6 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		boolean appendRedirect = isAppendRedirect(queryContext);
-
 		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		String assetPublisherPageURL = getAssetPublisherPageURL(queryContext);
@@ -104,11 +102,6 @@ public class DLFileEntryItemBuilder extends BaseResultItemBuilder
 				_assetEntryLocalService.getEntry(
 					DLFileEntry.class.getName(), GetterUtil.getLong(
 						document.get(Field.ENTRY_CLASS_PK))).getEntryId());
-
-			if (appendRedirect) {
-				return GSearchUtil.appendRedirectToURL(
-					portletRequest, sb.toString());
-			}
 
 		}
 		else {

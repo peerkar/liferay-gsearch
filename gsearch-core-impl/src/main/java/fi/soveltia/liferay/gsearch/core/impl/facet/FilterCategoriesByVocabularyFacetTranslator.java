@@ -1,8 +1,10 @@
+
 package fi.soveltia.liferay.gsearch.core.impl.facet;
 
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -26,13 +28,15 @@ import fi.soveltia.liferay.gsearch.core.impl.results.ResultsBuilderImpl;
 	immediate = true,
 	service = FacetTranslator.class
 )
-public class FilterCategoriesByVocabularyFacetTranslator implements FacetTranslator  {
+public class FilterCategoriesByVocabularyFacetTranslator
+	implements FacetTranslator {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean canProcess(String translatorName) {
+
 		return NAME.equals(translatorName);
 	}
 
@@ -56,32 +60,38 @@ public class FilterCategoriesByVocabularyFacetTranslator implements FacetTransla
 		JSONObject configuration)
 		throws Exception {
 
-		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
-		
-		JSONObject translatorConfiguration = configuration.getJSONObject("translator_params");
-	
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
+
+		JSONObject translatorConfiguration =
+			configuration.getJSONObject("translator_params");
+
 		Long vocabularyId = translatorConfiguration.getLong("vocabulary_id");
-		
+
 		JSONArray termArray = JSONFactoryUtil.createJSONArray();
-		
+
 		if (vocabularyId > 0) {
-			
+
 			try {
 				List<TermCollector> termCollectors =
-								facetCollector.getTermCollectors();
+					facetCollector.getTermCollectors();
 
-				AssetVocabulary assetVocabulary = _assetVocabularyLocalService.
-								getAssetVocabulary(vocabularyId);
-				
-				List<AssetCategory> assetCategories = assetVocabulary.getCategories();
+				AssetVocabulary assetVocabulary =
+					_assetVocabularyLocalService.getAssetVocabulary(
+						vocabularyId);
+
+				List<AssetCategory> assetCategories =
+					assetVocabulary.getCategories();
 
 				for (AssetCategory assetCategory : assetCategories) {
 
 					for (TermCollector tc : termCollectors) {
 
-						if ((Long.valueOf(tc.getTerm()) == assetCategory.getCategoryId())) {
-							
-							JSONObject item = JSONFactoryUtil.createJSONObject();
+						if ((Long.valueOf(
+							tc.getTerm()) == assetCategory.getCategoryId())) {
+
+							JSONObject item =
+								JSONFactoryUtil.createJSONObject();
 
 							item.put("frequency", tc.getFrequency());
 							item.put("name", assetCategory.getTitle(locale));
@@ -92,20 +102,23 @@ public class FilterCategoriesByVocabularyFacetTranslator implements FacetTransla
 					}
 				}
 
-			} catch (Exception e) {
-				
-				_log.error(e.getMessage(), e);
 			}
-			
+			catch (PortalException e) {
+
+				_log.warn(
+					"Asset vocabulary " + vocabularyId + " defined in facets " +
+						"configuration was not found.");
+			}
+
 		}
 		return termArray;
 	}
 
 	private static final Logger _log =
-					LoggerFactory.getLogger(ResultsBuilderImpl.class);
-	
+		LoggerFactory.getLogger(ResultsBuilderImpl.class);
+
 	private static final String NAME = "filter_categories_by_vocabulary";
-	
+
 	@Reference
 	AssetVocabularyLocalService _assetVocabularyLocalService;
 }

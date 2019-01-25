@@ -1,4 +1,3 @@
-
 package fi.soveltia.liferay.gsearch.core.impl.query.clause;
 
 import com.liferay.portal.kernel.json.JSONObject;
@@ -14,10 +13,10 @@ import org.osgi.service.component.annotations.Reference;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
-import fi.soveltia.liferay.gsearch.query.DecayFunctionScoreQuery;
+import fi.soveltia.liferay.gsearch.query.FieldValueFactorFunctionScoreQuery;
 
 /**
- * Decay function score query builder.
+ * Field value factor function score query builder.
  * 
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-function-score-query.html
  * 
@@ -27,7 +26,7 @@ import fi.soveltia.liferay.gsearch.query.DecayFunctionScoreQuery;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
+public class FieldValueFactorFunctionScoreQueryBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}
@@ -44,39 +43,46 @@ public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
 			return null;
 		}
 
-		DecayFunctionScoreQuery functionScoreQuery =
-			new DecayFunctionScoreQuery(null);
+		FieldValueFactorFunctionScoreQuery functionScoreQuery =
+			new FieldValueFactorFunctionScoreQuery(null);
 
-		// Boost
+		// Boost.
 
 		if (Validator.isNotNull(configuration.get("boost"))) {
 			functionScoreQuery.setBoost(
 				GetterUtil.getFloat(configuration.get("boost")));
 		}
 
-		// Boostmode
+		// Boostmode.
 
 		if (Validator.isNotNull(configuration.get("boost_mode"))) {
 			functionScoreQuery.setBoostMode(
 				GetterUtil.getString(configuration.get("boost_mode")));
 		}
 
-		// Decay
+		// Factor.
 
-		if (Validator.isNotNull(configuration.get("decay"))) {
-			functionScoreQuery.setDecay(
-				GetterUtil.getDouble(configuration.get("decay")));
+		if (Validator.isNotNull(configuration.get("factor"))) {
+			functionScoreQuery.setFactor(
+				GetterUtil.getFloat(configuration.get("factor")));
 		}
 
 		// Field name
 
 		functionScoreQuery.setFieldName(fieldName);
 
-		// Function type (gauss, linear, exp)
+		// Missing field value.
 
-		if (Validator.isNotNull(configuration.get("function_type"))) {
-			functionScoreQuery.setFunctionType(
-				configuration.getString("function_type"));
+		if (Validator.isNotNull(configuration.get("missing"))) {
+			functionScoreQuery.setMissing(
+				configuration.getDouble("missing"));
+		}
+
+		// Modified.
+
+		if (Validator.isNotNull(configuration.get("modifier"))) {
+			functionScoreQuery.setModifier(
+				configuration.getString("modifier"));
 		}
 
 		// Max boost
@@ -93,51 +99,12 @@ public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
 				GetterUtil.getFloat(configuration.get("min_score")));
 		}
 
-		// Multivalue mode
-
-		if (Validator.isNotNull(configuration.get("multi_value_mode"))) {
-			functionScoreQuery.setMultiValueMode(
-				configuration.getString("multi_value_mode"));
-		}
-
-		// Offset
-
-		if (Validator.isNotNull(configuration.get("offset"))) {
-			functionScoreQuery.setOffset(
-				configuration.getString("offset"));
-		}
-
-		// Origin
-		
-		if (Validator.isNotNull(configuration.get("origin"))) {
-			
-
-			if (configuration.getString("origin_type").equals("date")) {
-				functionScoreQuery.setOrigin(
-					_configurationHelper.parseConfigurationVariables(
-						portletRequest, queryContext, configuration.getString("origin")));
-			}
-		}
-
-		// Scale
-
-		if (Validator.isNotNull(configuration.get("scale"))) {
-			functionScoreQuery.setScale(configuration.getString("scale"));
-		}
-
 		// Score mode
 
 		if (Validator.isNotNull(configuration.get("score_mode"))) {
 			functionScoreQuery.setScoreMode(configuration.getString("score_mode"));
 		}
-
-		// Weight
-
-		if (Validator.isNotNull(configuration.get("weight"))) {
-			functionScoreQuery.setWeight(
-				GetterUtil.getFloat(configuration.get("weight")));
-		}
-
+		
 		return functionScoreQuery;
 	}
 
@@ -150,7 +117,7 @@ public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
 		return (querytype.equals(QUERY_TYPE));
 	}
 
-	private static final String QUERY_TYPE = "decay_function_score";
+	private static final String QUERY_TYPE = "field_value_factor";
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;

@@ -22,7 +22,9 @@ import java.util.List;
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
@@ -39,26 +41,14 @@ import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
 )
 public class EntryClassNameFilterBuilder implements FilterBuilder {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void addFilters(
 		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
 		BooleanFilter postFilter, QueryContext queryContext)
 		throws Exception {
 
-		List<String> entryClassNames =
-			(List<String>) queryContext.getParameter(
-				ParameterNames.ENTRY_CLASS_NAMES);
+		List<String> entryClassNames = getEntryClassNames(queryContext);
 		
-		if (entryClassNames == null) {
-			entryClassNames = new ArrayList<String>();
-
-			entryClassNames.addAll(
-				parseDefaultEntryClasses(
-					queryContext.getConfiguration(
-						ConfigurationKeys.ENTRY_CLASS_NAME)));
-		}
-
 		BooleanQuery query = new BooleanQueryImpl();
 
 		for (String className : entryClassNames) {
@@ -80,6 +70,40 @@ public class EntryClassNameFilterBuilder implements FilterBuilder {
 		QueryFilter queryFilter = new QueryFilter(query);
 		preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);
 
+	}
+
+	/**
+	 * Try to get entry class names in this order 1) QueryContext parameters. If
+	 * not found then 2) QueryContext configurations. If not found then 3)
+	 * Global entryclassname configuration
+	 * 
+	 * @param queryContext
+	 * @return
+	 * @throws ClassNotFoundException 
+	 * @throws JSONException 
+	 */
+	@SuppressWarnings("unchecked")
+	protected List<String> getEntryClassNames(QueryContext queryContext) 
+					throws JSONException, ClassNotFoundException {
+
+		List<String> entryClassNames = (List<String>) queryContext.getParameter(
+			ParameterNames.ENTRY_CLASS_NAMES);
+		
+		if (entryClassNames == null) {
+
+			if (queryContext.getConfiguration(
+				ConfigurationKeys.ENTRY_CLASS_NAME) != null) {
+				entryClassNames = parseEntryClassNames(
+					queryContext.getConfiguration(
+						ConfigurationKeys.ENTRY_CLASS_NAME));
+			}
+			else {
+				entryClassNames = parseEntryClassNames(
+					_configurationHelper.getAssetTypeConfiguration());
+
+			}
+		}
+		return entryClassNames;
 	}
 
 	/**
@@ -119,14 +143,14 @@ public class EntryClassNameFilterBuilder implements FilterBuilder {
 	}
 
 	/**
-	 * Parse default set of asset class names to search for.
+	 * Parse asset class names from configuration.
 	 * 
 	 * @param configuration
 	 * @return
 	 * @throws ClassNotFoundException
 	 * @throws JSONException
 	 */
-	protected List<String> parseDefaultEntryClasses(String[] configuration)
+	protected List<String> parseEntryClassNames(String[] configuration)
 		throws ClassNotFoundException, JSONException {
 
 		List<String> entryClassNames = new ArrayList<String>();
@@ -141,4 +165,8 @@ public class EntryClassNameFilterBuilder implements FilterBuilder {
 
 		return entryClassNames;
 	}
+
+	@Reference
+	private ConfigurationHelper _configurationHelper;
+
 }

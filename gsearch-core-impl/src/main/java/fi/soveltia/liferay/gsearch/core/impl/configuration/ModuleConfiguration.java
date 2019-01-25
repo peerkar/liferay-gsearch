@@ -25,7 +25,7 @@ public interface ModuleConfiguration {
 	public int highlightFragmentSize();	
 
 	@Meta.AD(
-		deflt = "200", 
+		deflt = "5", 
 		description = "snippet-size-desc",
 	    name = "snippet-size-name",
 		required = false
@@ -33,7 +33,7 @@ public interface ModuleConfiguration {
 	public int snippetSize();	
 
 	@Meta.AD(
-		deflt = "20", 
+		deflt = "50", 
 		description = "max-facet-terms-desc",
 	    name = "max-facet-terms-name",
 		required = false

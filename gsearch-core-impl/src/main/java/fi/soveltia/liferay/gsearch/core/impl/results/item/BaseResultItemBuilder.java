@@ -137,8 +137,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document, QueryContext queryContext)
 		throws Exception { 
-		
-		boolean appendRedirect = isAppendRedirect(queryContext);
 
 		boolean viewResultsInContext = isViewInContext(queryContext);
 
@@ -156,10 +154,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 					WindowState.MAXIMIZED));
 		}
 		
-		if (appendRedirect) {
-			return GSearchUtil.appendRedirectToURL(portletRequest, sb.toString());
-		}
-
 		return sb.toString();
 	}
 
@@ -360,12 +354,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		}
 
 		return null;
-	}
-	
-	protected boolean isAppendRedirect(QueryContext queryContext) {
-
-		return GetterUtil.getBoolean(queryContext.getParameter(
-			ParameterNames.APPEND_REDIRECT), false);
 	}
 	
 	protected boolean isViewInContext(QueryContext queryContext) {

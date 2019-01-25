@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import fi.soveltia.liferay.gsearch.core.api.results.facet.processor.FacetProcess
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactory;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Results builder implementation.
@@ -81,7 +83,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		try {
 			resultsObject.put(
 				"facets", createFacetsArray(
-					searchContext, queryContext));
+					searchContext, queryContext, hits));
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);
@@ -133,9 +135,13 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @throws Exception
 	 */
 	protected JSONArray createFacetsArray(
-		SearchContext searchContext, QueryContext queryContext)
+		SearchContext searchContext, QueryContext queryContext, Hits hits)
 		throws Exception {
 
+		if (hits.getLength() == 0) {
+			return JSONFactoryUtil.createJSONArray();
+		}
+		
 		Map<String, Facet> facets = searchContext.getFacets();
 
 		if (facets == null || facets.size() == 0) {
@@ -316,11 +322,16 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				// Link.
 
+				String link = resultItemBuilder.getLink(
+					portletRequest, portletResponse, document,
+					queryContext);
+				
 				jsonObject.put(
-					"link",
-					resultItemBuilder.getLink(
-						portletRequest, portletResponse, document,
-						queryContext));
+					"link", link);
+				
+				// Redirect
+				
+				jsonObject.put("redirect", GSearchUtil.getRedirect(portletRequest, link));
 
 				// Additional metadata.
 

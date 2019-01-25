@@ -33,7 +33,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 	immediate = true, 
 	service = ClauseBuilder.class
 )
-public class MatchQueryBuilderImpl implements ClauseBuilder {
+public class MatchQueryBuilder implements ClauseBuilder {
 
 	/**
 	 * {@inheritDoc}

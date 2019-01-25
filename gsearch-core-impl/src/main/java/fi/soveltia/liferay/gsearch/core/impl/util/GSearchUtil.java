@@ -28,7 +28,6 @@ import javax.portlet.PortletRequest;
  */
 public class GSearchUtil {
 
-
 	/**
 	 * Append redirect to url.
 	 * 
@@ -37,8 +36,7 @@ public class GSearchUtil {
 	 * @return
 	 * @throws PortalException
 	 */
-	public static String appendRedirectToURL(
-		PortletRequest portletRequest, String url)
+	public static String getRedirect(PortletRequest portletRequest, String url)
 		throws PortalException {
 
 		ThemeDisplay themeDisplay =
@@ -50,8 +48,6 @@ public class GSearchUtil {
 
 		StringBundler sb = new StringBundler();
 
-		sb.append(url);
-
 		if (url.contains("?")) {
 			sb.append("&redirect=");
 		}
@@ -60,11 +56,11 @@ public class GSearchUtil {
 		}
 
 		if (currentURL.indexOf("?q=") > 0 || currentURL.indexOf("&q=") > 0) {
-		
+
 			sb.append(currentURL.substring(0, currentURL.indexOf("?")));
-	
+
 			String part2;
-	
+
 			if (currentURL.indexOf("?q=") > 0) {
 				part2 = currentURL.substring(currentURL.indexOf("?q="));
 			}
@@ -72,15 +68,16 @@ public class GSearchUtil {
 				part2 = currentURL.substring(currentURL.indexOf("&q="));
 				part2 = part2.replace("&q", "?q");
 			}
-	
+
 			sb.append(HtmlUtil.escapeURL(part2));
-		} else {
+		}
+		else {
 			sb.append(HtmlUtil.escapeURL(currentURL));
 		}
-		
+
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Try to find an asset publisher instance id on a layout
 	 * 
@@ -126,10 +123,12 @@ public class GSearchUtil {
 			LayoutLocalServiceUtil.getLayout(themeDisplay.getPlid());
 		return PortalUtil.getLayoutFriendlyURL(selectedLayout, themeDisplay);
 	}
-	
+
 	/**
-	 * Get layout by friendlyurl.
-	 * 
+	 * Get layout by friendlyurl. Possible syntaxes: -
+	 * /group/something/viewasset (full group path) - /viewasset (path to
+	 * current group)
+	 *
 	 * @param resourceRequest
 	 * @return layout
 	 * @throws PortalException
@@ -142,15 +141,43 @@ public class GSearchUtil {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		if (layoutFriendlyURL != null) {
+		if (layoutFriendlyURL == null) {
+			throw new PortalException(
+				"Default asset publisher page is not defined. Check Liferay GSearch configuration.");
+		}
+
+		if (layoutFriendlyURL.startsWith("/group/") ||
+			layoutFriendlyURL.startsWith("/web/")) {
+
+			boolean isPrivate = false;
+
+			if (layoutFriendlyURL.startsWith("/group/")) {
+				isPrivate = true;
+			}
+
+			int position1 = layoutFriendlyURL.indexOf("/", 1);
+
+			int position2 = layoutFriendlyURL.indexOf("/", position1);
+			
+			int position3 = position1 + position2 + 1;
+
+			String groupFriendlyURL = layoutFriendlyURL.substring(position1, position3);
+
+			Group group = GroupLocalServiceUtil.getFriendlyURLGroup(
+				themeDisplay.getCompanyId(), groupFriendlyURL);
+
+			layoutFriendlyURL = layoutFriendlyURL.substring(position3);
+
+			return LayoutLocalServiceUtil.getFriendlyURLLayout(
+				group.getGroupId(), isPrivate, layoutFriendlyURL);
+
+		}
+		else {
+
 			return LayoutLocalServiceUtil.getFriendlyURLLayout(
 				themeDisplay.getScopeGroupId(),
 				themeDisplay.getLayout().isPrivateLayout(), layoutFriendlyURL);
 		}
-
-		throw new PortalException(
-			"Couldn't find asset publisher layout for " + layoutFriendlyURL +
-				". Please check configuration.");
 	}
 
 	/**

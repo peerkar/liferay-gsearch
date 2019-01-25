@@ -20,7 +20,6 @@ import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
-import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * JournalArticle item type result builder.
@@ -56,8 +55,6 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		Document document, QueryContext queryContext)
 		throws Exception {
 
-		boolean appendRedirect = isAppendRedirect(queryContext);
-
 		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		String assetPublisherPageURL = getAssetPublisherPageURL(queryContext);
@@ -83,11 +80,6 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 				getNotLayoutBoundJournalArticleUrl(
 					portletRequest, getJournalArticle(document),
 					assetPublisherPageURL));
-		}
-
-		if (appendRedirect) {
-			return GSearchUtil.appendRedirectToURL(
-				portletRequest, sb.toString());
 		}
 
 		return sb.toString();
