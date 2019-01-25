@@ -26,5 +26,7 @@
 	String getSearchResultsURL = (String)request.getAttribute("searchResultsURL");
 	
 	String currentResultLayout = portletPreferences.getValue("resultLayout", "list");
-	
+
+	boolean appendRedirect = GetterUtil.getBoolean(portletPreferences.getValue("appendRedirect", "true"));
+
 %>

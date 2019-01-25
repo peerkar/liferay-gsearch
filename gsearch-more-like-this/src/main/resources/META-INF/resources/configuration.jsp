@@ -9,7 +9,6 @@
 	String entryClassNames = preferences.getValue("entryClassNames", ConfigurationUtil.getDefaultConfigurationValue("entryClassNames"));
 	String assetPublisherPage = preferences.getValue("assetPublisherPage", "/viewasset");
 	boolean showResultsInContext = GetterUtil.getBoolean(preferences.getValue("showResultsInContext", "true"));
-	boolean appendRedirect = GetterUtil.getBoolean(preferences.getValue("appendRedirect", "true"));
 %>
 
 <liferay-portlet:actionURL portletConfiguration="<%= true %>" var="configurationActionURL" />

@@ -58,11 +58,17 @@
 	function <portlet:namespace />getRow(item) {
 
 		let html = '';
+		
+		let link = item.link;
+		
+		if (<%=appendRedirect %>) {
+			link += item.redirect;	
+		}
 
 		if (item.imageSrc && item.imageSrc != '') {
 	
 				html += '<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">';
-				html += '<a href="' + item.link + '">';
+				html += '<a href="' + link + '">';
 				html += '<img alt="' + item.title + '" src="' + item.imageSrc + '" title="' + item.title + '" />';
 				html += '</a>';
 				html += '</div>';
@@ -82,7 +88,7 @@
 		} else if (item.userPortraitUrl) {
 			
 				html += '<div class="smallimage col-md-3 col-lg-3 hidden-xs hidden-sm">';
-				html += '<a href="' + item.link + '">';
+				html += '<a href="' + link + '">';
 				html += '<img alt="' + item.title + '" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="' + item.userPortraitUrl  + '" title="' + item.title + '" />';
 				html += '</a>';
 				html += '</div>';
@@ -94,11 +100,11 @@
 		html += '<div class="heading">';
 
 		if (item.type != '') {
-			html += '<span class="type"><a href="' + item.link + '">[' + item.type + ']</a></span>';
+			html += '<span class="type"><a href="' + link + '">[' + item.type + ']</a></span>';
 		}
 						
 		html += '<h1>';
-		html += '<a class="highlightable" href="' + item.link + '" title="' + item.title + '">' + item.title + '</a>';
+		html += '<a class="highlightable" href="' + link + '" title="' + item.title + '">' + item.title + '</a>';
 		html += '</h1>';
 				
 		if (item.highlight) {
@@ -107,7 +113,7 @@
 		html += '</div>';
 		
 		html += '<div class="link">';
-		html += '<a class="highlightable" href="' + item.link + '">' + item.link + '</a>';
+		html += '<a class="highlightable" href="' + link + '">' + item.link + '</a>';
 		html += '</div>';
 
 		html += '<div class="description ">';
@@ -136,39 +142,43 @@
 	}
 
 	jQuery(document).ready(function() {
-		
-		jQuery.ajax({
-			type: 'POST',
-			url: '<%= getSearchResultsURL %>',
-			success: function(data) {
-        	  
-				if (data.items && data.items.length > 0) {
 
-					let resultLayout = '<%=currentResultLayout %>';
+		if (<%=isConfigured %>) {
+			
+			jQuery('#p_p_id<portlet:namespace />').show();
+			
+			jQuery.ajax({
+				type: 'POST',
+				url: '<%= getSearchResultsURL %>',
+				success: function(data) {
+	        	  
+					if (data.items && data.items.length > 0) {
 
-					let html;
-					
-					if (resultLayout == 'strip') {
+						let resultLayout = '<%=currentResultLayout %>';
 
-						html = <portlet:namespace />generateStripLayout(data.items);
+						let html;
 						
-					} else {
+						if (resultLayout == 'strip') {
 
-						html = <portlet:namespace />generateDefaultLayout(data.items);
+							html = <portlet:namespace />generateStripLayout(data.items);
+							
+						} else {
+
+							html = <portlet:namespace />generateDefaultLayout(data.items);
+						}
+						
+						jQuery('#<portlet:namespace />SearchResults').html(html);
 					}
-					
-					jQuery('#<portlet:namespace />SearchResults').html(html);
-
-					jQuery('#p_p_id<portlet:namespace />').show();
-					
-				} else if (<%=themeDisplay.isSignedIn() %>){
-					
-					jQuery('#p_p_id<portlet:namespace />').show();
-				} else {
-					
-					jQuery('#p_p_id<portlet:namespace />').hide();
 				}
-			}
-		});
+			});			
+			
+		} else if (<%=themeDisplay.isSignedIn() %>){
+			
+			jQuery('#p_p_id<portlet:namespace />').show();
+
+		} else {
+			
+			jQuery('#p_p_id<portlet:namespace />').hide();
+		}
 	});
 </aui:script>

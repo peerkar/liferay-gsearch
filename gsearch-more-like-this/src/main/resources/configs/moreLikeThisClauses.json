@@ -1,6 +1,6 @@
 [
 	{
-		"description": "More Like This query.",
+		"description": "Elasticsearch More Like This (MLT) query.",
 		"conditions": [],
 		"clauses": [
 			{
@@ -36,7 +36,7 @@
 		]
 	},
 	{
-		"description": "As an example of clause stacking, as in GSearch clause configuration, boost additionally results having tag official.",
+		"description": "Clauses can be stacked. An example of additionally boosting results having tag 'official'.",
 		"conditions": [],
 		"clauses": [
 			{

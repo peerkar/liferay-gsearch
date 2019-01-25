@@ -78,10 +78,18 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		// Try to find an asset entry on page.
 
-		AssetEntry assetEntry =
-			getAssetEntry(resourceRequest, resourceResponse);
+		AssetEntry assetEntry = null;
 
-		// Try to find contents similar.
+		try {
+		
+			assetEntry = getAssetEntry(resourceRequest, resourceResponse);
+
+		} catch (Exception e) {
+			
+			_log.warn("Assetentry not found.");
+		}
+		
+		// Even if assetentry was null there could be static configuration keyword.
 
 		try {
 			getMoreLikeThis(resourceRequest, resourceResponse, assetEntry);
@@ -295,6 +303,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			queryContext.setParameter(
 				ParameterNames.ENTRY_CLASS_NAMES, entryClassNames);
+			
 			queryContext.setKeywords(String.valueOf(assetEntry.getClassPK()));
 		}
 
@@ -302,8 +311,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		queryContext.setParameter(
 			ParameterNames.VIEW_RESULTS_IN_CONTEXT, false);
-
-		queryContext.setParameter(ParameterNames.APPEND_REDIRECT, false);
 
 		queryContext.setQueryContributorsEnabled(false);
 
@@ -530,6 +537,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		queryContext.setParameter(
 			ParameterNames.COMPANY_ID, themeDisplay.getCompanyId());
+		
 		queryContext.setParameter(
 			ParameterNames.LOCALE, themeDisplay.getLocale());
 
@@ -544,12 +552,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		queryContext.setParameter(
 			ParameterNames.VIEW_RESULTS_IN_CONTEXT, GetterUtil.getBoolean(
 				preferences.getValue("showResultsInContext", "true")));
-
-		// Append redirect.
-
-		queryContext.setParameter(
-			ParameterNames.APPEND_REDIRECT, GetterUtil.getBoolean(
-				preferences.getValue("appendRedirect", "true")));
 
 		// Disable post processors.
 
