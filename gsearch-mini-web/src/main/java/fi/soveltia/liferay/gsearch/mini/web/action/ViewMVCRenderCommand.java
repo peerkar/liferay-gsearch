@@ -60,6 +60,12 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			}
 		}
 
+		// Append redirect.
+		
+		renderRequest.setAttribute(
+			GSearchMiniWebKeys.APPEND_REDIRECT,
+			_moduleConfiguration.isRedirectAppended());
+		
 		// Autocomplete on/off.
 
 		renderRequest.setAttribute(

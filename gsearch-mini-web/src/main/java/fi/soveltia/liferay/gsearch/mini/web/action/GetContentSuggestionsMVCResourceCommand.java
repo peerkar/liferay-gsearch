@@ -97,12 +97,6 @@ public class GetContentSuggestionsMVCResourceCommand
 				ParameterNames.VIEW_RESULTS_IN_CONTEXT,
 				_moduleConfiguration.isViewResultsInContext());
 
-			// Append redirect to URL.
-
-			queryContext.setParameter(
-				ParameterNames.APPEND_REDIRECT,
-				false);			
-
 		}
 		catch (PortalException e) {
 
@@ -227,6 +221,9 @@ public class GetContentSuggestionsMVCResourceCommand
 
 	private ResourceBundle _resourceBundle;
 
-	@Reference(target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", unbind = "-")
+	@Reference(
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", 
+		unbind = "-"
+	)
 	private ResourceBundleLoader _resourceBundleLoader;
 }

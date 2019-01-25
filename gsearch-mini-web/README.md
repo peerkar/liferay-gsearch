@@ -9,5 +9,5 @@ None.
 
 ## Configuration
 
-After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> Other -> Mini Portlet.
+After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> GSearch -> Mini Portlet.
 

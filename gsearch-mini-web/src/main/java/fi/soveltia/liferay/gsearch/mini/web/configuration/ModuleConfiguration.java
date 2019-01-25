@@ -38,7 +38,7 @@ public interface ModuleConfiguration {
 	public int autoCompleteRequestDelay();	
 
 	@Meta.AD(
-		deflt = "keywords", 
+		deflt = "contents", 
 	    description = "suggest-mode-desc",
 	    name = "suggest-mode-name",
 	    optionLabels = {"Keywords", "Contents"},
@@ -80,15 +80,24 @@ public interface ModuleConfiguration {
 	public String[] hideOnPages();
 	
 	@Meta.AD(
-		deflt = "false", 
+		deflt = "true", 
 		description = "view-in-context-desc",
 	    name = "view-in-context-name",
 		required = false
 	)
 	public boolean isViewResultsInContext();	
+
 	
 	@Meta.AD(
-		deflt = "3", 
+		deflt = "true", 
+		description = "append-redirect-desc",
+	    name = "append-redirect-name",
+		required = false
+	)
+	public boolean isRedirectAppended();	
+	
+	@Meta.AD(
+		deflt = "2", 
 	    name = "keywords-min-length",
 		required = false
 	)

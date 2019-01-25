@@ -96,7 +96,13 @@
 				noCache: false,
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
-			    	location.href = suggestion.data.link;
+			    	
+			    	let link = suggestion.data.link; 
+
+			    	if (<%=appendRedirect%>) {
+				    	link += suggestion.data.redirect;
+			    	}
+			    	location.href = link;
 			    },
 				paramName: 'q',
 				preserveInput: true,
