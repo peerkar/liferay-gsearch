@@ -60,12 +60,12 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			}
 		}
 
-		// Autocomplete on/off.
-
+		// Append redirect.
+		
 		renderRequest.setAttribute(
-			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED,
-			_moduleConfiguration.enableAutoComplete());
-
+			GSearchMiniWebKeys.APPEND_REDIRECT,
+			_moduleConfiguration.isRedirectAppended());
+		
 		// Autocomplete request delay.
 
 		renderRequest.setAttribute(
@@ -100,7 +100,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 				createResourceURL(
 					renderResponse,
 					GSearchMiniResourceKeys.GET_CONTENT_SUGGESTIONS));
-			
+
 			renderRequest.setAttribute(
 				GSearchMiniWebKeys.SUGGEST_MODE, "contents");
 
@@ -112,7 +112,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 				createResourceURL(
 					renderResponse,
 					GSearchMiniResourceKeys.GET_KEYWORD_SUGGESTIONS));
-			
+
 			renderRequest.setAttribute(
 				GSearchMiniWebKeys.SUGGEST_MODE, "keywords");
 		}

@@ -17,12 +17,12 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "Mini Portlet"
+	name = "mini-portlet-configuration"
 )
 public interface ModuleConfiguration {
 
 	@Meta.AD(
-		deflt = "keywords", 
+		deflt = "contents", 
 	    description = "suggest-mode-desc",
 	    name = "suggest-mode-name",
 	    optionLabels = {"Keywords", "Contents"},
@@ -38,6 +38,13 @@ public interface ModuleConfiguration {
 	)
 	public int contentSuggestionsCount();
 	
+	@Meta.AD(
+		deflt = "150", 
+	    description = "suggestions-delay-desc",
+	    name = "suggestions-delay-name",
+		required = false
+	)
+	public int autoCompleteRequestDelay();	
 	
 	@Meta.AD(
 		deflt = "/search", 
@@ -64,36 +71,29 @@ public interface ModuleConfiguration {
 	public String[] hideOnPages();
 	
 	@Meta.AD(
-		deflt = "false", 
+		deflt = "true", 
 		description = "view-in-context-desc",
 	    name = "view-in-context-name",
 		required = false
 	)
 	public boolean isViewResultsInContext();	
+
 	
 	@Meta.AD(
-		deflt = "3", 
+		deflt = "true", 
+		description = "append-redirect-desc",
+	    name = "append-redirect-name",
+		required = false
+	)
+	public boolean isRedirectAppended();	
+	
+	@Meta.AD(
+		deflt = "2", 
 	    name = "keywords-min-length",
 		required = false
 	)
 	public int queryMinLength();
 	
-	@Meta.AD(
-		deflt = "true", 
-	    name = "enable-autocompletion-name",
-	    description = "enable-autocompletion-desc",
-		required = false
-	)
-	public boolean enableAutoComplete();
-
-	@Meta.AD(
-		deflt = "150", 
-	    description = "autocomplete-delay-desc",
-	    name = "autocomplete-delay-name",
-		required = false
-	)
-	public int autoCompleteRequestDelay();	
-
 	@Meta.AD(
 		deflt = "10000", 
 		description = "request-timeout-desc",

@@ -11,8 +11,10 @@ import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Locale;
 import java.util.Map;
@@ -31,8 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
 import fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
@@ -70,27 +73,32 @@ public class GetContentSuggestionsMVCResourceCommand
 		if (_log.isDebugEnabled()) {
 			_log.debug("GetSearchResultsMVCResourceCommand.doServeResource()");
 		}
-		
+
 		// Build query parameters object.
 
-		QueryParams queryParams = null;
-		
+		QueryContext queryContext = null;
+
 		try {
 
 			// Build basic params.
-						
-			queryParams = _queryParamsBuilder.buildQueryParams(resourceRequest,
-				_moduleConfiguration.contentSuggestionsCount());
 
-			// Asset publisher page.  
+			queryContext = _queryContextBuilder.buildQueryContext(
+				resourceRequest,
+				_moduleConfiguration.contentSuggestionsCount());
 			
-			queryParams.setAssetPublisherPageURL(_moduleConfiguration.assetPublisherPage());
-			
+
+			queryContext.setParameter(
+				ParameterNames.ASSET_PUBLISHER_URL,
+				_moduleConfiguration.assetPublisherPage());
+
 			// Show results in context.
-			
-			queryParams.setViewResultsInContext(_moduleConfiguration.isViewResultsInContext());
-				
-		} catch (PortalException e) {
+
+			queryContext.setParameter(
+				ParameterNames.VIEW_RESULTS_IN_CONTEXT,
+				_moduleConfiguration.isViewResultsInContext());
+
+		}
+		catch (PortalException e) {
 
 			_log.error(e.getMessage(), e);
 
@@ -98,17 +106,17 @@ public class GetContentSuggestionsMVCResourceCommand
 		}
 
 		// Try to get search results.
-		
+
 		JSONObject responseObject = null;
 
 		try {
 			responseObject = _gSearch.getSearchResults(
-				resourceRequest, resourceResponse, queryParams);	
-			
+				resourceRequest, resourceResponse, queryContext);
+
 			// Localize result types.
-			
+
 			setResultTypeLocalizations(resourceRequest, responseObject);
-			
+
 		}
 		catch (Exception e) {
 
@@ -122,7 +130,7 @@ public class GetContentSuggestionsMVCResourceCommand
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
 	}
-	
+
 	/**
 	 * Get localization.
 	 * 
@@ -135,7 +143,8 @@ public class GetContentSuggestionsMVCResourceCommand
 		String key, Locale locale, Object... objects) {
 
 		if (_resourceBundle == null) {
-			_resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
+			_resourceBundle =
+				_resourceBundleLoader.loadResourceBundle(locale.toString());
 		}
 
 		String value =
@@ -143,56 +152,59 @@ public class GetContentSuggestionsMVCResourceCommand
 
 		return value == null ? _language.format(locale, key, objects) : value;
 	}
-		
+
 	/**
-	 * Localize result types
-	 * 
-	 * This is not in the templates because of https://issues.liferay.com/browse/LPS-75141
+	 * Localize result types This is not in the templates because of
+	 * https://issues.liferay.com/browse/LPS-75141
 	 * 
 	 * @param portletRequest
 	 * @param responseObject
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
-	protected void setResultTypeLocalizations(PortletRequest portletRequest, JSONObject responseObject) throws JSONException {
+	protected void setResultTypeLocalizations(
+		PortletRequest portletRequest, JSONObject responseObject)
+		throws JSONException {
 
-		
-		String[]configuration = _configurationHelper.getAssetTypeConfiguration();
-		
-		Locale locale = portletRequest.getLocale();
-		
+		String[] configuration =
+			_configurationHelper.getAssetTypeConfiguration();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
+
 		JSONArray items = responseObject.getJSONArray("items");
-		
+
 		if (items == null || items.length() == 0) {
 			return;
 		}
-		
+
 		for (int i = 0; i < items.length(); i++) {
-			
+
 			JSONObject resultItem = items.getJSONObject(i);
 
-			System.out.println(resultItem.getString("type"));
-
 			for (int j = 0; j < configuration.length; j++) {
-				
-				JSONObject configurationItem = JSONFactoryUtil.createJSONObject(configuration[j]);
 
-				if (resultItem.getString("type").equalsIgnoreCase(configurationItem.getString("entry_class_name"))) {
+				JSONObject configurationItem =
+					JSONFactoryUtil.createJSONObject(configuration[j]);
+
+				if (resultItem.getString("type").equalsIgnoreCase(
+					configurationItem.getString("entry_class_name"))) {
 					resultItem.put("key", configurationItem.getString("key"));
 					break;
 				}
 			}
-			
+
 			resultItem.put(
 				"type", getLocalization(
 					resultItem.getString("type").toLowerCase(), locale));
-			
 
 		}
-	}		
-	
+	}
+
 	private static final Logger _log =
 		LoggerFactory.getLogger(GetContentSuggestionsMVCResourceCommand.class);
-	
+
 	@Reference
 	private ConfigurationHelper _configurationHelper;
 
@@ -205,8 +217,8 @@ public class GetContentSuggestionsMVCResourceCommand
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
-	private QueryParamsBuilder _queryParamsBuilder;
-	
+	private QueryContextBuilder _queryContextBuilder;
+
 	private ResourceBundle _resourceBundle;
 
 	@Reference(

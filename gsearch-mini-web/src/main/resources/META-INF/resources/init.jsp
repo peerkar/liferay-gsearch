@@ -17,12 +17,11 @@
 <portlet:defineObjects />
 
 <%
-	Boolean autoCompleteEnabled = (Boolean)request.getAttribute(GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED);
 	Integer autoCompleteRequestDelay = (Integer)request.getAttribute(GSearchMiniWebKeys.AUTO_COMPLETE_REQUEST_DELAY);
 	Integer queryMinLength = (Integer)request.getAttribute(GSearchMiniWebKeys.QUERY_MIN_LENGTH);
 	Integer requestTimeout = (Integer)request.getAttribute(GSearchMiniWebKeys.REQUEST_TIMEOUT);
 	String searchPageURL = (String)request.getAttribute(GSearchMiniWebKeys.SEARCHPAGE_URL);
-	String suggestionsURL = (String)request.getAttribute(GSearchMiniWebKeys.SUGGESTIONS_URL);
-	
+	String suggestionsURL = (String)request.getAttribute(GSearchMiniWebKeys.SUGGESTIONS_URL);	
 	String suggestMode = (String)request.getAttribute(GSearchMiniWebKeys.SUGGEST_MODE);
+	Boolean appendRedirect = (Boolean)request.getAttribute(GSearchMiniWebKeys.APPEND_REDIRECT);
 %>

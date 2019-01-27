@@ -54,7 +54,7 @@
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
 
-        let keycode = (event.keyCode ? event.keyCode : event.which);
+        var keycode = (event.keyCode ? event.keyCode : event.which);
         
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -66,12 +66,12 @@
 	 */
 	 function <portlet:namespace />initAutocomplete() {
 
-		let searchFieldElement = $('#<portlet:namespace />MiniSearchField');
+		var searchFieldElement = $('#<portlet:namespace />MiniSearchField');
 		 		
-		Liferay.Loader.require('devbridgeAutocomplete', function(devbridgeAutocomplete) {
+		Liferay.Loader.require('devbridge-autocomplete', function() {
 
-			$(searchFieldElement).devbridgeAutocomplete({
-			
+			$(searchFieldElement).devbridgeAutocomplete({				
+
 				dataType: 'json',
 				deferRequestBy: <%=autoCompleteRequestDelay %>,
 				formatResult: function (suggestion, currentValue) {
@@ -80,7 +80,7 @@
 				},
 				formatGroup: function(suggestion, category) {
 					
-					let link = '<%= searchPageURL %>' + '?type=' + 
+					var link = '<%= searchPageURL %>' + '?type=' + 
 						suggestion.data.key + '&q=' + 
 						$('#<portlet:namespace />MiniSearchField').val();
 
@@ -94,51 +94,67 @@
 				groupBy: 'type',
 				minChars: <%=queryMinLength %>,
 				noCache: false,
+				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
-			    	location.href = suggestion.data.link;
+			    	
+			    	var link = suggestion.data.link; 
+
+			    	if (<%=appendRedirect%>) {
+				    	link += suggestion.data.redirect;
+			    	}
+			    	location.href = link;
 			    },
 				paramName: 'q',
 				preserveInput: true,
+				preventBadQueries: false,
 				serviceUrl: '<%=suggestionsURL %>',
+			    showNoSuggestionNotice: true,
 				transformResult: function(response) {
 	
 					if (response) {
-				        return {
+					      
+						// Sort array by type.
+						
+					    response.items.sort(<portlet:namespace />sortByType);
+						
+						return {
+							
 				            suggestions: $.map(response.items, function(dataItem) {
 
 				            	// Shorten to (for now) fixed 75 chars.
 					        	
-								let description = dataItem.description;
+								var description = dataItem.description;
 				            	
-								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '')				            	
+								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '');
 								
 						        if (description.length > 75) {
 						        	description = description.substring(0, 75) + '...';
 						        }
 								
-								let value = '<h1>' + dataItem.title_raw + '</h1>' + description;				            	
+								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';
 				            	
 				                return {
-				                	value: value, data: dataItem };
+				                	value: value, data: dataItem
+				                };
 				            })
 				        };						
 	    			} else {
 	    				return {
 	    					suggestions: []
-	    				}
+	    				};
 		    		}
 				},
 				triggerSelectOnValidInput: false
 			});
 		});
 	}	
-	
+	 	
 	/**
 	 * Show message
 	 */
 	function <portlet:namespace />showMessage(title) {
 		
-		let elementId = '<portlet:namespace />MiniSearchFieldMessage';
+		var elementId = '<portlet:namespace />MiniSearchFieldMessage';
 		
 		$('#' + elementId).tooltip({title: title}).tooltip('show');
 		
@@ -148,6 +164,13 @@
 			$('#' + elementId).tooltip('hide');
 		}, 2000);		
 	}	
+	
+	/**
+ 	* Sort objects by type.
+	*/
+	function <portlet:namespace />sortByType (A, B) {
+		return ((A.type == B.type) ? 0 : ((A.type > B.type) ? 1 : -1 ));
+	}
 
 	function <portlet:namespace />openMoreLink(link) { 
 

@@ -54,14 +54,14 @@
 	 */
 	function <portlet:namespace />doSearch() {
 
-		let q = $('#<portlet:namespace />MiniSearchField').val();
+		var q = $('#<portlet:namespace />MiniSearchField').val();
 		
 		if (q.length < <%=queryMinLength%>) {
 			<portlet:namespace />showMessage(Liferay.Language.get('min-character-count-is') + '<%=queryMinLength %>');
 			return false;
 		}
 		
-		let url = '<%=searchPageURL %>?q=' + q;
+		var url = '<%=searchPageURL %>?q=' + q;
 
 		window.location.replace(url);
 	}
@@ -71,7 +71,7 @@
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
 
-        let keycode = (event.keyCode ? event.keyCode : event.which);
+        var keycode = (event.keyCode ? event.keyCode : event.which);
         
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -83,11 +83,11 @@
 	 */
 	 function <portlet:namespace />initAutocomplete() {
 
-		let searchFieldElement = $('#<portlet:namespace />MiniSearchField');
+		var searchFieldElement = $('#<portlet:namespace />MiniSearchField');
 		 		
-		Liferay.Loader.require('devbridgeAutocomplete', function(devbridgeAutocomplete) {
+		Liferay.Loader.require('devbridge-autocomplete', function() {
 
-			$(searchFieldElement).devbridgeAutocomplete({
+			$(searchFieldElement).devbridgeAutocomplete({				
 			
 				dataType: 'json',
 				deferRequestBy: <%=autoCompleteRequestDelay %>,
@@ -125,7 +125,7 @@
 	 */
 	function <portlet:namespace />showMessage(title) {
 		
-		let elementId = '<portlet:namespace />MiniSearchFieldMessage';
+		var elementId = '<portlet:namespace />MiniSearchFieldMessage';
 		
 		$('#' + elementId).tooltip({title: title}).tooltip('show');
 		
