@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
 
 /**
@@ -76,7 +76,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		throws Exception {
 
 		String keywords =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS);
+			ParamUtil.getString(portletRequest, ParameterNames.KEYWORDS);
 
 		if (Validator.isNull(keywords)) {
 			return new String[0];

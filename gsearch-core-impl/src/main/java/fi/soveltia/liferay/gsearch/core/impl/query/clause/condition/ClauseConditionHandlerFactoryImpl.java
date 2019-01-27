@@ -40,7 +40,7 @@ public class ClauseConditionHandlerFactoryImpl
 		}
 
 		for (ClauseConditionHandler clauseConditionHandler : _clauseConditionHandlers) {
-			if (clauseConditionHandler.canHandle(handlerName)) {
+			if (clauseConditionHandler.canProcess(handlerName)) {
 				return clauseConditionHandler;
 			}
 		}

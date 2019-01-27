@@ -8,13 +8,10 @@ import java.util.Map;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Asset type specific result item builder. 
- * 
- * Implementations of this interface build
- * a single result item.
+ * Asset type specific single result item builder. 
  * 
  * @author Petteri Karttunen
  */
@@ -23,8 +20,6 @@ public interface ResultItemBuilder {
 	/**
 	 * Check if this builder can build the result item for the document.
 	 * 
-	 * Checking is done by default using the entryClassName field
-	 * 
 	 * @param document
 	 * @return
 	 */
@@ -32,8 +27,6 @@ public interface ResultItemBuilder {
 
 	/**
 	 * Get item date. 
-	 * 
-	 * Defaults to modified date.
 	 * 
 	 * @param portletRequest
 	 * @param document
@@ -63,13 +56,13 @@ public interface ResultItemBuilder {
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document
-	 * @param queryParams
+	 * @param queryContext
 	 * @return item url
 	 * @throws Exception
 	 */
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryParams queryParams)
+		Document document, QueryContext queryContext)
 		throws Exception;
 
 	/**
@@ -89,7 +82,7 @@ public interface ResultItemBuilder {
 	 * 
 	 * @param portletRequest
 	 * @param document
-	 * @return item description
+	 * @return thumbnail src
 	 * @throws Exception
 	 */
 	public String getThumbnail(PortletRequest portletRequest, Document document)

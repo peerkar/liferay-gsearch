@@ -11,12 +11,12 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.core.impl.configuration.FacetConfiguration",
 	localization = "content/Language",
-	name = "Facet Configuration"
+	name = "facet-configuration"
 )
 public interface FacetConfiguration {
 
 	@Meta.AD(
-		deflt = "[Please get the default configuration from the project GitHub page.",
+		deflt = "",
 		description = "facet-configuration-desc",
 	    name = "facet-configuration-name",
 		required = false

@@ -3,7 +3,7 @@ package fi.soveltia.liferay.gsearch.core.api.configuration;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * A configuration helper interface.
@@ -60,5 +60,5 @@ public interface ConfigurationHelper {
 	 * @return
 	 */
 	public String parseConfigurationVariables(
-		PortletRequest portletRequest, QueryParams queryParams, String input);
+		PortletRequest portletRequest, QueryContext queryParams, String input);
 }

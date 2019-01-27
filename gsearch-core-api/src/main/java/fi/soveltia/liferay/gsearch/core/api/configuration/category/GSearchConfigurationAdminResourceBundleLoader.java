@@ -1,6 +1,6 @@
 
 // This class localizes Control panel System Settings category but requires 
-// high kernel version.
+// a high kernel version.
 
 /*
 

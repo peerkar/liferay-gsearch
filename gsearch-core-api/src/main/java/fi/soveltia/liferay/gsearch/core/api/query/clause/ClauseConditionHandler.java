@@ -5,16 +5,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Handle clause condition interface. 
- * 
- * Implementations of this interface check
- * conditions: whether a clause should be applied.
+ * Checks clause's conditions.
  * 
  * @author Petteri Karttunen
- * 
  */
 public interface ClauseConditionHandler {
 
@@ -22,13 +18,13 @@ public interface ClauseConditionHandler {
 	 * Is this condition true.
 	 * 
 	 * @param portletRequest
-	 * @param queryParams
+	 * @param queryContext
 	 * @param parameters
 	 * @return
 	 * @throws Exception
 	 */
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryParams queryParams,
+		PortletRequest portletRequest, QueryContext queryContext,
 		JSONObject parameters)
 		throws Exception;
 
@@ -38,5 +34,5 @@ public interface ClauseConditionHandler {
 	 * @param handlerName
 	 * @return
 	 */
-	public boolean canHandle(String handlerName);
+	public boolean canProcess(String handlerName);
 }

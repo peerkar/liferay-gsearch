@@ -11,7 +11,7 @@ import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -60,7 +60,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryParams queryParams)
+		Document document, QueryContext queryContext)
 		throws Exception {
 
 		return document.get("treePath");

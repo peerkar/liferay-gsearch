@@ -1,30 +1,26 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.configuration;
 
-import com.liferay.petra.string.StringBundler;
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * JSON configuration helper service implementation.
@@ -37,14 +33,6 @@ import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 	service = ConfigurationHelper.class
 )
 public class ConfigurationHelperImpl implements ConfigurationHelper {
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -196,7 +184,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	 */
 	@Override
 	public String parseConfigurationVariables(
-		PortletRequest portletRequest, QueryParams queryParams, String input) {
+		PortletRequest portletRequest, QueryContext queryParams, String input) {
 
 		input = input.replace(
 			"$_now_yyyy-mm-dd_$", NOW_YYYY_MM_DD.format(new Date()));
@@ -274,6 +262,4 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
-
-	private volatile ModuleConfiguration _moduleConfiguration;
 }

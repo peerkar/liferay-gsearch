@@ -6,13 +6,12 @@ import com.liferay.portal.kernel.search.SearchContext;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Query postprocessor service. Implementations of this service can do query
- * processing after the search has been done.
+ * Does query processing after the search has been done. 
  * 
- * Can be used for example to query indexing.
+ * Ccan be used for example for query indexing.
  * 
  * @author Petteri Karttunen
  */
@@ -23,13 +22,13 @@ public interface QueryPostProcessor {
 	 * 
 	 * @param portletRequest
 	 * @param searchContext
-	 * @param queryParams
+	 * @param queryContext
 	 * @param hits
 	 * @return true / false
 	 * @throws Exception
 	 */
 	public boolean process(
 		PortletRequest portletRequest, SearchContext searchContext,
-		QueryParams queryParams, Hits hits)
+		QueryContext queryContext, Hits hits)
 		throws Exception;
 }

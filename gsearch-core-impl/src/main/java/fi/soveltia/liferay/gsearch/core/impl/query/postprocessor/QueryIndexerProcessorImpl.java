@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.search.IndexWriterHelper;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.suggest.SuggestionConstants;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 import java.util.Map;
@@ -20,9 +21,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
-import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfiguration;
 
 /**
  * Query indexer processor. Originally
@@ -33,7 +35,7 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfiguration", 
 	immediate = true, 
 	service = QueryPostProcessor.class
 )
@@ -43,21 +45,21 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
+		_keywordSuggesterConfiguration = ConfigurableUtil.createConfigurable(
+			KeywordSuggesterConfiguration.class, properties);
 	}
 
 	@Override
 	public boolean process(
 		PortletRequest portletRequest, SearchContext searchContext,
-		QueryParams queryParams, Hits hits)
+		QueryContext queryContext, Hits hits)
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Processing QueryIndexer");
 		}
 
-		if (!_moduleConfiguration.isQuerySuggestionsEnabled()) {
+		if (!_keywordSuggesterConfiguration.isQuerySuggestionsEnabled()) {
 			return true;
 		}
 
@@ -65,17 +67,25 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			_log.debug("QueryIndexer is enabled");
 		}
 
-		if (hits.getLength() >= _moduleConfiguration.queryIndexingThreshold()) {
+		if (hits.getLength() >= _keywordSuggesterConfiguration.queryIndexingThreshold()) {
+
+			// Filter words.
+
+			String filteredWords = filterKeywords(queryContext.getKeywords());
+			if (filteredWords.length() == 0) {
+				return true;
+			}
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"QueryIndexing threshold exceeded. Indexing keywords: " +
-						queryParams.getKeywords());
+						queryContext.getKeywords());
 			}
 
 			addDocument(
-				queryParams.getCompanyId(), queryParams.getKeywords(),
-				queryParams.getLocale());
+				(long) queryContext.getParameter(ParameterNames.COMPANY_ID),
+				filteredWords,
+				(Locale) queryContext.getParameter(ParameterNames.LOCALE));
 		}
 		else {
 			if (_log.isDebugEnabled()) {
@@ -94,11 +104,61 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			locale);
 	}
 
+	/**
+	 * Exclude not wanted keywords from being indexed.
+	 * 
+	 * @param keywords
+	 * @return
+	 */
+	protected String filterKeywords(String keywords) {
+
+		String[] excludedWords = _keywordSuggesterConfiguration.excludedWords();
+
+		String splitter = _keywordSuggesterConfiguration.filterSplitter();
+
+		if (excludedWords == null || excludedWords.length == 0 ||
+			Validator.isNull(splitter)) {
+
+			return keywords;
+		}
+
+		String[] keywordArray = keywords.split(splitter);
+
+		for (String keyword : keywordArray) {
+
+			for (String exclude : excludedWords) {
+
+				if (exclude.endsWith("*")) {
+				
+					exclude = exclude.substring(0,exclude.length()-1);	
+					
+					if (keyword.startsWith(exclude)) {
+
+						if (_log.isDebugEnabled()) {
+							_log.debug("Excluding keyword by stem: " + keyword);
+						}
+
+						keywords = keywords.replace(keyword, "");
+					}
+				}
+				else if (keyword.equals(exclude)) {
+
+					if (_log.isDebugEnabled()) {
+						_log.debug("Excluding keyword: " + keyword);
+					}
+
+					keywords = keywords.replace(keyword, "");
+				}
+			}
+		}
+		return keywords;
+	}
+
 	private static final Logger _log =
 		LoggerFactory.getLogger(QueryIndexerProcessorImpl.class);
 
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
 
-	private volatile ModuleConfiguration _moduleConfiguration;
+	private volatile KeywordSuggesterConfiguration _keywordSuggesterConfiguration;
 }

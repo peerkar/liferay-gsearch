@@ -9,7 +9,8 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -17,8 +18,7 @@ import javax.portlet.PortletResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -43,8 +43,8 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(
-			GSearchWebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		return getJournalArticle(document).getArticleImageURL(themeDisplay);
 	}
@@ -52,25 +52,37 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryParams queryParams)
+		Document document, QueryContext queryContext)
 		throws Exception {
 
-		String link = null;
-		
-		if (queryParams.isViewResultsInContext()) {
+		boolean viewResultsInContext = isViewInContext(queryContext);
 
-			link = getAssetRenderer(document).getURLViewInContext(
-				(LiferayPortletRequest) portletRequest,
-				(LiferayPortletResponse) portletResponse, null);
-		}
-		
-		if (Validator.isNull(link)) {
-			link = getNotLayoutBoundJournalArticleUrl(
-				portletRequest, getJournalArticle(document),
-				queryParams.getAssetPublisherPageURL());
+		String assetPublisherPageURL = getAssetPublisherPageURL(queryContext);
+
+		StringBundler sb = new StringBundler();
+
+		if (viewResultsInContext) {
+
+			sb.append(
+				getAssetRenderer(document).getURLViewInContext(
+					(LiferayPortletRequest) portletRequest,
+					(LiferayPortletResponse) portletResponse, null));
+
 		}
 
-		return link;
+		if (sb.length() == 0 || sb.toString().equals("null")) {
+
+			// It can happen that there's a string "null".
+
+			sb = new StringBundler();
+
+			sb.append(
+				getNotLayoutBoundJournalArticleUrl(
+					portletRequest, getJournalArticle(document),
+					assetPublisherPageURL));
+		}
+
+		return sb.toString();
 	}
 
 	/**
@@ -87,14 +99,8 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 		return _journalArticleService.getLatestArticle(entryClassPK);
 	}
 
-	@Reference(unbind = "-")
-	protected void setJournalArticleService(
-		JournalArticleService journalArticleService) {
-
-		_journalArticleService = journalArticleService;
-	}
-
-	private static JournalArticleService _journalArticleService;
+	@Reference
+	private JournalArticleService _journalArticleService;
 
 	private static final String NAME = JournalArticle.class.getName();
 

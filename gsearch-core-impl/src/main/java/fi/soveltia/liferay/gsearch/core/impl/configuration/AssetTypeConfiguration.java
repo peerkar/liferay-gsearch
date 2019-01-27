@@ -11,13 +11,13 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.core.impl.configuration.AssetTypeConfiguration",
 	localization = "content/Language",
-	name = "Asset Type Configuration"
+	name = "asset-type-configuration"
 )
 public interface AssetTypeConfiguration {
 
 	
 	@Meta.AD(
-		deflt = "[Please get the default configuration from the project GitHub page.",
+		deflt = "",
 		description = "asset-types-desc",
 	    name = "asset-types-name",
 		required = false

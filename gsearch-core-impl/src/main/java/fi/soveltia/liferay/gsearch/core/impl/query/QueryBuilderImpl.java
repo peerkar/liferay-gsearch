@@ -9,6 +9,7 @@ import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -26,17 +27,20 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseBuilderFactory;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandler;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandlerFactory;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.contributor.QueryContributor;
-import fi.soveltia.liferay.gsearch.core.api.query.filter.QueryFilterBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
@@ -56,29 +60,25 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 */
 	@Override
 	public Query buildQuery(
-		PortletRequest portletRequest, QueryParams queryParams,
-		boolean processQueryContributors)
+		PortletRequest portletRequest, QueryContext queryContext)
 		throws Exception {
 
 		// Build query.
 
 		BooleanQuery query =
-			constructQuery(portletRequest, queryParams);
+			constructQuery(portletRequest, queryContext);
 
 		// Process query contributors.
 
-		if (processQueryContributors) {
+		if (queryContext.isQueryContributorsEnabled()) {
 
 			processQueryContributors(portletRequest, query);
 		}
 
 		// Add filters.
-
-		BooleanFilter preBooleanFilter =
-			_queryFilterBuilder.buildQueryFilter(portletRequest, queryParams);
-
-		query.setPreBooleanFilter(preBooleanFilter);
-
+		
+		addFilters(portletRequest, queryContext, query);
+						
 		return query;
 	}
 
@@ -91,10 +91,57 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}
 
 	/**
-	 * Add query contributor to the list.
+	 * Add filters to query.
 	 * 
-	 * @param queryContributor
+	 * @param portletRequest
+	 * @param queryContext
+	 * @param query
+	 * @throws Exception
 	 */
+	protected void addFilters(PortletRequest portletRequest, QueryContext queryContext, Query query) throws Exception {
+
+		BooleanFilter preFilter = new BooleanFilter();
+
+		BooleanFilter postFilter = new BooleanFilter();
+
+		for (FilterBuilder f : _filterBuilders) {
+
+			f.addFilters(portletRequest, preFilter, postFilter, queryContext);
+		}
+		
+		// Add permission clauses.
+		
+		Query permissionQuery = _permissionFilterQueryBuilder.buildPermissionQuery(
+			portletRequest, queryContext);
+		
+		if (permissionQuery != null) {
+			QueryFilter permissionFilter = new QueryFilter(permissionQuery);
+			preFilter.add(permissionFilter, BooleanClauseOccur.MUST);
+		}
+		
+		query.setPreBooleanFilter(preFilter);
+		
+		if (postFilter.hasClauses()) {
+			query.setPostFilter(postFilter);
+		}
+	}
+
+	protected void addFilterBuilder(
+		FilterBuilder filterBuilder) {
+
+		
+		if (_filterBuilders == null) {
+			_filterBuilders = new ArrayList<FilterBuilder>();
+		}
+		_filterBuilders.add(filterBuilder);
+	}
+
+	protected void addPermissionFilterQueryBuilder(
+		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
+
+		_permissionFilterQueryBuilder = permissionFilterQueryBuilder;
+	}
+
 	protected void addQueryContributor(QueryContributor queryContributor) {
 
 		if (_queryContributors == null) {
@@ -103,17 +150,19 @@ public class QueryBuilderImpl implements QueryBuilder {
 		_queryContributors.add(queryContributor);
 	}
 
-	protected boolean checkConditions(PortletRequest portletRequest, 
-		QueryParams queryParams, JSONArray conditionsArray) throws Exception {
-		
+	protected boolean checkConditions(
+		PortletRequest portletRequest, QueryContext queryParams,
+		JSONArray conditionsArray)
+		throws Exception {
+
 		if (conditionsArray == null || conditionsArray.length() == 0) {
 			return true;
 		}
-		
+
 		ClauseConditionHandler clauseConditionHandler;
-		
+
 		boolean isValid = false;
-		
+
 		for (int i = 0; i < conditionsArray.length(); i++) {
 
 			JSONObject condition = conditionsArray.getJSONObject(i);
@@ -123,38 +172,40 @@ public class QueryBuilderImpl implements QueryBuilder {
 			String occur = condition.getString("occur");
 
 			// Try to get a clause builder for the query type.
-			
-			clauseConditionHandler = _clauseConditionHandlerFactory.
-				getHandler(handlerName);
+
+			clauseConditionHandler =
+				_clauseConditionHandlerFactory.getHandler(handlerName);
 
 			// Check if condition is valid.
 			// Return false if no handler is found.
-			
+
 			if (clauseConditionHandler != null) {
 
-				JSONObject handlerParameters = condition.
-						getJSONObject("handler_parameters");
+				JSONObject handlerParameters =
+					condition.getJSONObject("handler_parameters");
 
-				if (clauseConditionHandler.isTrue(portletRequest, 
-					queryParams, handlerParameters)) {
+				if (clauseConditionHandler.isTrue(
+					portletRequest, queryParams, handlerParameters)) {
 
 					isValid = true;
 
-				} else {
-					
+				}
+				else {
+
 					if ("must".equals(occur)) {
 						return false;
 					}
 				}
 
-			} else {
-				
+			}
+			else {
+
 				return false;
 			}
 		}
 		return isValid;
 	}
-	
+
 	/**
 	 * Construct query. Please note that QueryStringQuery type is an extension
 	 * of Liferay StringQuery. Thus, if you don't want to use the custom search
@@ -168,7 +219,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * @throws Exception
 	 */
 	protected BooleanQuery constructQuery(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryContext queryContext)
 		throws Exception {
 
 		BooleanQuery query = new BooleanQueryImpl();
@@ -178,27 +229,36 @@ public class QueryBuilderImpl implements QueryBuilder {
 		ClauseBuilder clauseBuilder;
 
 		Query clause;
-		
-		String[] configuration = queryParams.getClauseConfiguration();
+
+		String[] configuration = queryContext.getConfiguration(
+			ConfigurationKeys.CLAUSE);
 
 		for (int i = 0; i < configuration.length; i++) {
 
 			JSONObject clauseObject =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			JSONArray conditionsArray =
-				clauseObject.getJSONArray("conditions");;
-
-			boolean applyClauses = false;	
+			// Check if this clause is enabled
 				
+			if (!clauseObject.getBoolean("enabled", true)) {
+				continue;
+			}
+				
+			// Process conditions.
 			// Conditions are error prone for editing.
 			// Just log the error to be able to recover.
 
-			try {	
-				
-				applyClauses = checkConditions(portletRequest, queryParams, conditionsArray);
+			JSONArray conditionsArray = clauseObject.getJSONArray("conditions");
 
-			} catch (Exception e) {
+			boolean applyClauses = false;
+
+			try {
+
+				applyClauses = checkConditions(
+					portletRequest, queryContext, conditionsArray);
+
+			}
+			catch (Exception e) {
 
 				_log.error(e.getMessage(), e);
 
@@ -246,9 +306,10 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 					if (clauseBuilder != null) {
 
-						clause =
-							clauseBuilder.buildClause(portletRequest, clauseItem.getJSONObject("query_configuration"), 
-								queryParams);
+						clause = clauseBuilder.buildClause(
+							portletRequest,
+							clauseItem.getJSONObject("query_configuration"),
+							queryContext);
 
 						if (clause != null) {
 							query.add(clause, occur);
@@ -257,6 +318,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 				}
 			}
 		}
+		
 		return query;
 	}
 
@@ -304,12 +366,19 @@ public class QueryBuilderImpl implements QueryBuilder {
 			}
 		}
 	}
+	
 
-	/**
-	 * Remove a query contributor from list.
-	 * 
-	 * @param clauseBuilder
-	 */
+	protected void removeFilterBuilder(FilterBuilder filterBuilder) {
+
+		_filterBuilders.remove(filterBuilder);
+	}
+
+	protected void removePermissionFilterQueryBuilder(
+		PermissionFilterQueryBuilder permissionFilterQueryBuilder) {
+
+		_permissionFilterQueryBuilder = null;
+	}
+
 	protected void removeQueryContributor(QueryContributor queryContributor) {
 
 		_queryContributors.remove(queryContributor);
@@ -329,8 +398,14 @@ public class QueryBuilderImpl implements QueryBuilder {
 	@Reference
 	private ClauseConditionHandlerFactory _clauseConditionHandlerFactory;
 
-	@Reference
-	private QueryFilterBuilder _queryFilterBuilder;
+	@Reference(
+		bind = "addFilterBuilder", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = FilterBuilder.class, 
+		unbind = "removeFilterBuilder"
+	)
+	private volatile List<FilterBuilder> _filterBuilders = null;
 
 	@Reference(
 		cardinality = ReferenceCardinality.MULTIPLE, 
@@ -340,4 +415,13 @@ public class QueryBuilderImpl implements QueryBuilder {
 	)
 	private volatile List<QueryContributor> _queryContributors = null;
 
+	@Reference(
+		bind = "addPermissionFilterQueryBuilder", 
+		policy = ReferencePolicy.STATIC, 
+		policyOption = ReferencePolicyOption.GREEDY, 
+		service = PermissionFilterQueryBuilder.class, 
+		unbind = "removePermissionFilterQueryBuilder"
+	)
+	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
+	
 }

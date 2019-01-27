@@ -8,8 +8,8 @@ import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandler;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Keyword match condition handler.
@@ -20,21 +20,22 @@ import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandler;
 	immediate = true, 
 	service = ClauseConditionHandler.class
 )
-public class KeywordMatchClauseConditionHandler implements ClauseConditionHandler {
+public class KeywordMatchClauseConditionHandler
+	implements ClauseConditionHandler {
 
 	@Override
-	public boolean canHandle(String handlerName) {
+	public boolean canProcess(String handlerName) {
 
 		return (handlerName.equals(HANDLER_NAME));
 	}
 
 	@Override
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryParams queryParams,
+		PortletRequest portletRequest, QueryContext queryContext,
 		JSONObject configuration)
 		throws Exception {
 
-		String keywords = queryParams.getKeywords();
+		String keywords = queryContext.getKeywords();
 
 		String matchType = configuration.getString("match_type");
 
@@ -58,7 +59,8 @@ public class KeywordMatchClauseConditionHandler implements ClauseConditionHandle
 	 * @param keywords
 	 * @return
 	 */
-	public boolean isFullPhraseMatch(JSONObject configuration, String keywords) {
+	public boolean isFullPhraseMatch(
+		JSONObject configuration, String keywords) {
 
 		JSONArray matchWords = configuration.getJSONArray("match_words");
 
@@ -72,9 +74,7 @@ public class KeywordMatchClauseConditionHandler implements ClauseConditionHandle
 	}
 
 	/**
-	 * Handle full word matching case.
-	 * 
-	 * Values for match_occur: should | must
+	 * Handle full word matching case. Values for match_occur: should | must
 	 * 
 	 * @param configuration
 	 * @param keywords
@@ -82,7 +82,8 @@ public class KeywordMatchClauseConditionHandler implements ClauseConditionHandle
 	 */
 	public boolean isFullWordMatch(JSONObject configuration, String keywords) {
 
-		String splitter = configuration.getString("keyword_splitter_regexp", " ");
+		String splitter =
+			configuration.getString("keyword_splitter_regexp", " ");
 
 		JSONArray matchWords = configuration.getJSONArray("match_words");
 

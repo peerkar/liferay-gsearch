@@ -15,37 +15,7 @@ import aQute.bnd.annotation.metatype.Meta;
 	name = "GSearch Core"
 )
 public interface ModuleConfiguration {
-	@Meta.AD(
-		deflt = "true", 
-	    description = "enable-query-suggestions-name-desc",
-	    name = "enable-query-suggestions-name",
-		required = false
-	)
-	public boolean isQuerySuggestionsEnabled();
-
-	@Meta.AD(
-		deflt = "1", 
-		description = "query-suggestions-hits-threshold-desc",
-	    name = "query-suggestions-hits-threshold-name",
-		required = false
-	)
-	public int querySuggestionsHitsThreshold();
-
-	@Meta.AD(
-		deflt = "1", 
-	    name = "query-suggestions-max-name",
-		required = false
-	)
-	public int querySuggestionsMax();
-
-	@Meta.AD(
-		deflt = "2", 
-		description = "query-indexing-threshold-desc",
-	    name = "query-indexing-threshold-name",
-		required = false
-	)
-	public int queryIndexingThreshold();
-
+	
 	@Meta.AD(
 		deflt = "50", 
 		description = "highlight-fragment-size-desc",
@@ -53,9 +23,17 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public int highlightFragmentSize();	
-	
+
 	@Meta.AD(
-		deflt = "20", 
+		deflt = "5", 
+		description = "snippet-size-desc",
+	    name = "snippet-size-name",
+		required = false
+	)
+	public int snippetSize();	
+
+	@Meta.AD(
+		deflt = "50", 
 		description = "max-facet-terms-desc",
 	    name = "max-facet-terms-name",
 		required = false

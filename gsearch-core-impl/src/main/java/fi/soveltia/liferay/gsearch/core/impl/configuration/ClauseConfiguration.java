@@ -11,12 +11,12 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.core.impl.configuration.ClauseConfiguration",
 	localization = "content/Language",
-	name = "Clause Configuration"
+	name = "clause-configuration"
 )
 public interface ClauseConfiguration {
 
 	@Meta.AD(
-		deflt = "[Please get the default configuration from the project GitHub page.",
+		deflt = "",
 		description = "clause-configuration-desc",
 	    name = "clause-configuration-name",
 		required = false

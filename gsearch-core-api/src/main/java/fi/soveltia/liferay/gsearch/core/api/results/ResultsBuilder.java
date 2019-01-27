@@ -8,13 +8,10 @@ import com.liferay.portal.kernel.search.SearchContext;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Results builder interface. 
- * 
- * Implementations of this interface build a search
- * results object.
+ * Builds the search results object.
  * 
  * @author Petteri Karttunen
  */
@@ -25,12 +22,12 @@ public interface ResultsBuilder {
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
-	 * @param queryParams
+	 * @param queryContext
 	 * @param searchContext
 	 * @param hits
 	 * @return
 	 */
 	public JSONObject buildResults(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams, SearchContext searchContext, Hits hits);
+		QueryContext queryContext, SearchContext searchContext, Hits hits);
 }

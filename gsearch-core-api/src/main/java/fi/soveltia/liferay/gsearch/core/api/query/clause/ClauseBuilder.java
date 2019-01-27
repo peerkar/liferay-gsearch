@@ -6,30 +6,28 @@ import com.liferay.portal.kernel.search.Query;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Query clause builder. 
- * 
- * Implementations of this build typed (Match, QueryStringQuery etc) clauses
- * to be added to the main query.
+ * Builds a single query clause (Match, QueryStringQuery etc).
  * 
  * @author Petteri Karttunen
  */
 public interface ClauseBuilder {
-	
+
 	/**
 	 * Build clause.
 	 * 
 	 * @param portletRequest
 	 * @param configuration
-	 * @param queryParams
+	 * @param queryContext
 	 * @return Query object
 	 * @throws Exception
 	 */
-	public Query buildClause(PortletRequest portletRequest,
-		JSONObject configuration, QueryParams queryParams)
-		throws Exception;	
+	public Query buildClause(
+		PortletRequest portletRequest, JSONObject configuration,
+		QueryContext queryContext)
+		throws Exception;
 
 	/**
 	 * Check if this builder can build the requested query type

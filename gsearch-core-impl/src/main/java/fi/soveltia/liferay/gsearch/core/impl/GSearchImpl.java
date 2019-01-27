@@ -2,6 +2,8 @@
 package fi.soveltia.liferay.gsearch.core.impl;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.BooleanClauseFactoryUtil;
@@ -12,8 +14,9 @@ import com.liferay.portal.kernel.search.IndexSearcherHelper;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.QueryConfig;
 import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.search.facet.Facet;
+import com.liferay.portal.kernel.search.facet.SimpleFacet;
+import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +36,10 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.facet.FacetsBuilder;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
 import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
@@ -58,42 +62,25 @@ public class GSearchImpl implements GSearch {
 	@Override
 	public JSONObject getSearchResults(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams)
+		QueryContext queryContext)
 		throws Exception {
 
-		return getSearchResults(
-			portletRequest, portletResponse, queryParams, true, true);
-	}
+		// Build query.
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JSONObject getSearchResults(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryParams queryParams, boolean executeQueryPostProcessors, 
-		boolean processQueryContributors)
-		throws Exception {
-
-		// Build query
+		Query query = _queryBuilder.buildQuery(portletRequest, queryContext);
 		
-		Query query = _queryBuilder.buildQuery(
-			portletRequest, queryParams,
-			processQueryContributors);
-
 		// Create SearchContext.
 
 		SearchContext searchContext =
-			getSearchContext(portletRequest, queryParams);
+			getSearchContext(portletRequest, queryContext);
 
 		// Set facets.
 
-		_facetsBuilder.setFacets(searchContext, queryParams);
-		 
+		setFacets(searchContext, queryContext);
+
 		// Set query config.
 
-		setQueryConfig(searchContext, queryParams, query);
+		setQueryConfig(searchContext, queryContext, query);
 
 		// Execute search.
 
@@ -101,16 +88,16 @@ public class GSearchImpl implements GSearch {
 
 		// Execute query post processors.
 
-		if (executeQueryPostProcessors) {
+		if (queryContext.isQueryPostProcessorsEnabled()) {
 
 			executeQueryPostProcessors(
-				portletRequest, searchContext, queryParams, hits);
+				portletRequest, searchContext, queryContext, hits);
 		}
 
 		// Build results JSON object.
 
 		JSONObject resultsObject = _resultsBuilder.buildResults(
-			portletRequest, portletResponse, queryParams, searchContext, hits);
+			portletRequest, portletResponse, queryContext, searchContext, hits);
 
 		return resultsObject;
 	}
@@ -122,9 +109,9 @@ public class GSearchImpl implements GSearch {
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
 	}
-	
+
 	/**
-	 * Add query post processor to the list.
+	 * Add query post processor.
 	 * 
 	 * @param clauseBuilder
 	 */
@@ -162,14 +149,17 @@ public class GSearchImpl implements GSearch {
 			});
 
 		Hits hits = _indexSearcherHelper.search(searchContext, query);
-
+		
 		if (_log.isDebugEnabled()) {
-			_log.debug("Query: " + hits.getQuery());
-			_log.debug("Hits: " + hits.getLength());
-			_log.debug("Returned: " + hits.getDocs().length);
-			_log.debug("Time:" + hits.getSearchTime());
-			_log.debug(
-				"Suggestions size: " + hits.getQuerySuggestions().length);
+			
+			if (hits != null) {
+				_log.debug("Query: " + hits.getQuery());
+				_log.debug("Hits: " + hits.getLength());
+				_log.debug("Returned: " + hits.getDocs().length);
+				_log.debug("Time:" + hits.getSearchTime());
+				_log.debug(
+					"Suggestions size: " + hits.getQuerySuggestions().length);
+			}
 		}
 		return hits;
 	}
@@ -182,7 +172,7 @@ public class GSearchImpl implements GSearch {
 	 */
 	protected void executeQueryPostProcessors(
 		PortletRequest portletRequest, SearchContext searchContext,
-		QueryParams queryParams, Hits hits) {
+		QueryContext queryContext, Hits hits) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing query post processors.");
@@ -201,7 +191,7 @@ public class GSearchImpl implements GSearch {
 
 			try {
 				queryPostProcessor.process(
-					portletRequest, searchContext, queryParams, hits);
+					portletRequest, searchContext, queryContext, hits);
 			}
 			catch (Exception e) {
 				_log.error(e.getMessage(), e);
@@ -216,54 +206,75 @@ public class GSearchImpl implements GSearch {
 	 * @throws Exception
 	 */
 	protected SearchContext getSearchContext(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryContext queryContext)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 		SearchContext searchContext = new SearchContext();
-		
-		searchContext.setCompanyId(themeDisplay.getCompanyId());
-		searchContext.setStart(queryParams.getStart());
-		searchContext.setEnd(queryParams.getEnd());
-		searchContext.setSorts(queryParams.getSorts());
+
+		searchContext.setCompanyId(
+			(long) queryContext.getParameter(ParameterNames.COMPANY_ID));
+		searchContext.setStart(queryContext.getStart());
+		searchContext.setEnd(queryContext.getEnd());
+		searchContext.setSorts(queryContext.getSorts());
 
 		return searchContext;
+	}
+
+	protected void setFacets(
+		SearchContext searchContext, QueryContext queryContext)
+		throws JSONException {
+
+		String[] configuration = queryContext.getConfiguration(
+			ConfigurationKeys.FACET);
+		
+		if (configuration == null) {
+			return;
+		}
+
+		for (int i = 0; i < configuration.length; i++) {
+
+			JSONObject item =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
+
+			String fieldName = item.getString("field_name");
+
+			JSONObject dataObject = JSONFactoryUtil.createJSONObject();
+			dataObject.put("maxTerms", _moduleConfiguration.maxFacetTerms());
+
+			FacetConfiguration facetConfiguration = new FacetConfiguration();
+			facetConfiguration.setFieldName(fieldName);
+			facetConfiguration.setStatic(false);
+			facetConfiguration.setDataJSONObject(dataObject);
+
+			Facet facet = new SimpleFacet(searchContext);
+			facet.setFacetConfiguration(facetConfiguration);
+
+			searchContext.addFacet(facet);
+		}
 	}
 
 	/**
 	 * Set query config
 	 * 
 	 * @param searchContext
-	 * @param queryParams
+	 * @param queryContext
 	 */
 	protected void setQueryConfig(
-		SearchContext searchContext, QueryParams queryParams, Query query) {
+		SearchContext searchContext, QueryContext queryContext, Query query) {
 
-		// Create Queryconfig.
-
-		QueryConfig queryConfig = searchContext.getQueryConfig();
+		QueryConfig queryConfig = new QueryConfig();
 
 		queryConfig.setHighlightEnabled(true);
+		queryConfig.setHighlightFragmentSize(
+			_moduleConfiguration.highlightFragmentSize());
+		queryConfig.setHighlightSnippetSize(_moduleConfiguration.snippetSize());
 
 		// Set highlighted fields
 
-		String contentFieldLocalized =
-			Field.CONTENT + "_" + queryParams.getLocale().toString();
-
-		String titleFieldLocalized =
-			Field.TITLE + "_" + queryParams.getLocale().toString();
-
 		queryConfig.setHighlightFieldNames(
 			new String[] {
-				Field.CONTENT, contentFieldLocalized, Field.TITLE,
-				titleFieldLocalized
+				Field.CONTENT, Field.TITLE,
 			});
-		queryConfig.setHighlightFragmentSize(_moduleConfiguration.highlightFragmentSize());
-
-		// TODO: Of some reason queryconfig has to be set on both searchcontext
-		// and query.
 
 		query.setQueryConfig(queryConfig);
 	}
@@ -280,13 +291,10 @@ public class GSearchImpl implements GSearch {
 	}
 
 	private static final Logger _log =
-					LoggerFactory.getLogger(GSearchImpl.class);
+		LoggerFactory.getLogger(GSearchImpl.class);
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
-
-	@Reference
-	private FacetsBuilder _facetsBuilder;
 
 	@Reference
 	private IndexSearcherHelper _indexSearcherHelper;
@@ -305,6 +313,6 @@ public class GSearchImpl implements GSearch {
 		unbind = "removeQueryPostProcessor"
 	)
 	private volatile List<QueryPostProcessor> _queryPostProcessors = null;
-	
+
 	private volatile ModuleConfiguration _moduleConfiguration;
 }

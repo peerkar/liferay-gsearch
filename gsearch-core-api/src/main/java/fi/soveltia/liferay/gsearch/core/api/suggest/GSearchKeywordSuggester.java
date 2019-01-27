@@ -6,7 +6,7 @@ import com.liferay.portal.kernel.json.JSONArray;
 import javax.portlet.PortletRequest;
 
 /**
- * Keywords suggester / autocompletion interface.
+ * Keyword suggester interface.
  * 
  * @author Petteri Karttunen
  */
@@ -19,8 +19,7 @@ public interface GSearchKeywordSuggester {
 	 * @return suggestions JSON array
 	 * @throws Exception
 	 */
-	public JSONArray getSuggestions(
-		PortletRequest portletRequest)
+	public JSONArray getSuggestions(PortletRequest portletRequest)
 		throws Exception;
 
 	/**
@@ -30,7 +29,6 @@ public interface GSearchKeywordSuggester {
 	 * @return suggestions JSON array
 	 * @throws Exception
 	 */
-	public String[] getSuggestionsAsStringArray(
-		PortletRequest portletRequest)
+	public String[] getSuggestionsAsStringArray(PortletRequest portletRequest)
 		throws Exception;
 }

@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -35,7 +37,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
@@ -54,7 +57,9 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	public String getDate(PortletRequest portletRequest, Document document)
 		throws ParseException {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
 
 		String dateString = "";
 
@@ -85,7 +90,9 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		Document document)
 		throws SearchException {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
 
 		String description = null;
 
@@ -95,16 +102,30 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		if (Validator.isNull(description)) {
 			description = document.get(
-				locale,
-				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION,
-				Field.SNIPPET + StringPool.UNDERLINE + Field.DESCRIPTION);
+				locale, Field.CONTENT,
+				Field.CONTENT);
+			
+			// Limit description length in case we needed to grab the content.
+			
+			if(description.length() > DESCRIPTION_MAX_LENGTH) {
+				description = description.substring(0, DESCRIPTION_MAX_LENGTH);
+			}
 		}
 
 		if (Validator.isNull(description)) {
+			
 			description = getSummary(
 				portletRequest, portletResponse, document, true).getContent();
 		}
-
+				
+		// Be sure to remove html tags. This should be fixed in adapter.
+		
+		description = description.replaceAll("<liferay-hl>", "---LR-HL-START---");
+		description = description.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
+		description = HtmlUtil.stripHtml(description);
+		description = description.replaceAll("---LR-HL-START---", "<liferay-hl>");
+		description = description.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
+		
 		return description;
 	}
 
@@ -114,12 +135,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	@Override
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryParams queryParams)
+		Document document, QueryContext queryContext)
 		throws Exception { 
+
+		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		StringBundler sb = new StringBundler();
 			
-		if (queryParams.isViewResultsInContext()) {
+		if (viewResultsInContext) {
 			
 			sb.append(getAssetRenderer(document).getURLViewInContext(
 			(LiferayPortletRequest) portletRequest,
@@ -130,8 +153,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 					(LiferayPortletResponse) portletResponse,
 					WindowState.MAXIMIZED));
 		}
-		
-		// Add redirect etc here.
 		
 		return sb.toString();
 	}
@@ -205,16 +226,28 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		Locale locale = themeDisplay.getLocale();
 
 		String title = null;
-
+		
 		if (isHighlight) {
+			
 			title = document.get(
 				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
 				Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
 		}
-		else {
+		
+		if (Validator.isNull(title)) {
+
+			title = document.get(
+				locale, Field.TITLE,
+				Field.TITLE);
+		}
+
+		if (Validator.isNull(title)) {
+
 			title = document.get(
 				locale, "localized" + StringPool.UNDERLINE + Field.TITLE,
 				Field.TITLE);
@@ -237,6 +270,12 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		return document.get(Field.ENTRY_CLASS_NAME);
 	}
 
+	protected String getAssetPublisherPageURL(QueryContext queryContext) {
+
+		return (String)queryContext.getParameter(
+			ParameterNames.ASSET_PUBLISHER_URL);
+	}
+	
 	/**
 	 * Get asset renderer.
 	 * 
@@ -286,7 +325,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	}
 
 	/**
-	 * /** Get document summary.
+	 * Get document summary.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -316,7 +355,15 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return null;
 	}
-
+	
+	protected boolean isViewInContext(QueryContext queryContext) {
+		
+		return GetterUtil.getBoolean(queryContext.getParameter(
+			ParameterNames.VIEW_RESULTS_IN_CONTEXT), true);
+	}
+	
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
+	
+	private static final int DESCRIPTION_MAX_LENGTH = 400;
 }

@@ -22,11 +22,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.QueryBuilder;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.postprocessor.QueryPostProcessor;
 import fi.soveltia.liferay.gsearch.core.api.suggest.GSearchKeywordSuggester;
-import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
+import fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfiguration;
 
 /**
  * Query suggestions post processor.
@@ -50,14 +50,14 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 	@Override
 	public boolean process(
 		PortletRequest portletRequest, SearchContext searchContext,
-		QueryParams queryParams, Hits hits)
+		QueryContext queryParams, Hits hits)
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Processing QuerySuggestions");
 		}
 
-		if (!_moduleConfiguration.isQuerySuggestionsEnabled()) {
+		if (!_keywordSuggesterConfiguration.isQuerySuggestionsEnabled()) {
 			return true;
 		}
 
@@ -65,7 +65,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 			_log.debug("QuerySuggestions are enabled.");
 		}
 
-		if (hits.getLength() >= _moduleConfiguration.querySuggestionsHitsThreshold()) {
+		if (hits.getLength() >= _keywordSuggesterConfiguration.querySuggestionsHitsThreshold()) {
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Hits threshold was exceeded. Returning.");
@@ -117,7 +117,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 
 			queryParams.setKeywords(querySuggestions[0]);
 
-			Query query = _queryBuilder.buildQuery(portletRequest, queryParams, true);
+			Query query = _queryBuilder.buildQuery(portletRequest, queryParams);
 
 			BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 				query, BooleanClauseOccur.MUST.getName());
@@ -140,14 +140,14 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 	@Modified
 	protected void activate(Map<String, Object> properties) {
 
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
+		_keywordSuggesterConfiguration = ConfigurableUtil.createConfigurable(
+			KeywordSuggesterConfiguration.class, properties);
 	}
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(QuerySuggestionsProcessorImpl.class);
 	
-	private volatile ModuleConfiguration _moduleConfiguration;
+	private volatile KeywordSuggesterConfiguration _keywordSuggesterConfiguration;
 
 	@Reference
 	private GSearchKeywordSuggester _gSearchKeywordSuggester;
