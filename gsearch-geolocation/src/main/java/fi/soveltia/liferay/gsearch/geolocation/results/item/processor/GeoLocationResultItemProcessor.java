@@ -15,13 +15,14 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 import fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration;
 
 /**
- * Add geolocation properties required for the maps result layout.
+ * Adds coordinates to result items so that they can be showed on maps result
+ * layout.
  * 
  * @author Petteri Karttunen
  */
@@ -45,8 +46,10 @@ public class GeoLocationResultItemProcessor implements ResultItemProcessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void process(PortletRequest portletRequest, QueryParams queryParams, 
-		Document document, ResultItemBuilder resultItemBuilder, JSONObject resultItem)
+	public void process(
+		PortletRequest portletRequest, QueryContext queryParams,
+		Document document, ResultItemBuilder resultItemBuilder,
+		JSONObject resultItem)
 		throws Exception {
 
 		if (!isEnabled()) {
@@ -59,7 +62,7 @@ public class GeoLocationResultItemProcessor implements ResultItemProcessor {
 		if (geoLocationPointField == null) {
 			return;
 		}
-		
+
 		GeoLocationPoint geoLocationPoint =
 			geoLocationPointField.getGeoLocationPoint();
 

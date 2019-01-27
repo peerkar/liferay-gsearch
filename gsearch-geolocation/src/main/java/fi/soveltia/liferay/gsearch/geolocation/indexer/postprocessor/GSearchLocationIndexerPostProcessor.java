@@ -4,17 +4,13 @@ package fi.soveltia.liferay.gsearch.geolocation.indexer.postprocessor;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.BooleanQuery;
+import com.liferay.portal.kernel.search.BaseIndexerPostProcessor;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
-import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.Summary;
-import com.liferay.portal.kernel.search.filter.BooleanFilter;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.Validator;
 
-import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.annotations.Activate;
@@ -26,7 +22,7 @@ import fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration
 import fi.soveltia.liferay.gsearch.geolocation.service.GeoLocationService;
 
 /**
- * GSearch geolocation indexer postprocessor
+ * Indexes geolocation data to the configured field.
  * 
  * @author Petteri Karttunen
  */
@@ -35,6 +31,7 @@ import fi.soveltia.liferay.gsearch.geolocation.service.GeoLocationService;
 	configurationPid = "fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration",
 	immediate = true,
 	property = {
+		"indexer.class.name=com.liferay.blogs.kernel.model.BlogsEntry",
 		"indexer.class.name=com.liferay.blogs.model.BlogsEntry",
 		"indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry",
 		"indexer.class.name=com.liferay.journal.model.JournalArticle",
@@ -45,21 +42,7 @@ import fi.soveltia.liferay.gsearch.geolocation.service.GeoLocationService;
 	service = IndexerPostProcessor.class
 )
 public class GSearchLocationIndexerPostProcessor
-	implements IndexerPostProcessor {
-
-	@Override
-	public void postProcessContextBooleanFilter(
-		BooleanFilter booleanFilter, SearchContext searchContext)
-		throws Exception {
-
-	}
-
-	@Override
-	public void postProcessContextQuery(
-		BooleanQuery contextQuery, SearchContext searchContext)
-		throws Exception {
-
-	}
+	extends BaseIndexerPostProcessor {
 
 	@Override
 	public void postProcessDocument(Document document, Object obj)
@@ -70,6 +53,10 @@ public class GSearchLocationIndexerPostProcessor
 		}
 		
 		String ipAddress = getIpAddress();
+		
+		if (ipAddress == null) {
+			return;
+		}
 
 		Float[] coordinates = _geolocationService.getCoordinates(ipAddress);
 
@@ -94,34 +81,6 @@ public class GSearchLocationIndexerPostProcessor
 			_moduleConfiguration.indexField(), latitude, longitude);
 	}
 
-	@Override
-	public void postProcessFullQuery(
-		BooleanQuery fullQuery, SearchContext searchContext)
-		throws Exception {
-
-	}
-
-	@Override
-	public void postProcessSearchQuery(
-		BooleanQuery searchQuery, BooleanFilter booleanFilter,
-		SearchContext searchContext)
-		throws Exception {
-
-	}
-
-	@Override
-	public void postProcessSearchQuery(
-		BooleanQuery searchQuery, SearchContext searchContext)
-		throws Exception {
-
-	}
-
-	@Override
-	public void postProcessSummary(
-		Summary summary, Document document, Locale locale, String snippet) {
-
-	}
-
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -135,20 +94,28 @@ public class GSearchLocationIndexerPostProcessor
 	 */
 	protected String getIpAddress() {
 
-		// Check if there's a configured test address
+		try {
 
-		String ipAddress = _moduleConfiguration.testIpAddress();
+			// Check if there's a configured test address
 
-		if (Validator.isNotNull(ipAddress)) {
-			return ipAddress;
+			String ipAddress = _moduleConfiguration.testIpAddress();
+
+			if (Validator.isNotNull(ipAddress)) {
+				return ipAddress;
+			}
+
+			// Get the ip from servicecontext
+
+			ServiceContext serviceContext =
+				ServiceContextThreadLocal.getServiceContext();
+
+			return serviceContext.getRemoteAddr();
 		}
-
-		// Get the ip from servicecontext
-
-		ServiceContext serviceContext =
-			ServiceContextThreadLocal.getServiceContext();
-
-		return serviceContext.getRemoteAddr();
+		catch (Exception e) {
+			_log.warn("Couldn't resolve remote address. This might be because of this task bein executed as a background process.");
+		}
+		
+		return null;
 	}
 
 	@Reference

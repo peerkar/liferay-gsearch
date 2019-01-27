@@ -17,7 +17,7 @@ import fi.soveltia.liferay.gsearch.geolocation.query.contributor.DecayFunction;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "Geolocation"
+	name = "geolocation-configuration"
 )
 public interface ModuleConfiguration {
 

@@ -2,7 +2,7 @@
 package fi.soveltia.liferay.gsearch.geolocation.service;
 
 /**
- * Geolocation service
+ * Geolocation service for resolving coordinates for an IP.
  * 
  * @author Petteri Karttunen
  */

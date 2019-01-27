@@ -1,8 +1,7 @@
 dependencies {
-
 	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "1.0.0"
-    compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
-
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
+	
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	compileOnly group: "javax.portlet", name: "portlet-api", version: "3.0.0"
 	compileOnly group: "javax.servlet", name: "javax.servlet-api", version: "3.0.1"
@@ -13,3 +12,4 @@ dependencies {
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-api")
 	compileOnly project(":modules:liferay-gsearch:gsearch-query-api")
 }
+
