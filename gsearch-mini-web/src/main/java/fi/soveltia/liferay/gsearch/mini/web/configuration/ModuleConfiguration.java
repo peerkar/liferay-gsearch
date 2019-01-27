@@ -22,59 +22,50 @@ import aQute.bnd.annotation.metatype.Meta;
 public interface ModuleConfiguration {
 
 	@Meta.AD(
-		deflt = "true", 
-	    name = "enable-autocompletion-name",
-	    description = "enable-autocompletion-desc",
-		required = false
-	)
-	public boolean enableAutoComplete();
-
-	@Meta.AD(
-		deflt = "150", 
-	    description = "autocomplete-delay-desc",
-	    name = "autocomplete-delay-name",
-		required = false
-	)
-	public int autoCompleteRequestDelay();	
-
-	@Meta.AD(
 		deflt = "contents", 
-	    description = "suggest-mode-desc",
-	    name = "suggest-mode-name",
-	    optionLabels = {"Keywords", "Contents"},
-	    optionValues = {"keywords", "contents"},
+		description = "suggest-mode-desc",
+		name = "suggest-mode-name",
+		optionLabels = {"Keywords", "Contents"},
+		optionValues = {"keywords", "contents"},
 		required = false
 	)
 	public String suggestMode();
 
 	@Meta.AD(
 		deflt = "7", 
-	    name = "content-suggestions-count-name",
+		name = "content-suggestions-count-name",
 		required = false
 	)
 	public int contentSuggestionsCount();
 	
+	@Meta.AD(
+		deflt = "150", 
+		description = "suggestions-delay-desc",
+		name = "suggestions-delay-name",
+		required = false
+	)
+	public int autoCompleteRequestDelay();	
 	
 	@Meta.AD(
 		deflt = "/search", 
-	    name = "search-portlet-page-name",
-	    description = "search-portlet-page-desc",
+		name = "search-portlet-page-name",
+		description = "search-portlet-page-desc",
 		required = false
 	)
 	public String searchPortletPage();
 
 	@Meta.AD(
 		deflt = "/viewasset", 
-	    name = "asset-publisher-page-name",
-	    description = "asset-publisher-page-desc",
+		name = "asset-publisher-page-name",
+		description = "asset-publisher-page-desc",
 		required = false
 	)
 	public String assetPublisherPage();	
 	
 	@Meta.AD(
 		deflt = "/search", 
-	    name = "hide-on-pages-name",
-	    description = "hide-on-pages-desc",
+		name = "hide-on-pages-name",
+		description = "hide-on-pages-desc",
 		required = false
 	)
 	public String[] hideOnPages();
@@ -82,23 +73,22 @@ public interface ModuleConfiguration {
 	@Meta.AD(
 		deflt = "true", 
 		description = "view-in-context-desc",
-	    name = "view-in-context-name",
+		name = "view-in-context-name",
 		required = false
 	)
 	public boolean isViewResultsInContext();	
-
 	
 	@Meta.AD(
 		deflt = "true", 
 		description = "append-redirect-desc",
-	    name = "append-redirect-name",
+		name = "append-redirect-name",
 		required = false
 	)
 	public boolean isRedirectAppended();	
 	
 	@Meta.AD(
 		deflt = "2", 
-	    name = "keywords-min-length",
+		name = "keywords-min-length",
 		required = false
 	)
 	public int queryMinLength();
@@ -106,7 +96,7 @@ public interface ModuleConfiguration {
 	@Meta.AD(
 		deflt = "10000", 
 		description = "request-timeout-desc",
-	    name = "request-timeout-name",
+		name = "request-timeout-name",
 		required = false
 	)
 	public int requestTimeout();
