@@ -2,7 +2,9 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard Liferay search portlet available. 
 
-This application gives you full control over queries sent from Liferay to Elasticsearch and makes it possible to consume user contextual information in constructing search queries as well as create conditional subqueries, with the help of a rule engine. With this application you can, for example, bring certain result higher on the list based on user's Audience Targeting segments or location. 
+This application gives you full control over queries sent from Liferay to the search engine and makes it possible to consume user contextual information as well as create conditional subqueries, with the help of a rule engine. With this application you can, for example, bring certain result higher on the list based on user's Audience Targeting segments, location or keyword matching.
+
+While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which extends the standard query type support.
 
 The application has multiple extension points for customization and you can just choose to use the backend modules and create your own UI implementation.
 
