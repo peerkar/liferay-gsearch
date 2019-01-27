@@ -15,7 +15,7 @@ The application has multiple extension points for customization and you can just
 
 * [About](https://github.com/peerkar/liferay-gsearch/wiki/About)
 * [Project modules](https://github.com/peerkar/liferay-gsearch/wiki/Project-Modules)
-* [Compatibility matrix](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility)
+* [Compatibility](https://github.com/peerkar/liferay-gsearch/wiki/Compatibility)
 * [Changelog](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * [Documentation Wiki](https://github.com/peerkar/liferay-gsearch/wiki)
 
