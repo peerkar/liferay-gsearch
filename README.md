@@ -19,7 +19,7 @@ The application has multiple extension points for customization and you can just
 * [Changelog](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * [Documentation Wiki](https://github.com/peerkar/liferay-gsearch/wiki)
 
-## Quick Installation Guide
+## Installation
 
 There are basically two options for using this application: with or without the provided custom Elasticsearch 6.1 adapter.
 
@@ -36,59 +36,59 @@ __Without custom adapter__
 * Just deploy the modules and use it with any supported search engine.
 * Use it with recent CE 7.0 and 7.1 versions.
 
-### Minimal Installation
+## Minimal Installation Guide
 
-#### Step 1
+### Step 1
 
 Download Liferay GSearch binaries for your portal version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries).
 
-#### Step 2
+### Step 2
 
 Deploy JARS and check from log and from Gogo shell that everything deployed correctly.
 
 __Notice:__ If you don't plan to use the Audience Targeting or Geolocation integration, don't deploy those modules (check module names).
 
-#### Step 3
+### Step 3
 
 Deploy the GSearch portlet from Widgets menu to a portal page.
 
-#### Step 4
+### Step 4
 
 Create a page with friendly URL "/viewasset" on a same site as the search portlet and place an Asset Publisher on it.
 
 __That's all.__
 
-### Full Installation
+## Full Installation Guide
 
 In addition to the steps before:
 
-#### Step 5
+### Step 5
 
 Install standalone Elasticsearch 6.1 server and configure the portal to use that. See server installation instructions [here](https://dev.liferay.com/en/discover/deployment/-/knowledge_base/7-0/installing-elasticsearch)
 
-#### Step 6
+### Step 6
 
 Dowload and deploy the custom Elasticsearch adapter binary (or binaries, depending on the portal version) from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries) for your portal version (see __adapter__ subfolder).
 
 To avoid any conflicts with the standard Adapter, put the respective module on a module blackist in the System Configuration. Notably on DXP 7.0, you also have to deactivate or uninstall the ES 2.1 adapter (or reboot portal after blacklisting). 
 
-#### Step 8
+### Step 8
 
 __Do full reindex__ to create custom analyzers, mappings and settings. 
 
-#### Step 9
+### Step 9
 
 To enable Audience Targeting integration and support, install Liferay Audience Targeting plugin from Liferay Marketplace. 
 
 This is also optional but greatly enchances possibilities to use user contextual information in query boosting by allowing to use integrate Audience Targeting user segments in query conditions as well as automatically boost segmented content.
 
-#### Step 10
+### Step 10
 
 Check configurations in Control Panel -> System Settings -> GSearch. There are lots of options and examples. For example, if you plan to use geolocation, you have to provide there Google and IPStack API keys.
 
 __Notice__ that More Like This portlet has a portlet instance configuration.
 
-#### Step 11
+### Step 11
 
 If you have problems or questions, file a ticket. I'm doing the project almost completely as a hobby, so the installation or configuration instructions are at times minimal. Sorry for that.
 
