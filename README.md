@@ -33,8 +33,8 @@ __With custom adapter:__
 
 __Without custom adapter__
 
-* Just deploy the modules and use it with any supported search engine.
-* Use it with recent CE 7.0 and 7.1 versions.
+* Limited functionalities but can be used it with any supported search engine, like SOLR
+* Works on recent CE 7.0 and 7.1 versions
 
 ## Minimal Installation Guide
 
