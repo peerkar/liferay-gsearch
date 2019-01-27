@@ -102,19 +102,13 @@ If you are willing to contribute or have problems or questions, ping me filing a
  
 ## Important Note About Permissions
 
-This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index.
+This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index. It doesn't take the role inherited permissions into account.
 
 The standard Liferay search portlet relies on both the indexed permissions and on post permission filtering which happens after search results have been fetched. This approach has historically made features like paging and sorting problematic. 
 
-So, is this application secure? Because Liferay permissioning only understands *grant* and not *deny* permissions, this application is more restrictive than standard search portlet and doesn't expose anything, users should not be allowed to see. However as it doesn't take the inherited roles and permissions into account, users might not see everything they should see. What this means is, that this application is currently suitable mostly for public websites or for private sites where these restrictions won't matter.
+So, is this application secure? Because Liferay permissioning only supports *grant* and not *deny* permissions, this application is more restrictive than standard search portlet and doesn't expose anything, users should not be allowed to see. However as it doesn't take the inherited roles and permissions into account, users might not see everything they should see. What this means is, that this application is currently suitable mostly for public websites or for private sites where these restrictions won't matter.
 
-To extend this solution to fully support inherited role permissions, it's suggested to:
-
-1. Extend the index schema with custom permission fields
-1. Sync the inherited role permissions to the index
-1. Create a custom fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher service priority to add the custom permission clauses. This extension point has a dynamic reference option so that it'd be easily customizable.
-
-In a large scale system, this approach would have to be designed carefully to avoid performance problems.
+If you want to enhance the provided solution and extend the permissioning support, you can override the default fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher ranking implementation priority. The extension point has a dynamic reference option so that it'd be easily customizable.
 
 ## Disclaimer
 
