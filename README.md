@@ -90,7 +90,7 @@ __Notice__ that More Like This portlet has a portlet instance configuration.
 
 ### Step 11
 
-If you have problems or questions, file a ticket. I'm doing the project almost completely as a hobby, so the installation or configuration instructions are at times minimal. Sorry for that.
+If you are willing to contribute or have problems or questions, ping me filing a ticket. I'm doing the project almost completely as a hobby, so the installation or configuration instructions are at times minimal. Sorry for that.
 
 ## Known Issues (important)
 
