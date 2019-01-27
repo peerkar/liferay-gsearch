@@ -30,7 +30,9 @@ class GSearchMapsResultLayout extends Component {
 		
 		let _self = this;
 
-		Liferay.Loader.require('GoogleMapsLoader', function(GoogleMapsLoader) {
+		Liferay.Loader.require('google-maps-loader', function(GoogleMapsLoader) {
+			
+			console.log(GoogleMapsLoader);
 			
 			GoogleMapsLoader.KEY = _self.googleMapsAPIKey;
 

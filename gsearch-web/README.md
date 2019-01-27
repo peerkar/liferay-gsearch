@@ -1,10 +1,10 @@
 # Liferay GSearch Web
 
-This is the GSearch portlet modulle.
+The main Liferay GSearch portlet module.
 
-## Installation
+## Prerequisites
 
-Check the compatibility matrix on the documentation wiki and download a compatible version from [binaries folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries). Deploy.
+Core modules installed.
 
 ## Configuration
 

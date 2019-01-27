@@ -7,17 +7,17 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
@@ -32,12 +32,14 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParamsBuilder;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.web.portlet.util.LocalizationHelper;
 
 /**
  * Resource command for getting the search results.
@@ -45,7 +47,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration",
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration", 
 	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
@@ -72,9 +74,9 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			_log.debug("GetSearchResultsMVCResourceCommand.doServeResource()");
 		}
 
-		// Build query parameters object.
+		// Build query context object.
 
-		QueryParams queryParams = null;
+		QueryContext queryContext = null;
 
 		// Result layout
 
@@ -84,26 +86,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			// Build basic params.
 
-			queryParams = _queryParamsBuilder.buildQueryParams(
+			queryContext = _queryContextBuilder.buildQueryContext(
 				resourceRequest, _moduleConfiguration.pageSize());
 
-			// Asset publisher page.
+			// Set other context parameters
 
-			queryParams.setAssetPublisherPageURL(
-				_moduleConfiguration.assetPublisherPage());
-
-			// Show results in context.
-
-			queryParams.setViewResultsInContext(
-				_moduleConfiguration.isViewResultsInContext());
-
-			// Set additional fields to include in results.
-
-			setAdditionalResultFields(queryParams);
-
-			// Set extra params.
-
-			setExtraParams(resourceRequest, queryParams, resultLayout);
+			setContextParameters(queryContext, resultLayout);
 
 		}
 		catch (PortalException e) {
@@ -119,7 +107,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		try {
 			responseObject = _gSearch.getSearchResults(
-				resourceRequest, resourceResponse, queryParams);
+				resourceRequest, resourceResponse, queryContext);
 
 			// Set active result layout
 
@@ -128,7 +116,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			// Set result layout options.
 
 			setResultLayoutOptions(
-				resourceRequest, queryParams, responseObject, resultLayout);
+				resourceRequest, queryContext, responseObject, resultLayout);
 
 			// Localize facets (This is SOY specific and done here because of
 			// https://issues.liferay.com/browse/LPS-75141).
@@ -152,27 +140,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
-	}
-
-	/**
-	 * Get localization.
-	 * 
-	 * @param key
-	 * @param locale
-	 * @param objects
-	 * @return
-	 */
-	protected String getLocalization(
-		String key, Locale locale, Object... objects) {
-
-		if (_resourceBundle == null) {
-			_resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
-		}
-
-		String value =
-			ResourceBundleUtil.getString(_resourceBundle, key, objects);
-
-		return value == null ? _language.format(locale, key, objects) : value;
 	}
 
 	/**
@@ -211,42 +178,83 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	/**
 	 * Set additional fields to be included in results.
 	 * 
-	 * @param queryParams
+	 * @param queryContext
 	 */
-	protected void setAdditionalResultFields(QueryParams queryParams) {
+	protected void setAdditionalResultFields(QueryContext queryContext) {
 
-		// Asset tags
+		// Asset tags.
+
+		Map<String, Class<?>> additionalResultFields =
+			new HashMap<String, Class<?>>();
 
 		if (_moduleConfiguration.isAssetTagsVisible()) {
-			queryParams.addAdditionalResultField("assetTagNames", String[].class);
+			additionalResultFields.put("assetTagNames", String[].class);
+		}
+
+		// Asset categories.
+
+		if (_moduleConfiguration.isAssetCategoriesVisible()) {
+			additionalResultFields.put("assetCategoryTitles", String[].class);
+		}
+
+		// Username.
+
+		if (_moduleConfiguration.isUserNameVisible()) {
+
+			additionalResultFields.put("userName", String.class);
+		}
+
+		if (additionalResultFields.size() > 0) {
+			queryContext.setParameter(
+				ParameterNames.ADDITIONAL_RESULT_FIELDS,
+				additionalResultFields);
 		}
 	}
 
 	/**
-	 * Set query extra parameters.
+	 * Set context parameters.
 	 * 
-	 * @param portletRequest
-	 * @param queryParams
+	 * @param queryContext
+	 * @param resultLayout
 	 */
-	protected void setExtraParams(
-		PortletRequest portletRequest, QueryParams queryParams,
-		String resultLayout) {
+	protected void setContextParameters(
+		QueryContext queryContext, String resultLayout) {
 
-		// Include thumbnail?
+		// Datepicker format
+
+		queryContext.setParameter(
+			ParameterNames.DATEPICKER_FORMAT,
+			_moduleConfiguration.datePickerFormat());
+
+		// Asset publisher page.
+
+		queryContext.setParameter(
+			ParameterNames.ASSET_PUBLISHER_URL,
+			_moduleConfiguration.assetPublisherPage());
+
+		// Show results in context.
+
+		queryContext.setParameter(
+			ParameterNames.VIEW_RESULTS_IN_CONTEXT,
+			_moduleConfiguration.isViewResultsInContext());
+
+		// Layout specific options
 
 		if (resultLayout.equals("thumbnailList") ||
 			resultLayout.equals("image")) {
-
-			queryParams.addExtraParam("includeThumbnail", true);
+			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
-
-		// Include user initials?
 
 		if (resultLayout.equals("userImageList") ||
-			resultLayout.equals("image")) {
+			 resultLayout.equals("maps")) {
 
-			queryParams.addExtraParam("includeUserPortrait", true);
+			queryContext.setParameter(
+				ParameterNames.INCLUDE_USER_PORTRAIT, true);
 		}
+
+		// Set additional fields to include in results.
+
+		setAdditionalResultFields(queryContext);
 	}
 
 	/**
@@ -259,7 +267,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	protected void setFacetLocalizations(
 		PortletRequest portletRequest, JSONObject responseObject) {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
 
 		JSONArray facets = responseObject.getJSONArray("facets");
 
@@ -273,17 +284,31 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			resultItem.put(
 				"anyOption",
-				getLocalization(
-					"any-" + resultItem.getString("paramName").toLowerCase(),
-					locale));
+				_localizationHelper.getLocalization(
+					locale,
+					"any-" + resultItem.getString("param_name").toLowerCase()));
 
 			resultItem.put(
 				"multipleOption",
-				getLocalization(
-					"multiple-" +
-						resultItem.getString("paramName").toLowerCase(),
-					locale));
+				_localizationHelper.getLocalization(
+					locale, "multiple-" +
+						resultItem.getString("param_name").toLowerCase()));
 
+			// Localize entryClassNames.
+
+			if (resultItem.getString("field_name").equals("entryClassName")) {
+
+				JSONArray values = resultItem.getJSONArray("values");
+
+				for (int j = 0; j < values.length(); j++) {
+
+					JSONObject value = values.getJSONObject(j);
+
+					value.put(
+						"name", _localizationHelper.getLocalization(
+							locale, value.getString("name").toLowerCase()));
+				}
+			}
 		}
 	}
 
@@ -291,17 +316,20 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * Set available result layout options to response object.
 	 * 
 	 * @param portletRequest
-	 * @param queryParams
+	 * @param queryContext
 	 * @param responseObject
 	 * @param resultLayout
 	 * @throws JSONException
 	 */
 	protected void setResultLayoutOptions(
-		PortletRequest portletRequest, QueryParams queryParams,
+		PortletRequest portletRequest, QueryContext queryContext,
 		JSONObject responseObject, String resultLayout)
 		throws Exception {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
 
 		String[] configuration = _moduleConfiguration.resultLayouts();
 
@@ -312,12 +340,14 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			JSONObject configurationItem =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			if (!shouldShowResultLayout(portletRequest, configurationItem)) {
+			// Should we show the layout.
+			
+			if (!shouldShowResultLayout(portletRequest, resultLayout, configurationItem)) {
 				continue;
 			}
 			configurationItem.put(
-				"title",
-				getLocalization(configurationItem.getString("title"), locale));
+				"title", _localizationHelper.getLocalization(
+					locale, configurationItem.getString("title")));
 
 			resultLayoutOptions.put(configurationItem);
 		}
@@ -336,7 +366,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	protected void setResultTypeLocalizations(
 		PortletRequest portletRequest, JSONObject responseObject) {
 
-		Locale locale = portletRequest.getLocale();
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
 
 		JSONArray items = responseObject.getJSONArray("items");
 
@@ -349,13 +382,26 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			JSONObject resultItem = items.getJSONObject(i);
 
 			resultItem.put(
-				"type", getLocalization(
-					resultItem.getString("type").toLowerCase(), locale));
+				"type", _localizationHelper.getLocalization(
+					locale, resultItem.getString("type").toLowerCase()));
 		}
 	}
 
 	protected boolean shouldShowResultLayout(
-		PortletRequest portletRequest, JSONObject configurationItem) {
+		PortletRequest portletRequest, String resultLayout, JSONObject configurationItem) {
+
+		// Is enabled
+		
+		if (!configurationItem.getBoolean("enabled", true)) {
+			return false;
+		}
+		
+		// Don't show maps layout if Google Maps API key not defined.
+
+		if ("maps".equals(resultLayout) && 
+				Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
+			return false;
+		}
 
 		// Process filters
 
@@ -411,15 +457,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	private GSearch _gSearch;
 
 	@Reference
-	private Language _language;
+	private LocalizationHelper _localizationHelper;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
-	private QueryParamsBuilder _queryParamsBuilder;
+	private QueryContextBuilder _queryContextBuilder;
 
-	private ResourceBundle _resourceBundle;
-
-	@Reference(target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.web)", unbind = "-")
-	private ResourceBundleLoader _resourceBundleLoader;
 }

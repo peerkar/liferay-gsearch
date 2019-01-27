@@ -29,14 +29,17 @@ class GSearchQuery extends State {
 				if (params.length > 0) {
 					params = params.concat('&');
 				}
-			
-				params = params.concat(parameter.key).concat('=').concat(parameter.value);
+
+				let value = parameter.value.replace(/ /g, '%20');
+				value = parameter.value.replace(/\"/g, '%22');
+				
+				params = params.concat(parameter.key).concat('=').concat(value);
 			}
 		}
 		
 		url = url.concat(params);
 		
-		return encodeURI(url);
+		return url;
 	}
 	
 	/**

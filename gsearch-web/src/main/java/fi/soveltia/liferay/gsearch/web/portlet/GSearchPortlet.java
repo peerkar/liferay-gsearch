@@ -20,6 +20,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 		"com.liferay.portlet.css-class-wrapper=gsearch-portlet",
 		"com.liferay.portlet.display-category=category.gsearch",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
+		"com.liferay.portlet.header-portlet-css=/js/bootstrap-datepicker/css/bootstrap-datepicker.css",
 		"com.liferay.portlet.layout-cacheable=false",
 		"com.liferay.portlet.preferences-owned-by-group=true",
 		"com.liferay.portlet.private-request-attributes=false",

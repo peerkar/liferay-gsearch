@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "mark.js": "^8.11.0",
     "metal-component": "^2.4.5",
     "metal-soy": "^2.4.5"
   },
@@ -13,5 +12,5 @@
     "metal-multimap": "1.0.0"
   },
   "name": "gsearch-web",
-  "version": "3.0.3"
+  "version": "4.0.0"
 }

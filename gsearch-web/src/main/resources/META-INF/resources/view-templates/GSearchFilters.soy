@@ -6,7 +6,7 @@
  */
 {template .render}
 	{@param? portletNamespace: string}
-	{@param? typeOptionsMenu: html}
+	{@param? assetTypeOptions: html}
 
 	<div class="row text-center" id="{$portletNamespace}BasicFilters">
 
@@ -18,9 +18,10 @@
 				<span class="selection"></span>
 				<span class="caret"></span>
 			</button>
-			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu" id="{$portletNamespace}TypeFilterOptions">
+			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="dropdown-menu countable-static-facets-list" 
+				data-facetname="entryClassName" id="{$portletNamespace}TypeFilterOptions">
 				<li class="selected default"><a data-value="everything" href="#">{msg desc=""}search-everything{/msg}</a></li>
-				{$typeOptionsMenu}
+				{$assetTypeOptions}
 			</ul>
 		</div>
 		
@@ -53,6 +54,14 @@
 				<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
 				<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
 				<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+				<li>
+					<div class="datepicker-title" id="{$portletNamespace}RangeSelectionTitle">{msg desc=""}time-range{/msg}</div>
+					<div class="datepicker-container" id="{$portletNamespace}RangeSelection">
+					    <input type="text" class="actual-range start">
+					    <span class="range-divider">-</span>
+					    <input type="text" class="actual-range end">
+					</div>
+				</li>
 			</ul>
 		</div>
 	</div>

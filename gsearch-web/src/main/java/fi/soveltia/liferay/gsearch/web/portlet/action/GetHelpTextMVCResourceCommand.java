@@ -6,18 +6,16 @@ import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
+import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -25,14 +23,15 @@ import javax.portlet.ResourceResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
-import fi.soveltia.liferay.gsearch.web.portlet.GSearchPortlet;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.web.portlet.util.LocalizationHelper;
 
 /**
  * Resource command for getting the help text.
@@ -96,6 +95,8 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 		ThemeDisplay themeDisplay = (ThemeDisplay) resourceRequest.getAttribute(
 			GSearchWebKeys.THEME_DISPLAY);
 
+		Locale locale = themeDisplay.getLocale();
+		
 		String articleId = _moduleConfiguration.helpTextArticleId();
 
 		long groupId =
@@ -124,11 +125,7 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 
 		if (_helpText == null) {
 
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", resourceRequest.getLocale(),
-				GSearchPortlet.class);
-
-			_helpText = LanguageUtil.get(resourceBundle, "helptext");
+			_helpText = _localizationHelper.getLocalization(locale, "helptext");
 		}
 
 		return _helpText;
@@ -142,5 +139,8 @@ public class GetHelpTextMVCResourceCommand extends BaseMVCResourceCommand {
 	private String _helpText;
 
 	private JournalArticleService _journalArticleService;
+	
+	@Reference
+	LocalizationHelper _localizationHelper;
 
 }

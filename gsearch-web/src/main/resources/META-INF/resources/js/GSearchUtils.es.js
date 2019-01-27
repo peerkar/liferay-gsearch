@@ -206,7 +206,7 @@ class GSearchUtils {
 			let value = $(this).attr('data-value');
 
 			if (currentValues.indexOf(value) < 0) {
-				
+
 				component.setQueryParam(paramName, value, true, isMultiValued);
 
 				let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, [value], isMultiValued);

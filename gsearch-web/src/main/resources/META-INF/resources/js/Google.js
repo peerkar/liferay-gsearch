@@ -3,7 +3,9 @@
 	if (root === null) {
 		throw new Error('Google-maps package can be used only in browser');
 	}
-
+	
+	// GSearch: expose as global.
+	/* 
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
 	} else if (typeof exports === 'object') {
@@ -11,7 +13,10 @@
 	} else {
 		root.GoogleMapsLoader = factory();
 	}
+	*/
+	root.GoogleMapsLoader = factory();
 
+	
 })(typeof window !== 'undefined' ? window : null, function() {
 
 

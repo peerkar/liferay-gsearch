@@ -1,3 +1,4 @@
+
 package fi.soveltia.liferay.gsearch.web.configuration;
 
 import com.liferay.portal.kernel.util.StringBundler;
@@ -16,9 +17,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * Configuration initializer.
+ * Sets default configuration.
  * 
  * @author Petteri Karttunen
  */
@@ -41,19 +41,18 @@ public class ConfigurationInitializer {
 	 */
 	protected void checkConfiguration() {
 
-		_log.info(
-			"Checking Web configuration.");
+		_log.info("Checking Web configuration.");
 
 		try {
 
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				CONFIGURATION_PID);
+			Configuration configuration =
+				_configurationAdmin.getConfiguration(CONFIGURATION_PID);
 
 			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, CONFIGURATION_PID);
-			} else {
-				_log.info("Configuration exists."); 
+				setDefaultConfiguration(configuration, CONFIGURATION_PID);
+			}
+			else {
+				_log.info("Configuration exists.");
 
 			}
 
@@ -76,10 +75,10 @@ public class ConfigurationInitializer {
 
 			StringBundler sb = new StringBundler();
 			sb.append("configs/").append(fileName).append(".config");
-			
+
 			inputStream = this.getClass().getClassLoader().getResourceAsStream(
 				sb.toString());
-			
+
 			configuration.update(ConfigurationHandler.read(inputStream));
 
 			_log.info("Default configuration set.");
@@ -104,7 +103,6 @@ public class ConfigurationInitializer {
 
 	private static final String CONFIGURATION_PID =
 		"fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration";
-
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(ConfigurationInitializer.class);

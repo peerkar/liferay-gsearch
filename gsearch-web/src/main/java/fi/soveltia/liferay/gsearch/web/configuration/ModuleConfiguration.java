@@ -101,6 +101,22 @@ public interface ModuleConfiguration {
 	public boolean isAssetTagsVisible();
 
 	@Meta.AD(
+		deflt = "false", 
+	    description = "show-username-desc",
+	    name = "show-username-name",
+		required = false
+	)
+	public boolean isUserNameVisible();
+	
+	@Meta.AD(
+		deflt = "false", 
+	    description = "show-asset-categories-desc",
+	    name = "show-asset-categories-name",
+		required = false
+	)
+	public boolean isAssetCategoriesVisible();
+	
+	@Meta.AD(
 		deflt = "", 
 		description = "result-layouts-desc",
 	    name = "result-layouts-name",
@@ -115,6 +131,15 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public boolean isViewResultsInContext();
+
+	@Meta.AD(
+		deflt = "false", 
+		description = "append-redirect-desc",
+	    name = "append-redirect-name",
+		required = false
+	)
+	public boolean isRedirectAppended();
+
 	
 	@Meta.AD(
 		deflt = "", 
@@ -123,5 +148,13 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public String googleMapsAPIKey();
+	
+	@Meta.AD(
+		deflt = "yyyy-MM-dd", 
+		description = "datepicker-format-desc",
+	    name = "datepicker-format-name",
+		required = false
+	)
+	public String datePickerFormat();
 }
 

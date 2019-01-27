@@ -2,26 +2,18 @@
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
@@ -31,14 +23,18 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.web.menuoption.MenuOptionProvider;
 
 /**
  * View render command. Primary/default view.
@@ -65,101 +61,17 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			_log.debug("ViewMVCRenderCommand.render()");
 		}
 
-		Template template =
-			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
+		// Set template parameters.
 
-		// Set namespace (a convenience alias for $id).
+		setTemplateParameters(renderRequest, renderResponse);
 
-		String portletNamespace = renderResponse.getNamespace();
-		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
+		// Set menu options.
 
-		// Autocomplete on/off.
+		setMenuOptions(renderRequest);
 
-		template.put(
-			GSearchWebKeys.AUTO_COMPLETE_ENABLED,
-			_moduleConfiguration.isKeywordSuggesterEnabled());
+		// Set initial parameters and values from url.
 
-		// Autocomplete request delay.
-
-		template.put(
-			GSearchWebKeys.AUTO_COMPLETE_REQUEST_DELAY,
-			_moduleConfiguration.keywordSuggesterRequestDelay());
-
-		// Set help text resource url.
-
-		template.put(
-			GSearchWebKeys.HELP_TEXT_URL, createResourceURL(
-				renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
-
-		// Set search results resource url.
-
-		template.put(
-			GSearchWebKeys.SEARCH_RESULTS_URL, createResourceURL(
-				renderResponse, GSearchResourceKeys.GET_SEARCH_RESULTS));
-
-		// Set autocomplete/suggestions resource url.
-
-		template.put(
-			GSearchWebKeys.SUGGESTIONS_URL, createResourceURL(
-				renderResponse, GSearchResourceKeys.GET_SUGGESTIONS));
-
-		try {
-
-			// Set supported asset type options.
-
-			setAssetTypeOptions(renderRequest, template);
-
-			// Set sort options
-			
-			setSortOptions(renderRequest, template);
-			
-		}
-		catch (Exception e) {
-
-			throw new RuntimeException(e);
-		}
-
-		// Set request timeout.
-
-		template.put(
-			GSearchWebKeys.REQUEST_TIMEOUT,
-			_moduleConfiguration.requestTimeout());
-
-		// Set query min length.
-
-		template.put(
-			GSearchWebKeys.QUERY_MIN_LENGTH,
-			_moduleConfiguration.queryMinLength());
-
-		// Enable / disable JS console logging messages.
-
-		template.put(
-			GSearchWebKeys.JS_DEBUG_ENABLED,
-			_moduleConfiguration.isJSDebuggingEnabled());
-
-		// Get/set parameters from url
-
-		setInitialParameters(renderRequest, template);
-
-		// Set facet fields
-
-		template.put(GSearchWebKeys.FACET_FIELDS, _facetFields);
-
-		// Tags param name
-
-		template.put(GSearchWebKeys.ASSET_TAG_PARAM, "assetTagNames");
-
-		// Show tags
-
-		template.put(
-			GSearchWebKeys.SHOW_ASSET_TAGS,
-			_moduleConfiguration.isAssetTagsVisible());
-
-		// Google maps API key
-
-		template.put(
-			GSearchWebKeys.GMAPS_API_KEY,
-			_moduleConfiguration.googleMapsAPIKey());
+		setInitialParameters(renderRequest);
 
 		return "GSearch";
 	}
@@ -170,34 +82,15 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-
-		try {
-			setFacetFields();
-		}
-		catch (JSONException e) {
-			_log.error(e.getMessage(), e);
-		}
 	}
-	
-	/**
-	 * Get localization.
-	 * 
-	 * @param key
-	 * @param locale
-	 * @param objects
-	 * @return
-	 */
-	protected String getLocalization(
-		String key, Locale locale, Object... objects) {
 
-		if (_resourceBundle == null) {
-			_resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
+	protected void addMenuOptionProvider(
+		MenuOptionProvider menuOptionProvider) {
+
+		if (_menuOptionProviders == null) {
+			_menuOptionProviders = new ArrayList<MenuOptionProvider>();
 		}
-
-		String value =
-			ResourceBundleUtil.getString(_resourceBundle, key, objects);
-
-		return value == null ? _language.format(locale, key, objects) : value;
+		_menuOptionProviders.add(menuOptionProvider);
 	}
 
 	/**
@@ -217,63 +110,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		return portletURL.toString();
 	}
 
-	/**
-	 * Set asset type options.
-	 * 
-	 * Localization are here and not in the templates because of https://issues.liferay.com/browse/LPS-75141
-	 * 
-	 * @param renderRequest
-	 * @param template
-	 * @throws Exception
-	 */
-	protected void setAssetTypeOptions(
-		PortletRequest portletRequest, Template template) throws Exception {
+	protected void removeMenuOptionProvider(
+		MenuOptionProvider menuOptionProvider) {
 
-		Locale locale = portletRequest.getLocale();
-		
-		String[] configuration = _coreConfigurationHelper.getAssetTypeConfiguration();
-
-		JSONArray options = JSONFactoryUtil.createJSONArray();
-
-		for (int i = 0; i < configuration.length; i++) {
-
-			JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
-
-			item.put(
-				"localization",
-				getLocalization(
-					"type." + item.getString("entry_class_name").toLowerCase(),
-					locale));
-			options.put(item);
-		}
-
-		template.put(GSearchWebKeys.ASSET_TYPE_OPTIONS,
-			options);
-		
-
-	}		
-	
-	/**
-	 * Get / set facet field configuration
-	 * 
-	 * @throws JSONException
-	 */
-	protected void setFacetFields()
-		throws JSONException {
-
-		String[] configuration = _coreConfigurationHelper.getFacetConfiguration();
-		
-		if (configuration.length > 0) {
-
-			_facetFields = new String[configuration.length];
-
-			for (int i = 0; i < configuration.length; i++) {
-
-				JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
-
-				_facetFields[i] = item.getString("param_name");
-			}
-		}
+		_menuOptionProviders.remove(menuOptionProvider);
 	}
 
 	/**
@@ -283,8 +123,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	 * @param renderRequest
 	 * @param template
 	 */
-	protected void setInitialParameters(
-		RenderRequest renderRequest, Template template) {
+	protected void setInitialParameters(RenderRequest renderRequest) {
+
+		Template template =
+			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
 
 		HttpServletRequest httpServletRequest =
 			PortalUtil.getHttpServletRequest(renderRequest);
@@ -293,20 +135,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		// Basic params
 
-		String keywords = ParamUtil.getString(request, GSearchWebKeys.KEYWORDS);
+		String keywords = ParamUtil.getString(request, ParameterNames.KEYWORDS);
 
-		String scopeFilter =
-			ParamUtil.getString(request, GSearchWebKeys.FILTER_SCOPE);
-		String timeFilter =
-			ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME);
+		String scopeFilter = ParamUtil.getString(request, ParameterNames.SCOPE);
+		String timeFilter = ParamUtil.getString(request, ParameterNames.TIME);
+		String timeFrom =
+			ParamUtil.getString(request, ParameterNames.TIME_FROM);
+		String timeTo = ParamUtil.getString(request, ParameterNames.TIME_TO);
+
 		String typeFilter =
-			ParamUtil.getString(request, GSearchWebKeys.FILTER_TYPE);
+			ParamUtil.getString(request, ParameterNames.ASSET_TYPE);
 
 		String sortField =
-			ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
+			ParamUtil.getString(request, ParameterNames.SORT_FIELD);
 		String sortDirection =
-			ParamUtil.getString(request, GSearchWebKeys.SORT_DIRECTION);
-		String start = ParamUtil.getString(request, GSearchWebKeys.START);
+			ParamUtil.getString(request, ParameterNames.SORT_DIRECTION);
+
+		String start = ParamUtil.getString(request, ParameterNames.START);
 
 		String resultsLayout =
 			ParamUtil.getString(request, GSearchWebKeys.RESULTS_LAYOUT);
@@ -316,49 +161,63 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		if (Validator.isNotNull(keywords)) {
 			initialParameters.put(
-				GSearchWebKeys.KEYWORDS, new String[] {
+				ParameterNames.KEYWORDS, new String[] {
 					keywords
 				});
 		}
 
 		if (Validator.isNotNull(scopeFilter)) {
 			initialParameters.put(
-				GSearchWebKeys.FILTER_SCOPE, new String[] {
+				ParameterNames.SCOPE, new String[] {
 					scopeFilter
 				});
 		}
 
 		if (Validator.isNotNull(timeFilter)) {
 			initialParameters.put(
-				GSearchWebKeys.FILTER_TIME, new String[] {
+				ParameterNames.TIME, new String[] {
 					timeFilter
+				});
+		}
+
+		if (Validator.isNotNull(timeFrom)) {
+			initialParameters.put(
+				ParameterNames.TIME_FROM, new String[] {
+					timeFrom
+				});
+		}
+
+		if (Validator.isNotNull(timeTo)) {
+			initialParameters.put(
+				ParameterNames.TIME_TO, new String[] {
+					timeTo
 				});
 		}
 
 		if (Validator.isNotNull(typeFilter)) {
 			initialParameters.put(
-				GSearchWebKeys.FILTER_TYPE, new String[] {
+				ParameterNames.ASSET_TYPE, new String[] {
 					typeFilter
 				});
 		}
 
 		if (Validator.isNotNull(sortDirection)) {
 			initialParameters.put(
-				GSearchWebKeys.SORT_DIRECTION, new String[] {
+				ParameterNames.SORT_DIRECTION, new String[] {
 					sortDirection
 				});
 		}
 
 		if (Validator.isNotNull(sortField)) {
 			initialParameters.put(
-				GSearchWebKeys.SORT_FIELD, new String[] {
+				ParameterNames.SORT_FIELD, new String[] {
 					sortField
 				});
 		}
 
 		if (Validator.isNotNull(start)) {
 			initialParameters.put(
-				GSearchWebKeys.START, new String[] {
+				ParameterNames.START, new String[] {
 					start
 				});
 		}
@@ -390,38 +249,135 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	}
 
 	/**
-	 * Set sort options.
-	 * 
-	 * Localization are here and not in the templates because of https://issues.liferay.com/browse/LPS-75141
+	 * Set menu options
 	 * 
 	 * @param renderRequest
-	 * @param template
-	 * @throws Exception
 	 */
-	protected void setSortOptions(
-		PortletRequest portletRequest, Template template) throws Exception {
+	protected void setMenuOptions(RenderRequest renderRequest) {
 
-		Locale locale = portletRequest.getLocale();
-		
-		String[] configuration = _coreConfigurationHelper.getSortConfiguration();
-
-		JSONArray options = JSONFactoryUtil.createJSONArray();
-
-		for (int i = 0; i < configuration.length; i++) {
-
-			JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
-
-			item.put(
-				"localization", getLocalization(
-					"sort-by-" + item.getString("key").toLowerCase(), locale));
-
-			options.put(item);
+		if (_log.isDebugEnabled()) {
+			_log.debug("Processing menu option providers.");
 		}
 
-		template.put(
-			GSearchWebKeys.SORT_OPTIONS, options);
+		if (_menuOptionProviders == null) {
+			return;
+		}
+
+		for (MenuOptionProvider menuOptionProvider : _menuOptionProviders) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Processing " + menuOptionProvider.getClass().getName());
+			}
+
+			try {
+
+				menuOptionProvider.setOptions(renderRequest);
+
+			}
+			catch (Exception e) {
+
+				throw new RuntimeException(e);
+			}
+		}
 	}
-	
+
+	/**
+	 * Set template parameters.
+	 * 
+	 * @param renderRequest
+	 */
+	protected void setTemplateParameters(
+		RenderRequest renderRequest, RenderResponse renderResponse) {
+
+		Template template =
+			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
+
+		// Set namespace (a convenience alias for $id).
+
+		String portletNamespace = renderResponse.getNamespace();
+		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
+
+		// Redirect
+		
+		template.put(
+			GSearchWebKeys.APPEND_REDIRECT,
+			_moduleConfiguration.isRedirectAppended());
+		
+		// Autocomplete on/off.
+
+		template.put(
+			GSearchWebKeys.AUTO_COMPLETE_ENABLED,
+			_moduleConfiguration.isKeywordSuggesterEnabled());
+
+		// Autocomplete request delay.
+
+		template.put(
+			GSearchWebKeys.AUTO_COMPLETE_REQUEST_DELAY,
+			_moduleConfiguration.keywordSuggesterRequestDelay());
+
+		// Set help text resource url.
+
+		template.put(
+			GSearchWebKeys.HELP_TEXT_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
+
+		// Set search results resource url.
+
+		template.put(
+			GSearchWebKeys.SEARCH_RESULTS_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_SEARCH_RESULTS));
+
+		// Set autocomplete/suggestions resource url.
+
+		template.put(
+			GSearchWebKeys.SUGGESTIONS_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_SUGGESTIONS));
+
+		// Set request timeout.
+
+		template.put(
+			GSearchWebKeys.REQUEST_TIMEOUT,
+			_moduleConfiguration.requestTimeout());
+
+		// Set query min length.
+
+		template.put(
+			GSearchWebKeys.QUERY_MIN_LENGTH,
+			_moduleConfiguration.queryMinLength());
+
+		// Enable / disable JS console logging messages.
+
+		template.put(
+			GSearchWebKeys.JS_DEBUG_ENABLED,
+			_moduleConfiguration.isJSDebuggingEnabled());
+
+		// Set facet fields
+
+		template.put(GSearchWebKeys.FACET_FIELDS, _facetFields);
+
+		// Tags param name
+
+		template.put(GSearchWebKeys.ASSET_TAG_PARAM, "assetTagNames");
+
+		// Show tags
+
+		template.put(
+			GSearchWebKeys.SHOW_ASSET_TAGS,
+			_moduleConfiguration.isAssetTagsVisible());
+
+		// Google maps API key
+
+		template.put(
+			GSearchWebKeys.GMAPS_API_KEY,
+			_moduleConfiguration.googleMapsAPIKey());
+
+		// Datepicker format
+
+		template.put(
+			ParameterNames.DATEPICKER_FORMAT,
+			_moduleConfiguration.datePickerFormat());
+	}
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(ViewMVCRenderCommand.class);
@@ -429,18 +385,16 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	@Reference
 	protected ConfigurationHelper _coreConfigurationHelper;
 
+	@Reference(
+		bind = "addMenuOptionProvider", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = MenuOptionProvider.class, 
+		unbind = "removeMenuOptionProvider"
+	)
+	private volatile List<MenuOptionProvider> _menuOptionProviders = null;
+
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static String[] _facetFields = null;
-	
-	@Reference
-	private Language _language;
-
-	private ResourceBundle _resourceBundle;
-
-	@Reference(
-		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.web)", 
-		unbind = "-"
-	)
-	private ResourceBundleLoader _resourceBundleLoader;
 }

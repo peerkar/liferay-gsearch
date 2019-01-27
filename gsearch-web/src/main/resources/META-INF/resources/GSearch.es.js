@@ -29,7 +29,7 @@ class GSearch extends Component {
 		if (this.debug) {
 			console.log("GSearch.attached()");
 		}
-		
+				
 		// This component is hidden initially to get all the subcomponents to render fully before shown.
 		
 		this.visible = true;
@@ -66,8 +66,6 @@ class GSearch extends Component {
 	 */
 	created() {
 
-		console.log("GSearch.created()");
-		
 		// Create query object. 
 		// Need to create the query object here for that to be available 
 		// for the nested templates. Constructor of this template
@@ -186,22 +184,6 @@ class GSearch extends Component {
 				// Refresh the selections
 				
 				this.components.facetSelectionsComponent.update = Date.now();
-
-				// Store the facets for the initial query (and allow selecting multiple single value facets)
-
-				/* Code in comments below allows to persist the facet options for original query.*/
-				 
-				/*
-				if (!this.components.facetComponent.facets || this.query.needsFacetsUpdate) {
-					this.components.facetComponent.facets = results.facets;
-					this.originalFacets = results.facets;
-				} else if (!results.facets || results.facets.length == 0) {
-					this.components.facetComponent.facets = results.facets;
-				} else {
-					this.components.facetComponent.facets = this.originalFacets;
-				}
-				*/
-
 				this.components.facetComponent.facets = results.facets;
 
 				this.components.statsComponent.results = results;
