@@ -11,4 +11,3 @@ dependencies {
 
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-api")
 }
-

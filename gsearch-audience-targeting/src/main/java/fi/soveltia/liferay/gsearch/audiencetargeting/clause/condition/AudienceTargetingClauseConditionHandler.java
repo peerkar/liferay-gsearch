@@ -4,12 +4,6 @@ package fi.soveltia.liferay.gsearch.audiencetargeting.clause.condition;
 import com.liferay.content.targeting.service.UserSegmentLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.search.BooleanClauseOccur;
-import com.liferay.portal.kernel.search.BooleanQuery;
-import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.TermQuery;
-import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
-import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 
 import javax.portlet.PortletRequest;
 
@@ -20,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.audiencetargeting.constants.GSearchAudienceTargetingConstants;
 import fi.soveltia.liferay.gsearch.audiencetargeting.query.contributor.AudienceTargetingQueryContributor;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandler;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Audience Targeting clause condition handler.
+ * Processes "audience_targeting_user_segments" clause condition.
  * 
  * @author Petteri Karttunen
  */
@@ -36,14 +30,14 @@ public class AudienceTargetingClauseConditionHandler
 	implements ClauseConditionHandler {
 
 	@Override
-	public boolean canHandle(String handlerName) {
+	public boolean canProcess(String handlerName) {
 
 		return (handlerName.equals(HANDLER_NAME));
 	}
 
 	@Override
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryParams queryParams,
+		PortletRequest portletRequest, QueryContext queryParams,
 		JSONObject configuration)
 		throws Exception {
 
@@ -51,7 +45,6 @@ public class AudienceTargetingClauseConditionHandler
 			GSearchAudienceTargetingConstants.USER_SEGMENT_ID_PARAM);
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("AudienceTargetingClauseConditionHandler.isTrue()");
 
 			if (userSegmentIds != null) {
 				_log.debug("Current user has following user segments:");
@@ -76,11 +69,11 @@ public class AudienceTargetingClauseConditionHandler
 			for (long matchId : matchUserSegmentIds) {
 
 				if (id == matchId) {
-					
+
 					if (_log.isDebugEnabled()) {
 						_log.debug("Found match:" + id);
 					}
-					
+
 					return true;
 				}
 			}
@@ -120,5 +113,4 @@ public class AudienceTargetingClauseConditionHandler
 
 	@Reference
 	private UserSegmentLocalService _userSegmentLocalService;
-
 }

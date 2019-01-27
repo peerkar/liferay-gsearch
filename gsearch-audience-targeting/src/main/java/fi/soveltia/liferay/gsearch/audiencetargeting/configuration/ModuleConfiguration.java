@@ -16,17 +16,17 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.audiencetargeting.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "Audience Targeting"
+	name = "audience-targeting-configuration"
 )
 public interface ModuleConfiguration {
 	
 	@Meta.AD(
 		deflt = "false", 
-	    description = "enable-query-contributor-desc",
-	    name = "enable-query-contributor-name",
+	    description = "enable-feature-desc",
+	    name = "enable-feature-name",
 		required = false
 	)
-	public boolean enableQueryContributor();
+	public boolean enableFeature();
 	
 	@Meta.AD(
 		deflt = "2.0f", 

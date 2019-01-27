@@ -84,7 +84,7 @@ public class AudienceTargetingQueryContributor implements QueryContributor {
 	@Override
 	public boolean isEnabled() {
 
-		return _moduleConfiguration.enableQueryContributor();
+		return _moduleConfiguration.enableFeature();
 	}
 
 	@Activate
