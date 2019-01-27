@@ -26,12 +26,12 @@ There are basically two options for using this application: with or without the 
 __With custom adapter:__
 
 * Take use of all the configuration options and extra query types for improving relevancy
-* Use all the configuration options for Query String query (without, per field configurations won't work)
-* Get support for extra query types like function score queries to improve relevancy
-* Take use of improved Elasticsearch index configuration
+  * Use extra query types like function score queries to improve relevancy
+  * Use all the configuration options for Query String query (without, for example per field configurations won't work)
+* Take use of improved Elasticsearch index configuration and mappings
 * Use keyword suggesters
 
-__ Without custom adapter__
+__Without custom adapter__
 
 * Just deploy the modules and use it with any supported search engine.
 * Use it with recent CE 7.0 and 7.1 versions.
@@ -76,7 +76,7 @@ To avoid any conflicts with the standard Adapter, put the respective module on a
 
 __Do full reindex__ to create custom analyzers, mappings and settings. 
 
-### Step 9
+#### Step 9
 
 To enable Audience Targeting integration and support, install Liferay Audience Targeting plugin from Liferay Marketplace. 
 
