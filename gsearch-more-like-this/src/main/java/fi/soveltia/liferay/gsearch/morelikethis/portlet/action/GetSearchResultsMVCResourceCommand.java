@@ -7,6 +7,7 @@ import com.liferay.blogs.kernel.model.BlogsEntry;
 import com.liferay.blogs.kernel.service.BlogsEntryLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -22,23 +23,16 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.wiki.model.WikiPage;
-import com.liferay.wiki.service.WikiNodeLocalService;
 import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.portlet.PortletPreferences;
@@ -52,8 +46,11 @@ import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
+import fi.soveltia.liferay.gsearch.morelikethis.portlet.GSearchWebKeys;
 
 /**
  * Resource command for getting the search results.
@@ -79,14 +76,20 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			_log.debug("GetSearchResultsMVCResourceCommand.doServeResource()");
 		}
 
-		AssetEntry assetEntry =
-			getAssetEntry(resourceRequest, resourceResponse);
+		// Try to find an asset entry on page.
 
-		System.out.println(assetEntry);
+		AssetEntry assetEntry = null;
 
-		if (assetEntry == null) {
-			return;
+		try {
+		
+			assetEntry = getAssetEntry(resourceRequest, resourceResponse);
+
+		} catch (Exception e) {
+			
+			_log.warn("Assetentry not found.");
 		}
+		
+		// Even if assetentry was null there could be static configuration keyword.
 
 		try {
 			getMoreLikeThis(resourceRequest, resourceResponse, assetEntry);
@@ -97,7 +100,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	}
 
 	/**
-	 * Try to find the assetentry for the contents being shown on asset
+	 * Tries to find the assetentry for the contents being shown on asset
 	 * publisher.
 	 * 
 	 * @param resourceRequest
@@ -118,13 +121,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) r.getAttribute(WebKeys.THEME_DISPLAY);
 
-		String layoutURL =
-			themeDisplay.getLayoutFriendlyURL(themeDisplay.getLayout());
+		String layoutURL = themeDisplay.getLayout().getFriendlyURL();
 
 		String currentFriendlyURL = resourceRequest.getParameter("currentURL");
 
 		String assetUrlOrId = null;
-		
+
 		if (currentFriendlyURL.indexOf(layoutURL) < 0) {
 
 			int pos = currentFriendlyURL.indexOf("/-/");
@@ -133,53 +135,89 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 				assetUrlOrId = currentFriendlyURL.substring((pos + 3));
 
 				JournalArticle journalArticle = getJournalArticle(assetUrlOrId);
-				assetEntry = _assetEntryLocalService.getEntry(JournalArticle.class.getName(), journalArticle.getResourcePrimKey());
+				assetEntry = _assetEntryLocalService.getEntry(
+					JournalArticle.class.getName(),
+					journalArticle.getResourcePrimKey());
 			}
 		}
 		else if (currentFriendlyURL.indexOf("/-/asset_publisher") > 0) {
 
 			if (currentFriendlyURL.indexOf(JOURNAL_KEY) > 0) {
 				assetUrlOrId = getAssetUrlOrId(currentFriendlyURL, JOURNAL_KEY);
-				
+
 				JournalArticle journalArticle = getJournalArticle(assetUrlOrId);
-				assetEntry = _assetEntryLocalService.getEntry(JournalArticle.class.getName(), journalArticle.getResourcePrimKey());
-				
-			} else if (currentFriendlyURL.indexOf(DL_KEY) > 0) {
+				assetEntry = _assetEntryLocalService.getEntry(
+					JournalArticle.class.getName(),
+					journalArticle.getResourcePrimKey());
+
+			}
+			else if (currentFriendlyURL.indexOf(DL_KEY) > 0) {
 				assetUrlOrId = getAssetUrlOrId(currentFriendlyURL, DL_KEY);
 
-				assetEntry = _assetEntryLocalService.getAssetEntry(Long.valueOf(assetUrlOrId));
+				assetEntry = _assetEntryLocalService.getAssetEntry(
+					Long.valueOf(assetUrlOrId));
 
-			} else if (currentFriendlyURL.indexOf(WIKI_KEY) > 0) {
+			}
+			else if (currentFriendlyURL.indexOf(WIKI_KEY) > 0) {
 				assetUrlOrId = getAssetUrlOrId(currentFriendlyURL, WIKI_KEY);
 
-				assetEntry = _assetEntryLocalService.getAssetEntry(Long.valueOf(assetUrlOrId));
+				assetEntry = _assetEntryLocalService.getAssetEntry(
+					Long.valueOf(assetUrlOrId));
 
-			} else if (currentFriendlyURL.indexOf(BLOG_KEY) > 0) {
+			}
+			else if (currentFriendlyURL.indexOf(BLOG_KEY) > 0) {
 				assetUrlOrId = getAssetUrlOrId(currentFriendlyURL, BLOG_KEY);
 
 				BlogsEntry blogsEntry = getBlogsEntry(assetUrlOrId);
-				assetEntry = _assetEntryLocalService.getEntry(BlogsEntry.class.getName(), blogsEntry.getPrimaryKey());
+				assetEntry = _assetEntryLocalService.getEntry(
+					BlogsEntry.class.getName(), blogsEntry.getPrimaryKey());
 			}
-		} else {
-			
+		}
+		else {
+
 			// Try to get wiki page resourcePrimKey.
-	
+
 			String[] urlParts = currentFriendlyURL.split("&");
-			
+
 			for (String s : urlParts) {
-				
-				if (s.startsWith("_com_liferay_wiki_web_portlet_WikiPortlet_pageResourcePrimKey")) {
-					
+
+				if (s.startsWith(
+					"_com_liferay_wiki_web_portlet_WikiPortlet_pageResourcePrimKey")) {
+
 					String[] valueParts = s.split("=");
-					assetEntry = _assetEntryLocalService.getEntry(WikiPage.class.getName(), Long.valueOf(valueParts[1]));
+					assetEntry = _assetEntryLocalService.getEntry(
+						WikiPage.class.getName(), Long.valueOf(valueParts[1]));
 
 					break;
 				}
-				
+
 			}
 		}
 		return assetEntry;
 
+	}
+
+	/**
+	 * Get asset types configuration.
+	 * 
+	 * @param preferences
+	 * @return
+	 * @throws JSONException
+	 */
+	private List<String> getAssetTypeConfiguration(
+		PortletPreferences preferences)
+		throws JSONException {
+
+		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
+			preferences.getValue("entryClassNames", null));
+
+		List<String> configuration = new ArrayList<String>();
+
+		for (int i = 0; i < queryConfiguration.length(); i++) {
+			configuration.add(queryConfiguration.getString(i));
+		}
+
+		return configuration;
 	}
 
 	/**
@@ -208,16 +246,18 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @return
 	 */
 	private BlogsEntry getBlogsEntry(String urlTitle) {
-		
-        DynamicQuery dynamicQuery = _blogsEntryLocalService.dynamicQuery()
-            .add(RestrictionsFactoryUtil.eq("urlTitle", urlTitle)).add(RestrictionsFactoryUtil.eq("status", 0));
 
-        List<BlogsEntry> entries = _blogsEntryLocalService.dynamicQuery(dynamicQuery);
-        
-        if (entries != null && entries.size() > 0) {
-        	return entries.get(0);
-        }
-        return null;
+		DynamicQuery dynamicQuery = _blogsEntryLocalService.dynamicQuery().add(
+			RestrictionsFactoryUtil.eq("urlTitle", urlTitle)).add(
+				RestrictionsFactoryUtil.eq("status", 0));
+
+		List<BlogsEntry> entries =
+			_blogsEntryLocalService.dynamicQuery(dynamicQuery);
+
+		if (entries != null && entries.size() > 0) {
+			return entries.get(0);
+		}
+		return null;
 	}
 
 	/**
@@ -234,56 +274,67 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		AssetEntry assetEntry)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 		PortletPreferences preferences = resourceRequest.getPreferences();
-		
-		// Build query parameters object.
 
-		QueryParams queryParams = new QueryParams();
+		// Build query parameters object for resolving doc UID.
 
-		queryParams.setAssetTypeConfiguration(new String[0]);
-		queryParams.setClauseConfiguration(getResolveUIDClauseConfiguration(preferences));
-		queryParams.setFacetConfiguration(new String[0]);
-		queryParams.setSortConfiguration(new String[0]);
-		
-		queryParams.setCompanyId(themeDisplay.getCompanyId());
-		queryParams.setGroupIds(new long[] {assetEntry.getGroupId()});
-		queryParams.setLocale(themeDisplay.getLocale());
-	
-		queryParams.setStart(0);
-		queryParams.setEnd(1);
-		queryParams.setPageSize(1);
+		QueryContext queryContext = new QueryContext();
 
-		List<String> entryClassNames = new ArrayList<String>();
-		entryClassNames.add(assetEntry.getClassName());
-		queryParams.setEntryClassNames(entryClassNames);
-		
-		queryParams.setAssetPublisherPageURL(preferences.getValue("assetPublisherPage", ""));
+		setQueryContextBasicParameters(resourceRequest, queryContext);
 
-		queryParams.setKeywords("entryClassPK: " + assetEntry.getClassPK());
+		queryContext.setConfiguration(
+			ConfigurationKeys.CLAUSE,
+			getResolveUIDClauseConfiguration(preferences));
 
-		// This extra param adds docUID to the response.
-		// We won't share the UID publicly.
-		
-		queryParams.addExtraParam("includeDocUID", true);
+		queryContext.setStart(0);
+		queryContext.setEnd(1);
+		queryContext.setPageSize(1);
+
+		// Assetentry might be null as there could be static keywords.
+
+		if (assetEntry != null) {
+			queryContext.setParameter(
+				ParameterNames.GROUP_ID, new long[] {
+					assetEntry.getGroupId()
+				});
+
+			List<String> entryClassNames = new ArrayList<String>();
+			entryClassNames.add(assetEntry.getClassName());
+
+			queryContext.setParameter(
+				ParameterNames.ENTRY_CLASS_NAMES, entryClassNames);
+			
+			queryContext.setKeywords(String.valueOf(assetEntry.getClassPK()));
+		}
+
+		// Optimize a little and don't parse these for nothing.
+
+		queryContext.setParameter(
+			ParameterNames.VIEW_RESULTS_IN_CONTEXT, false);
+
+		queryContext.setQueryContributorsEnabled(false);
+
+		// This param tells the DocumentUIDResultItemProcessor to include
+		// docUID field in the response.
+		// We won't share the UID publicly, though.
+
+		queryContext.setParameter(GSearchWebKeys.INCLUDE_DOC_UID, true);
 
 		// Try to get search results.
 
 		String docUID = null;
 
 		JSONObject responseObject = _gSearch.getSearchResults(
-			resourceRequest, resourceResponse, queryParams);
+			resourceRequest, resourceResponse, queryContext);
 
-		if (responseObject != null) {
+		if (responseObject != null &&
+			responseObject.getJSONArray("items").length() > 0) {
+
 			JSONObject item =
 				responseObject.getJSONArray("items").getJSONObject(0);
 			docUID = item.getString("uid");
 		}
 
-		System.out.println(docUID);
-		
 		return docUID;
 	}
 
@@ -294,18 +345,21 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @return
 	 */
 	private JournalArticle getJournalArticle(String urlTitle) {
-		
-        DynamicQuery dynamicQuery = _journalArticleLocalService.dynamicQuery()
-            .add(RestrictionsFactoryUtil.eq("urlTitle", urlTitle)).add(RestrictionsFactoryUtil.eq("status", 0));
 
-        List<JournalArticle> entries = _journalArticleLocalService.dynamicQuery(dynamicQuery);
-        
-        if (entries != null && entries.size() > 0) {
-        	return entries.get(0);
-        }
-        return null;
-	}	
-	
+		DynamicQuery dynamicQuery =
+			JournalArticleLocalServiceUtil.dynamicQuery().add(
+				RestrictionsFactoryUtil.eq("urlTitle", urlTitle)).add(
+					RestrictionsFactoryUtil.eq("status", 0));
+
+		List<JournalArticle> entries =
+			JournalArticleLocalServiceUtil.dynamicQuery(dynamicQuery);
+
+		if (entries != null && entries.size() > 0) {
+			return entries.get(0);
+		}
+		return null;
+	}
+
 	/**
 	 * Get localization.
 	 * 
@@ -318,7 +372,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		String key, Locale locale, Object... objects) {
 
 		if (_resourceBundle == null) {
-			_resourceBundle = _resourceBundleLoader.loadResourceBundle(locale);
+			_resourceBundle =
+				_resourceBundleLoader.loadResourceBundle(locale.toString());
 		}
 
 		String value =
@@ -326,7 +381,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		return value == null ? _language.format(locale, key, objects) : value;
 	}
-	
+
 	/**
 	 * Get more like this list.
 	 * 
@@ -347,72 +402,55 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			return;
 		}
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 		PortletPreferences preferences = resourceRequest.getPreferences();
 
 		// Build query parameters object.
 
-		QueryParams queryParams = new QueryParams();
-		
+		QueryContext queryContext = new QueryContext();
+
+		setQueryContextBasicParameters(resourceRequest, queryContext);
+
 		// Set configurations.
-		
-		queryParams.setClauseConfiguration(getMoreLikeThisClauseConfiguration(preferences));
-		queryParams.setFacetConfiguration(new String[0]);
-		
-		queryParams.setCompanyId(themeDisplay.getCompanyId());
-		queryParams.setGroupIds(new long[0]);
-		queryParams.setLocale(themeDisplay.getLocale());
-		queryParams.setStart(0);
-		
-		queryParams.setStatus(WorkflowConstants.STATUS_APPROVED);
 
-		int itemsToShow = GetterUtil.getInteger(preferences.getValue("itemsToShow", "5"));
-		queryParams.setEnd(itemsToShow - 1);
-		queryParams.setPageSize(itemsToShow);
+		queryContext.setConfiguration(
+			ConfigurationKeys.CLAUSE,
+			getMoreLikeThisClauseConfiguration(preferences));
+		queryContext.setParameter(
+			ParameterNames.ENTRY_CLASS_NAMES,
+			getAssetTypeConfiguration(preferences));
 
-		queryParams.setViewResultsInContext(true);
-		queryParams.setAssetPublisherPageURL(preferences.getValue("assetPublisherPage", ""));
+		queryContext.setStart(0);
+		int itemsToShow =
+			GetterUtil.getInteger(preferences.getValue("itemsToShow", "5"));
+		queryContext.setEnd(itemsToShow - 1);
+		queryContext.setPageSize(itemsToShow);
 
-		JSONArray classNameArray = JSONFactoryUtil.createJSONArray(preferences.getValue("classNames", ""));
+		// Doc UID.
 
-		List<String> entryClassNames = new ArrayList<String>();
-
-		for (Object item : classNameArray) {
-			entryClassNames.add((String) item);
-		}
-		queryParams.setEntryClassNames(entryClassNames);
-		
-		// This extra param adds docUID to the response.
-		// We won't share the UID publicly.
-
-		queryParams.addExtraParam("docUID", docUID);
+		queryContext.setParameter(ParameterNames.DOC_UID, docUID);
 
 		String resultLayout = preferences.getValue("resultLayout", "list");
-		
-		// Include thumbnail?
-		
+
+		// Layout options.
+
 		if (resultLayout.equals("thumbnailList") ||
 			resultLayout.equals("image")) {
-
-			queryParams.addExtraParam("includeThumbnail", true);	
+			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
 
-		// Include user initials?
-		
-		if (resultLayout.equals("userImageList") ||
-			resultLayout.equals("image")) {
+		if (resultLayout.equals("userImageList")) {
 
-			queryParams.addExtraParam("includeUserPortrait", true);	
+			queryContext.setParameter(
+				ParameterNames.INCLUDE_USER_PORTRAIT, true);
 		}
-		
+
 		// Try to get search results.
 
 		JSONObject responseObject = null;
 
 		try {
-			responseObject = _gSearch.getSearchResults(resourceRequest, resourceResponse, queryParams);
+			responseObject = _gSearch.getSearchResults(
+				resourceRequest, resourceResponse, queryContext);
 
 			setResultTypeLocalizations(resourceRequest, responseObject);
 		}
@@ -422,13 +460,13 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			return;
 		}
-		
+
 		// Write response to output stream.
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, responseObject);
 	}
-	
+
 	/**
 	 * Get query clause configuration for MLT query.
 	 * 
@@ -436,8 +474,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @return
 	 * @throws JSONException
 	 */
-	private String[] getMoreLikeThisClauseConfiguration(PortletPreferences preferences) throws JSONException {
-		
+	private String[] getMoreLikeThisClauseConfiguration(
+		PortletPreferences preferences)
+		throws JSONException {
+
 		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
 			preferences.getValue("moreLikeThisClauses", null));
 
@@ -446,11 +486,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		String[] configuration = new String[queryConfiguration.length()];
-		
+
 		for (int i = 0; i < queryConfiguration.length(); i++) {
 			configuration[i] = queryConfiguration.getString(i);
 		}
-		
+
 		return configuration;
 	}
 
@@ -461,8 +501,10 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @return
 	 * @throws JSONException
 	 */
-	private String[] getResolveUIDClauseConfiguration(PortletPreferences preferences) throws JSONException {
-		
+	private String[] getResolveUIDClauseConfiguration(
+		PortletPreferences preferences)
+		throws JSONException {
+
 		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
 			preferences.getValue("resolveUIDClauses", null));
 
@@ -471,57 +513,103 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		String[] configuration = new String[queryConfiguration.length()];
-		
+
 		for (int i = 0; i < queryConfiguration.length(); i++) {
 			configuration[i] = queryConfiguration.getString(i);
 		}
-		
+
 		return configuration;
-	}	
-	
+	}
+
+	/**
+	 * Set basic query context parameters.
+	 * 
+	 * @param resourceRequest
+	 * @param queryContext
+	 */
+	private void setQueryContextBasicParameters(
+		ResourceRequest resourceRequest, QueryContext queryContext) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		PortletPreferences preferences = resourceRequest.getPreferences();
+
+		queryContext.setParameter(
+			ParameterNames.COMPANY_ID, themeDisplay.getCompanyId());
+		
+		queryContext.setParameter(
+			ParameterNames.LOCALE, themeDisplay.getLocale());
+
+		// Asset publisher page.
+
+		queryContext.setParameter(
+			ParameterNames.ASSET_PUBLISHER_URL,
+			preferences.getValue("assetPublisherPage", "/viewasset"));
+
+		// Show results in context.
+
+		queryContext.setParameter(
+			ParameterNames.VIEW_RESULTS_IN_CONTEXT, GetterUtil.getBoolean(
+				preferences.getValue("showResultsInContext", "true")));
+
+		// Disable post processors.
+
+		queryContext.setQueryPostProcessorsEnabled(false);
+
+	}
+
 	/**
 	 * Localize result types.
 	 * 
 	 * @param portletRequest
 	 * @param responseObject
-	 * @throws JSONException 
+	 * @throws JSONException
 	 */
-	private void setResultTypeLocalizations(PortletRequest portletRequest, JSONObject responseObject) throws JSONException {
-		
-		String[]configuration = _configurationHelper.getAssetTypeConfiguration();
-		
-		Locale locale = portletRequest.getLocale();
-		
+	private void setResultTypeLocalizations(
+		PortletRequest portletRequest, JSONObject responseObject)
+		throws JSONException {
+
+		String[] configuration =
+			_configurationHelper.getAssetTypeConfiguration();
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
+
 		JSONArray items = responseObject.getJSONArray("items");
-		
+
 		if (items == null || items.length() == 0) {
 			return;
 		}
-		
+
 		for (int i = 0; i < items.length(); i++) {
-			
+
 			JSONObject resultItem = items.getJSONObject(i);
 
 			for (int j = 0; j < configuration.length; j++) {
-				
-				JSONObject configurationItem = JSONFactoryUtil.createJSONObject(configuration[i]);
-				
-				if (configurationItem.getString("entry_class_name").equalsIgnoreCase(resultItem.getString("type"))) {
+
+				JSONObject configurationItem =
+					JSONFactoryUtil.createJSONObject(configuration[i]);
+
+				if (configurationItem.getString(
+					"entry_class_name").equalsIgnoreCase(
+						resultItem.getString("type"))) {
 					resultItem.put("key", configurationItem.getString("key"));
 					break;
 				}
 			}
-			
+
 			resultItem.put(
 				"type", getLocalization(
 					resultItem.getString("type").toLowerCase(), locale));
 		}
-	}		
-		
-	
+	}
+
 	private static final Log _log =
-					LogFactoryUtil.getLog(GetSearchResultsMVCResourceCommand.class);
-	
+		LogFactoryUtil.getLog(GetSearchResultsMVCResourceCommand.class);
+
 	private static final String JOURNAL_KEY = "/content/";
 	private static final String DL_KEY = "/document/id/";
 	private static final String BLOG_KEY = "/blog/";
@@ -531,29 +619,28 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	BlogsEntryLocalService _blogsEntryLocalService;
+	private BlogsEntryLocalService _blogsEntryLocalService;
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
 
 	@Reference
-	private JournalArticleLocalService _journalArticleLocalService;
-
-	@Reference
 	private GSearch _gSearch;
 
 	@Reference
+	private JournalArticleLocalService _journalArticleLocalService;
+
+	@Reference
 	private Language _language;
-	
+
 	private ResourceBundle _resourceBundle;
 
 	@Reference(
-		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", 
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.morelikethis)", 
 		unbind = "-"
 	)
 	private ResourceBundleLoader _resourceBundleLoader;
-	
+
 	@Reference
 	private WikiPageLocalService _wikiPageLocalService;
 }
-

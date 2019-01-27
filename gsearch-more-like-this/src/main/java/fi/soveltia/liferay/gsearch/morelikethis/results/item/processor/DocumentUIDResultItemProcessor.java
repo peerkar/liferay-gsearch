@@ -3,14 +3,16 @@ package fi.soveltia.liferay.gsearch.morelikethis.results.item.processor;
 
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
+import fi.soveltia.liferay.gsearch.morelikethis.portlet.GSearchWebKeys;
 
 /**
  * Adds index document uid to results for use in More Like This query.
@@ -28,6 +30,7 @@ public class DocumentUIDResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public boolean isEnabled() {
+
 		return true;
 	}
 
@@ -36,14 +39,16 @@ public class DocumentUIDResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public void process(
-		PortletRequest portletRequest, QueryParams queryParams,
-		Document document, ResultItemBuilder resultItemBuilder, JSONObject resultItem)
+		PortletRequest portletRequest, QueryContext queryContext,
+		Document document, ResultItemBuilder resultItemBuilder,
+		JSONObject resultItem)
 		throws Exception {
-		
-		if (queryParams.getExtraParams().get("includeDocUID") == null) {
-			return;
+
+		boolean includeDocUID = GetterUtil.getBoolean(
+			queryContext.getParameter(GSearchWebKeys.INCLUDE_DOC_UID), false);
+
+		if (includeDocUID) {
+			resultItem.put("uid", document.get("uid"));
 		}
-		
-		resultItem.put("uid", document.get("uid"));
 	}
 }

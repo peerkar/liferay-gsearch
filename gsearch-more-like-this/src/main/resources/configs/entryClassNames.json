@@ -1,0 +1,8 @@
+[
+	"com.liferay.journal.model.JournalArticle", 
+	"com.liferay.document.library.kernel.model.DLFileEntry",
+	"com.liferay.message.boards.kernel.model.MBMessage",
+	"com.liferay.blogs.kernel.model.BlogsEntry", 
+	"com.liferay.blogs.model.BlogsEntry",
+	"com.liferay.wiki.model.WikiPage"
+]

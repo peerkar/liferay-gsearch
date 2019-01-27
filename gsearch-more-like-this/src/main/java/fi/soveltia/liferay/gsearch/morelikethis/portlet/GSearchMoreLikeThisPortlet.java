@@ -9,7 +9,7 @@ import org.osgi.service.component.annotations.Component;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
 
 /**
- * Liferay GSearch More Like This.
+ * Portlet class.
  * 
  * @author Petteri Karttunen
  */
@@ -19,7 +19,7 @@ import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPor
         "com.liferay.portlet.css-class-wrapper=gsearch-more-like-this-portlet",
 		"com.liferay.portlet.display-category=category.gsearch",
 		"com.liferay.portlet.header-portlet-css=/css/main.css",
-		"com.liferay.portlet.instanceable=false",
+		"com.liferay.portlet.instanceable=true",
 		"javax.portlet.display-name=gsearch-more-like-this-portlet",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.config-template=/configuration.jsp",

@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.morelikethis.portlet.action;
 
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.RenderRequest;
@@ -11,8 +12,8 @@ import javax.portlet.ResourceURL;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
+import fi.soveltia.liferay.gsearch.morelikethis.portlet.GSearchWebKeys;
 
 /**
  * Primary/default view.
@@ -33,13 +34,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	public String render(
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
+		// Check if configured so we can display a message on UI.
+
 		renderRequest.setAttribute(
-			GSearchWebKeys.SEARCH_RESULTS_URL,
-			createResourceURL(renderRequest, renderResponse, "get_search_results"));
-		
+			"isConfigured",
+			Validator.isNotNull(
+				renderRequest.getPreferences().getValue(
+					"resolveUIDClauses", null)));
+
+		// Set search results URL.
+
+		renderRequest.setAttribute(
+			GSearchWebKeys.SEARCH_RESULTS_URL, createResourceURL(
+				renderRequest, renderResponse, "get_search_results"));
+
 		return "/view.jsp";
 	}
-	
+
 	/**
 	 * Create resource URL for a resourceId
 	 * 
@@ -47,14 +58,16 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	 * @param resourceId
 	 * @return url string
 	 */
-	protected String createResourceURL(RenderRequest renderRequest,
-		RenderResponse renderResponse, String resourceId) {
+	protected String createResourceURL(
+		RenderRequest renderRequest, RenderResponse renderResponse,
+		String resourceId) {
 
 		ResourceURL portletURL = renderResponse.createResourceURL();
 
 		portletURL.setResourceID(resourceId);
-		
-		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		portletURL.setParameter("currentURL", themeDisplay.getURLCurrent());
 
 		return portletURL.toString();

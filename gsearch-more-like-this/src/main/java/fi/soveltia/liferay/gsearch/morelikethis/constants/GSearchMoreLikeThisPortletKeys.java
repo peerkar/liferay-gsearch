@@ -1,7 +1,9 @@
 package fi.soveltia.liferay.gsearch.morelikethis.constants;
 
 /**
- * @author liferay
+ * Portlet names.
+ * 
+ * @author Petteri Karttunen
  */
 public class GSearchMoreLikeThisPortletKeys {
 
