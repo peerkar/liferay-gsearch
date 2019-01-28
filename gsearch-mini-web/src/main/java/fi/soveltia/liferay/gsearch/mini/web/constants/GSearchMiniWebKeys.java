@@ -11,8 +11,6 @@ public class GSearchMiniWebKeys {
 	
 	public static final String APPEND_REDIRECT = "miniAppendRedirect";
 	
-	public static final String AUTO_COMPLETE_ENABLED = "miniAutoCompleteEnabled";
-
 	public static final String AUTO_COMPLETE_REQUEST_DELAY = "miniAutoCompleteRequestDelay";
 
 	public static final String QUERY_MIN_LENGTH = "miniQueryMinLength";

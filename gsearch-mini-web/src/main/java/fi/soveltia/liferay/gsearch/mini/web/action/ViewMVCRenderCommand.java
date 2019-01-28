@@ -65,12 +65,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(
 			GSearchMiniWebKeys.APPEND_REDIRECT,
 			_moduleConfiguration.isRedirectAppended());
-		
-		// Autocomplete on/off.
-
-		renderRequest.setAttribute(
-			GSearchMiniWebKeys.AUTO_COMPLETE_ENABLED,
-			_moduleConfiguration.enableAutoComplete());
 
 		// Autocomplete request delay.
 
