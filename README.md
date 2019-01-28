@@ -2,7 +2,9 @@
 
 Liferay GSearch is a modular and highly configurable, Google-like search application for Liferay 7.0 and 7.1 CE and DXP bringing many [features](https://github.com/peerkar/liferay-gsearch/wiki/About) missing in the standard Liferay search portlet available. 
 
-This application gives you full control over queries sent from Liferay to Elasticsearch and makes it possible to consume user contextual information in constructing search queries as well as create conditional subqueries, with the help of a rule engine. With this application you can, for example, bring certain result higher on the list based on user's Audience Targeting segments or location. 
+This application gives you full control over queries sent from Liferay to the search engine and makes it possible to consume user contextual information as well as create conditional subqueries, with the help of a rule engine. With this application you can, for example, bring certain result higher on the list based on user's Audience Targeting segments, location or keyword matching.
+
+While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which extends the standard query type support.
 
 The application has multiple extension points for customization and you can just choose to use the backend modules and create your own UI implementation.
 
@@ -100,19 +102,13 @@ If you are willing to contribute or have problems or questions, ping me filing a
  
 ## Important Note About Permissions
 
-This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index.
+This solution, as it is, relies only on the content specific permissions which are indexed in the Elastisearch index. It doesn't take the role inherited permissions into account.
 
 The standard Liferay search portlet relies on both the indexed permissions and on post permission filtering which happens after search results have been fetched. This approach has historically made features like paging and sorting problematic. 
 
-So, is this application secure? Because Liferay permissioning only understands *grant* and not *deny* permissions, this application is more restrictive than standard search portlet and doesn't expose anything, users should not be allowed to see. However as it doesn't take the inherited roles and permissions into account, users might not see everything they should see. What this means is, that this application is currently suitable mostly for public websites or for private sites where these restrictions won't matter.
+So, is this application secure? Because Liferay permissioning only supports *grant* and not *deny* permissions, this application is more restrictive than standard search portlet and doesn't expose anything, users should not be allowed to see. However as it doesn't take the inherited roles and permissions into account, users might not see everything they should see. What this means is, that this application is currently suitable mostly for public websites or for private sites where these restrictions won't matter.
 
-To extend this solution to fully support inherited role permissions, it's suggested to:
-
-1. Extend the index schema with custom permission fields
-1. Sync the inherited role permissions to the index
-1. Create a custom fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher service priority to add the custom permission clauses. This extension point has a dynamic reference option so that it'd be easily customizable.
-
-In a large scale system, this approach would have to be designed carefully to avoid performance problems.
+If you want to enhance the provided solution and extend the permissioning support, you can override the default fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder service implementation with a higher ranking implementation priority. The extension point has a dynamic reference option so that it'd be easily customizable.
 
 ## Disclaimer
 
