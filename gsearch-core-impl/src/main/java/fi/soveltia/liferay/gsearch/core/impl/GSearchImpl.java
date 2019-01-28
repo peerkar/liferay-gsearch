@@ -264,8 +264,6 @@ public class GSearchImpl implements GSearch {
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
 		
-		queryConfig.setHighlightEnabled(true);		
-		
 		queryConfig.setHighlightEnabled(true);
 		queryConfig.setHighlightFragmentSize(
 			_moduleConfiguration.highlightFragmentSize());
