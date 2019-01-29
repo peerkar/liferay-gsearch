@@ -4,6 +4,8 @@ This custom Elasticsearch adapter version has been tested with following portal 
 
 * DXP 7.1 FIXPACK 5
 
+__(Same binaries are for CE-GA3 (Impl version 2.0.35)__
+
 ## Installation Instructions
 
 1. Download and deploy the binaries in this folder
