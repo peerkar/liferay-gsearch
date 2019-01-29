@@ -1,6 +1,6 @@
 # 2019-01-27
 
-This build has been tested with the following portal versions:
+Liferay GSearch application binaries. This build has been tested with the following portal versions:
 
 * DXP 7.1 fixpacks 0,1,2,3,4,5,6
 * CE 7.1 GA2 
