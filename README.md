@@ -11,7 +11,8 @@ The application has multiple extension points for customization and you can just
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
 ## News
-* (2019-01-27) [Core version 6.0.0 with DXP 7.0 backport and lots of improvements now available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
+* __(2019-01-29)__ [Custom Elasticsearch adapters for 7.1 CE versions now available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
+* __(2019-01-27)__ [Core version 6.0.0 with DXP 7.0 backport and lots of improvements now available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 
 ## Documentation
 
