@@ -56,7 +56,11 @@ Deploy the GSearch portlet from Widgets menu to a portal page.
 
 ### Step 4
 
-Create a page with friendly URL "/viewasset" on a same site as the search portlet and place an Asset Publisher on it.
+Create a page with friendly URL "/viewasset" on a same site as the search portlet and place an Asset Publisher on it. 
+
+### Step 5 
+
+Many features are disabled by default. Check configuration options in Control Panel -> System Settings -> GSearch. Defaults with examples are provided. 
 
 __That's all.__
 
@@ -86,7 +90,7 @@ This is also optional but greatly enchances possibilities to use user contextual
 
 ### Step 10
 
-Check configurations in Control Panel -> System Settings -> GSearch. There are lots of options and examples. For example, if you plan to use geolocation, you have to provide there Google and IPStack API keys.
+Check configurations in Control Panel -> System Settings -> GSearch. 
 
 __Notice__ that More Like This portlet has a portlet instance configuration.
 
