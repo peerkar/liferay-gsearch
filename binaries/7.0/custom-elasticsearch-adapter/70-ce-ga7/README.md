@@ -2,7 +2,7 @@
 
 This custom Elasticsearch adapter version has been tested with following portal versions:
 
-* DXP 7.0 CE Ga7
+* DXP 7.0 CE GA7
 * DXP 7.0 fixpack 50
 * DXP 7.0 fixpack 60
 
