@@ -2,6 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.impl.configuration;
 
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,6 +137,16 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 					configuration, KEYWORD_SUGGESTER_CONFIGURATION_PID);
 			}
 
+			// Also check the situation where configuration is saved but there's no 
+			// suggester configuration.
+			
+			String[] config = (String[])configuration.getProperties().get("keywordSuggesters");
+			
+			if (config == null || config.length == 0 ||  config[0].length() == 0) {
+				setDefaultConfiguration(
+					configuration, KEYWORD_SUGGESTER_CONFIGURATION_PID);
+			}
+						
 			return (String[]) _configurationAdmin.getConfiguration(
 				KEYWORD_SUGGESTER_CONFIGURATION_PID).getProperties().get(
 					"keywordSuggesters");
