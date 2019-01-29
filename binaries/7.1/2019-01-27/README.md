@@ -10,5 +10,5 @@ Liferay GSearch application binaries. This build has been tested with the follow
 
 Please see the project main [README](https://github.com/peerkar/liferay-gsearch)
 
-Get the custom Elasticsearch adapter for your portal version in folter "custom-elasticsearch-adapter"
+Get the custom Elasticsearch adapter for your portal version in folder "custom-elasticsearch-adapter"
  
