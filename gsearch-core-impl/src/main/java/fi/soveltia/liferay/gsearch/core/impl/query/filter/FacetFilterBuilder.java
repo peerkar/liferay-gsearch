@@ -82,16 +82,23 @@ public class FacetFilterBuilder implements FilterBuilder {
 				query.add(condition, occur);
 
 			}
-
+			
 			// Don't add to prefilters if we do post filtering only.
 
 			if (query.hasClauses()) {
 
 				if ("pre".equals(f.getFilterMode())) {
+					
+					System.out.println(f.getFieldName());
+					
 					preFilterQuery.add(query, BooleanClauseOccur.MUST);
 				}
 				else {
-					postFilterQuery.add(query, BooleanClauseOccur.MUST);
+					
+					// Using SHOULD allows to make "conflicting" facet selections
+					// like web-content and pdf
+					
+					postFilterQuery.add(query, BooleanClauseOccur.SHOULD);
 				}
 			}
 		}
