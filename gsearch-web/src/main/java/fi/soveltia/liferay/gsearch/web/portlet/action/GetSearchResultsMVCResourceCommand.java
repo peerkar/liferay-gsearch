@@ -326,6 +326,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		JSONObject responseObject, String resultLayout)
 		throws Exception {
 
+		if (responseObject.getJSONArray("items").length() == 0) {
+			responseObject.put(
+				GSearchWebKeys.RESULTS_LAYOUT_OPTIONS, JSONFactoryUtil.createJSONArray());
+			return;
+		}
+		
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 

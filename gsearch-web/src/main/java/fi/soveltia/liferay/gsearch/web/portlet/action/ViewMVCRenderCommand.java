@@ -383,7 +383,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		LoggerFactory.getLogger(ViewMVCRenderCommand.class);
 
 	@Reference
-	protected ConfigurationHelper _coreConfigurationHelper;
+	private ConfigurationHelper _configurationHelper;
 
 	@Reference(
 		bind = "addMenuOptionProvider", 
