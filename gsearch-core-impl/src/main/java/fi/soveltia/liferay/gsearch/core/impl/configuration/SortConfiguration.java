@@ -14,7 +14,6 @@ import aQute.bnd.annotation.metatype.Meta;
 	name = "sort-configuration"
 )
 public interface SortConfiguration {
-
 	
 	@Meta.AD(
 		deflt = "",
