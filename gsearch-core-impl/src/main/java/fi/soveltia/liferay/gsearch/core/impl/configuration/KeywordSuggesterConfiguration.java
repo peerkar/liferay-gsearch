@@ -17,7 +17,7 @@ import aQute.bnd.annotation.metatype.Meta;
 public interface KeywordSuggesterConfiguration {
 
 	@Meta.AD(
-		deflt = "true", 
+		deflt = "false", 
 	    description = "enable-query-suggestions-name-desc",
 	    name = "enable-query-suggestions-name",
 		required = false

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationItemHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
@@ -28,8 +29,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
-	immediate = true,
+	immediate = true, 
 	service = ConfigurationHelper.class
 )
 public class ConfigurationHelperImpl implements ConfigurationHelper {
@@ -40,27 +40,14 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Override
 	public String[] getAssetTypeConfiguration() {
 
-		try {
+		String[] config = _assetTypeConfigurationHelper.getConfiguration();
 
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				ASSET_TYPE_CONFIGURATION_PID);
-
-			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, ASSET_TYPE_CONFIGURATION_PID);
-			}
-
-			return (String[]) _configurationAdmin.getConfiguration(
-				ASSET_TYPE_CONFIGURATION_PID).getProperties().get("assetTypes");
-
-		}
-		catch (IOException e) {
-			_log.error(e.getMessage(), e);
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				AssetTypeConfigurationItemHelper.CONFIGURATION_PID);
 		}
 
-		_log.warn("Asset type configuration is not set.");
-
-		return new String[] {};
+		return _assetTypeConfigurationHelper.getConfiguration();
 	}
 
 	/**
@@ -69,26 +56,14 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Override
 	public String[] getClauseConfiguration() {
 
-		try {
+		String[] config = _clauseConfigurationHelper.getConfiguration();
 
-			Configuration configuration =
-				_configurationAdmin.getConfiguration(CLAUSE_CONFIGURATION_PID);
-
-			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, CLAUSE_CONFIGURATION_PID);
-			}
-
-			return (String[]) _configurationAdmin.getConfiguration(
-				CLAUSE_CONFIGURATION_PID).getProperties().get("clauses");
-		}
-		catch (Exception e) {
-			_log.error(e.getMessage(), e);
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				ClauseConfigurationItemHelper.CONFIGURATION_PID);
 		}
 
-		_log.warn("Clause configuration is not set.");
-
-		return new String[] {};
+		return _clauseConfigurationHelper.getConfiguration();
 	}
 
 	/**
@@ -97,27 +72,14 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Override
 	public String[] getFacetConfiguration() {
 
-		try {
+		String[] config = _facetConfigurationHelper.getConfiguration();
 
-			Configuration configuration =
-				_configurationAdmin.getConfiguration(FACET_CONFIGURATION_PID);
-
-			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, FACET_CONFIGURATION_PID);
-			}
-
-			return (String[]) _configurationAdmin.getConfiguration(
-				FACET_CONFIGURATION_PID).getProperties().get("facets");
-
-		}
-		catch (IOException e) {
-			_log.error(e.getMessage(), e);
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				FacetConfigurationItemHelper.CONFIGURATION_PID);
 		}
 
-		_log.warn("Facets configuration is not set.");
-
-		return new String[] {};
+		return _facetConfigurationHelper.getConfiguration();
 	}
 
 	/**
@@ -126,28 +88,15 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Override
 	public String[] getKeywordSuggesterConfiguration() {
 
-		try {
+		String[] config =
+			_keywordSuggestertConfigurationHelper.getConfiguration();
 
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				KEYWORD_SUGGESTER_CONFIGURATION_PID);
-
-			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, KEYWORD_SUGGESTER_CONFIGURATION_PID);
-			}
-
-			return (String[]) _configurationAdmin.getConfiguration(
-				KEYWORD_SUGGESTER_CONFIGURATION_PID).getProperties().get(
-					"keywordSuggesters");
-
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				KeywordSuggesterItemHelper.CONFIGURATION_PID);
 		}
-		catch (IOException e) {
-			_log.error(e.getMessage(), e);
-		}
-
-		_log.warn("Keyword suggester configuration is not set.");
-
-		return new String[] {};
+		
+		return _keywordSuggestertConfigurationHelper.getConfiguration();
 	}
 
 	/**
@@ -156,27 +105,14 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Override
 	public String[] getSortConfiguration() {
 
-		try {
+		String[] config = _sortConfigurationHelper.getConfiguration();
 
-			Configuration configuration =
-				_configurationAdmin.getConfiguration(SORT_CONFIGURATION_PID);
-
-			if (configuration.getProperties() == null) {
-				setDefaultConfiguration(
-					configuration, SORT_CONFIGURATION_PID);
-			}
-
-			return (String[]) _configurationAdmin.getConfiguration(
-				SORT_CONFIGURATION_PID).getProperties().get("sorts");
-
-		}
-		catch (IOException e) {
-			_log.error(e.getMessage(), e);
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				SortConfigurationItemHelper.CONFIGURATION_PID);
 		}
 
-		_log.warn("Sort configuration is not set.");
-
-		return new String[] {};
+		return _sortConfigurationHelper.getConfiguration();
 	}
 
 	/**
@@ -201,19 +137,20 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setDefaultConfiguration(
-		Configuration configuration, String fileName) {
+	private void setDefaultConfiguration(String configurationName) {
 
-		_log.info(
-			"Setting default configuration for: " + configuration.getPid());
+		_log.info("Setting default configuration for: " + configurationName);
 
 		InputStream inputStream = null;
 
 		try {
 
+			Configuration configuration =
+				_configurationAdmin.getConfiguration(configurationName);
+
 			StringBundler sb = new StringBundler();
-			sb.append("configs/").append(fileName).append(".config");
-			
+			sb.append("configs/").append(configurationName).append(".config");
+
 			inputStream = this.getClass().getClassLoader().getResourceAsStream(
 				sb.toString());
 
@@ -239,21 +176,6 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		}
 	}
 
-	private static final String ASSET_TYPE_CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.AssetTypeConfiguration";
-
-	private static final String CLAUSE_CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.ClauseConfiguration";
-
-	private static final String FACET_CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.FacetConfiguration";
-
-	private static final String KEYWORD_SUGGESTER_CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfiguration";
-
-	private static final String SORT_CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.SortConfiguration";
-
 	private static final Logger _log =
 		LoggerFactory.getLogger(ConfigurationHelperImpl.class);
 
@@ -262,4 +184,20 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference(target = "(config.item=assettype)")
+	private ConfigurationItemHelper _assetTypeConfigurationHelper;
+
+	@Reference(target = "(config.item=clause)")
+	private ConfigurationItemHelper _clauseConfigurationHelper;
+
+	@Reference(target = "(config.item=facet)")
+	private ConfigurationItemHelper _facetConfigurationHelper;
+
+	@Reference(target = "(config.item=keyword)")
+	private ConfigurationItemHelper _keywordSuggestertConfigurationHelper;
+
+	@Reference(target = "(config.item=sort)")
+	private ConfigurationItemHelper _sortConfigurationHelper;
+
 }
