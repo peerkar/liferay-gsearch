@@ -1,4 +1,3 @@
-/*
 package fi.soveltia.lifefay.gsearch.hy.results.item;
 
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
@@ -18,7 +17,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.common.url.ViewNewsURLService;
 import fi.soveltia.lifefay.gsearch.hy.util.HYDDMUtil;
-import fi.soveltia.lifefay.gsearch.hy.util.HYUtil;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
@@ -35,25 +33,25 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Component(
-	immediate = true, 
-	service = ResultItemBuilder.class
+	immediate = true,
+	service = ResultItemBuilder.class,
   	property = {
-     "service.ranking:Integer=100"	
+     "service.ranking:Integer=100"
 	}
 )
 public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 	@Override
 	public boolean canBuild(Document document) {
-		
+
 		// FIXME. This shouldn't really be take from global configuration.
-		
+
 		String[] facetConfiguration = _configurationHelper.getFacetConfiguration();
-		
+
 		List<String> newsKeys = HYDDMUtil.getHYNewsDDMStructureKeys(facetConfiguration);
-		
+
 		return newsKeys.contains(document.get("ddmStructureKey"));
-		
+
 	}
 
 	@Override
@@ -65,7 +63,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
 
 		try {
-			JournalArticle article = getJournalArticle(document));
+			JournalArticle article = getJournalArticle(document);
 			return viewNewsUrlService.getSingleArticleUrl(
 				portletRequest, article);
 		}
@@ -127,4 +125,3 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 }
 
-*/

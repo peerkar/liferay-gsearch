@@ -1,16 +1,13 @@
-/*
 package fi.soveltia.lifefay.gsearch.hy.results.item;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -33,7 +30,7 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.BaseResultItemBuilder;
 
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = ResultItemBuilder.class
 )
 public class FeedEntryItemBuilder extends BaseResultItemBuilder
@@ -108,4 +105,3 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 	private UserLocalService userLocalService;
 
 }
-*/

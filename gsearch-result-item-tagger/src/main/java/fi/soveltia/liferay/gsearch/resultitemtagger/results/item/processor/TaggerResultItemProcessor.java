@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -25,12 +26,12 @@ import fi.soveltia.liferay.gsearch.resultitemtagger.configuration.ModuleConfigur
 
 /**
  * Results item tag highlighter implementation.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.resultitemtagger.configuration.ModuleConfiguration",
-	immediate = true, 
+	immediate = true,
 	service = ResultItemProcessor.class
 )
 public class TaggerResultItemProcessor implements ResultItemProcessor {
@@ -49,7 +50,8 @@ public class TaggerResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public void process(
-		PortletRequest portletRequest, QueryContext queryParams,
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryParams,
 		Document document, ResultItemBuilder resultItemBuilder,
 		JSONObject resultItem)
 		throws Exception {

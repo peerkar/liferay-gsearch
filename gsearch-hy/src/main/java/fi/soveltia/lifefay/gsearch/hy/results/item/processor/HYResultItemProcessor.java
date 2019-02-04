@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -37,6 +38,9 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import fi.helsinki.flamma.feed.model.FeedEntry;
+import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -47,8 +51,9 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
 
+
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = ResultItemProcessor.class
 )
 public class HYResultItemProcessor implements ResultItemProcessor {
@@ -125,7 +130,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	/**
 	 * Get asset renderer.
-	 * 
+	 *
 	 * @param entryClassName
 	 * @param entryClassPK
 	 * @return
@@ -144,7 +149,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	/**
 	 * Get breadcrumbs for DLFileEntry.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param queryContext
@@ -160,7 +165,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
+
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
 
 		long groupId = getAssetRenderer(
@@ -187,17 +192,14 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		return String.join(" / ", breadcrumbs);
 	}
 
-	// FIXME
-
 	private String getFeedBreadcrumbs(
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder)
 		throws Exception {
 
-    	/*
         long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
-    	
+
     	try {
             FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
             User user = getUser(feedEntry.getUserId());
@@ -209,14 +211,26 @@ public class HYResultItemProcessor implements ResultItemProcessor {
         } catch (NumberFormatException e) {
             _log.error(String.format("Cannot parse '%s' as long.", entryClassPK));
         }
-        */
 
 		return "";
 	}
 
+	private User getUser(long userId) {
+		try {
+			User user = userLocalService.getUser(userId);
+			if (user.getStatus() == WorkflowConstants.STATUS_APPROVED) {
+				return user;
+			}
+		} catch (PortalException e) {
+			_log.error(String.format("Cannot get user with userId %s", userId));
+		}
+		return null;
+
+	}
+
 	/**
 	 * Get group name.
-	 * 
+	 *
 	 * @param groupId
 	 * @param locale
 	 * @return
@@ -238,12 +252,10 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	/**
 	 * Get journal article breadcrumbs.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param portletResponse
 	 * @param document
-	 * @param assetPublisherPageFriendlyURL
-	 * @param entryClassPK
 	 * @return
 	 * @throws Exception
 	 */
@@ -278,7 +290,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	/**
 	 * Check whether current item is a "News" content. Checked from HY facet
 	 * params.
-	 * 
+	 *
 	 * @param queryContext
 	 * @param document
 	 * @return
@@ -296,7 +308,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	/**
 	 * Set additional properties.
-	 * 
+	 *
 	 * @param document
 	 * @param resultItem
 	 */
@@ -360,7 +372,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	/**
 	 * Set categories.
-	 * 
+	 *
 	 * @param document
 	 * @param locale
 	 * @param resultItem
@@ -454,5 +466,11 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	@Reference
 	private AssetCategoryPropertyLocalService _assetCategoryPropertyLocalService;
+
+	@Reference
+	private UserLocalService userLocalService;
+
+	@Reference
+	private FeedEntryLocalService feedEntryLocalService;
 
 }

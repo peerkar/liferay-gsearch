@@ -1,7 +1,7 @@
 dependencies {
 	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api', version: '3.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '2.10.0'
-			
+
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "2.23.0"
 
 	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
@@ -14,4 +14,10 @@ dependencies {
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-api")
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-impl")
 	compileOnly project(":modules:liferay-gsearch:gsearch-query-api")
+
+	compileOnly project(":modules:flamma-common")
+	compileOnly project(":modules:feed:feed-web")
+	compileOnly project(":modules:feed:feed-api")
+
+
 }
