@@ -3,6 +3,7 @@ package fi.soveltia.lifefay.gsearch.hy.results.item;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -101,6 +102,21 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 		return super.getDescription(portletRequest, portletResponse, document);
 	}
 
+	/**
+	 * Get journal article.
+	 * 
+	 * @return
+	 * @throws PortalException
+	 */
+	@Override
+	protected JournalArticle getJournalArticle(Document document)
+		throws PortalException {
+
+		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+
+		return _journalArticleService.getLatestArticle(entryClassPK);
+	}
+	
 	private static final Log log =
 		LogFactoryUtil.getLog(NewsJournalArticleItemBuilder.class);
 
@@ -122,6 +138,9 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 	@Reference
 	private ClassNameLocalService classNameLocalService;
+	
+	@Reference
+	private JournalArticleService _journalArticleService;
 
 }
 

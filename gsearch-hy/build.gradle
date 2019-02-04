@@ -15,9 +15,10 @@ dependencies {
 	compileOnly project(":modules:liferay-gsearch:gsearch-core-impl")
 	compileOnly project(":modules:liferay-gsearch:gsearch-query-api")
 
-	compileOnly project(":modules:flamma-common")
-	compileOnly project(":modules:feed:feed-web")
-	compileOnly project(":modules:feed:feed-api")
+
+	//compileOnly project(":modules:flamma-common")
+	//compileOnly project(":modules:feed:feed-web")
+	//compileOnly project(":modules:feed:feed-api")
 
 
 }
