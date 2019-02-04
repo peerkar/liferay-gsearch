@@ -25,7 +25,7 @@ class GSearchHYMenus extends Component {
 		
 		// Set initial query parameters from calling url.
 
-		GSearchUtils.setInitialQueryParameters(
+		HYUtils.setInitialQueryParameters(
 			this.initialQueryParameters, 
 			this.templateParameters, 
 			this.setQueryParam
@@ -57,18 +57,19 @@ class GSearchHYMenus extends Component {
 		
 		this.setInitialDateRangeParameters();	
 
-		GSearchUtils.bulkSetupOptionLists(
-			'Facets', 
-			'timemenu', 
-			this
-		);		
+		HYUtils.bulkSetupOptionLists(
+			this.portletNamespace + 'Facets',
+			'timemenu',
+			this.getQueryParam,
+			this.setQueryParam
+		);
 	}
 	
 	/**
 	 * Setup time range filters
 	 */
 	setupTimeRangeFilter() {
-
+		
 		let language = Liferay.ThemeDisplay.getLanguageId().substring(0,2);
 
 		let _self = this;
