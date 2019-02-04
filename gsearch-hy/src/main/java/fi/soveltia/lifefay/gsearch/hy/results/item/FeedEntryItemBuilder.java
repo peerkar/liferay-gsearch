@@ -9,11 +9,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
@@ -88,9 +83,6 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 		LogFactoryUtil.getLog(FeedEntryItemBuilder.class);
 
 	private static final String NAME = FeedEntry.class.getName();
-
-	private static Map<Locale, ResourceBundle> resourceBundles =
-		new HashMap<>();
 
 	@Reference
 	private FeedUrlService feedUrlService;

@@ -1,6 +1,6 @@
+
 package fi.soveltia.lifefay.gsearch.hy.results.item;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
@@ -15,6 +15,16 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.common.url.ViewNewsURLService;
 import fi.soveltia.lifefay.gsearch.hy.util.HYDDMUtil;
@@ -22,16 +32,6 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.JournalArticleItemBuilder;
-
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Component(
 	immediate = true,
@@ -102,12 +102,6 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 		return super.getDescription(portletRequest, portletResponse, document);
 	}
 
-	/**
-	 * Get journal article.
-	 * 
-	 * @return
-	 * @throws PortalException
-	 */
 	@Override
 	protected JournalArticle getJournalArticle(Document document)
 		throws PortalException {
@@ -119,8 +113,6 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 	
 	private static final Log log =
 		LogFactoryUtil.getLog(NewsJournalArticleItemBuilder.class);
-
-	private List<String> DDM_STRUCTURE_KEYS = null;
 
 	private List<Long> DDM_STRUCTURE_IDS = new ArrayList<>();
 

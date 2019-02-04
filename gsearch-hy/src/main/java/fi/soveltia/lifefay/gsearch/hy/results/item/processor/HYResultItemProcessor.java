@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +39,13 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
-import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import fi.helsinki.flamma.feed.model.FeedEntry;
-import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.helsinki.flamma.feed.model.FeedEntry;
+import fi.helsinki.flamma.feed.service.FeedEntryLocalService;
 import fi.soveltia.lifefay.gsearch.hy.util.HYDDMUtil;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
@@ -78,7 +78,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		// Set categories to result item.
-
+		
 		setCategories(document, themeDisplay.getLocale(), resultItem);;
 
 		// Set type, icon and breadcrumbs.
@@ -198,7 +198,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		ResultItemBuilder resultItemBuilder)
 		throws Exception {
 
-        long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
 
     	try {
             FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
@@ -331,7 +331,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 						portletRequest, portletResponse, queryContext, document,
 						resultItemBuilder));
 			}
-			else if (FEED_ENTRY_CLASS.equals(entryClassName)) {
+			else if (FeedEntry.class.getName().equals(entryClassName)) {
 
 				resultItem.put("typeKey", "feed-entry");
 				// resultItem.put("icon", "icon-feed");
@@ -448,9 +448,6 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(HYResultItemProcessor.class);
-
-	private static final String FEED_ENTRY_CLASS =
-		"fi.helsinki.flamma.feed.model.FeedEntry";
 
 	@Reference
 	private GroupLocalService _groupLocalService;
