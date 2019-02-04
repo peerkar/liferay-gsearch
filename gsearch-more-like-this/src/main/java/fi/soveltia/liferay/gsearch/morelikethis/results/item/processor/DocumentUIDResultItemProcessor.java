@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.util.GetterUtil;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -39,7 +40,7 @@ public class DocumentUIDResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public void process(
-		PortletRequest portletRequest, QueryContext queryContext,
+		PortletRequest portletRequest, PortletResponse portletResponse, QueryContext queryContext,
 		Document document, ResultItemBuilder resultItemBuilder,
 		JSONObject resultItem)
 		throws Exception {

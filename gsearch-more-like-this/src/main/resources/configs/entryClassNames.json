@@ -1,8 +1,17 @@
-[
-	"com.liferay.journal.model.JournalArticle", 
-	"com.liferay.document.library.kernel.model.DLFileEntry",
-	"com.liferay.message.boards.kernel.model.MBMessage",
-	"com.liferay.blogs.kernel.model.BlogsEntry", 
-	"com.liferay.blogs.model.BlogsEntry",
-	"com.liferay.wiki.model.WikiPage"
-]
+{
+	"description": "Allows to search only defined entryClassNames (asset types). This filter is optional (occur = should).",
+	"field_name": "entryClassName",
+	"filter_enabled": true,
+	"filter_occur": "should",
+ 	"values": [
+		"com.liferay.journal.model.JournalArticle",
+		"com.liferay.document.library.kernel.model.DLFileEntry",
+		"com.liferay.message.boards.kernel.model.MBMessage",
+		"com.liferay.blogs.kernel.model.BlogsEntry",
+		"com.liferay.blogs.model.BlogsEntry",
+		"com.liferay.knowledge.base.model.KBArticle",
+		"com.liferay.wiki.model.WikiPage",
+		"non-liferay-type-example"
+	],
+	"value_occur": "should"
+}
