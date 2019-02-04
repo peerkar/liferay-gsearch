@@ -25,7 +25,7 @@ class GSearchHYMenus extends Component {
 		
 		// Set initial query parameters from calling url.
 
-		HYUtils.setInitialQueryParameters(
+		GSearchUtils.setInitialQueryParameters(
 			this.initialQueryParameters, 
 			this.templateParameters, 
 			this.setQueryParam
@@ -40,8 +40,6 @@ class GSearchHYMenus extends Component {
 		if (this.debug) {
 			console.log("GSearchHYMenus.rendered()");
 		}
-		
-		console.log("rendered");
 		
 		// Setup type menu.
 		
@@ -59,23 +57,11 @@ class GSearchHYMenus extends Component {
 		
 		this.setInitialDateRangeParameters();	
 
-		HYUtils.bulkSetupOptionLists(
-				this.portletNamespace + 'Facets',
-				'timemenu',
-				this.getQueryParam,
-				this.setQueryParam
-			);
-
-		/*
-		// Setup unit menu.
-
-		HYUtils.bulkSetupOptionLists(
-			this.portletNamespace + 'Facets',
-			'optionmenu',
-			this.getQueryParam,
-			this.setQueryParam
-		);
-		*/
+		GSearchUtils.bulkSetupOptionLists(
+			'Facets', 
+			'timemenu', 
+			this
+		);		
 	}
 	
 	/**
