@@ -19,10 +19,4 @@ dependencies {
 	compileOnly project(":modules:feed:feed-web")
 	compileOnly project(":modules:feed:feed-api")
 
-	// compileOnly files('libs/fi.helsinki.flamma.common.jar')
-	// compileOnly files('libs/fi.helsinki.flamma.configuration.api.jar')
-	// compileOnly files('libs/fi.helsinki.flamma.configuration.service.jar')
-	// compileOnly files('libs/fi.helsinki.flamma.feed.api.jar')
-	// compileOnly files('libs/fi.helsinki.flamma.feed.jar')
-	// compileOnly files('libs/fi.helsinki.flamma.feed.service.jar')
 }
