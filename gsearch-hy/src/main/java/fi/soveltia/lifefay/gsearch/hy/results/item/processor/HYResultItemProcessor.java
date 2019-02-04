@@ -295,7 +295,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	}
 
 	/**
-	 * Set type key.
+	 * Set additional properties.
 	 * 
 	 * @param document
 	 * @param resultItem
@@ -321,8 +321,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			}
 			else if (FEED_ENTRY_CLASS.equals(entryClassName)) {
 
-				resultItem.put("typeKey", "news");
-				resultItem.put("icon", "icon-news");
+				resultItem.put("typeKey", "feed-entry");
+				// resultItem.put("icon", "icon-feed");
 				resultItem.put(
 					"breadcrumbs",
 					getFeedBreadcrumbs(
