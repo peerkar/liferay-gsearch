@@ -4,15 +4,10 @@ import Soy from 'metal-soy/src/Soy';
 
 import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
-import GSearchFilters from './view-templates/GSearchFilters.es';
-import GSearchFacets from './view-templates/GSearchFacets.es';
-import GSearchFacetSelections from './view-templates/GSearchFacetSelections.es';
-import GSearchHelp from './view-templates/GSearchHelp.es';
+import GSearchHYMenus from './view-templates/GSearchHYMenus.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
 import GSearchResults from './view-templates/GSearchResults.es';
 import GSearchResultLayoutOptions from './view-templates/GSearchResultLayoutOptions.es';
-import GSearchSort from './view-templates/GSearchSort.es';
-import GSearchStats from './view-templates/GSearchStats.es';
 
 import templates from './GSearch.soy';
 
@@ -180,22 +175,18 @@ class GSearch extends Component {
 				}
 				
 				// Component updates
-
-				// Refresh the selections
 				
-				this.components.facetSelectionsComponent.update = Date.now();
-				this.components.facetComponent.facets = results.facets;
 
-				this.components.statsComponent.results = results;
 				this.components.resultsComponent.results = results;
 				this.components.pagingComponent.paging = results.paging;
 				
 				if (results.items && results.items.length > 0) {
+					this.components.hyComponent.results = results;
 					this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
-					this.components.sortComponent.visible = true;
+					$('#' + this.portletNamespace + 'Stats').show();
 				} else {
+					$('#' + this.portletNamespace + 'Stats').hide();
 					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
-					this.components.sortComponent.visible = false;
 				}
 				
 			} else {

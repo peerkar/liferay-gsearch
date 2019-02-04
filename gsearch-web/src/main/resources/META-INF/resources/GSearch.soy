@@ -4,7 +4,6 @@
  * GSearch portlet main view.
  *
  * @param id
- * @param? addResultsCallback
  * @param? getQueryParam
  * @param portletNamespace
  * @param? setQueryParam
@@ -14,84 +13,36 @@
 	
 	<div class="container-fluid gsearch-container" id="{$id}" style="display: none;">
 	
-		// Help.
-		
-		<div class="col-xs-12 col-md-6 col-lg-6 gsearch-centered gsearch-help">
-			{call GSearchHelp.render data="all" /}
-			{call GSearchHelp.button}
-				{param portletNamespace: $portletNamespace /}
-			{/call}
-		</div>	
-
+		<h2>{msg desc=""}search-title{/msg}</h2>
+	
 		// Searchfield.
 
-		<div class="col-xs-12 col-sm-10 col-md-6 col-lg-6 gsearch-centered gsearch-searchfield">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-centered gsearch-searchfield">
 			{call GSearchField.render data="all"}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
 			{/call}			
 		</div>
 
-		// Basic Filters.
+		// HY menu.
 
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered gsearch-filters">
-			{call GSearchFilters.render data="all"}
-				{param getQueryParam: $getQueryParam /}
-				{param setQueryParam: $setQueryParam /}
-				{param addResultsCallback: $addResultsCallback /}
-			{/call}
-		</div>		
-		
-		// Facets.
-
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered gsearch-filters gsearch-facets">
-			{call GSearchFacets.render data="all"}
-				{param ref: 'facetComponent' /}
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-centered gsearch-filters gsearch-hy">
+			{call GSearchHYMenus.render data="all"}
+				{param ref: 'hyComponent' /}
 				{param getQueryParam: $getQueryParam /}
 				{param setQueryParam: $setQueryParam /}
 			{/call}
 		</div>  
-		
-		// Selected facets.
-		
-		{call GSearchFacetSelections.render data="all"}
-			{param ref: 'facetSelectionsComponent' /}
-		{/call}
 
-		// Stats.
-
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10  gsearch-centered  gsearch-stats">
-			{call GSearchStats.render}
-				{param ref: 'statsComponent' /}
+		// Results layout.
+					
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12  gsearch-results-layout">
+			{call GSearchResultLayoutOptions.render data="all"}
+				{param ref: 'resultLayoutOptionsComponent' /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
 			{/call}
-		</div>  
-		
-		<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered">
-
-			<div class="row">
-
-				// Sort.
-			
-				<div class="col-xs-8 col-sm-8 col-md-6 col-lg-6 gsearch-sort">
-					{call GSearchSort.render data="all"}
-						{param ref: 'sortComponent' /}
-						{param getQueryParam: $getQueryParam /}
-						{param setQueryParam: $setQueryParam /}
-					{/call}				
-				</div>
-				
-				// Results layout.
-
-				<div class="col-xs-4 col-sm-4 col-md-6 col-lg-6 gsearch-results-layout">
-					{call GSearchResultLayoutOptions.render data="all"}
-						{param ref: 'resultLayoutOptionsComponent' /}
-						{param getQueryParam: $getQueryParam /}
-						{param setQueryParam: $setQueryParam /}
-					{/call}
-				</div>
-			</div>  			
 		</div>  					
-
 
 		// Results.
 

@@ -18,4 +18,3 @@ Liferay.Loader.addModule({
   anonymous   : true,
   path        : MODULE_PATH + '/js/bootstrap-datepicker/js/bootstrap-datepicker.js'
 });
-

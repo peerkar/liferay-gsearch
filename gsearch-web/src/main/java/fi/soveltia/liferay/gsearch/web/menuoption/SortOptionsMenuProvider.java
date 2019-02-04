@@ -41,7 +41,7 @@ public class SortOptionsMenuProvider implements MenuOptionProvider {
 		Locale locale = themeDisplay.getLocale();
 
 		String[] configuration =
-			_coreConfigurationHelper.getSortConfiguration();
+			_configurationHelper.getSortConfiguration();
 
 		JSONArray options = JSONFactoryUtil.createJSONArray();
 
@@ -61,7 +61,7 @@ public class SortOptionsMenuProvider implements MenuOptionProvider {
 	}
 	
 	@Reference
-	protected ConfigurationHelper _coreConfigurationHelper;
+	protected ConfigurationHelper _configurationHelper;
 
 	@Reference
 	LocalizationHelper _localizationHelper;

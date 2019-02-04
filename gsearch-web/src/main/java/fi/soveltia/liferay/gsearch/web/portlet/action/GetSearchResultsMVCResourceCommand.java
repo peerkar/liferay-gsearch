@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.GSearch;
-import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
@@ -245,13 +244,20 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
 
+		/*
 		if (resultLayout.equals("userImageList") ||
 			 resultLayout.equals("maps")) {
 
 			queryContext.setParameter(
 				ParameterNames.INCLUDE_USER_PORTRAIT, true);
 		}
+		*/
+		// HY
+		
+		queryContext.setParameter(
+			ParameterNames.INCLUDE_USER_PORTRAIT, true);
 
+		
 		// Set additional fields to include in results.
 
 		setAdditionalResultFields(queryContext);
@@ -294,20 +300,15 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 					locale, "multiple-" +
 						resultItem.getString("param_name").toLowerCase()));
 
-			// Localize entryClassNames.
+			JSONArray values = resultItem.getJSONArray("values");
 
-			if (resultItem.getString("field_name").equals("entryClassName")) {
+			for (int j = 0; j < values.length(); j++) {
 
-				JSONArray values = resultItem.getJSONArray("values");
+				JSONObject value = values.getJSONObject(j);
 
-				for (int j = 0; j < values.length(); j++) {
-
-					JSONObject value = values.getJSONObject(j);
-
-					value.put(
-						"name", _localizationHelper.getLocalization(
-							locale, value.getString("name").toLowerCase()));
-				}
+				value.put(
+					"name", _localizationHelper.getLocalization(
+						locale, value.getString("name").toLowerCase()));
 			}
 		}
 	}
@@ -390,6 +391,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			resultItem.put(
 				"type", _localizationHelper.getLocalization(
 					locale, resultItem.getString("type").toLowerCase()));
+
 		}
 	}
 
@@ -455,9 +457,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(GetSearchResultsMVCResourceCommand.class);
-
-	@Reference
-	protected ConfigurationHelper _configurationHelper;
 
 	@Reference
 	private GSearch _gSearch;

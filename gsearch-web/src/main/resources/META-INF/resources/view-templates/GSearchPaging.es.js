@@ -2,8 +2,6 @@ import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 
-import GSearchUtils from '../js/GSearchUtils.es';
-
 import templates from './GSearchPaging.soy';
 
 /**

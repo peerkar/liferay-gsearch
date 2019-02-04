@@ -2,141 +2,67 @@
  * GSearch utility class
  */
 
-class GSearchUtils {
-	
-	/**
-	 * Check if object is empty
-	 * 
- 	 * @param {Object} component
-	 */
-	static isEmptyObject(obj) { 
-		
-		if (!obj) {
-			return true;
-		}
-		
-		for (var x in obj) { 
-			return false; 
-		}
-		return true;
-	}
-	
-	/**
-	 * Add an option item to list of selections 
-	 * 
-	 * @param {String} component
-	 * @param {String} optionMenu
-	 * @param {String} paramName
-	 * @param {String} isMultiValued
-	 * @param {String} value
-	 */
-	static addToSelections(component, optionMenu, paramName, isMultiValued, anchor) {
-
-		let text = null;
-		let textElement = $(anchor).find('.text');
-		
-		if (textElement.length > 0) {
-			text = $(textElement).html();
-		} else {
-			text = $(anchor).html();
-		}
-		
-		let html = '<li>';
-		html += text;
-		html += '<a href="#">';
-		html += '<span title="' + Liferay.Language.get('remove') + '" class="glyphicon glyphicon-remove-circle"></span>';
-		html += '</a>';
-		html += '</li>';
-		
-		let item = $(html);
-		$('#' + component.portletNamespace + 'facet-selections ul').append(item);
-		$(item).on('click', function(event) {
-			GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, $(anchor).attr('data-value'));		
-			event.preventDefault();
-		});
-	}
-	
-	/**
-	 * Remove event listeners
-	 *
-	 * @param {String} menuWrapperElementId
-	 * @param {String} menuClass
-	 */
-	static bulkCleanUpOptionListEvents(menuWrapperElementId, menuClass) {
-
-		$('#' + menuWrapperElementId + ' .' + menuClass + ' li a').each(function() {	
-			$(this).unbind();
-		});		
-	}
+class HYUtils {
 	
 	/**
 	 * Bulk setup option lists.
  	 *
-	 * @param {String} menuWrapperName
-	 * @param {String} menuClass
-	 * @param {Object} component
+	 * @param {String} menuWrapperElementId
+	 * @param {String} triggerElementId
+	 * @param {Object} queryParamGetter
+     * @param {Object} queryParamSetter
  	 *
 	 */
-	static bulkSetupOptionLists(menuWrapperName, menuClass, component, bindToSelections=false) {
+	static bulkSetupOptionLists(menuWrapperElementId, menuClass, queryParamGetter, queryParamSetter) {
 		
-		let menuElement = $(component.element.querySelectorAll('#' + component.portletNamespace + menuWrapperName + ' .' + menuClass));
-		
-		if (menuElement.length === 0) {
-			return;
-		}
+        $('#' + menuWrapperElementId + ' .' + menuClass).each(function() {
 
-		menuElement.each(function() {
-			
+			let options = $(this).find('.dropdown-menu').attr('id');
+			if (!options) {
+                options = $(this).find('.tabs-menu').attr('id');
+			}
+			let trigger = $(this).find('button').attr('id');
 			let paramName = $(this).attr('data-paramname');
 			let isMultiValued = $(this).attr('data-ismultivalued');
-			
-			// Convert to boolean
-			
-			let isMulti = (isMultiValued == 'true');
+			let isClearOnClickDisabled = $(this).attr('data-isclearonclickdisabled');
 
-			GSearchUtils.setupOptionList(
-				component, 
-				this,
+			// Convert to boolean
+
+			let isMulti = (isMultiValued == 'true');
+			let isClearDisabled = (isClearOnClickDisabled == 'true');
+
+			HYUtils.setupOptionList(
+				options,
+				trigger,
+				queryParamGetter,
+				queryParamSetter,
 				paramName,
 				isMulti,
-				bindToSelections
+                isClearDisabled
 			);
 
-			/*
-			 
-			// Dropdown animation  
-			 
-			$(this).on('show.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideDown(250);
-			});
-
-			$(this).on('hide.bs.dropdown', function() {
-				$(this).find('.dropdown-menu').first().stop(true, true).slideUp(200);
-			});
-			
-			*/
-		});			
+		});
 	}
-	
+
 	/**
 	 * Set initial query parameters.
-	 * 
+	 *
 	 * @param {String} parameterArray
 	 * @param {Object} queryParamSetter
-	 * 
+	 *
 	 */
-	static setInitialQueryParameters(initialValues, keyArray, setQueryParam) {
-		
+	static setInitialQueryParameters(initialValues, keyArray, queryParamSetter) {
+
 		if (!(initialValues && keyArray)) {
 			return;
 		}
 
 		let length = keyArray.length;
-		
+
 		for (let i = 0; i < length; i++) {
 
 			let field = keyArray[i];
-		
+
 			let values = initialValues[field];
 
 			if (!values) {
@@ -144,247 +70,271 @@ class GSearchUtils {
 			}
 
 			let length2 = values.length;
-			
+
 			for (let j = 0; j < length2; j++) {
 
-				let value = values[j];			
-			
+				let value = values[j];
+
 				if (value) {
-					setQueryParam(field, value, false);
+					queryParamSetter(field, value, false);
 
 				} else {
-					
+
 					// Reset possibly cached state
-					
-					setQueryParam(field, '', false);
-				}				
+
+					queryParamSetter(field, '', false);
+				}
 			}
 		}
-	}	
-		
+	}
+
 	/**
 	 * Setup option list.
 	 *
-	 * @param {Object} component
-	 * @param {String} optionMenu
-	 * @param {String} paramName
-	 * @param {String} initialValue
-	 */
-	static setupOptionList(component, optionMenu, paramName, isMultiValued = false, bindToSelections = false) {
+	 * @param {String} optionElementId
+	 * @param {String} triggerElementId
+	 * @param {Object} queryParamGetter
+	 * @param {Object} queryParamSetter
+	 * @param {String} queryParam
+	 * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
+     */
+	static setupOptionList(optionElementId, triggerElementId, queryParamGetter,
+			queryParamSetter, queryParam, isMultiValued = false, isClearDisabled = false) {
 
-		let values = component.getQueryParam(paramName);
+		let values = queryParamGetter(queryParam);
 
 		// Set initially selected item
-		
-		let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, values, isMultiValued, bindToSelections);
 
-		// Set text
-		
-		if (selectedItems.length > 0) {
-			GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
-		}
-		
+		HYUtils.setOptionListSelectedItems(optionElementId,
+				triggerElementId, values, isMultiValued);
+
 		// Set click events
-		
-		GSearchUtils.setOptionListClickEvents(component, optionMenu, paramName, isMultiValued) 
+		HYUtils.setOptionListClickEvents(optionElementId, triggerElementId,
+				queryParamGetter, queryParamSetter, queryParam, isMultiValued, isClearDisabled)
 	}
-	
+
 	/**
 	 * Set click events for options list for setting query params.
 	 *
-	 * @param {String} component
-	 * @param {String} optionMenu
-	 * @param {String} paramName
-	 * @param {Boolean} isMultiValued
+	 * @param {String} optionElementId
+	 * @param {String} triggerElementId
+	 * @param {Object} queryParamGetter
+	 * @param {Object} queryParamSetter
+	 * @param {String} queryParam
+     * @param {Boolean} isMultiValued
+     * @param {Boolean} isClearDisabled
 	 */
-	static setOptionListClickEvents(component, optionMenu, paramName, isMultiValued) {
-		
-		$(optionMenu).find('li a').on('click', function(event) {
+	static setOptionListClickEvents(optionElementId, triggerElementId, queryParamGetter,
+			queryParamSetter, queryParam, isMultiValued, isClearDisabled) {
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').on('click', function(event) {
 
-			let currentValues = component.getQueryParam(paramName);
-			
-			let value = $(this).attr('data-value');
+			let isClickDisabled = false;
+            let parent = event.currentTarget.parentElement;
 
-			if (currentValues.indexOf(value) < 0) {
-
-				component.setQueryParam(paramName, value, true, isMultiValued);
-
-				let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, [value], isMultiValued);
-				
-				if (selectedItems.length > 0) {
-					
-					GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
-				}
-				
-			} else {
-
-				GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value);
+            if (isClearDisabled) {
+                // disable clearing current filter when it is clicked again
+                isClickDisabled = $(parent).hasClass('selected');
 			}
-			event.preventDefault();
-		});			
+
+            let currentValues = queryParamGetter(queryParam);
+            let value = $(this).attr('data-value');
+
+            let clickTarget = $(event.currentTarget);
+
+            // when default is clicked:
+			//    - clear all filters of this type
+			//    - remove all selected classes except default
+			//    - remove all checked checkboxes except check default
+            if (isMultiValued && $(this).closest('li').hasClass('default')) {
+				for (let i = 0; i < currentValues.length; i++) {
+                    queryParamSetter(queryParam, null, false, isMultiValued, currentValues[i]);
+				}
+                $('#' + optionElementId + ' li.selected').removeClass('selected');
+                queryParamSetter(queryParam, value, true, isMultiValued);
+                HYUtils.setOptionListSelectedItems(optionElementId,
+                    triggerElementId, [value], isMultiValued);
+                $('#' + optionElementId + ' li :checkbox').prop('checked', false);
+                $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
+            } else if (!isClickDisabled) {
+
+            	if (isMultiValued) {
+                    $('#' + optionElementId + ' li.default').removeClass('selected');
+                    let checkbox = $('#' + optionElementId + ' li.default :checkbox');
+                    checkbox.prop('checked', false);
+                    let previousValue = checkbox.attr('data-value');
+                    if ((typeof previousValue === 'undefined') && (currentValues.length > 0)) {
+                    	previousValue = '0'; // use dummy default value if it is not explicitly set for this type of filter
+					}
+                    queryParamSetter(queryParam, null, false, isMultiValued, previousValue);
+                }
+				if (currentValues.indexOf(value) < 0) {
+
+					let isRefresh = true;
+                    if (clickTarget.hasClass('time-range')) {
+                        $(parent).find('div.time-range').removeClass('hidden');
+						isRefresh = false;
+                    } else if (clickTarget.hasClass('time')) {
+                        $('#' + optionElementId + ' div.time-range').addClass('hidden');
+                        $('#' + optionElementId + ' input.time-range').val('');
+                        queryParamSetter('timeStart', '', false, false);
+                        queryParamSetter('timeEnd', '', false, false);
+
+                    }
+                    queryParamSetter(queryParam, value, isRefresh, isMultiValued);
+
+					HYUtils.setOptionListSelectedItems(optionElementId,
+						triggerElementId, [value], isMultiValued);
+
+
+				} else {
+
+                    queryParamSetter(queryParam, null, true, isMultiValued, value);
+
+					HYUtils.unsetOptionListSelectedItem(optionElementId, value);
+
+					if (clickTarget.hasClass('time-range')) {
+                        $(parent).find('div.time-range').addClass('hidden');
+                    }
+				}
+
+			}
+
+            if (event.currentTarget.nodeName === 'A') {
+                event.preventDefault();
+			}
+		});
 	}
-	
+
 	/**
 	 * Set selected option item.
-	 * 
-	 * @param {String} optionMenu
-	 * @param {Object} values
-	 * @param {Boolean} isMultiValued
+	 *
+	 * @param {String} optionElementId
+	 * @param {String} value
 	 */
-	static setOptionListSelectedItems(component, optionMenu, paramName, values, isMultiValued, bindToSelections) {
+	static setOptionListSelectedItems(optionElementId, triggerElementId, values, isMultiValued) {
 
-		let selectedItems = [];
+		let defaultItem = $('#' + optionElementId + ' li.default');
 
-		let defaultItem = $(optionMenu).find('li.default a');
-				
 		let valueFound = false;
-		
-		$(optionMenu).find('li a').each(function() {
-			
+
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
+
+			let parentLi = $(this).parent();
+			if (parentLi.prop('tagName') !== 'LI') {
+				parentLi = parentLi.parent();
+        	}
 			if (!isMultiValued) {
 
 				if ($(this).attr('data-value') == values[0]) {
-					
+
 					valueFound = true;
 
-					$(optionMenu).find('li').removeClass('selected');
+					$('#' + optionElementId + ' li').removeClass('selected');
+
+					$('#' + optionElementId + ' li :checkbox').prop('checked', false);
+
+					parentLi.addClass('selected');
 					
-					$(this).parent().addClass('selected');
-	
-					selectedItems.push(this);
-					
-					if (bindToSelections) {
-						GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
-					}
+					$(this).prop('checked', true);
+
 					return false;
 				}
 
 			} else {
-				
+
 				let length = values.length;
-				
+
 				for (let i = 0; i < length; i++) {
 
 					let value = values[i];
-				
-					if ($(this).attr('data-value') == value) {
-						
-						valueFound = true;
-						
-						$(defaultItem).parent().removeClass('selected');
 
-						$(this).parent().addClass('selected');
+					if ($(this).attr('data-value') == value) {
+
+						valueFound = true;
+
+						defaultItem.removeClass('selected');
 						
-						if (bindToSelections) {
-							GSearchUtils.addToSelections(component, optionMenu, paramName, isMultiValued, this);
-						}
+						$(defaultItem).find(' :checkbox').prop('checked', false);
+
+						parentLi.addClass('selected');
 						
-						selectedItems.push(this);
+						$(this).prop('checked', true);
+
 					}
 				}
 			}
 		});
-			
-		if (!valueFound && defaultItem.length > 0) {
 
-			selectedItems.push(defaultItem);
-		}
-
-		return selectedItems;
 	}
-	
+
 	/**
 	 * Set text for the trigger element.
-	 * 
-	 * If there's a text element in the selected element, 
+	 *
+	 * If there's a text element in the selected element,
 	 * use contents of that as a source.
-	 * 
-	 * @param {String} optionMenu
-	 * @param {Object} selectedItems
-	 * @param {String} paramName
+	 *
+	 * @param {String} triggerElementId
+	 * @param {Object} selectedItem
 	 */
-	static setOptionListTriggerElementText(optionMenu, selectedItems, paramName) {
-						
+	static setOptionListTriggerElementText(triggerElementId, selectedItems, queryParam) {
+
 		if (selectedItems.length > 1) {
-			
-			let html = $(optionMenu).attr('data-multipleoption');
+
+			let html = $('#' + triggerElementId ).parent().attr('data-multipleoption');
 
 			// Fallback translation. See ResultItemBuilder.
-			
+
 			if (!html) {
-				html = "multiple " + paramName.toLowerCase();
+				html = "multiple " + queryParam.toLowerCase();
 			}
-			
-			$(optionMenu).find(' .selection').html('[<i> ' + html + ' </i>]');
-			
+
+			$('#' + triggerElementId + ' .selection').html('[<i> ' + html + ' </i>]');
+
 			return;
 		}
 
 		let textElement = $(selectedItems[0]).find('.text');
-		
+
 		let text = null;
-		
+
 		if (textElement.length > 0) {
 			text = $(textElement).html();
 		} else {
 			text = $(selectedItems[0]).html();
 		}
 
-		$(optionMenu).find('.selection').html(text);
+		$('#' + triggerElementId + ' .selection').html(text);
 	}
-	
+
 	/**
 	 * Unset selected option item.
-	 * 
-	 * @param {String} optionMenu
+	 *
+	 * @param {String} optionElementId
 	 * @param {String} value
 	 */
-	static unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value) {
-		
-		component.setQueryParam(paramName, null, true, isMultiValued, value);
+	static unsetOptionListSelectedItem(optionElementId, value) {
 
-		$(optionMenu).find('li a').each(function() {
-				
+		$('#' + optionElementId + ' li a, #' + optionElementId + ' li :checkbox').each(function() {
+
 			if ($(this).attr('data-value') == value) {
+                let parentLi = $(this).parent();
+                if (parentLi.nodeName !== 'LI') {
+                    parentLi = parentLi.parent();
+                }
+				parentLi.removeClass('selected');
 
-				$(this).parent().removeClass('selected');
-				
 				return false;
 			}
 		});
 
 		// If there are no more selections mark the default item ("any") as selected.
 
-		if ($(optionMenu).find('li.selected').length === 0) {
-			$(optionMenu).find('li.default').addClass('selected');
+		if ($('#' + optionElementId + ' li.selected').length === 0) {
+			$('#' + optionElementId + ' li.default').addClass('selected');
+            $('#' + optionElementId + ' li.default :checkbox').prop('checked', true);
 		}
-	}
-
-	/**
-	 * Get URL parameter
-	 *
- 	 * See https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-     *
- 	 * @param {String} name
-	 */
-	static getURLParameters() {
-
-		let urlParams;
-	   
-		let match,
-	        pl     = /\+/g,  
-	        search = /([^&=]+)=?([^&]*)/g,
-	        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-	        query  = window.location.search.substring(1);
-
-	    urlParams = {};
-	    
-	    while (match = search.exec(query)) {
-	       urlParams[decode(match[1])] = decode(match[2]);
-	    }
-	    
-	    return urlParams;
 	}
 }
 
-export default GSearchUtils;
+export default HYUtils;
