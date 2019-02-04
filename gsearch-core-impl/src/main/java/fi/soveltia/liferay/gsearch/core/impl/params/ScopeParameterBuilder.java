@@ -11,6 +11,7 @@ import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationException;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
@@ -36,18 +37,14 @@ public class ScopeParameterBuilder implements ParameterBuilder {
 		String scopeFilter =
 			ParamUtil.getString(portletRequest, ParameterNames.SCOPE);
 
-		long[] groupIds;
-
 		if ("this-site".equals(scopeFilter)) {
-			groupIds = new long[] {
-				themeDisplay.getScopeGroupId()
-			};
-		}
-		else {
-			groupIds = new long[0];
-		}
 
-		queryContext.setParameter(ParameterNames.GROUP_ID, groupIds);
+			FilterParameter filter = new FilterParameter("groupId");
+			filter.setAttribute("values", new long[] {
+				themeDisplay.getScopeGroupId()});
+
+			queryContext.addFilterParameter(ParameterNames.GROUP_ID, filter);
+		}
 	}
 
 	@Override

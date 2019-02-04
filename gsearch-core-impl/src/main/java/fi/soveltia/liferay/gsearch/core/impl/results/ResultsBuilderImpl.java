@@ -2,7 +2,6 @@
 package fi.soveltia.liferay.gsearch.core.impl.results;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
@@ -10,10 +9,6 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
-import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
-import com.liferay.portal.kernel.search.facet.collector.TermCollector;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
-import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
-import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslatorFactory;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessor;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessorFactory;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.ResultsBuilder;
-import fi.soveltia.liferay.gsearch.core.api.results.facet.processor.FacetProcessor;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilderFactory;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
@@ -82,8 +76,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		try {
 			resultsObject.put(
-				"facets", createFacetsArray(
-					searchContext, queryContext, hits));
+				"facets", createFacetsArray(searchContext, queryContext, hits));
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);
@@ -97,25 +90,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		return resultsObject;
 	}
 
-	/**
-	 * Add facet processor.
-	 * 
-	 * @param facetProcessor
-	 */
-	protected void addFacetProcessor(
-		FacetProcessor facetProcessor) {
-
-		if (_facetProcessors == null) {
-			_facetProcessors = new ArrayList<FacetProcessor>();
-		}
-		_facetProcessors.add(facetProcessor);
-	}
-	
-	/**
-	 * Add result item processor.
-	 * 
-	 * @param resultItemProcessor
-	 */
 	protected void addResultItemProcessor(
 		ResultItemProcessor resultItemProcessor) {
 
@@ -141,110 +115,42 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		if (hits.getLength() == 0) {
 			return JSONFactoryUtil.createJSONArray();
 		}
-		
+
 		Map<String, Facet> facets = searchContext.getFacets();
 
 		if (facets == null || facets.size() == 0) {
 			return JSONFactoryUtil.createJSONArray();
 		}
-		
-		String[] facetConfiguration = queryContext.getConfiguration(ConfigurationKeys.FACET);
+
+		String[] configuration =
+			queryContext.getConfiguration(ConfigurationKeys.FACET);
 		
 		// Get facets.
 
 		JSONArray resultArray = JSONFactoryUtil.createJSONArray();
 
-		List<Facet> facetsList = sortFacetList(
-			ListUtil.fromCollection(facets.values()), facetConfiguration);
-		
-		// Get a configured facet.
+		// Loop through configured facets.
 
-		for (int i = 0; i < facetConfiguration.length; i++) {
+		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject configuration = null;
-			Facet facet = null;
+			JSONObject facetConfiguration =
+				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			JSONObject configurationItem =
-				JSONFactoryUtil.createJSONObject(facetConfiguration[i]);
+			String processorName =
+				facetConfiguration.getString("processor_name", "default");
 
-			for (Facet f : facetsList) {
+			FacetProcessor facetProcessor =
+				_facetProcessorFactory.getProcessor(processorName);
 
-				if (f.isStatic()) {
-					continue;
-				}
-				
-			
-				if (f.getFieldName().equals(
-					configurationItem.get("field_name"))) {
-	
-					configuration = configurationItem;
-					facet = f;
-	
-					break;
-				}
+			if (facetProcessor == null) {
+				facetProcessor = _facetProcessorFactory.getProcessor("default");
 			}
-			
-			if (configuration == null) {
-				
-				continue;
 
-			} else {
+			JSONObject resultObject = facetProcessor.processFacetResults(
+				queryContext, facets.values(), facetConfiguration);
 
-				FacetCollector facetCollector = facet.getFacetCollector();
-	
-				JSONArray termArray = JSONFactoryUtil.createJSONArray();
-	
-				// Process facets
-	
-				String facetTranslatorName = (String)configuration.get("translator_name");
-				
-				if (facetTranslatorName != null) {
-				
-					FacetTranslator translator =
-						_facetTranslatorFactory.getTranslator(facetTranslatorName);
-
-					if (translator != null) {
-						termArray = translator.fromResults(
-							queryContext, facetCollector, configuration);
-					}
-				}
-				else {
-					
-					List<TermCollector> termCollectors =
-						facetCollector.getTermCollectors();
-	
-					for (TermCollector tc : termCollectors) {
-	
-						JSONObject item = JSONFactoryUtil.createJSONObject();
-	
-						item.put("frequency", tc.getFrequency());
-						item.put("name", tc.getTerm());
-						item.put("term", tc.getTerm());
-	
-						termArray.put(item);
-					}
-				}
-	
-				// Put terms to results, if found.
-	
-				if (termArray.length() > 0) {
-					
-					JSONObject resultItem = JSONFactoryUtil.createJSONObject();
-	
-					resultItem.put(
-						"field_name", configuration.get("field_name"));
-					resultItem.put(
-						"param_name", configuration.get("param_name"));
-					resultItem.put("icon", configuration.get("icon"));
-					
-					if (configuration.get("hide") != null) {
-						resultItem.put("hide", configuration.get("hide"));
-	
-					}
-					resultItem.put("values", termArray);
-	
-					resultArray.put(resultItem);
-				}
+			if (resultObject != null) {
+				resultArray.put(resultObject);
 			}
 		}
 		return resultArray;
@@ -323,26 +229,25 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				// Link.
 
 				String link = resultItemBuilder.getLink(
-					portletRequest, portletResponse, document,
-					queryContext);
-				
-				jsonObject.put(
-					"link", link);
-				
+					portletRequest, portletResponse, document, queryContext);
+
+				jsonObject.put("link", link);
+
 				// Redirect
-				
-				jsonObject.put("redirect", GSearchUtil.getRedirect(portletRequest, link));
+
+				jsonObject.put(
+					"redirect", GSearchUtil.getRedirect(portletRequest, link));
 
 				// Additional metadata.
 
 				jsonObject.put(
 					"metadata",
 					resultItemBuilder.getMetadata(portletRequest, document));
-				
+
 				// Execute result item processors
 
-				executeResultItemProcessors(
-					portletRequest, queryContext, document, resultItemBuilder,
+				executeResultItemProcessors( 
+					portletRequest, portletResponse, queryContext, document, resultItemBuilder,
 					jsonObject);
 
 				// Put single item to result array
@@ -363,7 +268,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @return meta information JSON object
 	 */
-	protected JSONObject createMetaObject(QueryContext queryContext, Hits hits) {
+	protected JSONObject createMetaObject(
+		QueryContext queryContext, Hits hits) {
 
 		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
@@ -484,14 +390,15 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @param resultItem
 	 */
 	protected void executeResultItemProcessors(
-		PortletRequest portletRequest, QueryContext queryContext,
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryContext,
 		Document document, ResultItemBuilder resultItemBuilder,
 		JSONObject resultItem) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing result item processors.");
 		}
-		
+
 		if (_resultItemProcessors == null) {
 			return;
 		}
@@ -502,7 +409,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				try {
 					r.process(
-						portletRequest, queryContext, document,
+						portletRequest, portletResponse, queryContext, document,
 						resultItemBuilder, resultItem);
 				}
 				catch (Exception e) {
@@ -519,59 +426,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		}
 	}
 
-	/**
-	 * Remove facet processor.
-	 * 
-	 * @param facetProcessor
-	 */
-	protected void remoceFacetProcessor(
-		FacetProcessor facetProcessor) {
-
-		_facetProcessors.remove(facetProcessor);
-	}	
-	
-	/**
-	 * Remove a result item processor.
-	 * 
-	 * @param resultItemProcessor
-	 */
 	protected void removeResultItemProcessor(
 		ResultItemProcessor resultItemProcessor) {
 
 		_resultItemProcessors.remove(resultItemProcessor);
-	}
-
-	/**
-	 * Sort facet list. Use the order of configuration.
-	 * 
-	 * @param facets
-	 * @param configuration
-	 * @return sorted facet list
-	 * @throws JSONException
-	 */
-	protected List<Facet> sortFacetList(
-		List<Facet> facets, String[] configuration)
-		throws JSONException {
-
-		List<Facet> sortedList = new ArrayList<Facet>();
-
-		for (int i = 0; i < configuration.length; i++) {
-
-			JSONObject facetItem =
-				JSONFactoryUtil.createJSONObject(configuration[i]);
-
-			String fieldName = facetItem.getString("field_name");
-
-			for (Facet facet : facets) {
-
-				if (fieldName.equals(facet.getFieldName())) {
-
-					sortedList.add(facet);
-					break;
-				}
-			}
-		}
-		return sortedList;
 	}
 
 	/**
@@ -613,17 +471,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	private static final Logger _log =
 		LoggerFactory.getLogger(ResultsBuilderImpl.class);
 
-	@Reference(
-		bind = "addFacetProcessor", 
-		cardinality = ReferenceCardinality.MULTIPLE, 
-		policy = ReferencePolicy.DYNAMIC, 
-		service = FacetProcessor.class,
-		unbind = "remoceFacetProcessor"
-	)
-	private volatile List<FacetProcessor> _facetProcessors;
-
 	@Reference
-	private FacetTranslatorFactory _facetTranslatorFactory;
+	private FacetProcessorFactory _facetProcessorFactory;
 
 	@Reference
 	private ResultItemBuilderFactory _resultsBuilderFactory;
@@ -632,7 +481,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		bind = "addResultItemProcessor", 
 		cardinality = ReferenceCardinality.MULTIPLE, 
 		policy = ReferencePolicy.DYNAMIC, 
-		service = ResultItemProcessor.class,
+		service = ResultItemProcessor.class, 
 		unbind = "removeResultItemProcessor"
 	)
 	private volatile List<ResultItemProcessor> _resultItemProcessors;

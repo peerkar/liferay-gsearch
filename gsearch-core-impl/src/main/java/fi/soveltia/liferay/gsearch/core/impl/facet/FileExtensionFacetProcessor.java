@@ -4,10 +4,14 @@ package fi.soveltia.liferay.gsearch.core.impl.facet;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,49 +19,112 @@ import java.util.Map.Entry;
 
 import org.osgi.service.component.annotations.Component;
 
-import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessor;
+import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Facet translator for document extension. {@see FacetTranslator}
+ * Facet processor for document extension.
  * 
  * @author Petteri Karttunen
  */
 @Component(
 	immediate = true,
-	service = FacetTranslator.class
+	service = FacetProcessor.class
 )
-public class FileExtensionFacetTranslator implements FacetTranslator {
+public class FileExtensionFacetProcessor extends BaseFacetProcessor
+	implements FacetProcessor {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean canProcess(String translatorName) {
+	public String getName() {
 
-		return NAME.equals(translatorName);
+		return NAME;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray fromResults(
-		QueryContext queryParams, FacetCollector facetCollector,
-		JSONObject configuration)
+	public void processFacetParameters(
+		List<FacetParameter> facetParameters, String[] parameterValues,
+		JSONObject facetConfiguration)
 		throws Exception {
 
+		JSONObject processorParams =
+			facetConfiguration.getJSONObject("processor_params");
+
+		String fieldName = processorParams.getString("field_name");
+
+		String filterMode = processorParams.getString("filter_mode", "pre");
+		String multiValueOperator =
+			processorParams.getString("multi_value_operator", "or");
+		boolean allowMultipleValues =
+			processorParams.getBoolean("allow_multiple_values", true);
+
+		List<String> values = new ArrayList<String>();
+
+		JSONArray aggregations = processorParams.getJSONArray("aggregations");
+
+		for (String parameterValue : parameterValues) {
+
+			String[] valueArray = null;
+
+			for (int i = 0; i < aggregations.length(); i++) {
+
+				JSONObject aggregation = aggregations.getJSONObject(i);
+
+				if (aggregation.getString("key").equals(parameterValue)) {
+					valueArray = aggregation.getString("values").split(",");
+					break;
+				}
+			}
+
+			if (valueArray != null) {
+				Collections.addAll(values, valueArray);
+			}
+			else {
+				values.add(parameterValue);
+			}
+		}
+
+		facetParameters.add(
+			new FacetParameter(
+				fieldName, values, allowMultipleValues, multiValueOperator,
+				filterMode));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public JSONObject processFacetResults(
+		QueryContext queryContext, Collection<Facet> facets,
+		JSONObject facetConfiguration)
+		throws Exception {
+
+		JSONObject processorParams =
+			facetConfiguration.getJSONObject("processor_params");
+
+		String fieldName = processorParams.getString("field_name");
+
+		JSONArray aggregations = processorParams.getJSONArray("aggregations");
+
+		FacetCollector facetCollector = getFacetCollector(facets, fieldName);
+
+		if (facetCollector == null) {
+			return null;
+		}
+
 		Map<String, Integer> termMap = new HashMap<String, Integer>();
-
-		JSONArray aggregations = configuration.getJSONArray("aggregations");
-
-		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
 
 		// First aggregate frequency counts
 
 		boolean mappingFound = false;
 
-		for (TermCollector tc : termCollectors) {
+		for (TermCollector tc : facetCollector.getTermCollectors()) {
 
 			// Check for empty term value!
 
@@ -96,7 +163,7 @@ public class FileExtensionFacetTranslator implements FacetTranslator {
 
 		// Then build JSON array
 
-		JSONArray facetArray = JSONFactoryUtil.createJSONArray();
+		JSONArray termArray = JSONFactoryUtil.createJSONArray();
 
 		for (Entry<String, Integer> entry : termMap.entrySet()) {
 
@@ -106,39 +173,10 @@ public class FileExtensionFacetTranslator implements FacetTranslator {
 			item.put("name", entry.getKey());
 			item.put("term", entry.getKey());
 
-			facetArray.put(item);
+			termArray.put(item);
 		}
 
-		return facetArray;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String[] toQuery(String value, JSONObject configuration) {
-
-		String[] values = null;
-
-		JSONArray aggregations = configuration.getJSONArray("aggregations");
-
-		for (int i = 0; i < aggregations.length(); i++) {
-
-			JSONObject aggregation = aggregations.getJSONObject(i);
-
-			if (aggregation.getString("key").equals(value)) {
-				values = aggregation.getString("values").split(",");
-				break;
-			}
-		}
-
-		if (values == null) {
-			values = new String[] {
-				value
-			};
-		}
-
-		return values;
+		return createResultObject(termArray, fieldName, facetConfiguration);
 	}
 
 	private static final String NAME = "file_extension";

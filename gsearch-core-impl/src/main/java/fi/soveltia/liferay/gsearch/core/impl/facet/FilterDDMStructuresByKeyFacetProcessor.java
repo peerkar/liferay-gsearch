@@ -1,9 +1,11 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.facet;
 
-import com.liferay.asset.kernel.model.AssetCategory;
-import com.liferay.asset.kernel.model.AssetVocabulary;
-import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
+import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -25,13 +27,17 @@ import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessor;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
+/**
+ * Filters DDM structures by key.
+ * 
+ * @author Petteri Karttunen
+ */
 @Component(
 	immediate = true,
 	service = FacetProcessor.class
 )
-public class FilterCategoriesByVocabularyFacetProcessor
-	extends BaseFacetProcessor
-	implements FacetProcessor { 
+public class FilterDDMStructuresByKeyFacetProcessor extends BaseFacetProcessor
+	implements FacetProcessor {
 
 	/**
 	 * {@inheritDoc}
@@ -56,44 +62,36 @@ public class FilterCategoriesByVocabularyFacetProcessor
 
 		String fieldName = processorParams.getString("field_name");
 
-		Long vocabularyId = processorParams.getLong("vocabulary_id");
+		FacetCollector facetCollector = getFacetCollector(facets, fieldName);
 
 		Locale locale =
 			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
 
-		FacetCollector facetCollector = getFacetCollector(facets, fieldName);
+		JSONArray ddmStructureKeys =
+			processorParams.getJSONArray("ddm_structure_key");
 
-		if (facetCollector == null) {
-			return null;
-		}
-		
 		JSONArray termArray = JSONFactoryUtil.createJSONArray();
 
-		if (vocabularyId > 0) {
+		if (ddmStructureKeys != null && ddmStructureKeys.length() > 0) {
 
 			try {
 				List<TermCollector> termCollectors =
 					facetCollector.getTermCollectors();
 
-				AssetVocabulary assetVocabulary =
-					_assetVocabularyLocalService.getAssetVocabulary(
-						vocabularyId);
+				for (TermCollector tc : termCollectors) {
 
-				List<AssetCategory> assetCategories =
-					assetVocabulary.getCategories();
+					for (int i = 0; i < ddmStructureKeys.length(); i++) {
 
-				for (AssetCategory assetCategory : assetCategories) {
-
-					for (TermCollector tc : termCollectors) {
-
-						if ((Long.valueOf(
-							tc.getTerm()) == assetCategory.getCategoryId())) {
+						if (tc.getTerm().equals(
+							ddmStructureKeys.getString(i))) {
 
 							JSONObject item =
 								JSONFactoryUtil.createJSONObject();
 
 							item.put("frequency", tc.getFrequency());
-							item.put("name", assetCategory.getTitle(locale));
+							item.put(
+								"name",
+								getDDMStructureName(tc.getTerm(), locale));
 							item.put("term", tc.getTerm());
 
 							termArray.put(item);
@@ -103,21 +101,34 @@ public class FilterCategoriesByVocabularyFacetProcessor
 
 			}
 			catch (PortalException e) {
-
-				_log.warn(
-					"Asset vocabulary " + vocabularyId + " defined in facets " +
-						"configuration was not found.");
+				_log.error(e.getMessage(), e);
 			}
 
 		}
 		return createResultObject(termArray, fieldName, facetConfiguration);
 	}
 
-	private static final Logger _log = LoggerFactory.getLogger(
-		FilterCategoriesByVocabularyFacetProcessor.class);
+	private String getDDMStructureName(String ddmStructureKey, Locale locale)
+		throws Exception {
 
-	private static final String NAME = "filter_categories_by_vocabulary";
+		DynamicQuery structureQuery = _ddmStructureLocalService.dynamicQuery();
+		structureQuery.add(
+			RestrictionsFactoryUtil.eq("structureKey", ddmStructureKey));
+
+		List<DDMStructure> structures =
+			DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
+
+		DDMStructure structure = structures.get(0);
+
+		return structure.getName(locale, true);
+
+	}
+
+	private static final Logger _log =
+		LoggerFactory.getLogger(FilterDDMStructuresByKeyFacetProcessor.class);
+
+	private static final String NAME = "filter_ddm_structures_by_key";
 
 	@Reference
-	AssetVocabularyLocalService _assetVocabularyLocalService;
+	private DDMStructureLocalService _ddmStructureLocalService;
 }

@@ -14,7 +14,7 @@ import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Keyword parameter builder.
+ * Parses keyword request parameter.
  * 
  * @author Petteri Karttunen
  */

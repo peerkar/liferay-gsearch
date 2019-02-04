@@ -2,6 +2,7 @@
 package fi.soveltia.liferay.gsearch.core.impl;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -105,7 +106,7 @@ public class GSearchImpl implements GSearch {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-
+		
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
 	}
@@ -233,23 +234,27 @@ public class GSearchImpl implements GSearch {
 
 		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject item =
+			JSONObject configurationItem =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
-
-			String fieldName = item.getString("field_name");
-
-			JSONObject dataObject = JSONFactoryUtil.createJSONObject();
-			dataObject.put("maxTerms", _moduleConfiguration.maxFacetTerms());
-
-			FacetConfiguration facetConfiguration = new FacetConfiguration();
-			facetConfiguration.setFieldName(fieldName);
-			facetConfiguration.setStatic(false);
-			facetConfiguration.setDataJSONObject(dataObject);
-
-			Facet facet = new SimpleFacet(searchContext);
-			facet.setFacetConfiguration(facetConfiguration);
-
-			searchContext.addFacet(facet);
+			
+			JSONArray aggregateFields = configurationItem.getJSONArray("aggregate_fields");
+			
+			for (int j = 0; j < aggregateFields.length(); j++) {
+				
+				JSONObject dataObject = JSONFactoryUtil.createJSONObject();
+				
+				dataObject.put("maxTerms", _moduleConfiguration.maxFacetTerms());
+	
+				FacetConfiguration facetConfiguration = new FacetConfiguration();
+				facetConfiguration.setFieldName(aggregateFields.getString(j));
+				facetConfiguration.setStatic(false);
+				facetConfiguration.setDataJSONObject(dataObject);
+	
+				Facet facet = new SimpleFacet(searchContext);
+				facet.setFacetConfiguration(facetConfiguration);
+	
+				searchContext.addFacet(facet);
+			}
 		}
 	}
 

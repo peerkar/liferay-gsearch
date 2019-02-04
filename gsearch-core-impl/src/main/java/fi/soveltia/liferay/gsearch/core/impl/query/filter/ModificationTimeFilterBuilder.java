@@ -14,6 +14,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
 
@@ -34,8 +35,14 @@ public class ModificationTimeFilterBuilder implements FilterBuilder {
 		BooleanFilter postFilter, QueryContext queryContext)
 		throws Exception {
 
-		Date from = (Date) queryContext.getParameter(ParameterNames.TIME_FROM);
-		Date to = (Date) queryContext.getParameter(ParameterNames.TIME_TO);
+		FilterParameter filter = queryContext.getFilterParameter(ParameterNames.TIME);
+		
+		if (filter == null) {
+			return;
+		}
+		
+		Date from = (Date) filter.getAttribute("timeFrom");
+		Date to = (Date) filter.getAttribute("timeTo");
 
 		if (from != null && to != null) {
 			BooleanQuery query = new BooleanQueryImpl();

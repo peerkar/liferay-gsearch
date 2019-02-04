@@ -2,17 +2,17 @@
 package fi.soveltia.liferay.gsearch.core.api.facet;
 
 /**
- * Facet translator factory.
+ * Facet processor factory.
  * 
  * @author Petteri Karttunen
  */
-public interface FacetTranslatorFactory {
+public interface FacetProcessorFactory {
 
 	/**
-	 * Get translator by name.
+	 * Get processor by name.
 	 * 
-	 * @param translatorName
+	 * @param processorName
 	 * @return
 	 */
-	public FacetTranslator getTranslator(String translatorName);
+	public FacetProcessor getProcessor(String processorName);
 }
