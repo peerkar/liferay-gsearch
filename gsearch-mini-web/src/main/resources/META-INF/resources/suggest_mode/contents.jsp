@@ -35,6 +35,8 @@
 <aui:script>
 
 	Liferay.Portlet.ready(
+			
+			
 	
 	    function(portletId, node) {
 			<portlet:namespace />initAutocomplete();
@@ -49,6 +51,23 @@
 	    }
 	);
 	
+	/**
+	 * Do search from icon or enter press.
+	 */
+	function <portlet:namespace />doSearch() {
+
+		let q = $('#<portlet:namespace />MiniSearchField').val();
+
+		if (q.length < <%=queryMinLength %>) {
+			<portlet:namespace />showMessage(Liferay.Language.get('min-character-count-is') + ' <%=queryMinLength %> ');
+			return false;
+		}
+
+		let url = "<%= searchPageURL %>?q=" + q;
+
+		window.location.replace(url);
+	}
+
 	/**
 	 * Handle keyup  events.
 	 */
