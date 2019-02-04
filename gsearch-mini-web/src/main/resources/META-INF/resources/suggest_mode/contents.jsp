@@ -67,6 +67,8 @@
 	 function <portlet:namespace />initAutocomplete() {
 
 		var searchFieldElement = $('#<portlet:namespace />MiniSearchField');
+		
+		let suggestionGroups = {};
 		 		
 		Liferay.Loader.require('devbridge-autocomplete', function() {
 
@@ -77,6 +79,58 @@
 				formatResult: function (suggestion, currentValue) {
 
 		            return suggestion.value;
+				},
+				formatResult: function(suggestion, currentValue) {
+
+					// Icon
+					
+					let iconDiv = $('<div/>').addClass('item-icon col-md-1 col-lg-1');
+					
+					if (suggestion.data.typeKey !== 'tool') {
+						let svg = $('<svg/>');
+	                    svg.attr('role', 'img');
+	                    let use = $('<use/>');
+	                    use.attr('xlink:href', '/o/flamma-theme/images/flamma/svg/svg.svg#' + suggestion.data.icon);
+	                    svg.append(use);
+	                    iconDiv.append(svg);
+
+					} else {
+
+						let span = $('<span/>');
+						iconDiv.addClass('tool');
+						span.html(suggestion.value.trim().substring(0,1).toUpperCase());
+						iconDiv.append(span);
+					}
+
+					// Data
+					
+					let dataDiv = $('<div/>').addClass('item-data  col-md-11 col-lg-11');
+
+					// Title
+					
+					let titleDiv = $('<div/>').addClass('search-suggestion-item-title').html(suggestion.value);
+
+					// Description 
+					
+					let descriptionDiv = $('<div/>').addClass('search-suggestion-item-description')
+					 
+					// Breadcrumbs 
+					
+					if (suggestion.data.breadcrumbs) {
+					
+						let breadcrumbSpan = $('<span/>').addClass('breadcrumb').html(suggestion.data.breadcrumbs);
+		                descriptionDiv.append(breadcrumbSpan);
+					}
+					
+	                // Date
+	                
+	                if (suggestion.data.date !== '') {
+	                    let dateSpan = $('<span/>').addClass('date').html(suggestion.data.date);
+	                	descriptionDiv.append(dateSpan)
+					}
+	                dataDiv.append(titleDiv);
+	                dataDiv.append(descriptionDiv);
+					return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 				},
 				formatGroup: function(suggestion, category) {
 					
