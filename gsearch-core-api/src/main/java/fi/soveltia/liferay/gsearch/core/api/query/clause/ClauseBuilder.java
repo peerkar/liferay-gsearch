@@ -16,7 +16,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public interface ClauseBuilder {
 
 	/**
-	 * Build clause.
+	 * Builds clause.
 	 * 
 	 * @param portletRequest
 	 * @param configuration
@@ -30,7 +30,7 @@ public interface ClauseBuilder {
 		throws Exception;
 
 	/**
-	 * Check if this builder can build the requested query type
+	 * Checks if this builder can build the requested query type
 	 * 
 	 * @param queryType
 	 * @return

@@ -6,7 +6,7 @@ import javax.portlet.PortletRequest;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Configuration helper interface.
+ * Configuration helper service.
  * 
  * @author Petteri Karttunen
  */

@@ -18,7 +18,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public interface ResultsBuilder {
 
 	/**
-	 * Build search results.
+	 * Builds search results.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse

@@ -11,7 +11,7 @@ import com.liferay.portal.kernel.search.Document;
 public interface ResultItemBuilderFactory {
 
 	/**
-	 * Get result builder.
+	 * Gets result builder.
 	 * 
 	 * @param document
 	 * @return ResultItemBuilder

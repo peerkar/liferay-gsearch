@@ -10,7 +10,7 @@ package fi.soveltia.liferay.gsearch.core.api.query.clause;
 public interface ClauseBuilderFactory {
 
 	/**
-	 * Get clause builder.
+	 * Gets clause builder.
 	 * 
 	 * @param queryType
 	 * @return ClauseBuilder

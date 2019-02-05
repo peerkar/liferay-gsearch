@@ -11,14 +11,18 @@ import javax.portlet.PortletResponse;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Asset type specific single result item builder. 
+ * Builds a single result item. 
  * 
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
 
 	/**
-	 * Check if this builder can build the result item for the document.
+	 * Checks whether this builder can build the result item 
+	 * for the index document. 
+	 * 
+	 * This is usually based on asset type but can be any condition.
+	 * 
 	 * 
 	 * @param document
 	 * @return
@@ -26,7 +30,7 @@ public interface ResultItemBuilder {
 	public boolean canBuild(Document document);
 
 	/**
-	 * Get item date. 
+	 * Gets item date. 
 	 * 
 	 * @param portletRequest
 	 * @param document
@@ -37,7 +41,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item description.
+	 * Gets item description.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -51,7 +55,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item link.
+	 * Gets item link.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -66,7 +70,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item additional metadata.
+	 * Gets item additional metadata.
 	 * 
 	 * @param portletRequest
 	 * @param document
@@ -78,7 +82,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get thumbnail (src) for a result item.
+	 * Gets thumbnail (src) for a result item.
 	 * 
 	 * @param portletRequest
 	 * @param document
@@ -89,7 +93,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item title.
+	 * Gets item title.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse
@@ -104,7 +108,7 @@ public interface ResultItemBuilder {
 		throws Exception;
 
 	/**
-	 * Get item asset type.
+	 * Gets item asset type.
 	 * 
 	 * @param document
 	 * @return name of the item asset type

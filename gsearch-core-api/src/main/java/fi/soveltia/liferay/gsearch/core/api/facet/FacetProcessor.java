@@ -11,8 +11,9 @@ import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Processes facets from parameters to query and from results to UI. For
- * example, file extension facet processor translates both "doc" and "docx"
+ * Processes facets from parameters to query and from results to UI. 
+ * 
+ * For example, file extension facet processor translates both "doc" and "docx"
  * facet terms and frequencies to a single aggregation called "MS Word". During
  * query time it translates MS Word back to query params "doc" and "docx".
  * 
@@ -21,14 +22,15 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public interface FacetProcessor {
 
 	/**
-	 * Get processor name.
+	 * Gets processor name.
 	 * 
 	 * @return
 	 */
 	public String getName();
 	
 	/**
-	 * Process facet request parameter values to facetparameter filters.
+	 * Processes / translates facet request parameter values 
+	 * to facetparameter filters.
 	 * 
 	 * @param facetParameters
 	 * @param parameterValues
@@ -41,7 +43,7 @@ public interface FacetProcessor {
 		throws Exception;
 
 	/**
-	 * Process facet values from search results for UI.
+	 * Processes facet values from search results for UI.
 	 * 
 	 * @param queryContext
 	 * @param facets

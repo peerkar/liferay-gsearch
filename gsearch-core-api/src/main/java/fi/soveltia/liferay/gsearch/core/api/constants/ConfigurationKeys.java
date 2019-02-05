@@ -1,5 +1,11 @@
 package fi.soveltia.liferay.gsearch.core.api.constants;
 
+/**
+ * Configuration keys.
+ * 
+ * @author Petteri Karttunen
+ *
+ */
 public class ConfigurationKeys {
 
 	public static final String CLAUSE = "clause";
