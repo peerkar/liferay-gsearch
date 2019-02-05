@@ -6,12 +6,7 @@
  	"values": [
 		"com.liferay.journal.model.JournalArticle",
 		"com.liferay.document.library.kernel.model.DLFileEntry",
-		"com.liferay.message.boards.kernel.model.MBMessage",
-		"com.liferay.blogs.kernel.model.BlogsEntry",
-		"com.liferay.blogs.model.BlogsEntry",
-		"com.liferay.knowledge.base.model.KBArticle",
-		"com.liferay.wiki.model.WikiPage",
-		"non-liferay-type-example"
+		"fi.helsinki.flamma.feed.model.FeedEntry"
 	],
 	"value_occur": "should"
 }

@@ -145,10 +145,7 @@
 		
 				.description {
 					color: #545454;
-					
-					@include media-query(null, $screen-xs-max) {
-						word-break: break-all;
-					}
+					word-break: break-word;
 				}
 			}
 		}

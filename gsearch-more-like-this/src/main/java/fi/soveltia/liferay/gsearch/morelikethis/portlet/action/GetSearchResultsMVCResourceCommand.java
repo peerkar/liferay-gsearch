@@ -414,9 +414,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			ConfigurationKeys.CLAUSE,
 			getMoreLikeThisClauseConfiguration(preferences));
 
-		
 		queryContext.setConfiguration(ConfigurationKeys.FILTER,
 			getFilterConfiguration(preferences));
+
+		queryContext.setConfiguration(ConfigurationKeys.FACET,
+			_configurationHelper.getFacetConfiguration());
 
 		queryContext.setStart(0);
 		int itemsToShow =
