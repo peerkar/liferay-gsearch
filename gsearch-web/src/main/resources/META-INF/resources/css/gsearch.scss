@@ -25,24 +25,30 @@
 	/* Datepicker */
 	
 	.datepicker-title {
+		color: #777;
 	    font-weight: bold;
 	    margin: 5px 0 0px 20px;
 	}
 	
-	.datepicker-container {
-		background: #fff;
-		margin: 5px 10px 20px 10px;
-		position: absolute;
+	.datepicker-wrapper {
+	
+		min-height:50px;
+	
+		.datepicker-container {
+			background: #fff;
+			margin: 5px 10px 20px 10px;
+			position: absolute;
+			
+			.actual-range {
+				display: flex;
+				font-size:90%;
+				margin: 0 auto;
+				width: 85%;
+			}
 		
-		.actual-range {
-			display: flex;
-			font-size:90%;
-			margin: 0 auto;
-			width: 80%;
-		}
-		
-		.range-divider {
-			margin: 0 10%;
+			.range-divider {
+				margin: 0 10%;
+			}
 		}
 	}
 	
@@ -305,7 +311,7 @@
 		padding-right: 0;
 		text-align: right;
 		
-		.options {
+		.options { 
 			float: right;
 			list-style-type: none;
 			

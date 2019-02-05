@@ -16,7 +16,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public interface GSearch {
 
 	/**
-	 * Get search results.
+	 * Gets search results.
 	 * 
 	 * @param portletRequest
 	 * @param portletResponse

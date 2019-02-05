@@ -4,7 +4,6 @@ import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClass
 
 import aQute.bnd.annotation.metatype.Meta;
 
-
 @ExtendedObjectClassDefinition(
 	category = "GSearch"
 )

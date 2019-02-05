@@ -18,7 +18,7 @@ import javax.portlet.PortletRequest;
 public interface QueryContributor {
 
 	/**
-	 * Build query.
+	 * Builds query.
 	 * 
 	 * @param portletRequest
 	 * @return Query

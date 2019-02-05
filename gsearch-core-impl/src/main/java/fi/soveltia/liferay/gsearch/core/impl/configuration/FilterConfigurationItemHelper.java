@@ -12,17 +12,17 @@ import org.osgi.service.component.annotations.Modified;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationItemHelper;
 
 /**
- * Facet configuration helper
+ * Prefilter configuration helper
  * 
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = AssetTypeConfigurationItemHelper.CONFIGURATION_PID, 
+	configurationPid = FilterConfigurationItemHelper.CONFIGURATION_PID, 
 	immediate = true,
-	property = "config.item=assettype",
+	property = "config.item=filter",
 	service = ConfigurationItemHelper.class
 )
-public class AssetTypeConfigurationItemHelper implements ConfigurationItemHelper {
+public class FilterConfigurationItemHelper implements ConfigurationItemHelper {
 
 	/**
 	 * {@inheritDoc}
@@ -30,7 +30,7 @@ public class AssetTypeConfigurationItemHelper implements ConfigurationItemHelper
 	@Override
 	public String[] getConfiguration() {
 
-		return _configuration.assetTypes();
+		return _configuration.filters();
 	}
 
 	@Activate
@@ -38,12 +38,12 @@ public class AssetTypeConfigurationItemHelper implements ConfigurationItemHelper
 	protected void activate(Map<String, Object> properties) {
 
 		_configuration = ConfigurableUtil.createConfigurable(
-			AssetTypeConfiguration.class, properties);
+			FilterConfiguration.class, properties);
 	}
 
-	private volatile AssetTypeConfiguration _configuration;
+	private volatile FilterConfiguration _configuration;
 
 	public static final String CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.AssetTypeConfiguration";
+		"fi.soveltia.liferay.gsearch.core.impl.configuration.FilterConfiguration";
 	
 }

@@ -10,10 +10,12 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
 import com.liferay.portal.kernel.service.GroupLocalService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,64 +23,65 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
-import fi.soveltia.liferay.gsearch.core.api.facet.FacetTranslator;
+import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessor;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Facet translator for web content structures.
+ * Facet processor for web content structures.
  * 
  * @author Petteri Karttunen
- * 
  */
 @Component(
-	immediate = true,
-	service = FacetTranslator.class
+	immediate = true, 
+	service = FacetProcessor.class
 )
-public class DDMStructureFacetTranslator implements FacetTranslator {
+public class DDMStructureFacetProcessor extends BaseFacetProcessor
+	implements FacetProcessor {
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean canProcess(String translatorName) {
+	public String getName() {
 
-		return NAME.equals(translatorName);
+		return NAME;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray fromResults(
-		QueryContext queryContext, FacetCollector facetCollector,
-		JSONObject configuration)
+	public JSONObject processFacetResults(
+		QueryContext queryContext, Collection<Facet> facets,
+		JSONObject facetConfiguration)
 		throws Exception {
 
-		Locale locale  = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
+		JSONObject processorParams =
+			facetConfiguration.getJSONObject("processor_params");
 
-		JSONArray facetArray = JSONFactoryUtil.createJSONArray();
+		String fieldName = processorParams.getString("field_name");
+
+		FacetCollector facetCollector = getFacetCollector(facets, fieldName);
+
+		if (facetCollector == null) {
+			return null;
+		}
+
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
+
+		JSONArray termArray = JSONFactoryUtil.createJSONArray();
 
 		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
 
 		for (TermCollector tc : termCollectors) {
 
 			JSONObject item = parseStructureData(tc, locale);
-			
-			facetArray.put(item);
+
+			termArray.put(item);
 		}
 
-		return facetArray;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String[] toQuery(String value, JSONObject configuration) {
-
-		return new String[] {
-			value
-		};
+		return createResultObject(termArray, fieldName, facetConfiguration);
 	}
 
 	/**

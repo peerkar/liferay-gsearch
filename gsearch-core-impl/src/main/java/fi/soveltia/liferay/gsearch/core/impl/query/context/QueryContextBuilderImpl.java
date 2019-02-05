@@ -13,7 +13,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
-import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationException;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
@@ -46,7 +45,7 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	 */
 	@Override
 	public QueryContext buildQueryContext(
-		PortletRequest portletRequest, String[] assetTypeConfiguration,
+		PortletRequest portletRequest, String[] filterConfiguration,
 		String[] clauseConfiguration, String[] facetConfiguration,
 		String[] sortConfiguration, int pageSize)
 		throws Exception {
@@ -56,7 +55,7 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 		queryContext.setPageSize(pageSize);
 
 		setConfigurations(
-			queryContext, assetTypeConfiguration, clauseConfiguration,
+			queryContext, filterConfiguration, clauseConfiguration,
 			facetConfiguration, sortConfiguration);
 
 		// Run parameter builders
@@ -84,13 +83,13 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	 * @param sortConfiguration
 	 */
 	protected void setConfigurations(
-		QueryContext queryContext, String[] assetTypeConfiguration,
+		QueryContext queryContext, String[] filterConfiguration,
 		String[] clauseConfiguration, String[] facetConfiguration,
 		String[] sortConfiguration) {
 
-		if (assetTypeConfiguration == null) {
-			queryContext.setConfiguration(ConfigurationKeys.ENTRY_CLASS_NAME,
-				_configurationHelper.getAssetTypeConfiguration());
+		if (filterConfiguration == null) {
+			queryContext.setConfiguration(ConfigurationKeys.FILTER,
+				_configurationHelper.getFilterConfiguration());
 		}
 
 		if (clauseConfiguration == null) {

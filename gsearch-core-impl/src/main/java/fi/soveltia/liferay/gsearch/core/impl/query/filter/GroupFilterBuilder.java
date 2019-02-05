@@ -14,6 +14,7 @@ import javax.portlet.PortletRequest;
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
 
@@ -37,8 +38,14 @@ public class GroupFilterBuilder implements FilterBuilder {
 		BooleanFilter postFilter, QueryContext queryContext)
 		throws Exception {
 
+		FilterParameter filter = queryContext.getFilterParameter(ParameterNames.GROUP_ID);
+		
+		if (filter == null) {
+			return;
+		}
+
 		long[] groupIds =
-			(long[]) queryContext.getParameter(ParameterNames.GROUP_ID);
+			(long[]) filter.getAttribute("values");
 
 		if (groupIds != null && groupIds.length > 0) {
 

@@ -44,7 +44,7 @@
 				"occur": "should",
 				"query_configuration": {
 					"boost": "5",
-					"field_name": "assetTagNames.raw",
+					"field_name": "assetCategoryTitles",
 					"query": "official"
 				}
 			}

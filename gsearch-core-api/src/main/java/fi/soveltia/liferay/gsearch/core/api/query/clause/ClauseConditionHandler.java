@@ -15,6 +15,14 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public interface ClauseConditionHandler {
 
 	/**
+	 * Checks if this handler can process the requested type.
+	 * 
+	 * @param handlerName
+	 * @return
+	 */
+	public boolean canProcess(String handlerName);
+
+	/**
 	 * Is this condition true.
 	 * 
 	 * @param portletRequest
@@ -27,12 +35,4 @@ public interface ClauseConditionHandler {
 		PortletRequest portletRequest, QueryContext queryContext,
 		JSONObject parameters)
 		throws Exception;
-
-	/**
-	 * Check if this handler can process the requested type.
-	 * 
-	 * @param handlerName
-	 * @return
-	 */
-	public boolean canProcess(String handlerName);
 }

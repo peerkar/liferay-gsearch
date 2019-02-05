@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationException;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
@@ -100,12 +101,19 @@ public class ModificationTimeParameterBuilder implements ParameterBuilder {
 			timeFrom = calendar.getTime();
 		}
 
-		if (timeFrom != null) {
-			queryContext.setParameter(ParameterNames.TIME_FROM, timeFrom);
-		}
+		if (timeFrom != null || timeTo != null) {
+		
+			FilterParameter filter = new FilterParameter(ParameterNames.TIME);
+			
+			if (timeFrom != null) {
+				filter.setAttribute("timeFrom", timeFrom);
+			}
 
-		if (timeTo != null) {
-			queryContext.setParameter(ParameterNames.TIME_TO, timeTo);
+			if (timeTo != null) {
+				filter.setAttribute("timeTo", timeTo);
+			}
+			
+			queryContext.addFilterParameter(ParameterNames.TIME, filter);
 		}
 	}
 

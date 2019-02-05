@@ -198,6 +198,22 @@ class GSearch extends Component {
 					this.components.sortComponent.visible = false;
 				}
 				
+				/*// FIXME
+
+				this.components.resultsComponent.results = results;
+				this.components.pagingComponent.paging = results.paging;
+				
+				if (results.items && results.items.length > 0) {
+					this.components.hyComponent.results = results;
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
+					$('#' + this.portletNamespace + 'Stats').show();
+				} else {
+					$('#' + this.portletNamespace + 'Stats').hide();
+					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
+				}
+
+				 */
+				
 			} else {
 				
 				// Assume here simply that there was an error if response was empty.

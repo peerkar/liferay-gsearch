@@ -9,19 +9,18 @@ import aQute.bnd.annotation.metatype.Meta;
 	category = "GSearch"
 )
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.core.impl.configuration.AssetTypeConfiguration",
+	id = "fi.soveltia.liferay.gsearch.core.impl.configuration.FilterConfiguration",
 	localization = "content/Language",
-	name = "asset-type-configuration"
+	name = "filter-configuration"
 )
-public interface AssetTypeConfiguration {
+public interface FilterConfiguration {
 
-	
 	@Meta.AD(
 		deflt = "",
-		description = "asset-types-desc",
-	    name = "asset-types-name",
+		description = "filter-desc",
+	    name = "filter-name",
 		required = false
 	)
-	public String[] assetTypes();
+	public String[] filters();
 	
 }

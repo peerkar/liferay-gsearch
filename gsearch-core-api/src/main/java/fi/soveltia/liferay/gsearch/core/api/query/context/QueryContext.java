@@ -3,8 +3,13 @@ package fi.soveltia.liferay.gsearch.core.api.query.context;
 
 import com.liferay.portal.kernel.search.Sort;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 
 /**
  * Query context.
@@ -37,6 +42,40 @@ public class QueryContext {
 	public void setEnd(int end) {
 
 		_end = end;
+	}
+
+	public void addFacetParameters(FacetParameter facetParameter) {
+
+		if (_facetParameters == null) {
+			_facetParameters = new ArrayList<FacetParameter>();
+		}
+		_facetParameters.add(facetParameter);
+	}
+
+	public List<FacetParameter> getFacetParameters() {
+
+		return _facetParameters;
+	}
+
+	public void setFacetParameters(List<FacetParameter> facetParameters) {
+
+		_facetParameters = facetParameters;
+	}
+
+	public void addFilterParameter(String key, FilterParameter filterParameter) {
+
+		if (_filterParameters == null) {
+			_filterParameters = new HashMap<String, FilterParameter>();
+		}
+		_filterParameters.put(key, filterParameter);
+	}
+	
+	public FilterParameter getFilterParameter(String key) {
+
+		if (_filterParameters != null) {
+			return _filterParameters.get(key);
+		}
+		return null;
 	}
 
 	public String getKeywords() {
@@ -128,6 +167,9 @@ public class QueryContext {
 
 	private String _keywords;
 	private String _originalKeywords;
+
+	private List<FacetParameter> _facetParameters;
+	private Map<String, FilterParameter> _filterParameters;
 	
 	private Map<String, String[]> _configurations;
 	private Map<String, Object> _parameters;
