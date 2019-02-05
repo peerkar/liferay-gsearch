@@ -78,7 +78,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		// Set categories to result item.
-		
+
 		setCategories(document, themeDisplay.getLocale(), resultItem);;
 
 		// Set type, icon and breadcrumbs.
@@ -356,7 +356,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			else if (JournalArticle.class.getName().equals(entryClassName)) {
 
 				resultItem.put("typeKey", "content");
-				resultItem.put("icon", "");
+				resultItem.put("icon", "icon-content");
 				resultItem.put(
 					"breadcrumbs",
 					getJournalArticleBreadcrumbs(
