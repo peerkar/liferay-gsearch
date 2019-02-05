@@ -406,11 +406,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		
 		// Don't show maps layout if Google Maps API key not defined.
 
-		if ("maps".equals(resultLayout) && 
+		if ("maps".equals(configurationItem.getString("key")) && 
 				Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
 			return false;
 		}
-
+		
 		// Process filters
 
 		JSONArray paramFiltersArray =
