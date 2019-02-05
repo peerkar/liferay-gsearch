@@ -55,13 +55,17 @@ public class HYDDMUtil {
 
 		List<String> keys = new ArrayList<String>();
 
-		JSONObject processorParams;
 		try {
-			processorParams =
-				getHYCompositeFacetConfiguration(queryContext).getJSONObject(
-					"processor_params");
+			
+			JSONObject configuration = 	getHYCompositeFacetConfiguration(queryContext);
+			
+			if (configuration != null) {
+				
+				JSONObject processorParams = configuration.getJSONObject(
+						"processor_params");				
+				keys = getDDMStructureKeys(HY_NEWS__KEY, processorParams);
+			}
 
-			keys = getDDMStructureKeys(HY_NEWS__KEY, processorParams);
 		}
 		catch (JSONException e) {
 			_log.error("Couldn't resolve HY composite facet configuration.", e);
@@ -133,6 +137,10 @@ public class HYDDMUtil {
 		String[] facetConfiguration =
 			queryContext.getConfiguration(ConfigurationKeys.FACET);
 
+		if (facetConfiguration == null) {
+			return null;
+		}
+		
 		for (int i = 0; i < facetConfiguration.length; i++) {
 
 			JSONObject configurationItem =
