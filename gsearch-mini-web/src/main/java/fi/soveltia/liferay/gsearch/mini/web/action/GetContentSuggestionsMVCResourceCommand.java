@@ -41,16 +41,16 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
 
 /**
  * Resource command for getting suggestions (autocomplete).
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration",
-	immediate = true, 
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
 		"mvc.command.name=" + GSearchMiniResourceKeys.GET_CONTENT_SUGGESTIONS
-	}, 
+	},
 	service = MVCResourceCommand.class
 )
 public class GetContentSuggestionsMVCResourceCommand
@@ -84,7 +84,7 @@ public class GetContentSuggestionsMVCResourceCommand
 			queryContext = _queryContextBuilder.buildQueryContext(
 				resourceRequest,
 				_moduleConfiguration.contentSuggestionsCount());
-			
+
 
 			queryContext.setParameter(
 				ParameterNames.ASSET_PUBLISHER_URL,
@@ -116,6 +116,8 @@ public class GetContentSuggestionsMVCResourceCommand
 
 			setResultTypeLocalizations(resourceRequest, responseObject);
 
+			setGroupingLocalizations(resourceRequest, responseObject);
+
 		}
 		catch (Exception e) {
 
@@ -132,7 +134,7 @@ public class GetContentSuggestionsMVCResourceCommand
 
 	/**
 	 * Get localization.
-	 * 
+	 *
 	 * @param key
 	 * @param locale
 	 * @param objects
@@ -155,7 +157,7 @@ public class GetContentSuggestionsMVCResourceCommand
 	/**
 	 * Localize result types This is not in the templates because of
 	 * https://issues.liferay.com/browse/LPS-75141
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param responseObject
 	 * @throws JSONException
@@ -182,9 +184,33 @@ public class GetContentSuggestionsMVCResourceCommand
 			resultItem.put(
 				"type", getLocalization(
 					resultItem.getString("type").toLowerCase(), locale));
-		}		
+		}
 	}
 
+	protected void setGroupingLocalizations(
+		PortletRequest portletRequest, JSONObject responseObject)
+		throws JSONException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		Locale locale = themeDisplay.getLocale();
+
+		JSONArray items = responseObject.getJSONArray("items");
+
+		if (items == null || items.length() == 0) {
+			return;
+		}
+
+		for (int i = 0; i < items.length(); i++) {
+
+			JSONObject resultItem = items.getJSONObject(i);
+
+			resultItem.put(
+				"group", getLocalization("suggestion.group." +
+					resultItem.getString("group").toLowerCase(), locale));
+		}
+	}
 	private static final Logger _log =
 		LoggerFactory.getLogger(GetContentSuggestionsMVCResourceCommand.class);
 
@@ -205,7 +231,7 @@ public class GetContentSuggestionsMVCResourceCommand
 	private ResourceBundle _resourceBundle;
 
 	@Reference(
-		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", 
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)",
 		unbind = "-"
 	)
 	private ResourceBundleLoader _resourceBundleLoader;

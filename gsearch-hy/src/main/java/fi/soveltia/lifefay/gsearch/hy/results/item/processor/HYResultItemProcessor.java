@@ -363,6 +363,14 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 						portletRequest, portletResponse, queryContext, document,
 						resultItemBuilder));
 			}
+			// add else branch for  process tools and people, set group etc
+			resultItem.put("group", "content");
+			List<String> facets = new ArrayList<>();
+			facets.add("news");
+			facets.add("contents");
+			facets.add("feeds");
+			facets.add("documents");
+			resultItem.put("facets", facets);
 		}
 		catch (Exception e) {
 

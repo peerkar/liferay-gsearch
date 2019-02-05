@@ -152,9 +152,10 @@
 					return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 				},
 				formatGroup: function(suggestion, category) {
-
-					var link = '<%= searchPageURL %>' + '?type=' +
-						suggestion.data.key + '&q=' +
+					var facets = suggestion.data.facets;
+					var facetUrlParams = 'hf=' + facets.join('&hf=');
+					var link = '<%= searchPageURL %>' + '?' +
+						facetUrlParams + '&q=' +
 						$('#<portlet:namespace />MiniSearchField').val();
 
 			        return '<div class="autocomplete-group">' +
@@ -164,7 +165,7 @@
 			       					 	Liferay.Language.get('more') +
 		       				'</a></span></div>';
 			    },
-				groupBy: 'type',
+				groupBy: 'group',
 				minChars: <%=queryMinLength %>,
 				noCache: false,
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
