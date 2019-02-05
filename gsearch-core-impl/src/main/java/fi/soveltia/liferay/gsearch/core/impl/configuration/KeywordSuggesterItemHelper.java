@@ -17,7 +17,7 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationItemHelpe
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = SortConfigurationItemHelper.CONFIGURATION_PID, 
+	configurationPid = KeywordSuggesterItemHelper.CONFIGURATION_PID, 
 	immediate = true,
 	property = "config.item=keyword",
 	service = ConfigurationItemHelper.class
