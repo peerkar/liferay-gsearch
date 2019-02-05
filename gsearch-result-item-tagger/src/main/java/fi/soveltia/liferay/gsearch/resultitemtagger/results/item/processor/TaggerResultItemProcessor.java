@@ -4,7 +4,6 @@ package fi.soveltia.liferay.gsearch.resultitemtagger.results.item.processor;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
-import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
