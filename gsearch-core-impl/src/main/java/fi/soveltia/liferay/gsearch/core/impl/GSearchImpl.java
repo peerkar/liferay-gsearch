@@ -61,19 +61,16 @@ public class GSearchImpl implements GSearch {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONObject getSearchResults(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryContext queryContext)
-		throws Exception {
+	public JSONObject getSearchResults(PortletRequest portletRequest, PortletResponse portletResponse,
+			QueryContext queryContext) throws Exception {
 
 		// Build query.
 
 		Query query = _queryBuilder.buildQuery(portletRequest, queryContext);
-		
+
 		// Create SearchContext.
 
-		SearchContext searchContext =
-			getSearchContext(portletRequest, queryContext);
+		SearchContext searchContext = getSearchContext(portletRequest, queryContext);
 
 		// Set facets.
 
@@ -91,14 +88,13 @@ public class GSearchImpl implements GSearch {
 
 		if (queryContext.isQueryPostProcessorsEnabled()) {
 
-			executeQueryPostProcessors(
-				portletRequest, searchContext, queryContext, hits);
+			executeQueryPostProcessors(portletRequest, searchContext, queryContext, hits);
 		}
 
 		// Build results JSON object.
 
-		JSONObject resultsObject = _resultsBuilder.buildResults(
-			portletRequest, portletResponse, queryContext, searchContext, hits);
+		JSONObject resultsObject = _resultsBuilder.buildResults(portletRequest, portletResponse, queryContext,
+				searchContext, hits);
 
 		return resultsObject;
 	}
@@ -106,18 +102,11 @@ public class GSearchImpl implements GSearch {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
+
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(ModuleConfiguration.class, properties);
 	}
 
-	/**
-	 * Add query post processor.
-	 * 
-	 * @param clauseBuilder
-	 */
-	protected void addQueryPostProcessor(
-		QueryPostProcessor queryPostProcessor) {
+	protected void addQueryPostProcessor(QueryPostProcessor queryPostProcessor) {
 
 		if (_queryPostProcessors == null) {
 			_queryPostProcessors = new ArrayList<QueryPostProcessor>();
@@ -134,46 +123,39 @@ public class GSearchImpl implements GSearch {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
-	protected Hits execute(SearchContext searchContext, Query query)
-		throws Exception {
+	protected Hits execute(SearchContext searchContext, Query query) throws Exception {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing search with query: " + query.toString());
 		}
 
-		BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
-			query, BooleanClauseOccur.MUST.getName());
+		BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(query, BooleanClauseOccur.MUST.getName());
 
-		searchContext.setBooleanClauses(
-			new BooleanClause[] {
-				booleanClause
-			});
+		searchContext.setBooleanClauses(new BooleanClause[] { booleanClause });
 
 		Hits hits = _indexSearcherHelper.search(searchContext, query);
-		
+
 		if (_log.isDebugEnabled()) {
-			
+
 			if (hits != null) {
 				_log.debug("Query: " + hits.getQuery());
 				_log.debug("Hits: " + hits.getLength());
 				_log.debug("Returned: " + hits.getDocs().length);
 				_log.debug("Time:" + hits.getSearchTime());
-				_log.debug(
-					"Suggestions size: " + hits.getQuerySuggestions().length);
+				_log.debug("Suggestions size: " + hits.getQuerySuggestions().length);
 			}
 		}
 		return hits;
 	}
 
 	/**
-	 * Execute registered query post processors.
+	 * Executes registered query post processors.
 	 * 
 	 * @param searchContext
 	 * @param hits
 	 */
-	protected void executeQueryPostProcessors(
-		PortletRequest portletRequest, SearchContext searchContext,
-		QueryContext queryContext, Hits hits) {
+	protected void executeQueryPostProcessors(PortletRequest portletRequest, SearchContext searchContext,
+			QueryContext queryContext, Hits hits) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Executing query post processors.");
@@ -186,34 +168,29 @@ public class GSearchImpl implements GSearch {
 		for (QueryPostProcessor queryPostProcessor : _queryPostProcessors) {
 
 			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Executing " + queryPostProcessor.getClass().getName());
+				_log.debug("Executing " + queryPostProcessor.getClass().getName());
 			}
 
 			try {
-				queryPostProcessor.process(
-					portletRequest, searchContext, queryContext, hits);
-			}
-			catch (Exception e) {
+				queryPostProcessor.process(portletRequest, searchContext, queryContext, hits);
+			} catch (Exception e) {
 				_log.error(e.getMessage(), e);
 			}
 		}
 	}
 
 	/**
-	 * Get searchcontext.
+	 * Gets searchcontext.
 	 * 
 	 * @return searchcontext object
 	 * @throws Exception
 	 */
-	protected SearchContext getSearchContext(
-		PortletRequest portletRequest, QueryContext queryContext)
-		throws Exception {
+	protected SearchContext getSearchContext(PortletRequest portletRequest, QueryContext queryContext)
+			throws Exception {
 
 		SearchContext searchContext = new SearchContext();
 
-		searchContext.setCompanyId(
-			(long) queryContext.getParameter(ParameterNames.COMPANY_ID));
+		searchContext.setCompanyId((long) queryContext.getParameter(ParameterNames.COMPANY_ID));
 		searchContext.setStart(queryContext.getStart());
 		searchContext.setEnd(queryContext.getEnd());
 		searchContext.setSorts(queryContext.getSorts());
@@ -221,82 +198,73 @@ public class GSearchImpl implements GSearch {
 		return searchContext;
 	}
 
-	protected void setFacets(
-		SearchContext searchContext, QueryContext queryContext)
-		throws JSONException {
+	/**
+	 * Sets configured facets.
+	 * 
+	 * @param searchContext
+	 * @param queryContext
+	 * @throws JSONException
+	 */
+	protected void setFacets(SearchContext searchContext, QueryContext queryContext) throws JSONException {
 
-		String[] configuration = queryContext.getConfiguration(
-			ConfigurationKeys.FACET);
-		
+		String[] configuration = queryContext.getConfiguration(ConfigurationKeys.FACET);
+
 		if (configuration == null) {
 			return;
 		}
 
 		for (int i = 0; i < configuration.length; i++) {
 
-			JSONObject configurationItem =
-				JSONFactoryUtil.createJSONObject(configuration[i]);
-			
+			JSONObject configurationItem = JSONFactoryUtil.createJSONObject(configuration[i]);
+
 			JSONArray aggregateFields = configurationItem.getJSONArray("aggregate_fields");
-			
+
 			for (int j = 0; j < aggregateFields.length(); j++) {
-				
+
 				JSONObject dataObject = JSONFactoryUtil.createJSONObject();
-				
+
 				dataObject.put("maxTerms", _moduleConfiguration.maxFacetTerms());
-	
+
 				FacetConfiguration facetConfiguration = new FacetConfiguration();
 				facetConfiguration.setFieldName(aggregateFields.getString(j));
 				facetConfiguration.setStatic(false);
 				facetConfiguration.setDataJSONObject(dataObject);
-	
+
 				Facet facet = new SimpleFacet(searchContext);
 				facet.setFacetConfiguration(facetConfiguration);
-	
+
 				searchContext.addFacet(facet);
 			}
 		}
 	}
 
-		/**
-	 * Set query config
+	/**
+	 * Sets query config.
 	 * 
 	 * @param searchContext
 	 * @param queryContext
 	 */
-	protected void setQueryConfig(
-		SearchContext searchContext, QueryContext queryContext, Query query) {
+	protected void setQueryConfig(SearchContext searchContext, QueryContext queryContext, Query query) {
 
 		QueryConfig queryConfig = searchContext.getQueryConfig();
-				
+
 		queryConfig.setHighlightEnabled(true);
-		queryConfig.setHighlightFragmentSize(
-			_moduleConfiguration.highlightFragmentSize());
+		queryConfig.setHighlightFragmentSize(_moduleConfiguration.highlightFragmentSize());
 		queryConfig.setHighlightSnippetSize(_moduleConfiguration.snippetSize());
 
 		// Set highlighted fields
 
-		queryConfig.setHighlightFieldNames(
-			new String[] {
-				Field.CONTENT, Field.TITLE,
-			});
+		queryConfig.setHighlightFieldNames(new String[] { Field.CONTENT, Field.TITLE, });
 
 		query.setQueryConfig(queryConfig);
 	}
 
-	/**
-	 * Remove a query post processor from list.
-	 * 
-	 * @param clauseBuilder
-	 */
-	protected void removeQueryPostProcessor(
-		QueryPostProcessor queryPostProcessor) {
+	protected void removeQueryPostProcessor(QueryPostProcessor queryPostProcessor) {
 
 		_queryPostProcessors.remove(queryPostProcessor);
 	}
 
-	private static final Logger _log =
-		LoggerFactory.getLogger(GSearchImpl.class);
+	private static final Logger _log = LoggerFactory.getLogger(GSearchImpl.class);
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
@@ -304,11 +272,10 @@ public class GSearchImpl implements GSearch {
 	@Reference
 	private IndexSearcherHelper _indexSearcherHelper;
 
-	@Reference
-	private QueryBuilder _queryBuilder;
+	private volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
-	private ResultsBuilder _resultsBuilder;
+	private QueryBuilder _queryBuilder;
 
 	@Reference(
 		bind = "addQueryPostProcessor", 
@@ -319,5 +286,6 @@ public class GSearchImpl implements GSearch {
 	)
 	private volatile List<QueryPostProcessor> _queryPostProcessors = null;
 
-	private volatile ModuleConfiguration _moduleConfiguration;
+	@Reference
+	private ResultsBuilder _resultsBuilder;
 }
