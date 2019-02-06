@@ -13,11 +13,11 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Keyword match condition handler.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = ClauseConditionHandler.class
 )
 public class KeywordMatchClauseConditionHandler
@@ -54,7 +54,7 @@ public class KeywordMatchClauseConditionHandler
 
 	/**
 	 * Check full phrase match.
-	 * 
+	 *
 	 * @param configuration
 	 * @param keywords
 	 * @return
@@ -75,7 +75,7 @@ public class KeywordMatchClauseConditionHandler
 
 	/**
 	 * Handle full word matching case. Values for match_occur: should | must
-	 * 
+	 *
 	 * @param configuration
 	 * @param keywords
 	 * @return
@@ -91,33 +91,18 @@ public class KeywordMatchClauseConditionHandler
 
 		String[] keywordArray = keywords.split(splitter);
 
+
 		for (int i = 0; i < matchWords.length(); i++) {
 
-			boolean hasMatch = false;
-
 			for (String keyword : keywordArray) {
-
 				if (matchWords.getString(i).equals(keyword)) {
 
-					if ("should".equals(matchOccur)) {
-
-						return true;
-
-					}
-					else {
-
-						hasMatch = true;
-
-						break;
-					}
+					return true;
 				}
 			}
 
-			if (!hasMatch) {
-				return false;
-			}
 		}
-		return true;
+		return false;
 	}
 
 	private static final String HANDLER_NAME = "keyword_match";
