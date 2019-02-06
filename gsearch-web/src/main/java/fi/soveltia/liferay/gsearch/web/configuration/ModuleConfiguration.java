@@ -1,16 +1,21 @@
 
 package fi.soveltia.liferay.gsearch.web.configuration;
 
+import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+
 import aQute.bnd.annotation.metatype.Meta;
 
 /**
- * GSearch Web module configuration.
+ * Liferay GSearch Web module configuration.
  * 
  * @author Petteri Karttunen
  *
  */
+@ExtendedObjectClassDefinition(
+	category = "GSearch"
+)
 @Meta.OCD(
-	id = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet",
+	id = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration",
 	localization = "content/Language",
 	name = "GSearch Portlet"
 )
@@ -22,8 +27,16 @@ public interface ModuleConfiguration {
 	    name = "enable-js-debug-name",
 		required = false
 	)
-	public boolean jsDebuggingEnabled();	
+	public boolean isJSDebuggingEnabled();	
 
+	@Meta.AD(
+		deflt = "/viewasset", 
+	    name = "asset-publisher-page-name",
+	    description = "asset-publisher-page-desc",
+		required = false
+	)
+	public String assetPublisherPage();	
+	
 	@Meta.AD(
 		deflt = "3", 
 	    name = "keywords-min-length",
@@ -32,20 +45,28 @@ public interface ModuleConfiguration {
 	public int queryMinLength();
 	
 	@Meta.AD(
-		deflt = "true", 
-	    name = "enable-autocompletion-name",
-	    description = "enable-autocompletion-desc",
+		deflt = "10", 
+		description = "page-size-desc",
+		name = "page-size-name",
 		required = false
 	)
-	public boolean enableAutoComplete();
+	public int pageSize();	
+	
+	@Meta.AD(
+		deflt = "true", 
+	    name = "enable-keyword-suggester-name",
+	    description = "enable-keyword-suggester-desc",
+		required = false
+	)
+	public boolean isKeywordSuggesterEnabled();
 
 	@Meta.AD(
 		deflt = "150", 
-	    description = "autocomplete-delay-desc",
-	    name = "autocomplete-delay-name",
+	    description = "keyword-suggester-delay-desc",
+	    name = "keyword-suggester-delay-name",
 		required = false
 	)
-	public int autoCompleteRequestDelay();	
+	public int keywordSuggesterRequestDelay();	
 
 	@Meta.AD(
 		deflt = "10000", 
@@ -70,13 +91,70 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public long helpTextGroupId();
-	
+
 	@Meta.AD(
 		deflt = "true", 
-	    description = "show-tags-desc",
-	    name = "show-tags-name",
+	    description = "show-asset-tags-desc",
+	    name = "show-asset-tags-name",
 		required = false
 	)
-	public boolean showTags();
+	public boolean isAssetTagsVisible();
+
+	@Meta.AD(
+		deflt = "false", 
+	    description = "show-username-desc",
+	    name = "show-username-name",
+		required = false
+	)
+	public boolean isUserNameVisible();
+	
+	@Meta.AD(
+		deflt = "false", 
+	    description = "show-asset-categories-desc",
+	    name = "show-asset-categories-name",
+		required = false
+	)
+	public boolean isAssetCategoriesVisible();
+	
+	@Meta.AD(
+		deflt = "", 
+		description = "result-layouts-desc",
+	    name = "result-layouts-name",
+		required = false
+	)
+	public String[] resultLayouts();
+	
+	@Meta.AD(
+		deflt = "false", 
+		description = "view-in-context-desc",
+	    name = "view-in-context-name",
+		required = false
+	)
+	public boolean isViewResultsInContext();
+
+	@Meta.AD(
+		deflt = "false", 
+		description = "append-redirect-desc",
+	    name = "append-redirect-name",
+		required = false
+	)
+	public boolean isRedirectAppended();
+
+	
+	@Meta.AD(
+		deflt = "", 
+		description = "google-maps-api-key-desc",
+	    name = "google-maps-api-key-name",
+		required = false
+	)
+	public String googleMapsAPIKey();
+	
+	@Meta.AD(
+		deflt = "yyyy-MM-dd", 
+		description = "datepicker-format-desc",
+	    name = "datepicker-format-name",
+		required = false
+	)
+	public String datePickerFormat();
 }
 

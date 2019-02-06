@@ -1,3 +1,3 @@
 # Liferay GSearch Core API
 
-This is the GSearch Core API module.
+GSearch Core API module.

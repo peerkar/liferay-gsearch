@@ -1,0 +1,73 @@
+{namespace GSearch}
+
+/**
+ * GSearch portlet main view.
+ *
+ * @param id
+ * @param? getQueryParam
+ * @param portletNamespace
+ * @param? setQueryParam
+ *
+ */
+{template .render}
+	
+	<div class="container-fluid gsearch-container" id="{$id}" style="display: none;">
+	
+		<h2>{msg desc=""}search-title{/msg}</h2>
+	
+		// Searchfield.
+
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-centered gsearch-searchfield">
+			{call GSearchField.render data="all"}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+			{/call}			
+		</div>
+
+		// HY menu.
+
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-centered gsearch-filters gsearch-hy">
+			{call GSearchHYMenus.render data="all"}
+				{param ref: 'hyComponent' /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+			{/call}
+		</div>  
+
+		// Results layout.
+					
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12  gsearch-results-layout">
+			{call GSearchResultLayoutOptions.render data="all"}
+				{param ref: 'resultLayoutOptionsComponent' /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+			{/call}
+		</div>  					
+
+		// Results.
+
+		{call GSearchResults.render data="all"}
+			{param ref: 'resultsComponent' /}
+			{param getQueryParam: $getQueryParam /}
+			{param setQueryParam: $setQueryParam /}
+		{/call}
+
+				
+		// Paging.
+
+		<div class="gsearch-centered text-center gsearch-paging ">
+
+			{call GSearchPaging.render data="all"}
+				{param ref: 'pagingComponent' /}
+				{param getQueryParam: $getQueryParam /}
+				{param setQueryParam: $setQueryParam /}
+			{/call}
+		</div>
+
+	</div>
+	
+{/template}
+
+
+
+

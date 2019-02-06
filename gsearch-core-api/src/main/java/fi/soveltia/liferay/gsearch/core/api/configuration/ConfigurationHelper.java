@@ -1,61 +1,64 @@
 
 package fi.soveltia.liferay.gsearch.core.api.configuration;
 
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONObject;
-
-import java.util.List;
-import java.util.Locale;
-
 import javax.portlet.PortletRequest;
 
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+
 /**
- * A configuration helper interface.
- *
+ * Configuration helper service.
+ * 
  * @author Petteri Karttunen
  */
 public interface ConfigurationHelper {
 
 	/**
-	 * Get asset type options localized. Should be deprecated when
-	 * https://issues.liferay.com/browse/LPS-75141 is solved.
-	 *
-	 * @param locale
-	 * @return
-	 * @throws JSONException
+	 * Get clause configuration.
+	 * 
+	 * @return String[]
 	 */
-	public JSONArray getAssetTypeOptions(Locale locale)
-		throws JSONException;
+	public String[] getClauseConfiguration();
 
 	/**
-	 * Get facets configuration
-	 *
-	 * @return JSONArray
+	 * Get facet configuration.
+	 * 
+	 * @return String[]
 	 * @throws Exception
 	 */
-	public JSONArray getFacetConfiguration() throws JSONException;
+	public String[] getFacetConfiguration();
 
 	/**
-	 * Get sort options localized. Should be deprecated when
-	 * https://issues.liferay.com/browse/LPS-75141 is solved.
-	 *
-	 * @param locale
+	 * Get keyword suggester configuration
+	 * 
 	 * @return
-	 * @throws JSONException
 	 */
-	public JSONArray getSortOptions(Locale locale)
-		throws JSONException;
+	public String[] getKeywordSuggesterConfiguration();
 
 	/**
-	 * Parse configuration field name which might have variables in it.
-	 *
+	 * Get filter configuration.
+	 * 
+	 * @return String[]
+	 */
+	public String[] getFilterConfiguration();
+	
+	/**
+	 * Get sort configuration.
+	 * 
+	 * @return String[]
+	 * @throws Exception
+	 */
+	public String[] getSortConfiguration();
+	
+	/**
+	 * Parse known variables in configuration key or value.
+	 * 
+	 * For example $_language_id_$ could be translated to current language id.
+	 *  
 	 * @param portletRequest
-	 * @param fieldName
+	 * @param queryParams
+	 * @param input
 	 * @return
 	 */
-	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName);
-
-	public List<String> getDDMStructureKeys(String typeKey);
-
+	public String parseConfigurationVariables(
+		PortletRequest portletRequest, QueryContext queryParams, String input);
 }

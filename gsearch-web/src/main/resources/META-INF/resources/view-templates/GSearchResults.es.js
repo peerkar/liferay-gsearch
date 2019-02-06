@@ -1,40 +1,47 @@
 import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
-import Mark from '../js/mark.es';
 
+import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
+import GSearchImageResultLayout from './GSearchImageResultLayout.soy';
+import GSearchMapsResultLayout from './GSearchMapsResultLayout.es';
 import templates from './GSearchResults.soy';
 
 /**
  * GSearch results component.
  */
 class GSearchResults extends Component {
-	
+		
 	/**
 	 * @inheritDoc
 	 * 
 	 */
-	constructor(opt_config, opt_parentElement) {
+	attached() {		
+		
+		if (this.debug) {
+			console.log("GSearchResults.attached()");
+		}
+	}
 	
-		super(opt_config, opt_parentElement);
-		
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.portletNamespace = opt_config.portletNamespace;
-		
-		this.assetTagParam = opt_config.assetTagParam;
-
-		this.showAssetTags = opt_config.showAssetTags;
+	decodeEntities(encodedString) {
+	    var textArea = document.createElement('textarea');
+	    textArea.innerHTML = encodedString;
+	    return textArea.value;
 	}
 	
 	/**
-	 * Highlight keywords in results
+	 * Decode highlight tags in results.
 	 * 
 	 */
-	doHighlightKeywords() {
+	decodeHighlightHTML() {
 		
-		if (this.results.items.length > 0 & this.results.meta.queryTerms.length > 0) {
-			new Mark($('#' + this.portletNamespace + 'SearchResults .item .highlightable').toArray()).mark(this.results.meta.queryTerms);
+		let _self = this;
+		
+		if (this.results.items.length) {
+			
+			$('#' + this.portletNamespace + 'SearchResults .item .highlightable').each(function() {
+				$(this).html(_self.decodeEntities($(this).html()));
+			});
 		}
 	}
 	
@@ -48,12 +55,15 @@ class GSearchResults extends Component {
 			console.log("GSearchResults.rendered()");
 		}
 		
-		this.doHighlightKeywords();
+		if (this.results) {
+
+			this.decodeHighlightHTML();
 		
-		// Set up tags (if present) links
-		
-		if (this.showAssetTags) {
-			this.setupTagLinks();
+			// Set up tags (if present) links
+			
+			if (this.showAssetTags) {
+				this.setupTagLinks();
+			}
 		}
 	}
 	
@@ -94,11 +104,21 @@ class GSearchResults extends Component {
  * @static
  */
 GSearchResults.STATE = {
-	results: {
+		
+	assetTagParam: {
 		value: null
+	},
+	debug: {
+		value: false
 	},
 	getQueryParam: {
 		validator: core.isFunction
+	},
+	portletNamespace: {
+		value: null
+	},
+	resultLayoutOptions: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction

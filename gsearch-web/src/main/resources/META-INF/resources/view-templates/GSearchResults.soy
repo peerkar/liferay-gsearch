@@ -3,119 +3,152 @@
 /**
  * Print search results
  *
+ * @param appendRedirect
+ * @param portletNamespace
  * @param? results
  */
 {template .render}
+	
+	<div>	
+		{if $results}
 
-	{if $results.items and length($results.items) > 0}
+			{if $results.items and length($results.items) > 0}
+		
+				// Wider layout for images.
+				
+				{let $widthlg: $results.resultsLayout == 'image' ? '12' : '12' /}
+				{let $widthsm: $results.resultsLayout == 'image' ? '12' : '12' /}
+				
+				<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-centered gsearch-results" id="{$portletNamespace}SearchResults">
+		
+					// Query suggestions.
+		
+					{if length($results.meta.querySuggestions) > 0}
+						{call GSearchQuerySuggestions.render data="all"}
+							{param meta: $results.meta /}
+						{/call}
+					{/if}
+					
+					// Result layout
+										
+					{if $results.resultsLayout == 'image'}
+					
+						{call GSearchImageResultLayout.render}
+							{param appendRedirect: $appendRedirect /}
+							{param results: $results /}
+						{/call}
+									
+					{elseif $results.resultsLayout == 'maps'}	
 
-		{if $results.meta.resultsLayout == 'image'}
+						// Maps layout
 
-			<ul class="display-class-icon list-unstyled row">
+						{call GSearchMapsResultLayout.render}
+							{param appendRedirect: $appendRedirect /}
+							{param results: $results /}
+						{/call}
 
-				{foreach $item in $results.items}
-					{call .imageItem}
-						{param item: $item /}
-					{/call}
-				{/foreach}
-			</ul>
-
-		{else}
-
-			{foreach $item in $results.items}
-				{call .item}
-					{param item: $item /}
-				{/call}
-			{/foreach}
-
-		{/if}
-	{else}
-
-		<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
-
-	{/if}
-{/template}
-
-/**
- * Print one image result item (Image search).
- *
- * @param item
- */
-{template .imageItem}
-
-	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
-
-	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
-
-		<a href="{$item.link}" title="{$item.title}">
-
-		<div class="card">
-
-			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$itemImage}');">
-				<img class="sr-only" alt="{$item.title}" src="{$itemImage}" title="{$item.title}">
-				<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
-			</div>
-
-			<div class="card-row card-row-padded card-row-valign-top">
-				<div class="card-col-content">
-					<span class="truncate-text date">{$item.date}</span>
-					<span class="truncate-text title">{$item.title}</span>
-					<span class="truncate-text dimensions">{$item.metadata.dimensions}</span>
-					<span class="truncate-text size">{$item.metadata.size}</span>
+					{else}	
+			
+						// Default result layout rendering.
+			
+						{foreach $item in $results.items}
+							{call .default}
+								{param appendRedirect: $appendRedirect /}
+								{param resultsLayout: $results.resultsLayout /}
+								{param item: $item /}
+							{/call}
+						{/foreach}
+			
+					{/if}
 				</div>
-			</div>
-		</div>
-		</a>
-	</li>
 
+			{else}
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 gsearch-centered  gsearch-results">
+					<div class="text-center no-results">{msg desc=""}no-results{/msg}</div>
+				</div>
+			{/if}
+		{/if}
+
+	</div>
+	
 {/template}
 
 /**
  * Print one result item.
  *
+ * @param appendRedirect
  * @param item
+ * @param resultsLayout
  */
-{template .item}
+{template .default}
+
+	{let $link: $appendRedirect == true ? ($item.link + $item.redirect) : $item.link /}
 
 	<div class="row">
 
 		<div class="item">
 
-			{if ($item.typeKey == 'feed-entry') or $item.imageSrc}
-                <div class="item-icon hidden-xs">
+			{if $item.icon and $resultsLayout == 'list'} 
+			
+                <div class="item-icon col-md-1 col-lg-1 hidden-xs">
 					<a href="{$item.link}">
 						<div class="{$item.typeKey}-icon">
 							{if ($item.typeKey == 'feed-entry')}
-								{if ($item.imageSrc == '')}
-									<div class="user-icon user-icon user-icon-default">
-										<span>{$item?.metadata?.initials}</span>
-									</div>
+
+								{if ($item.icon == '')}
+
+									{if $item.userPortraitUrl}
+						
+										<a href="{$link}">
+											<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+										</a>
+						
+									{elseif $item.userInitials}
+									
+										<span class="user-avatar-image"> 
+											<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+												<span>{$item.userInitials}</span>
+											</div> 
+										</span>
+									{/if}
 								{else}
-                                    <img src="{$item.imageSrc}"/>
+                                    <img src="{$item.icon}"/>
 								{/if}
 							{else}
                                 <svg role="img">
-                                    <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.imageSrc}"/>
+                                    <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.icon}"/>
                                 </svg>
 							{/if}
 						</div>
 					</a>
                 </div>
-			{/if}
-			{if ($item.typeKey == 'file')}
-				<div class="document-content">
+
+				<div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 content">				
+
+			{elseif $item.imageSrc}
+
+				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+					{if $item.imageSrc != ''}
+						<a href="{$link}">
+							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+						</a>
+					{/if}			
+				</div>
+
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
+
 			{else}
-				<div class="web-content">
+				<div class="content">
 			{/if}
 
 				<div class="heading">
 					<h4>
-						<a href="{$item.link}">{$item.title}</a>
+						<a class="highlightable"  href="{$item.link}">{$item.title}</a>
 					</h4>
 
-					{if $item.highlight}
+					{if $item.official_content}
 						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
-					{/if}
+					{/if} 
 				</div>
 
 				<div class="description ">
@@ -142,7 +175,6 @@
 				{/if}
 
 			</div>
-			<div class="clear"></div>
 		</div>
 
 	</div>

@@ -1,15 +1,13 @@
 # Liferay GSearch Mini Web
 
-This is the miniportlet for adding a search field into a theme. Please see the gsearch-test-theme for an example.
+Miniportlet for example for adding a search field into a theme.
 
-## Installation
+Supports for keyword and content suggestestions mode. Please see the gsearch-test-theme for an example how to embed into your theme.
 
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
-
-* fi.soveltia.liferay.gsearch.mini.web-VERSION.jar-[VERSION].jar
+## Prerequisites
+None.
 
 ## Configuration
 
-After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> Other -> GSearch Miniportlet.
-
+After the module has been deployed succesfully, please see the configuration options in Control Panel -> Configuration -> System Settings -> GSearch -> Mini Portlet.
 

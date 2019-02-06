@@ -1,167 +1,203 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.configuration;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.portlet.PortletRequest;
 
-import org.osgi.service.component.annotations.Activate;
+import org.apache.felix.cm.file.ConfigurationHandler;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationItemHelper;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * JSON configuration helper service implementation.
- *
- * @author Petteri
+ * 
+ * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.configuration.GSearchCore",
-	immediate = true,
+	immediate = true, 
 	service = ConfigurationHelper.class
 )
 public class ConfigurationHelperImpl implements ConfigurationHelper {
 
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-
-		_gSearchConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray getAssetTypeOptions(Locale locale)
-		throws JSONException {
+	public String[] getClauseConfiguration() {
 
-		String configuration = _gSearchConfiguration.typeConfiguration();
+		String[] config = _clauseConfigurationHelper.getConfiguration();
 
-		JSONArray translatedOptions = JSONFactoryUtil.createJSONArray();
-
-		JSONArray options = JSONFactoryUtil.createJSONArray(configuration);
-
-		for (int i = 0; i < options.length(); i++) {
-
-			JSONObject item = options.getJSONObject(i);
-
-			item.put(
-				"localization",
-				getLocalization(
-					"type." + item.getString("key").toLowerCase(),
-					locale));
-			translatedOptions.put(item);
-
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				ClauseConfigurationItemHelper.CONFIGURATION_PID);
 		}
-		return translatedOptions;
+
+		return _clauseConfigurationHelper.getConfiguration();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public JSONArray getFacetConfiguration()
-		throws JSONException {
+	public String[] getFacetConfiguration() {
 
-		return JSONFactoryUtil.createJSONArray(
-			_gSearchConfiguration.facetConfiguration());
-	}
+		String[] config = _facetConfigurationHelper.getConfiguration();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public JSONArray getSortOptions(Locale locale)
-		throws JSONException {
-
-		String configuration = _gSearchConfiguration.sortFieldConfiguration();
-
-		JSONArray translatedOptions = JSONFactoryUtil.createJSONArray();
-
-		JSONArray options = JSONFactoryUtil.createJSONArray(configuration);
-
-		for (int i = 0; i < options.length(); i++) {
-
-			JSONObject item = options.getJSONObject(i);
-
-			item.put(
-				"localization", getLocalization(
-					"sort-by-" + item.getString("key").toLowerCase(), locale));
-
-			translatedOptions.put(item);
-
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				FacetConfigurationItemHelper.CONFIGURATION_PID);
 		}
-		return translatedOptions;
+
+		return _facetConfigurationHelper.getConfiguration();
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String parseConfigurationKey(PortletRequest portletRequest, String fieldName) {
+	public String[] getKeywordSuggesterConfiguration() {
 
-		fieldName = fieldName.replace("$language_id", portletRequest.getLocale().toString());
+		String[] config =
+			_keywordSuggestertConfigurationHelper.getConfiguration();
 
-		return fieldName;
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				KeywordSuggesterItemHelper.CONFIGURATION_PID);
+		}
+		
+		return _keywordSuggestertConfigurationHelper.getConfiguration();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public List<String> getDDMStructureKeys(String typeKey) {
-		List<String> ddmStructureKeys = new ArrayList<>();
+	public String[] getFilterConfiguration() {
+		
+		String[] config = _filterConfigurationHelper.getConfiguration();
+
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				FilterConfigurationItemHelper.CONFIGURATION_PID);
+		}
+
+		return _filterConfigurationHelper.getConfiguration();
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String[] getSortConfiguration() {
+
+		String[] config = _sortConfigurationHelper.getConfiguration();
+
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				SortConfigurationItemHelper.CONFIGURATION_PID);
+		}
+
+		return _sortConfigurationHelper.getConfiguration();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String parseConfigurationVariables(
+		PortletRequest portletRequest, QueryContext queryParams, String input) {
+
+		input = input.replace(
+			"$_now_yyyy-mm-dd_$", NOW_YYYY_MM_DD.format(new Date()));
+
+		if (queryParams != null && queryParams.getKeywords() != null) {
+
+			input = input.replace("$_keywords_$", queryParams.getKeywords());
+		}
+
+		input = input.replace(
+			"$_language_id_$", portletRequest.getLocale().toString());
+
+		return input;
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setDefaultConfiguration(String configurationName) {
+
+		_log.info("Setting default configuration for: " + configurationName);
+
+		InputStream inputStream = null;
+
 		try {
-			JSONArray types = JSONFactoryUtil.createJSONArray(_gSearchConfiguration.typeConfiguration());
-			for (int i = 0; i < types.length(); i++) {
-				JSONObject type = types.getJSONObject(i);
-				if (typeKey.equalsIgnoreCase(type.getString("key"))) {
-					String structureKeys = type.getString("ddmStructureKey");
-					ddmStructureKeys.addAll(Arrays.asList(structureKeys.split("\\s*,\\s*")));
-					break;
-				}
-			}
 
-		} catch (JSONException e) {
-			_log.error("Cannot create json array from GSearch types configuration.", e);
-		}
-		return ddmStructureKeys;
-	}
+			Configuration configuration =
+				_configurationAdmin.getConfiguration(configurationName);
 
-	private String getLocalization(String key, Locale locale) {
+			StringBundler sb = new StringBundler();
+			sb.append("configs/").append(configurationName).append(".config");
 
-		if (_resourceBundle == null) {
-			_resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", locale, ConfigurationHelperImpl.class);
-		}
-		try {
-			return _resourceBundle.getString(key);
+			inputStream = this.getClass().getClassLoader().getResourceAsStream(
+				sb.toString());
+
+			configuration.update(ConfigurationHandler.read(inputStream));
+
+			_log.info("Default configuration set.");
+
 		}
 		catch (Exception e) {
-			_log.error(e, e);
+
+			_log.error(e.getMessage(), e);
 		}
-		return key;
+		finally {
+
+			if (inputStream != null) {
+				try {
+					inputStream.close();
+				}
+				catch (IOException e) {
+					_log.error(e.getMessage(), e);
+				}
+			}
+		}
 	}
 
+	private static final Logger _log =
+		LoggerFactory.getLogger(ConfigurationHelperImpl.class);
 
-	private volatile ModuleConfiguration _gSearchConfiguration;
+	private static final DateFormat NOW_YYYY_MM_DD =
+		new SimpleDateFormat("yyyy-MM-dd");
 
-	private ResourceBundle _resourceBundle;
+	@Reference
+	private ConfigurationAdmin _configurationAdmin;
 
-	private static final Log _log =
-		LogFactoryUtil.getLog(ConfigurationHelperImpl.class);
+	@Reference(target = "(config.item=filter)")
+	private ConfigurationItemHelper _filterConfigurationHelper;
+
+	@Reference(target = "(config.item=clause)")
+	private ConfigurationItemHelper _clauseConfigurationHelper;
+
+	@Reference(target = "(config.item=facet)")
+	private ConfigurationItemHelper _facetConfigurationHelper;
+
+	@Reference(target = "(config.item=keyword)")
+	private ConfigurationItemHelper _keywordSuggestertConfigurationHelper;
+
+	@Reference(target = "(config.item=sort)")
+	private ConfigurationItemHelper _sortConfigurationHelper;
+
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * QueryStringQuery API for the GSearch.
+ * QueryStringQuery API for the Liferay GSearch.
  *
  * This is made as an extension of StringQuery to avoid further customizations
  * for the portal search API (like QueryVisitor interface).

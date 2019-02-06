@@ -12,7 +12,6 @@ import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -22,18 +21,66 @@ import java.util.List;
 
 import javax.portlet.PortletRequest;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
-
 /**
  * GSearch utility class.
- *
+ * 
  * @author Petteri Karttunen
  */
 public class GSearchUtil {
 
 	/**
+	 * Append redirect to url.
+	 * 
+	 * @param portletRequest
+	 * @param url
+	 * @return
+	 * @throws PortalException
+	 */
+	public static String getRedirect(PortletRequest portletRequest, String url)
+		throws PortalException {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+		String currentURL = themeDisplay.getURLCurrent();
+
+		// Try to strip everything else but search parameters.
+
+		StringBundler sb = new StringBundler();
+
+		if (url.contains("?")) {
+			sb.append("&redirect=");
+		}
+		else {
+			sb.append("?redirect=");
+		}
+
+		if (currentURL.indexOf("?q=") > 0 || currentURL.indexOf("&q=") > 0) {
+
+			sb.append(currentURL.substring(0, currentURL.indexOf("?")));
+
+			String part2;
+
+			if (currentURL.indexOf("?q=") > 0) {
+				part2 = currentURL.substring(currentURL.indexOf("?q="));
+			}
+			else {
+				part2 = currentURL.substring(currentURL.indexOf("&q="));
+				part2 = part2.replace("&q", "?q");
+			}
+
+			sb.append(HtmlUtil.escapeURL(part2));
+		}
+		else {
+			sb.append(HtmlUtil.escapeURL(currentURL));
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Try to find an asset publisher instance id on a layout
-	 *
+	 * 
 	 * @param layout
 	 * @return portlet instance id
 	 * @throws PortalException
@@ -61,7 +108,7 @@ public class GSearchUtil {
 
 	/**
 	 * Get current layout friendly URL
-	 *
+	 * 
 	 * @return String friendly URL for the current layout
 	 * @throws PortalException
 	 */
@@ -78,39 +125,64 @@ public class GSearchUtil {
 	}
 
 	/**
-	 * Get redirect url.
+	 * Get layout by friendlyurl. Possible syntaxes: -
+	 * /group/something/viewasset (full group path) - /viewasset (path to
+	 * current group)
 	 *
-	 * @return redirect url
+	 * @param resourceRequest
+	 * @return layout
 	 * @throws PortalException
+	 *             if layout is not found
 	 */
-	public static String getRedirectURL(PortletRequest portletRequest)
+	public static Layout getLayoutByFriendlyURL(
+		PortletRequest portletRequest, String layoutFriendlyURL)
 		throws PortalException {
 
-		StringBundler sb = new StringBundler();
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
-		sb.append(GSearchUtil.getCurrentLayoutFriendlyURL(portletRequest));
-		sb.append("?");
-		sb.append(GSearchWebKeys.KEYWORDS).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.KEYWORDS));
-		sb.append("&").append(GSearchWebKeys.FILTER_SCOPE).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_SCOPE));
-		sb.append("&").append(GSearchWebKeys.FILTER_TIME).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TIME));
-		sb.append("&").append(GSearchWebKeys.FILTER_TYPE).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.FILTER_TYPE));
-		sb.append("&").append(GSearchWebKeys.SORT_FIELD).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_FIELD));
-		sb.append("&").append(GSearchWebKeys.SORT_DIRECTION).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.SORT_DIRECTION));
-		sb.append("&").append(GSearchWebKeys.START).append("=").append(
-			ParamUtil.getString(portletRequest, GSearchWebKeys.START));
+		if (layoutFriendlyURL == null) {
+			throw new PortalException(
+				"Default asset publisher page is not defined. Check Liferay GSearch configuration.");
+		}
 
-		return HtmlUtil.escapeURL(sb.toString());
+		if (layoutFriendlyURL.startsWith("/group/") ||
+			layoutFriendlyURL.startsWith("/web/")) {
+
+			boolean isPrivate = false;
+
+			if (layoutFriendlyURL.startsWith("/group/")) {
+				isPrivate = true;
+			}
+
+			int position1 = layoutFriendlyURL.indexOf("/", 1);
+
+			int position2 = layoutFriendlyURL.indexOf("/", position1);
+			
+			int position3 = position1 + position2 + 1;
+
+			String groupFriendlyURL = layoutFriendlyURL.substring(position1, position3);
+
+			Group group = GroupLocalServiceUtil.getFriendlyURLGroup(
+				themeDisplay.getCompanyId(), groupFriendlyURL);
+
+			layoutFriendlyURL = layoutFriendlyURL.substring(position3);
+
+			return LayoutLocalServiceUtil.getFriendlyURLLayout(
+				group.getGroupId(), isPrivate, layoutFriendlyURL);
+
+		}
+		else {
+
+			return LayoutLocalServiceUtil.getFriendlyURLLayout(
+				themeDisplay.getScopeGroupId(),
+				themeDisplay.getLayout().isPrivateLayout(), layoutFriendlyURL);
+		}
 	}
 
 	/**
 	 * Get group ids available for current user.
-	 *
+	 * 
 	 * @param themeDisplay
 	 * @return array of possible groupIds for a user
 	 * @throws PortalException

@@ -1,71 +1,60 @@
 
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
-import com.liferay.asset.kernel.model.AssetCategory;
-import com.liferay.asset.kernel.model.AssetVocabulary;
-import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
-import com.liferay.portal.kernel.dao.orm.QueryUtil;
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
 import javax.servlet.http.HttpServletRequest;
 
-import fi.helsinki.flamma.common.category.FlammaAssetCategoryService;
-import fi.soveltia.liferay.gsearch.web.portlet.CategoryDTO;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
-import fi.soveltia.liferay.gsearch.core.api.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
+import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
+import fi.soveltia.liferay.gsearch.web.menuoption.MenuOptionProvider;
 
 /**
  * View render command. Primary/default view.
- *
+ * 
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.mini.web.configuration.GSearchPortlet",
-	immediate = true,
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration",
+	immediate = true, 
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
-		"mvc.command.name=/"
-	},
+		"mvc.command.name=/",
+		"mvc.command.name=GSearch"
+	}, 
 	service = MVCRenderCommand.class
 )
-public class ViewMVCRenderCommand implements MVCRenderCommand{
+public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 	@Override
 	public String render(
@@ -75,6 +64,255 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 			_log.debug("ViewMVCRenderCommand.render()");
 		}
 
+		// Set template parameters.
+
+		setTemplateParameters(renderRequest, renderResponse);
+
+		// Set menu options.
+
+		setMenuOptions(renderRequest);
+
+		// Set initial parameters and values from url.
+
+		setInitialParameters(renderRequest);
+				
+		return "GSearch";
+	}
+
+	@Activate
+	@Modified
+	protected void activate(Map<Object, Object> properties) {
+		
+		_moduleConfiguration = ConfigurableUtil.createConfigurable(
+			ModuleConfiguration.class, properties);
+		
+		try {
+			setFacetFields();
+		}
+		catch (JSONException e) {
+			_log.error(e.getMessage(), e);
+		}		
+	}
+
+	protected void addMenuOptionProvider(
+		MenuOptionProvider menuOptionProvider) {
+
+		if (_menuOptionProviders == null) {
+			_menuOptionProviders = new ArrayList<MenuOptionProvider>();
+		}
+		_menuOptionProviders.add(menuOptionProvider);
+	}
+
+	/**
+	 * Create resource URL for a resourceId
+	 * 
+	 * @param renderResponse
+	 * @param resourceId
+	 * @return url string
+	 */
+	protected String createResourceURL(
+		RenderResponse renderResponse, String resourceId) {
+
+		ResourceURL portletURL = renderResponse.createResourceURL();
+
+		portletURL.setResourceID(resourceId);
+
+		return portletURL.toString();
+	}
+
+	protected void removeMenuOptionProvider(
+		MenuOptionProvider menuOptionProvider) {
+
+		_menuOptionProviders.remove(menuOptionProvider);
+	}
+	
+	/**
+	 * Get / set facet field configuration
+	 * 
+	 * @throws JSONException
+	 */
+	protected void setFacetFields()
+		throws JSONException {
+
+		String[] configuration = _configurationHelper.getFacetConfiguration();
+		
+		if (configuration.length > 0) {
+
+			_facetFields = new String[configuration.length];
+
+			for (int i = 0; i < configuration.length; i++) {
+
+				JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
+
+				_facetFields[i] = item.getString("param_name");
+			}
+		}
+	}	
+
+	/**
+	 * Set initial parameters for the templates. This is used to make search
+	 * bookmarkable and linkable.
+	 * 
+	 * @param renderRequest
+	 * @param template
+	 */
+	protected void setInitialParameters(RenderRequest renderRequest) {
+
+		Template template =
+			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
+
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(renderRequest);
+		HttpServletRequest request =
+			PortalUtil.getOriginalServletRequest(httpServletRequest);
+
+		// Basic params
+
+		String keywords = ParamUtil.getString(request, ParameterNames.KEYWORDS);
+
+		String scopeFilter = ParamUtil.getString(request, ParameterNames.SCOPE);
+		String timeFilter = ParamUtil.getString(request, ParameterNames.TIME);
+		String timeFrom =
+			ParamUtil.getString(request, ParameterNames.TIME_FROM);
+		String timeTo = ParamUtil.getString(request, ParameterNames.TIME_TO);
+
+		String sortField =
+			ParamUtil.getString(request, ParameterNames.SORT_FIELD);
+		String sortDirection =
+			ParamUtil.getString(request, ParameterNames.SORT_DIRECTION);
+
+		String start = ParamUtil.getString(request, ParameterNames.START);
+
+		String resultsLayout =
+			ParamUtil.getString(request, GSearchWebKeys.RESULTS_LAYOUT);
+
+		Map<String, String[]> initialParameters =
+			new HashMap<String, String[]>();
+
+		if (Validator.isNotNull(keywords)) {
+			initialParameters.put(
+				ParameterNames.KEYWORDS, new String[] {
+					keywords
+				});
+		}
+
+		if (Validator.isNotNull(scopeFilter)) {
+			initialParameters.put(
+				ParameterNames.SCOPE, new String[] {
+					scopeFilter
+				});
+		}
+
+		if (Validator.isNotNull(timeFilter)) {
+			initialParameters.put(
+				ParameterNames.TIME, new String[] {
+					timeFilter
+				});
+		}
+
+		if (Validator.isNotNull(timeFrom)) {
+			initialParameters.put(
+				ParameterNames.TIME_FROM, new String[] {
+					timeFrom
+				});
+		}
+
+		if (Validator.isNotNull(timeTo)) {
+			initialParameters.put(
+				ParameterNames.TIME_TO, new String[] {
+					timeTo
+				});
+		}
+
+		if (Validator.isNotNull(sortDirection)) {
+			initialParameters.put(
+				ParameterNames.SORT_DIRECTION, new String[] {
+					sortDirection
+				});
+		}
+
+		if (Validator.isNotNull(sortField)) {
+			initialParameters.put(
+				ParameterNames.SORT_FIELD, new String[] {
+					sortField
+				});
+		}
+
+		if (Validator.isNotNull(start)) {
+			initialParameters.put(
+				ParameterNames.START, new String[] {
+					start
+				});
+		}
+
+		if (Validator.isNotNull(resultsLayout)) {
+			initialParameters.put(
+				GSearchWebKeys.RESULTS_LAYOUT, new String[] {
+					resultsLayout
+				});
+		}
+
+		// Facets.
+
+		if (_facetFields != null) {
+
+			for (String facetKey : _facetFields) {
+
+				String[] facetValue =
+					ParamUtil.getStringValues(request, facetKey);
+
+				if (Validator.isNotNull(facetValue)) {
+					initialParameters.put(facetKey, facetValue);
+				}
+			}
+		}
+
+		template.put(
+			GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
+	}
+
+	/**
+	 * Set menu options
+	 * 
+	 * @param renderRequest
+	 */
+	protected void setMenuOptions(RenderRequest renderRequest) {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Processing menu option providers.");
+		}
+
+		if (_menuOptionProviders == null) {
+			return;
+		}
+
+		for (MenuOptionProvider menuOptionProvider : _menuOptionProviders) {
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Processing " + menuOptionProvider.getClass().getName());
+			}
+
+			try {
+
+				menuOptionProvider.setOptions(renderRequest);
+
+			}
+			catch (Exception e) {
+
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	/**
+	 * Set template parameters.
+	 * 
+	 * @param renderRequest
+	 */
+	protected void setTemplateParameters(
+		RenderRequest renderRequest, RenderResponse renderResponse) {
+
 		Template template =
 			(Template) renderRequest.getAttribute(WebKeys.TEMPLATE);
 
@@ -83,53 +321,41 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 		String portletNamespace = renderResponse.getNamespace();
 		template.put(GSearchWebKeys.PORTLET_NAMESPACE, portletNamespace);
 
-		template.put(GSearchWebKeys.LANGUAGE, renderRequest.getLocale().getLanguage());
-
+		// Redirect
+		
+		template.put(
+			GSearchWebKeys.APPEND_REDIRECT,
+			_moduleConfiguration.isRedirectAppended());
+		
 		// Autocomplete on/off.
 
 		template.put(
 			GSearchWebKeys.AUTO_COMPLETE_ENABLED,
-			_moduleConfiguration.enableAutoComplete());
+			_moduleConfiguration.isKeywordSuggesterEnabled());
 
 		// Autocomplete request delay.
 
 		template.put(
 			GSearchWebKeys.AUTO_COMPLETE_REQUEST_DELAY,
-			_moduleConfiguration.autoCompleteRequestDelay());
+			_moduleConfiguration.keywordSuggesterRequestDelay());
 
 		// Set help text resource url.
 
 		template.put(
-			GSearchWebKeys.HELP_TEXT_URL,
-			createResourceURL(renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
+			GSearchWebKeys.HELP_TEXT_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_HELP_TEXT));
 
 		// Set search results resource url.
 
 		template.put(
-			GSearchWebKeys.SEARCH_RESULTS_URL,
-			createResourceURL(renderResponse, GSearchResourceKeys.GET_SEARCH_RESULTS));
+			GSearchWebKeys.SEARCH_RESULTS_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_SEARCH_RESULTS));
 
 		// Set autocomplete/suggestions resource url.
 
 		template.put(
-			GSearchWebKeys.SUGGESTIONS_URL,
-			createResourceURL(renderResponse, GSearchResourceKeys.GET_SUGGESTIONS));
-
-		try {
-
-			// Set supported asset type options.
-
-			template.put(
-				GSearchWebKeys.ASSET_TYPE_OPTIONS,
-				_configurationHelperService.getAssetTypeOptions(renderRequest.getLocale()));
-
-			template.put(
-				GSearchWebKeys.SORT_OPTIONS,
-				_configurationHelperService.getSortOptions(renderRequest.getLocale()));
-
-		} catch (Exception e) {
-			_log.error(e, e);
-		}
+			GSearchWebKeys.SUGGESTIONS_URL, createResourceURL(
+				renderResponse, GSearchResourceKeys.GET_SUGGESTIONS));
 
 		// Set request timeout.
 
@@ -147,11 +373,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		template.put(
 			GSearchWebKeys.JS_DEBUG_ENABLED,
-			_moduleConfiguration.jsDebuggingEnabled());
-
-		// Get/set parameters from url
-
-		setInitialParameters(renderRequest, template);
+			_moduleConfiguration.isJSDebuggingEnabled());
 
 		// Set facet fields
 
@@ -163,228 +385,39 @@ public class ViewMVCRenderCommand implements MVCRenderCommand{
 
 		// Show tags
 
-		template.put(GSearchWebKeys.SHOW_ASSET_TAGS, _moduleConfiguration.showTags());
+		template.put(
+			GSearchWebKeys.SHOW_ASSET_TAGS,
+			_moduleConfiguration.isAssetTagsVisible());
 
-		template.put(GSearchWebKeys.UNIT_FILTERS, getUnitCategories(PortalUtil.getCompanyId(renderRequest), renderRequest.getLocale()));
+		// Google maps API key
 
-		return "View";
+		template.put(
+			GSearchWebKeys.GMAPS_API_KEY,
+			_moduleConfiguration.googleMapsAPIKey());
+
+		// Datepicker format
+
+		template.put(
+			ParameterNames.DATEPICKER_FORMAT,
+			_moduleConfiguration.datePickerFormat());
 	}
 
-	@Activate
-	@Modified
-	protected void activate(Map<Object, Object> properties) {
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
-
-		try {
-			setFacetFields();
-		}
-		catch (JSONException e) {
-			_log.error(e, e);
-		}
-	}
-
-	private List<CategoryDTO> getUnitCategories(long companyId, Locale locale) {
-		List<AssetCategory> facultyAssetCategories = flammaAssetCategoryService.getSelectableUnitCategories(companyId);
-
-		List<CategoryDTO> categories = new ArrayList<>();
-		AssetCategory universityCategory = flammaAssetCategoryService.getUniversityCategory(companyId);
-		categories.add(CategoryDTO.newBuilder()
-			.name(universityCategory.getTitle(locale))
-			.categoryId(universityCategory.getCategoryId())
-			.build());
-		categories.addAll(getCategoryDtos(locale, facultyAssetCategories));
-		return categories;
-
-	}
-
-
-	private List<CategoryDTO> getCategoryDtos(Locale locale, List<AssetCategory> assetCategories) {
-		return assetCategories
-			.stream()
-			.map(cat ->
-				CategoryDTO.newBuilder()
-					.name(cat.getTitle(locale))
-					.categoryId(cat.getCategoryId())
-					.build())
-			.collect(Collectors.toList());
-	}
-
-	/**
-	 * Create resource URL for a resourceId
-	 *
-	 * @param renderResponse
-	 * @param resourceId
-	 *
-	 * @return url string
-	 */
-	protected String createResourceURL(RenderResponse renderResponse, String resourceId) {
-
-		ResourceURL portletURL = renderResponse.createResourceURL();
-
-		portletURL.setResourceID(resourceId);
-
-		return portletURL.toString();
-	}
-
-	/**
-	 * Get / set facet field configuration
-	 *
-	 * @throws JSONException
-	 */
-	protected void setFacetFields() throws JSONException {
-
-		JSONArray configuration = _configurationHelperService.getFacetConfiguration();
-
-		if (configuration.length() > 0) {
-
-			_facetFields = new String[configuration.length()];
-
-			for (int i = 0; i < configuration.length(); i++) {
-
-				JSONObject item = configuration.getJSONObject(i);
-
-				_facetFields[i] = item.getString("paramName");
-			}
-		}
-	}
-
-	/**
-	 * Set initial parameters for the templates.
-	 *
-	 * This is used to make search bookmarkable and linkable.
-	 *
-	 * @param renderRequest
-	 * @param template
-	 */
-	protected void setInitialParameters(RenderRequest renderRequest, Template template) {
-
-		HttpServletRequest httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
-		HttpServletRequest request = PortalUtil.getOriginalServletRequest(httpServletRequest);
-
-		// Basic params
-
-		String keywords = ParamUtil.getString(request, GSearchWebKeys.KEYWORDS);
-
-		String scopeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_SCOPE);
-		String timeFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME);
-		String timeStartFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_START);
-		String timeEndFilter = ParamUtil.getString(request, GSearchWebKeys.FILTER_TIME_END);
-		String[] typeFilter = ParamUtil.getStringValues(request, GSearchWebKeys.FILTER_TYPE, new String[] {});
-
-		String sortField = ParamUtil.getString(request, GSearchWebKeys.SORT_FIELD);
-		String sortDirection = ParamUtil.getString(request, GSearchWebKeys.SORT_DIRECTION);
-		String start = ParamUtil.getString(request, GSearchWebKeys.START);
-
-		String resultsLayout = ParamUtil.getString(request, GSearchWebKeys.RESULTS_LAYOUT);
-
-		String[] unitFilter = ParamUtil.getStringValues(request, GSearchWebKeys.UNIT_PARAM);
-
-		Map<String, String[]>initialParameters = new HashMap<String, String[]>();
-
-		if (Validator.isNotNull(keywords)) {
-			initialParameters.put(GSearchWebKeys.KEYWORDS, new String[]{keywords});
-		}
-
-		if (Validator.isNotNull(scopeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_SCOPE, new String[]{scopeFilter});
-		}
-
-		if (Validator.isNotNull(timeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TIME, new String[]{timeFilter});
-		}
-
-		if (Validator.isNotNull(timeStartFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TIME_START, new String[]{timeStartFilter});
-		}
-
-		if (Validator.isNotNull(timeEndFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TIME_END, new String[]{timeEndFilter});
-		}
-
-		if (Validator.isNotNull(typeFilter)) {
-			initialParameters.put(GSearchWebKeys.FILTER_TYPE, typeFilter);
-		}
-
-		if (Validator.isNotNull(sortDirection)) {
-			initialParameters.put(GSearchWebKeys.SORT_DIRECTION, new String[]{sortDirection});
-		}
-
-		if (Validator.isNotNull(sortField)) {
-			initialParameters.put(GSearchWebKeys.SORT_FIELD, new String[]{sortField});
-		}
-
-		if (Validator.isNotNull(start)) {
-			initialParameters.put(GSearchWebKeys.START, new String[]{start});
-		}
-
-		if (Validator.isNotNull(resultsLayout)) {
-			initialParameters.put(GSearchWebKeys.RESULTS_LAYOUT, new String[]{resultsLayout});
-		}
-
-		if (Validator.isNotNull(unitFilter)) {
-			initialParameters.put(GSearchWebKeys.UNIT_PARAM, unitFilter);
-		}
-
-		// Facets.
-
-		if (_facetFields != null) {
-
-			for (String facetKey : _facetFields) {
-
-				String[] facetValue = ParamUtil.getStringValues(request, facetKey);
-
-				if (Validator.isNotNull(facetValue)) {
-					initialParameters.put(facetKey, facetValue);
-				}
-			}
-		}
-
-		template.put(GSearchWebKeys.INITIAL_QUERY_PARAMETERS, initialParameters);
-	}
-
-	private String getLocalization(String key, Locale locale) {
-
-		if (_resourceBundle == null) {
-			_resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", locale, GetSuggestionsMVCResourceCommand.class);
-		}
-		try {
-			return _resourceBundle.getString(key);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
-		return key;
-	}
-
-	private ResourceBundle _resourceBundle;
-
-	@Reference(unbind = "-")
-	protected void setJSONConfigurationHelperService(ConfigurationHelper configurationHelperService) {
-
-		_configurationHelperService = configurationHelperService;
-	}
+	private static final Logger _log =
+		LoggerFactory.getLogger(ViewMVCRenderCommand.class);
 
 	@Reference
-	protected ConfigurationHelper _configurationHelperService;
-
-	@Reference
-	private AssetCategoryLocalService assetCategoryLocalService;
-
-	@Reference
-	private AssetVocabularyLocalService assetVocabularyLocalService;
-
-	@Reference
-	private GroupLocalService groupLocalService;
-
-	@Reference
-	FlammaAssetCategoryService flammaAssetCategoryService;
+	private ConfigurationHelper _configurationHelper;
+	
+	@Reference(
+		bind = "addMenuOptionProvider", 
+		cardinality = ReferenceCardinality.MULTIPLE, 
+		policy = ReferencePolicy.DYNAMIC, 
+		service = MenuOptionProvider.class, 
+		unbind = "removeMenuOptionProvider"
+	)
+	private volatile List<MenuOptionProvider> _menuOptionProviders = null;
 
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	private static String[] _facetFields = null;
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ViewMVCRenderCommand.class);
 }

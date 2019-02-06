@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query.filter;
 
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.model.RoleConstants;
@@ -22,12 +20,14 @@ import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.params.QueryParams;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
 
 /**
- * Permission filter query builder implementation
+ * Permission query filter builder implementation.
  * 
  * @author Petteri Karttunen
  */
@@ -43,11 +43,14 @@ public class PermissionFilterQueryBuilderImpl
 	 */
 	@Override
 	public Query buildPermissionQuery(
-		PortletRequest portletRequest, QueryParams queryParams)
+		PortletRequest portletRequest, QueryContext queryContext)
 		throws Exception {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		
+		long companyId = themeDisplay.getCompanyId();
+
 		User user = themeDisplay.getUser();
 		long userId = user.getUserId();
 
@@ -58,9 +61,9 @@ public class PermissionFilterQueryBuilderImpl
 		}
 
 		Role guestRole = _roleLocalService.getRole(
-			queryParams.getCompanyId(), RoleConstants.GUEST);
+			companyId, RoleConstants.GUEST);
 		Role siteMemberRole = _roleLocalService.getRole(
-			queryParams.getCompanyId(), RoleConstants.SITE_MEMBER);
+			companyId, RoleConstants.SITE_MEMBER);
 
 		BooleanQueryImpl query = new BooleanQueryImpl();
 
@@ -110,7 +113,7 @@ public class PermissionFilterQueryBuilderImpl
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Group " + g.getName(queryParams.getLocale()) +
+						"Group " + g.getName() +
 							": Role " + r.getName() + "(" + r.getRoleId() +
 							")");
 				}
@@ -127,23 +130,13 @@ public class PermissionFilterQueryBuilderImpl
 
 	}
 
-	@Reference(unbind = "-")
-	protected void setPortal(Portal portal) {
+	private static final Logger _log =
+		LoggerFactory.getLogger(PermissionFilterQueryBuilderImpl.class);
 
-		_portal = portal;
-	}
-
-	@Reference(unbind = "-")
-	protected void setRoleLocalService(RoleLocalService roleLocalService) {
-
-		_roleLocalService = roleLocalService;
-	}
-
+	@Reference
 	private Portal _portal;
 
+	@Reference
 	private RoleLocalService _roleLocalService;
-
-	private static final Log _log =
-		LogFactoryUtil.getLog(PermissionFilterQueryBuilderImpl.class);
 
 }

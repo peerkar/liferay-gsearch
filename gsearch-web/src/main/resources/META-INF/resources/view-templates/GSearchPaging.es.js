@@ -2,8 +2,6 @@ import Component from 'metal-component/src/Component';
 import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 
-import GSearchUtils from '../js/GSearchUtils.es';
-
 import templates from './GSearchPaging.soy';
 
 /**
@@ -11,20 +9,6 @@ import templates from './GSearchPaging.soy';
  */
 class GSearchPaging extends Component {
 
-	/**
-	 * @inheritDoc
-	 */
-	constructor(opt_config, opt_parentElement) {
-
-		super(opt_config, opt_parentElement);
-
-		this.debug = opt_config.JSDebugEnabled;
-
-		this.initialQueryParameters = opt_config.initialQueryParameters; 
-		
-		this.portletNamespace = opt_config.portletNamespace;
-	}
-	
 	/**
 	 * @inheritDoc
 	 */
@@ -64,14 +48,12 @@ class GSearchPaging extends Component {
 
 		let _self = this;
 		
-		let element = $('#' + this.portletNamespace + 'Paging');
-		
-		element.find('span a').on('click', function(event) {
+		$('#' + this.portletNamespace + 'Paging').find('span a').on('click', function(event) {
 
 			event.preventDefault();
 
 			let value = $(this).attr('data-value');
-			
+
 			if (_self.debug) {
 				console.log("Going to page " + value);
 			}
@@ -101,6 +83,20 @@ class GSearchPaging extends Component {
 			}
 		});			
 	}
+	
+	/**
+	 * @inheritDoc 
+	 */
+	shouldUpdate(changes, propsChanges) {
+
+		if (this.debug) {
+			console.log("GSearchPaging.shouldUpdate()");
+		}		
+
+		$('#' + this.portletNamespace + 'Paging .optionmenu').remove();
+
+		return true;
+    }		
 }
 
 /** 
@@ -110,8 +106,14 @@ class GSearchPaging extends Component {
  * @static
  */
 GSearchPaging.STATE = {
+	debug: {
+		value: false
+	},
 	getQueryParam: {
 		validator: core.isFunction
+	},
+	initialQueryParameters: {
+		value: null
 	},
 	setQueryParam: {
 		validator: core.isFunction

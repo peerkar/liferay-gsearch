@@ -2,96 +2,118 @@
 package fi.soveltia.liferay.gsearch.core.api.results.item;
 
 import com.liferay.portal.kernel.search.Document;
-import fi.soveltia.liferay.gsearch.core.api.results.SearchResultCategory;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+
 /**
- * Asset type specific result item builder. Implementations of this class build
- * a single result item.
- *
+ * Builds a single result item. 
+ * 
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
 
 	/**
-	 * Check if this builder can build the requested document.
+	 * Checks whether this builder can build the result item 
+	 * for the index document. 
+	 * 
+	 * This is usually based on asset type but can be any condition.
+	 * 
+	 * 
+	 * @param document
+	 * @return
 	 */
 	public boolean canBuild(Document document);
 
 	/**
-	 * Get item hit date.
-	 *
+	 * Gets item date. 
+	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
-	public String getDate(Document document, Locale locale)
+	public String getDate(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
-	 * Get item description.
-	 *
+	 * Gets item description.
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
 	 * @return item description
-	 */
-	public String getDescription(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale)
-		throws Exception;
-
-	/**
-	 * Get item image src i.e. src attribute for img tag.
-	 *
-	 * @return item description
-	 */
-	public String getImageSrc(PortletRequest portletRequest, long entryClassPK)
-		throws Exception;
-
-	/**
-	 * Get item link.
-	 *
-	 * @return item link
 	 * @throws Exception
 	 */
-	public String getLink(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK)
+	public String getDescription(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document)
 		throws Exception;
 
 	/**
-	 * Get item additional metadata.
-	 *
+	 * Gets item link.
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param queryContext
+	 * @return item url
+	 * @throws Exception
+	 */
+	public String getLink(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, QueryContext queryContext)
+		throws Exception;
+
+	/**
+	 * Gets item additional metadata.
+	 * 
+	 * @param portletRequest
+	 * @param document
 	 * @return item metadata
 	 * @throws Exception
 	 */
-	public Map<String, String> getMetadata(Document document, Locale locale, long companyId)
+	public Map<String, String> getMetadata(
+		PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
-	 * Get item tags.
-	 *
-	 * @return item tags
+	 * Gets thumbnail (src) for a result item.
+	 * 
+	 * @param portletRequest
+	 * @param document
+	 * @return thumbnail src
+	 * @throws Exception
 	 */
-	public String[] getTags(Document document)
+	public String getThumbnail(PortletRequest portletRequest, Document document)
 		throws Exception;
 
 	/**
-	 * Get item title.
-	 *
+	 * Gets item title.
+	 * 
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @param highlight
 	 * @return item title
+	 * @throws Exception
 	 */
-	public String getTitle(PortletRequest portletRequest, PortletResponse portletResponse, Document document, Locale locale, long entryClassPK)
+	public String getTitle(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		Document document, boolean highlight)
 		throws Exception;
 
 	/**
-	 * Get item type
-	 *
+	 * Gets item asset type.
+	 * 
+	 * @param document
 	 * @return name of the item asset type
+	 * @throws Exception
 	 */
-	public String getType()
+	public String getType(Document document)
 		throws Exception;
-
-	public String getBreadcrumbs(PortletRequest portletRequest, PortletResponse portletResponse, Document document, String assetPublisherPageFriendlyURL, long entryClassPK) throws Exception;
-
-	public SearchResultCategory[] getCategories(Document document, Locale locale) throws Exception;
-
 }

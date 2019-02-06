@@ -1,15 +1,13 @@
 # Liferay GSearch Query API
 
-This is the GSearch Query API.
+This module extends the Liferay portal search query api bringing support to FunctionScoreQuery as well improved support for QueryStringQuery and MultiMatchQuery.
 
-This module extends the Liferay portal search query api.
+This module is required by the custom Elasticsearch Adapter.
 
-## Installation
+## Module Prerequisites
 
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
+None.
 
-* fi.soveltia.liferay.gsearch.query-[VERSION].jar
+## Module Configuration
 
-## Configuration
-
-No configuration needed.
+None.

@@ -1,12 +1,10 @@
 # Liferay GSearch Web
 
-This is the GSearch portlet modulle.
+The main Liferay GSearch portlet module.
 
-## Installation
+## Prerequisites
 
-Download the following jar from [latest folder](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/latest) and deploy:
-
-* fi.soveltia.liferay.gsearch.web-VERSION.jar-[VERSION].jar
+Core modules installed.
 
 ## Configuration
 
