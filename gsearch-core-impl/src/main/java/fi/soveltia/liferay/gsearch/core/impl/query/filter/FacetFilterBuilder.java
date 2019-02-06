@@ -16,7 +16,6 @@ import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
@@ -33,16 +32,13 @@ import fi.soveltia.liferay.gsearch.core.impl.query.QueryBuilderImpl;
 )
 public class FacetFilterBuilder implements FilterBuilder {
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void addFilters(
 		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
 		BooleanFilter postFilter, QueryContext queryContext)
 		throws Exception {
 
-		List<FacetParameter> facetParameters =
-			(List<FacetParameter>) queryContext.getParameter(
-				ParameterNames.FACETS);
+		List<FacetParameter> facetParameters = queryContext.getFacetParameters();
 
 		if (facetParameters == null) {
 			return;
@@ -52,7 +48,7 @@ public class FacetFilterBuilder implements FilterBuilder {
 		BooleanQueryImpl postFilterQuery = new BooleanQueryImpl();
 
 		for (FacetParameter f : facetParameters) {
-
+			
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (String value : f.getValues()) {
@@ -82,14 +78,12 @@ public class FacetFilterBuilder implements FilterBuilder {
 				query.add(condition, occur);
 
 			}
-			
+
 			// Don't add to prefilters if we do post filtering only.
 
 			if (query.hasClauses()) {
 
 				if ("pre".equals(f.getFilterMode())) {
-					
-					System.out.println(f.getFieldName());
 					
 					preFilterQuery.add(query, BooleanClauseOccur.MUST);
 				}

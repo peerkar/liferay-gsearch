@@ -5,7 +5,6 @@ import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
@@ -165,9 +164,6 @@ public class GetContentSuggestionsMVCResourceCommand
 		PortletRequest portletRequest, JSONObject responseObject)
 		throws JSONException {
 
-		String[] configuration =
-			_configurationHelper.getAssetTypeConfiguration();
-
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -183,23 +179,10 @@ public class GetContentSuggestionsMVCResourceCommand
 
 			JSONObject resultItem = items.getJSONObject(i);
 
-			for (int j = 0; j < configuration.length; j++) {
-
-				JSONObject configurationItem =
-					JSONFactoryUtil.createJSONObject(configuration[j]);
-
-				if (resultItem.getString("type").equalsIgnoreCase(
-					configurationItem.getString("entry_class_name"))) {
-					resultItem.put("key", configurationItem.getString("key"));
-					break;
-				}
-			}
-
 			resultItem.put(
 				"type", getLocalization(
 					resultItem.getString("type").toLowerCase(), locale));
-
-		}
+		}		
 	}
 
 	private static final Logger _log =

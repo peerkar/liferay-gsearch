@@ -6,18 +6,11 @@ import javax.portlet.PortletRequest;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * A configuration helper interface.
+ * Configuration helper service.
  * 
  * @author Petteri Karttunen
  */
 public interface ConfigurationHelper {
-
-	/**
-	 * Get asset type configuration.
-	 * 
-	 * @return String[]
-	 */
-	public String[] getAssetTypeConfiguration();
 
 	/**
 	 * Get clause configuration.
@@ -41,6 +34,13 @@ public interface ConfigurationHelper {
 	 */
 	public String[] getKeywordSuggesterConfiguration();
 
+	/**
+	 * Get filter configuration.
+	 * 
+	 * @return String[]
+	 */
+	public String[] getFilterConfiguration();
+	
 	/**
 	 * Get sort configuration.
 	 * 

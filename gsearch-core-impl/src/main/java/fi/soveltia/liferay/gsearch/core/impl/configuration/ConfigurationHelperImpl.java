@@ -38,22 +38,6 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String[] getAssetTypeConfiguration() {
-
-		String[] config = _assetTypeConfigurationHelper.getConfiguration();
-
-		if (config == null || config.length == 0 || config[0].length() == 0) {
-			setDefaultConfiguration(
-				AssetTypeConfigurationItemHelper.CONFIGURATION_PID);
-		}
-
-		return _assetTypeConfigurationHelper.getConfiguration();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public String[] getClauseConfiguration() {
 
 		String[] config = _clauseConfigurationHelper.getConfiguration();
@@ -99,6 +83,22 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 		return _keywordSuggestertConfigurationHelper.getConfiguration();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String[] getFilterConfiguration() {
+		
+		String[] config = _filterConfigurationHelper.getConfiguration();
+
+		if (config == null || config.length == 0 || config[0].length() == 0) {
+			setDefaultConfiguration(
+				FilterConfigurationItemHelper.CONFIGURATION_PID);
+		}
+
+		return _filterConfigurationHelper.getConfiguration();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -185,8 +185,8 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	@Reference
 	private ConfigurationAdmin _configurationAdmin;
 
-	@Reference(target = "(config.item=assettype)")
-	private ConfigurationItemHelper _assetTypeConfigurationHelper;
+	@Reference(target = "(config.item=filter)")
+	private ConfigurationItemHelper _filterConfigurationHelper;
 
 	@Reference(target = "(config.item=clause)")
 	private ConfigurationItemHelper _clauseConfigurationHelper;

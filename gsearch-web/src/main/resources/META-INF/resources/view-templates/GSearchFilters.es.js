@@ -49,9 +49,10 @@ class GSearchFilters extends Component {
 	
 	created() {
 		
-		// Setup asset type options 
+		if (this.debug) {
+			console.log("GSearchFilters.created()");
+		}
 		
-		this.setupAssetTypeOptions()
 	}
 
 	/**
@@ -64,27 +65,6 @@ class GSearchFilters extends Component {
 		}
 	}
 	
-	/**
-	 * Setup asset type options
-	 */
-	setupAssetTypeOptions() {
-		
-		let html = '';
-		
-		let length = this.assetTypeOptionsJSON.length;
-		
-		for (let i = 0; i < length; i++) {
-
-			let item = this.assetTypeOptionsJSON[i];
-
-			html += '<li><a data-facet="' + item.entry_class_name + '" data-value="' + item.key + '" href="#">';
-			html += '<span class="text">' + item.localization + '</span>';
-			html += '<span class="count"></span>';
-			html += '</a></li>';
-		}
-		this.assetTypeOptions = html;
-	}
-
 	/**
 	 * Setup time range filters
 	 */
@@ -114,16 +94,9 @@ class GSearchFilters extends Component {
 
 				let timeFrom = $('#' + _self.portletNamespace + 'RangeSelection .start').val();
 				
-				if (_self.getQueryParam('timeTo', true)) {
-					
-					_self.setQueryParam('time', 'range', false, false);
-					_self.setQueryParam('timeFrom', timeFrom, true, false);
-
-					_self.setDateRangeSelected();
-					
-				} else {
-					_self.setQueryParam('timeFrom', timeFrom, false, false);
-				}
+				_self.setQueryParam('time', 'range', false, false);
+				_self.setQueryParam('timeFrom', timeFrom, true, false);
+				_self.setDateRangeSelected();
 			});
 			
 			$('#' + _self.portletNamespace + 'RangeSelection .end').datepicker({
@@ -138,15 +111,9 @@ class GSearchFilters extends Component {
 
 				let timeTo = $('#' + _self.portletNamespace + 'RangeSelection .end').val();
 
-				if (_self.getQueryParam('timeFrom', true)) {
-					_self.setQueryParam('time', 'range', false, false);
-					_self.setQueryParam('timeTo', timeTo, true, false);
-
-					_self.setDateRangeSelected();
-					
-				} else {
-					_self.setQueryParam('timeTo', timeTo, false, false);
-				}
+				_self.setQueryParam('time', 'range', false, false);
+				_self.setQueryParam('timeTo', timeTo, true, false);
+				_self.setDateRangeSelected();
 			});
 		});
 		
@@ -209,12 +176,6 @@ GSearchFilters.STATE = {
 	addResultsCallback: {
 		validator: core.isFunction
 	},		
-	assetTypeOptions: {
-		value: null
-	},
-	assetTypeOptionsJSON: {
-		value: null
-	},
 	datePickerFormat: {
 		value: 'dd-mm-yyyy'
 	},

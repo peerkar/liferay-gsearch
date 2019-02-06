@@ -16,8 +16,6 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Locale;
-
 import javax.portlet.PortletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -25,7 +23,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
 
@@ -52,9 +49,7 @@ public class PermissionFilterQueryBuilderImpl
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		
-		long companyId = (long)queryContext.getParameter(ParameterNames.COMPANY_ID);
-				
-		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
+		long companyId = themeDisplay.getCompanyId();
 
 		User user = themeDisplay.getUser();
 		long userId = user.getUserId();
@@ -118,7 +113,7 @@ public class PermissionFilterQueryBuilderImpl
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Group " + g.getName(locale) +
+						"Group " + g.getName() +
 							": Role " + r.getName() + "(" + r.getRoleId() +
 							")");
 				}

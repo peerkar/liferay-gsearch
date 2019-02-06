@@ -5,39 +5,41 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
 
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
- * Processes single result item. 
+ * (Post) processes single result item. 
  * 
- * It can be used for example to "highlight" a single result 
- * item based on its' tag.
+ * It can, for example, be used to add any additional 
+ * properties to the result item.
  * 
  * @author Petteri Karttunen
  */
 public interface ResultItemProcessor {
 
 	/**
-	 * Is this processor enabled.
+	 * Checks whether this processor is enabled.
 	 * 
 	 * @return
 	 */
 	public boolean isEnabled();
 
 	/**
-	 * Process.
+	 * Processes the item.
 	 * 
 	 * @param portletRequest
+	 * @param portletResponse
 	 * @param queryParams
 	 * @param document
 	 * @param resultItemBuilder
 	 * @param resultItem
 	 */
 	public void process(
-		PortletRequest portletRequest, QueryContext queryParams,
-		Document document, ResultItemBuilder resultItemBuilder,
-		JSONObject resultItem)
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryParams, Document document,
+		ResultItemBuilder resultItemBuilder, JSONObject resultItem)
 		throws Exception;
 }

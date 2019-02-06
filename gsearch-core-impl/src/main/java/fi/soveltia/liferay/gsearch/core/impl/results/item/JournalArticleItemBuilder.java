@@ -102,6 +102,6 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	@Reference
 	private JournalArticleService _journalArticleService;
 
-	private static final String NAME = JournalArticle.class.getName();
+	public static final String NAME = JournalArticle.class.getName();
 
 }

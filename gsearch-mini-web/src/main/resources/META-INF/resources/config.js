@@ -4,8 +4,7 @@ Liferay.Loader.define('jquery', function(){
 
 Liferay.Loader.addModule({
   name        : 'devbridge-autocomplete',
-  anonymous   : true,
   dependencies: ['jquery'],
-  exports: '$.fn.devbridgeAutocomplete',
+  anonymous   : true,
   path        : MODULE_PATH + '/js/jquery.autocomplete.js'
 });

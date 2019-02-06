@@ -14,9 +14,8 @@ Liferay.Loader.addModule(
 
 Liferay.Loader.addModule({
   name        : 'bootstrap-datepicker',
-  anonymous   : true,
   dependencies: ['jquery'],
-  exports: '$.fn.datepicker',
+  anonymous   : true,
   path        : MODULE_PATH + '/js/bootstrap-datepicker/js/bootstrap-datepicker.js'
 });
 

@@ -2,6 +2,9 @@
 package fi.soveltia.liferay.gsearch.web.portlet.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCRenderCommand;
 import com.liferay.portal.kernel.template.Template;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -72,16 +75,23 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		// Set initial parameters and values from url.
 
 		setInitialParameters(renderRequest);
-
+				
 		return "GSearch";
 	}
 
 	@Activate
 	@Modified
 	protected void activate(Map<Object, Object> properties) {
-
+		
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
+		
+		try {
+			setFacetFields();
+		}
+		catch (JSONException e) {
+			_log.error(e.getMessage(), e);
+		}		
 	}
 
 	protected void addMenuOptionProvider(
@@ -115,6 +125,29 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		_menuOptionProviders.remove(menuOptionProvider);
 	}
+	
+	/**
+	 * Get / set facet field configuration
+	 * 
+	 * @throws JSONException
+	 */
+	protected void setFacetFields()
+		throws JSONException {
+
+		String[] configuration = _configurationHelper.getFacetConfiguration();
+		
+		if (configuration.length > 0) {
+
+			_facetFields = new String[configuration.length];
+
+			for (int i = 0; i < configuration.length; i++) {
+
+				JSONObject item = JSONFactoryUtil.createJSONObject(configuration[i]);
+
+				_facetFields[i] = item.getString("param_name");
+			}
+		}
+	}	
 
 	/**
 	 * Set initial parameters for the templates. This is used to make search
@@ -142,9 +175,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		String timeFrom =
 			ParamUtil.getString(request, ParameterNames.TIME_FROM);
 		String timeTo = ParamUtil.getString(request, ParameterNames.TIME_TO);
-
-		String typeFilter =
-			ParamUtil.getString(request, ParameterNames.ASSET_TYPE);
 
 		String sortField =
 			ParamUtil.getString(request, ParameterNames.SORT_FIELD);
@@ -191,13 +221,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			initialParameters.put(
 				ParameterNames.TIME_TO, new String[] {
 					timeTo
-				});
-		}
-
-		if (Validator.isNotNull(typeFilter)) {
-			initialParameters.put(
-				ParameterNames.ASSET_TYPE, new String[] {
-					typeFilter
 				});
 		}
 
@@ -384,7 +407,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
-
+	
 	@Reference(
 		bind = "addMenuOptionProvider", 
 		cardinality = ReferenceCardinality.MULTIPLE, 

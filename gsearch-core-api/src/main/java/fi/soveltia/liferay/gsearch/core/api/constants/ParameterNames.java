@@ -12,8 +12,6 @@ public class ParameterNames {
 
 	public static final String ASSET_PUBLISHER_URL = "assetPublisherURL";
 	
-	public static final String ASSET_TYPE = "type";
-	
 	public static final String COMPANY_ID = "companyId";
 	
 	public static final String DATEPICKER_FORMAT = "datePickerFormat";
@@ -21,10 +19,6 @@ public class ParameterNames {
 	public static final String DOC_UID = "docUID";
 
 	public static final String END = "end";
-
-	public static final String ENTRY_CLASS_NAMES = "entryClassNames";
-
-	public static final String FACETS = "facets";
 
 	public static final String GROUP_ID = "groupId";
 
@@ -53,8 +47,6 @@ public class ParameterNames {
 	public static final String TIME_TO = "timeTo";
 
 	public static final String TIME_FROM = "timeFrom";
-
-	public static final String USER_ID = "userId";
 
 	public static final String VIEW_RESULTS_IN_CONTEXT = "viewResultsInContext";
 

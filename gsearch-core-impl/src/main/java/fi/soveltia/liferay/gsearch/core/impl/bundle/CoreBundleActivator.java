@@ -12,8 +12,7 @@ import org.osgi.framework.BundleContext;
 public class CoreBundleActivator implements BundleActivator {
 
 	@Override
-	public void start(BundleContext bundleContext)
-		throws Exception {
+	public void start(BundleContext bundleContext) throws Exception {
 	}
 
 	@Override

@@ -1,4 +1,3 @@
-
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
 import com.liferay.portal.kernel.theme.ThemeDisplay;

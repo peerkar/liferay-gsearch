@@ -12,8 +12,6 @@ public class GSearchWebKeys implements WebKeys {
 
 	public static final String APPEND_REDIRECT = "appendRedirect";
 
-	public static final String ASSET_TYPE_OPTIONS = "assetTypeOptionsJSON";
-
 	public static final String ASSET_TAG_PARAM = "assetTagParam";
 
 	public static final String AUTO_COMPLETE_ENABLED = "autoCompleteEnabled";
@@ -53,6 +51,4 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String SUGGESTIONS_URL = "suggestionsURL";
 	
 	public static final String SORT_OPTIONS = "sortOptions";
-
-
 }

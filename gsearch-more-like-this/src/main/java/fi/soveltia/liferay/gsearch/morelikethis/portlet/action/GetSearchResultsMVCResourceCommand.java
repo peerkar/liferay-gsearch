@@ -48,6 +48,7 @@ import fi.soveltia.liferay.gsearch.core.api.GSearch;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.morelikethis.constants.GSearchMoreLikeThisPortletKeys;
 import fi.soveltia.liferay.gsearch.morelikethis.portlet.GSearchWebKeys;
@@ -198,26 +199,19 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	}
 
 	/**
-	 * Get asset types configuration.
+	 * Get filter configuration.
 	 * 
 	 * @param preferences
 	 * @return
 	 * @throws JSONException
 	 */
-	private List<String> getAssetTypeConfiguration(
+	private String[] getFilterConfiguration(
 		PortletPreferences preferences)
 		throws JSONException {
 
-		JSONArray queryConfiguration = JSONFactoryUtil.createJSONArray(
-			preferences.getValue("entryClassNames", null));
-
-		List<String> configuration = new ArrayList<String>();
-
-		for (int i = 0; i < queryConfiguration.length(); i++) {
-			configuration.add(queryConfiguration.getString(i));
-		}
-
-		return configuration;
+		String filterPreferences = preferences.getValue("entryClassNames", null);
+		return new String[] {filterPreferences};
+		
 	}
 
 	/**
@@ -301,8 +295,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			List<String> entryClassNames = new ArrayList<String>();
 			entryClassNames.add(assetEntry.getClassName());
 
-			queryContext.setParameter(
-				ParameterNames.ENTRY_CLASS_NAMES, entryClassNames);
+			FilterParameter filter = new FilterParameter("entryClassName");
+			filter.setAttribute("filterOccur", "must");
+			filter.setAttribute("valueOccur", "must");
+			filter.setAttribute("values", entryClassNames);			
+			
+			queryContext.addFilterParameter("entryClassName", filter);
 			
 			queryContext.setKeywords(String.valueOf(assetEntry.getClassPK()));
 		}
@@ -415,9 +413,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		queryContext.setConfiguration(
 			ConfigurationKeys.CLAUSE,
 			getMoreLikeThisClauseConfiguration(preferences));
-		queryContext.setParameter(
-			ParameterNames.ENTRY_CLASS_NAMES,
-			getAssetTypeConfiguration(preferences));
+
+		queryContext.setConfiguration(ConfigurationKeys.FILTER,
+			getFilterConfiguration(preferences));
+
+		queryContext.setConfiguration(ConfigurationKeys.FACET,
+			_configurationHelper.getFacetConfiguration());
 
 		queryContext.setStart(0);
 		int itemsToShow =
@@ -570,8 +571,6 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		PortletRequest portletRequest, JSONObject responseObject)
 		throws JSONException {
 
-		String[] configuration =
-			_configurationHelper.getAssetTypeConfiguration();
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
@@ -584,27 +583,15 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			return;
 		}
 
+
 		for (int i = 0; i < items.length(); i++) {
 
 			JSONObject resultItem = items.getJSONObject(i);
 
-			for (int j = 0; j < configuration.length; j++) {
-
-				JSONObject configurationItem =
-					JSONFactoryUtil.createJSONObject(configuration[i]);
-
-				if (configurationItem.getString(
-					"entry_class_name").equalsIgnoreCase(
-						resultItem.getString("type"))) {
-					resultItem.put("key", configurationItem.getString("key"));
-					break;
-				}
-			}
-
 			resultItem.put(
 				"type", getLocalization(
 					resultItem.getString("type").toLowerCase(), locale));
-		}
+		}		
 	}
 
 	private static final Log _log =
