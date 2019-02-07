@@ -288,6 +288,28 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	}
 
 	/**
+	 * Get news article breadcrumbs.
+	 *
+	 * @param portletRequest
+	 * @param portletResponse
+	 * @param document
+	 * @return
+	 * @throws Exception
+	 */
+	private String getNewsArticleBreadcrumbs(
+		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryContext, Document document,
+		ResultItemBuilder resultItemBuilder)
+		throws Exception {
+
+		long groupId = Long.valueOf(document.get(Field.GROUP_ID));
+
+		Locale locale = portletRequest.getLocale();
+
+		return getGroupName(groupId, locale);
+	}
+
+	/**
 	 * Check whether current item is a "News" content. Checked from HY facet
 	 * params.
 	 *
@@ -348,7 +370,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				resultItem.put("icon", "icon-news");
 				resultItem.put(
 					"breadcrumbs",
-					getJournalArticleBreadcrumbs(
+					getNewsArticleBreadcrumbs(
 						portletRequest, portletResponse, queryContext, document,
 						resultItemBuilder));
 

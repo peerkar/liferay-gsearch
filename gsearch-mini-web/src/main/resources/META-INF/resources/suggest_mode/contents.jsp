@@ -131,23 +131,23 @@
 
 					// Description
 
-					let descriptionDiv = $('<div/>').addClass('search-suggestion-item-description')
+					let descriptionDiv = $('<div/>').addClass('search-suggestion-item-description');
 
 					// Breadcrumbs
 
 					if (suggestion.data.breadcrumbs) {
 
-						let breadcrumbSpan = $('<span/>').addClass('breadcrumb').html(suggestion.data.breadcrumbs);
+						let breadcrumbSpan = $('<span/>').addClass('suggestion-breadcrumb').html(suggestion.data.breadcrumbs);
 		                descriptionDiv.append(breadcrumbSpan);
 					}
 
 	                // Date
 
-	                if (suggestion.data.date !== '') {
+	                if ((suggestion.data.typeKey === 'news') && (suggestion.data.date !== '')) {
 	                    let dateSpan = $('<span/>').addClass('date').html(suggestion.data.date);
 	                	descriptionDiv.append(dateSpan)
 					}
-	                dataDiv.append(titleDiv);
+					dataDiv.append(titleDiv);
 	                dataDiv.append(descriptionDiv);
 					return $('<div/>').addClass('search-suggestion-item').append(iconDiv).append(dataDiv).prop('outerHTML');
 				},
@@ -159,11 +159,13 @@
 						$('#<portlet:namespace />MiniSearchField').val();
 
 			        return '<div class="autocomplete-group">' +
-			    	    		'<span class="category">' + category + '</span>' +
-			    	    		'<span class="more">' +
-			    	    			'<a href="#" onClick="<portlet:namespace />openMoreLink(\'' + link + '\')">' +
-			       					 	Liferay.Language.get('more') +
-		       				'</a></span></div>';
+								// fixme hidden until people and tool groups are added
+			    	    		//'<span class="category">' + category + '</span>' +
+			    	    		//'<span class="more">' +
+			    	    		//	'<a href="#" onClick="<portlet:namespace />openMoreLink(\'' + link + '\')">' +
+			       				//	 	Liferay.Language.get('more') +
+		       				//'</a></span>' +
+	                        '</div>';
 			    },
 				groupBy: 'group',
 				minChars: <%=queryMinLength %>,
