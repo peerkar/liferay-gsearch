@@ -1,6 +1,8 @@
 # Adapter Installation
 
+Adapter build FP60 is using Voikko and has synonym dictionaries defined.
 
+Instructions:
 
 ## Step 1 - Voikko
 
@@ -10,7 +12,7 @@ The adapter is configured to use Voikko libraries from the following locations:
 	"libraryPath": "/usr/lib/x86_64-linux-gnu",
 	"dictionaryPath": "/opt/software/voikko/dictionary"
 ```
-Before installing, ensure that this configuration is valid
+Before installing, ensure that this configuration is valid. Also install the Voikko Elasticsearch plugin binary find at https://github.com/peerkar/elasticsearch-analysis-voikko/tree/gsearch-es-613/binaries as instructed at  https://github.com/peerkar/elasticsearch-analysis-voikko/tree/gsearch-es-613. Just use the custom binary instead of the one in the instructions.
 
 ## Step 2 - Synonym Dictionaries
 
