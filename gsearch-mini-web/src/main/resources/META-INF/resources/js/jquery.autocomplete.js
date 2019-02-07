@@ -111,7 +111,7 @@
             onSearchComplete: noop,
             onSearchError: noop,
             preserveInput: false,
-            containerClass: 'autocomplete-suggestions',
+            containerClass: 'autocomplete-gsearch-mini-suggestions',
             tabDisabled: false,
             dataType: 'text',
             currentRequest: null,
