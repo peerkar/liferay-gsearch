@@ -4,9 +4,13 @@
 	"filter_enabled": true,
 	"filter_occur": "should",
  	"values": [
-		"com.liferay.journal.model.JournalArticle",
+		"com.liferay.journal.model.JournalArticle", 
 		"com.liferay.document.library.kernel.model.DLFileEntry",
-		"fi.helsinki.flamma.feed.model.FeedEntry"
+		"com.liferay.message.boards.kernel.model.MBMessage",
+		"com.liferay.blogs.kernel.model.BlogsEntry", 
+		"com.liferay.blogs.model.BlogsEntry",
+		"com.liferay.wiki.model.WikiPage",
+		"com.liferay.knowledge.base.model.KBArticle"
 	],
 	"value_occur": "should"
 }
