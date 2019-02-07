@@ -90,33 +90,38 @@ public class KeywordMatchClauseConditionHandler
 		String matchOccur = configuration.getString("match_occur", "should");
 
 		String[] keywordArray = keywords.split(splitter);
+		
+		for (String keyword : keywordArray) {
 
-		for (int i = 0; i < matchWords.length(); i++) {
-
-			boolean hasMatch = false;
-
-			for (String keyword : keywordArray) {
+			boolean isWordMatch = false;
+			
+			for (int i = 0; i < matchWords.length(); i++) {
 
 				if (matchWords.getString(i).equals(keyword)) {
 
-					if ("should".equals(matchOccur)) {
+					if ("must_not".equals(matchOccur)) {
+
+						return false;
+					}		
+					else if ("should".equals(matchOccur)) {
 
 						return true;
-
 					}
 					else {
-
-						hasMatch = true;
+	
+						isWordMatch = true;
 
 						break;
 					}
 				}
 			}
-
-			if (!hasMatch) {
+			
+			if ("must".equals(matchOccur) && !isWordMatch) {
+				
 				return false;
 			}
 		}
+		
 		return true;
 	}
 
