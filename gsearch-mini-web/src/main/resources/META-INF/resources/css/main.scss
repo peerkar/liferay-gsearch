@@ -44,9 +44,9 @@
 
 /* Devbridge Autocomplete */
 
-.autocomplete-gsearch-mini-suggestions { 
+.gsearch-mini-suggestions {
 
-	background: #FFF; 
+	background: #fff; 
 	border: none;
 	box-shadow: 0 1px 10px -1px rgba(109, 109, 109, 0.3);
 	max-height: none!important;
@@ -131,7 +131,7 @@
 	}
 }
 
-.autocomplete-gsearch-mini-suggestions strong { 
+.gsearch-mini-suggestions strong { 
 	font-weight: bold; 
 	color: #000; 
 }
