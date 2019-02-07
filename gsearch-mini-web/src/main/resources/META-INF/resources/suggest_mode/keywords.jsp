@@ -88,7 +88,7 @@
 		Liferay.Loader.require('devbridge-autocomplete', function() {
 
 			$(searchFieldElement).devbridgeAutocomplete({				
-			
+				containerClass: 'gsearch-mini-suggestions',
 				dataType: 'json',
 				deferRequestBy: <%=autoCompleteRequestDelay %>,
 				minChars: <%=queryMinLength %>,
