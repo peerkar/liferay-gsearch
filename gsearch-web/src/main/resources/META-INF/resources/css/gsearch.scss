@@ -607,7 +607,7 @@
 	
 	.list-group-item.active,
 	.list-group-item.active:hover,
-	.list-group-item.active:focus,
+	.list-group-item.active:focus
 	 {
 		background: #f1f5f8;
 		border-color: #6b8b8d;
@@ -617,31 +617,29 @@
 /* Devbridge Autocomplete */
 
 .autocomplete-suggestions { 
+	
 	background: #FFF; 
 	border: 1px solid #999; 
 	overflow: auto; 
-}
 
-.autocomplete-suggestion { 
-	overflow: hidden; 
-	padding: 2px 5px; 
-	white-space: nowrap; 
+	.autocomplete-suggestion { 
+		overflow: hidden; 
+		padding: 5px 5px; 
+		white-space: nowrap; 
+	}
+	
+	.autocomplete-group { 
+		padding: 2px 5px; 
+	}
+	
+	.autocomplete-group strong { 
+		display: block; 
+		border-bottom: 1px solid #000; 
+	}
 }
-.autocomplete-selected { 
-	background: #F0F0F0; 
-}
-
+    
 .autocomplete-suggestions strong { 
 	font-weight: bold; 
 	color: #000; 
 }
 
-.autocomplete-group { 
-	padding: 2px 5px; 
-}
-
-.autocomplete-group strong { 
-	display: block; 
-	border-bottom: 1px solid #000; 
-}
-    
