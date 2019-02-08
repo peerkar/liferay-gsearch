@@ -30,7 +30,7 @@
 
 	{let $link: $appendRedirect ? ($item.link + $item.redirect) : $item.link /}
 
-	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
+	{let $itemImage: ($item.imageSrc and $item.imageSrc != '') ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
 
 	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
 	
@@ -39,16 +39,29 @@
 		<div class="card">
 
 			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$itemImage}');">
-				<img class="sr-only" alt="{$item.title}" src="{$itemImage}" title="{$item.title}">
-				<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
+				<img class="sr-only" alt="{$item.title_raw}" src="{$itemImage}" title="{$item.title}">
+				{if $item.metadata}
+					<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
+				{else}
+					<span class="sticker sticker-bottom sticker-warning">{$item.type}</span>
+				{/if}
 			</div>
 
 			<div class="card-row card-row-padded card-row-valign-top">
 				<div class="card-col-content">
 					<span class="truncate-text date">{$item.date}</span>
 					<span class="truncate-text title hihglightable">{$item.title_raw}</span>
-					<span class="truncate-text dimensions">{$item.metadata.dimensions}</span>
-					<span class="truncate-text size">{$item.metadata.size}</span>
+					
+					<span class="truncate-text dimensions">
+						{if $item.metadata}
+							{$item.metadata.dimensions}
+						{/if}
+					</span>
+					<span class="truncate-text size">
+						{if $item.metadata}
+							{$item.metadata.size}
+						{/if}
+					</span>
 				</div>
 			</div>
 		</div>
