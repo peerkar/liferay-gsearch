@@ -23,6 +23,8 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -352,6 +354,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 					getDLFileEntryBreadcrumbs(
 						portletRequest, portletResponse, queryContext, document,
 						resultItemBuilder));
+				resultItem.put("link",
+					getDLFileEntryLink(portletRequest, document));
 			}
 			else if (FeedEntry.class.getName().equals(entryClassName)) {
 
@@ -398,6 +402,18 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 			_log.error(e.getMessage(), e);
 		}
+	}
+
+	private String getDLFileEntryLink(PortletRequest portletRequest, Document document) {
+		StringBundler sb = new StringBundler();
+		sb.append(PortalUtil.getPortalURL(portletRequest));
+		sb.append("/documents/");
+		sb.append(document.get(Field.SCOPE_GROUP_ID));
+		sb.append("/");
+		sb.append(document.get(Field.FOLDER_ID));
+		sb.append("/");
+		sb.append(document.get("path"));
+		return sb.toString();
 	}
 
 	/**
