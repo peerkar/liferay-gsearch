@@ -65,7 +65,7 @@
 
 		let url = "<%= searchPageURL %>?q=" + q;
 
-		window.location.replace(url);
+		window.location.href = url;
 	}
 
 	/**
