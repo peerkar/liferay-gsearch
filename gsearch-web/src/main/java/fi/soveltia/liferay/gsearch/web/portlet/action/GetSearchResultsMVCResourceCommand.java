@@ -42,19 +42,21 @@ import fi.soveltia.liferay.gsearch.web.portlet.util.LocalizationHelper;
 
 /**
  * Resource command for getting the search results.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration", 
-	immediate = true, 
+	configurationPid = "fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration",
+	immediate = true,
 	property = {
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"mvc.command.name=" + GSearchResourceKeys.GET_SEARCH_RESULTS
-	}, 
+	},
 	service = MVCResourceCommand.class
 )
 public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
+
+	private static final int MAX_PAGE_SIZE = 30;
 
 	@Activate
 	@Modified
@@ -81,12 +83,14 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		String resultLayout = getResultLayoutParam(resourceRequest);
 
+		int pageSize = getPageSize(resourceRequest);
+
 		try {
 
 			// Build basic params.
 
 			queryContext = _queryContextBuilder.buildQueryContext(
-				resourceRequest, _moduleConfiguration.pageSize());
+				resourceRequest, pageSize);
 
 			// Set other context parameters
 
@@ -141,9 +145,17 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			resourceRequest, resourceResponse, responseObject);
 	}
 
+	private int getPageSize(ResourceRequest resourceRequest) {
+		int pageSize = ParamUtil.getInteger(resourceRequest, "pageSize", -1);
+		if (pageSize == -1) {
+			pageSize = _moduleConfiguration.pageSize();
+		}
+		return Math.min(pageSize, MAX_PAGE_SIZE); // make sure to return a sensible value
+	}
+
 	/**
 	 * Get and check result layout parameter. Use default if not valid layout
-	 * 
+	 *
 	 * @param portletRequest
 	 * @throws JSONException
 	 */
@@ -176,7 +188,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 	/**
 	 * Set additional fields to be included in results.
-	 * 
+	 *
 	 * @param queryContext
 	 */
 	protected void setAdditionalResultFields(QueryContext queryContext) {
@@ -212,7 +224,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 	/**
 	 * Set context parameters.
-	 * 
+	 *
 	 * @param queryContext
 	 * @param resultLayout
 	 */
@@ -253,11 +265,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 		*/
 		// HY
-		
+
 		queryContext.setParameter(
 			ParameterNames.INCLUDE_USER_PORTRAIT, true);
 
-		
+
 		// Set additional fields to include in results.
 
 		setAdditionalResultFields(queryContext);
@@ -266,7 +278,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	/**
 	 * Add localizations to facets. This is not in the templates because of
 	 * https://issues.liferay.com/browse/LPS-75141
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param responseObject
 	 */
@@ -315,7 +327,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 	/**
 	 * Set available result layout options to response object.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param queryContext
 	 * @param responseObject
@@ -331,8 +343,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			responseObject.put(
 				GSearchWebKeys.RESULTS_LAYOUT_OPTIONS, JSONFactoryUtil.createJSONArray());
 			return;
-		}		
-		
+		}
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -348,7 +360,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
 			// Should we show the layout.
-			
+
 			if (!shouldShowResultLayout(portletRequest, resultLayout, configurationItem)) {
 				continue;
 			}
@@ -366,7 +378,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	/**
 	 * Localize result types This is not in the templates because of
 	 * https://issues.liferay.com/browse/LPS-75141
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param responseObject
 	 */
@@ -399,18 +411,18 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		PortletRequest portletRequest, String resultLayout, JSONObject configurationItem) {
 
 		// Is enabled
-		
+
 		if (!configurationItem.getBoolean("enabled", true)) {
 			return false;
 		}
-		
+
 		// Don't show maps layout if Google Maps API key not defined.
 
-		if ("maps".equals(configurationItem.getString("key")) && 
+		if ("maps".equals(configurationItem.getString("key")) &&
 				Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
 			return false;
 		}
-		
+
 		// Process filters
 
 		JSONArray paramFiltersArray =
