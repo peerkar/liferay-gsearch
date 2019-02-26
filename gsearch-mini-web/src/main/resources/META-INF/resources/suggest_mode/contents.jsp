@@ -95,10 +95,6 @@
 
 				dataType: 'json',
 				deferRequestBy: <%=autoCompleteRequestDelay %>,
-				formatResult: function (suggestion, currentValue) {
-
-		            return suggestion.value;
-				},
 				formatResult: function(suggestion, currentValue) {
 
 					// Icon
@@ -190,8 +186,6 @@
 					if (response) {
 
 						// Sort array by type.
-
-					    response.items.sort(<portlet:namespace />sortByType);
 
 						return {
 
