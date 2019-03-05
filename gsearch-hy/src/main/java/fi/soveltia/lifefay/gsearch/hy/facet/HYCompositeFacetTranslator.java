@@ -1,35 +1,25 @@
 package fi.soveltia.lifefay.gsearch.hy.facet;
 
-import com.liferay.dynamic.data.mapping.model.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
-import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.search.facet.collector.FacetCollector;
 import com.liferay.portal.kernel.search.facet.collector.TermCollector;
-import com.liferay.portal.kernel.service.GroupLocalService;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessor;
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * HY composite facet translator.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
@@ -49,14 +39,10 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 	 */
 	public JSONObject processFacetResults(
 		QueryContext queryContext, Collection<Facet> facets,
-		JSONObject facetConfiguration)
-		throws Exception {
+		JSONObject facetConfiguration) {
 
 		JSONObject processorParams =
 			facetConfiguration.getJSONObject("processor_params");
-
-		Locale locale =
-			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
 
 		JSONObject resultItem = JSONFactoryUtil.createJSONObject();
 
@@ -68,10 +54,12 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 		resultItem.put("hide", facetConfiguration.getBoolean("hide", false));
 		resultItem.put("values", termArray);
 
-		addNewsResults(facets, processorParams, locale, termArray);
-		addContentsResults(facets, processorParams, locale, termArray);
-		addDocumentResults(facets, processorParams, locale, termArray);
-		addFeedResults(facets, processorParams, locale, termArray);
+		addNewsResults(facets, processorParams, termArray);
+		addContentsResults(facets, processorParams, termArray);
+		addDocumentResults(facets, processorParams, termArray);
+		addFeedResults(facets, processorParams, termArray);
+		addExpertSearchContactResults(facets, processorParams, termArray);
+		addToolResults(facets, processorParams, termArray);
 
 		return resultItem;
 	}
@@ -82,8 +70,7 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 	@Override
 	public void processFacetParameters(
 		List<FacetParameter> facetParameters, String[] parameterValues,
-		JSONObject facetConfiguration)
-		throws Exception {
+		JSONObject facetConfiguration) {
 
 		JSONObject processorParams =
 			facetConfiguration.getJSONObject("processor_params");
@@ -94,13 +81,17 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 		String feeds = processorParams.getString("feeds_param_value");
 
+		String expertSearchContacts = processorParams.getString("expert_search_contacts_param_value");
+
+		String tools = processorParams.getString("tools_param_value");
+
 		String news = processorParams.getString("news_param_value");
 
 		String contents = processorParams.getString("contents_param_value");
 
-		List<String> entryClassNames = new ArrayList<String>();
+		List<String> entryClassNames = new ArrayList<>();
 
-		List<String> ddmStructureKeys = new ArrayList<String>();
+		List<String> ddmStructureKeys = new ArrayList<>();
 
 		for (String parameterValue : parameterValues) {
 
@@ -122,6 +113,26 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 				String value =
 					processorParams.getString("feeds_entry_class_name");
+
+				if (value != null) {
+					entryClassNames.add(value);
+				}
+			}
+
+			if (parameterValue.equals(expertSearchContacts)) {
+
+				String value =
+					processorParams.getString("expert_search_contacts_entry_class_name");
+
+				if (value != null) {
+					entryClassNames.add(value);
+				}
+			}
+
+			if (parameterValue.equals(tools)) {
+
+				String value =
+					processorParams.getString("tools_entry_class_name");
 
 				if (value != null) {
 					entryClassNames.add(value);
@@ -164,9 +175,7 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 		}
 	}
 
-	private void addDocumentResults(
-		Collection<Facet> facets, JSONObject processorParams, Locale locale,
-		JSONArray termArray) {
+	private void addDocumentResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
 
 		String termKey =
 			processorParams.getString("documents_entry_class_name");
@@ -182,25 +191,20 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
 
-		for (TermCollector tc : termCollectors) {
+        addTermCollectorItems(termArray, termKey, paramValue, termCollectors);
+    }
 
-			if (termKey.equals(tc.getTerm())) {
-				JSONObject item = JSONFactoryUtil.createJSONObject();
+    private void addTermCollectorItems(JSONArray termArray, String termKey, String paramValue, List<TermCollector> termCollectors) {
+        for (TermCollector tc : termCollectors) {
 
-				item.put("frequency", tc.getFrequency());
-				item.put("name", paramValue);
-				item.put("term", paramValue);
+            if (termKey.equals(tc.getTerm())) {
+                addTermItem(termArray, paramValue, tc.getFrequency());
+                break;
+            }
+        }
+    }
 
-				termArray.put(item);
-				
-				break;
-			}
-		}
-	}
-
-	private void addContentsResults(
-		Collection<Facet> facets, JSONObject processorParams, Locale locale,
-		JSONArray termArray) {
+    private void addContentsResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
 
 		List<String> ddmStructureKeys = getDDMStructureKeyValues(
 			"contents_ddm_structure_keys", processorParams);
@@ -226,20 +230,21 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 		}
 
 		if (count > 0) {
-		
-			JSONObject item = JSONFactoryUtil.createJSONObject();
-	
-			item.put("frequency", count);
-			item.put("name", paramValue);
-			item.put("term", paramValue);
-	
-			termArray.put(item);
-		}
+            addTermItem(termArray, paramValue, count);
+        }
 	}
 
-	private void addFeedResults(
-		Collection<Facet> facets, JSONObject processorParams, Locale locale,
-		JSONArray termArray) {
+    private void addTermItem(JSONArray termArray, String paramValue, int count) {
+        JSONObject item = JSONFactoryUtil.createJSONObject();
+
+        item.put("frequency", count);
+        item.put("name", paramValue);
+        item.put("term", paramValue);
+
+        termArray.put(item);
+    }
+
+    private void addFeedResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
 
 		String termkey = processorParams.getString("feeds_entry_class_name");
 
@@ -254,25 +259,46 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
 
-		for (TermCollector tc : termCollectors) {
+        addTermCollectorItems(termArray, termkey, paramValue, termCollectors);
+    }
 
-			if (termkey.equals(tc.getTerm())) {
-				
-				JSONObject item = JSONFactoryUtil.createJSONObject();
+	private void addExpertSearchContactResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
 
-				item.put("frequency", tc.getFrequency());
-				item.put("name", paramValue);
-				item.put("term", paramValue);
+		String termkey = processorParams.getString("expert_search_contacts_entry_class_name");
 
-				termArray.put(item);
-				break;
-			}
+		String paramValue = processorParams.getString("expert_search_contacts_param_value");
+
+		FacetCollector facetCollector =
+			getFacetCollector(facets, "entryClassName");
+
+		if (facetCollector == null) {
+			return;
 		}
+
+		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
+
+        addTermCollectorItems(termArray, termkey, paramValue, termCollectors);
+    }
+
+	private void addToolResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
+
+		String termkey = processorParams.getString("tools_entry_class_name");
+
+		String paramValue = processorParams.getString("tools_param_value");
+
+		FacetCollector facetCollector =
+			getFacetCollector(facets, "entryClassName");
+
+		if (facetCollector == null) {
+			return;
+		}
+
+		List<TermCollector> termCollectors = facetCollector.getTermCollectors();
+
+		addTermCollectorItems(termArray, termkey, paramValue, termCollectors);
 	}
 
-	private void addNewsResults(
-		Collection<Facet> facets, JSONObject processorParams, Locale locale,
-		JSONArray termArray) {
+	private void addNewsResults(Collection<Facet> facets, JSONObject processorParams, JSONArray termArray) {
 
 		List<String> ddmStructureKeys = getDDMStructureKeyValues(
 			"news_ddm_structure_keys", processorParams);
@@ -299,14 +325,8 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 		if (count > 0) {
 
-			JSONObject item = JSONFactoryUtil.createJSONObject();
-	
-			item.put("frequency", count);
-			item.put("name", paramValue);
-			item.put("term", paramValue);
-	
-			termArray.put(item);
-		}
+            addTermItem(termArray, paramValue, count);
+        }
 	}
 
 	private List<String> getDDMStructureKeyValues(
@@ -314,7 +334,7 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 
 		JSONArray keys = configuration.getJSONArray(key);
 
-		List<String> values = new ArrayList<String>();
+		List<String> values = new ArrayList<>();
 
 		for (int i = 0; i < keys.length(); i++) {
 
@@ -324,8 +344,7 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 		return values;
 	}
 
-	protected FacetCollector getFacetCollector(
-		Collection<Facet> facets, String fieldName) {
+	private FacetCollector getFacetCollector(Collection<Facet> facets, String fieldName) {
 
 		for (Facet facet : facets) {
 
@@ -339,45 +358,6 @@ public class HYCompositeFacetTranslator implements FacetProcessor {
 		}
 		return null;
 	}
-
-	/**
-	 * Set structure data. There's no method for fetching structure by key so we
-	 * are using DynamicQuery here.
-	 * 
-	 * @param structureKey
-	 * @return
-	 * @throws PortalException
-	 */
-	protected JSONObject parseStructureData(TermCollector tc, Locale locale)
-		throws PortalException {
-
-		DynamicQuery structureQuery = _ddmStructureLocalService.dynamicQuery();
-		structureQuery.add(
-			RestrictionsFactoryUtil.eq("structureKey", tc.getTerm()));
-
-		List<DDMStructure> structures =
-			DDMStructureLocalServiceUtil.dynamicQuery(structureQuery);
-
-		DDMStructure structure = structures.get(0);
-
-		JSONObject item = JSONFactoryUtil.createJSONObject();
-
-		item.put("frequency", tc.getFrequency());
-		item.put(
-			"group_name",
-			_groupLocalService.getGroup(structure.getGroupId()).getName(
-				locale, true));
-		item.put("name", structure.getName(locale, true));
-		item.put("term", tc.getTerm());
-
-		return item;
-	}
-
-	@Reference
-	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
-	private GroupLocalService _groupLocalService;
 
 	private static final String NAME = "hy_composite_facet";
 

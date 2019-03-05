@@ -30,11 +30,11 @@ import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemPro
 
 /**
  * Check if any extra fields should be added to the results items.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true, 
+	immediate = true,
 	service = ResultItemProcessor.class
 )
 public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
@@ -63,22 +63,22 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 		if (additionalResultFields != null) {
 
 			// Loop for additional result fields. These have to be 1-1 index fields.
-	
+
 			for (Entry<String, Class<?>> entry : additionalResultFields.entrySet()) {
 
 				if (entry.getValue().isAssignableFrom(String.class)) {
-	
+
 					String value = document.get(entry.getKey());
-	
+
 					if (Validator.isNotNull(value)) {
 						resultItem.put(entry.getKey(), value);
 					}
-	
+
 				}
 				else if (entry.getValue().isAssignableFrom(String[].class)) {
-	
+
 					String[] values = document.getValues(entry.getKey());
-	
+
 					if (values != null && values.length > 0 &&
 						values[0].length() > 0) {
 						resultItem.put(entry.getKey(), values);
@@ -112,7 +112,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 	 * Include user portrait in result item. We let this method to handle
 	 * exceptions internally so that for example corrupt user references won't
 	 * silence the whole processor.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param document
 	 * @param resultItem
@@ -143,7 +143,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 		}
 		catch (PortalException e) {
 
-			_log.warn(e.getMessage());
+			_log.debug(e.getMessage());
 
 			String name = document.get(Field.USER_NAME);
 
@@ -158,7 +158,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 	/**
 	 * Include thumbnail. To optimize the speed and reduce unnecessary DB calls,
 	 * thumbnails are not included in the result items by default.
-	 * 
+	 *
 	 * @param portletRequest
 	 * @param document
 	 * @param resultItemBuilder

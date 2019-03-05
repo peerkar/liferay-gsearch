@@ -18,5 +18,7 @@ dependencies {
 	compileOnly project(":modules:flamma-common")
 	compileOnly project(":modules:feed:feed-web")
 	compileOnly project(":modules:feed:feed-api")
+	compileOnly project(":modules:expert-search-model:expert-search-model-api")
+	compileOnly project(":modules:profile-tools:profile-tools-api")
 
 }
