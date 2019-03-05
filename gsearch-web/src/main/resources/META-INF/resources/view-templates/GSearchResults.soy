@@ -88,32 +88,31 @@
 
 		<div class="item">
 
-			{if $item.icon and $resultsLayout == 'list' and $item.typeKey != 'content'}
+			{if $item.icon and $resultsLayout == 'list'}
 
                 <div class="item-icon col-md-1 col-lg-1 hidden-xs">
 					<a href="{$item.link}">
 						<div class="{$item.typeKey}-icon">
-							{if ($item.typeKey == 'feed-entry')}
+							{if ($item.typeKey == 'person')}
 
-								{if ($item.icon == '')}
+								{if $item.userPortraitUrl}
 
-									{if $item.userPortraitUrl}
+									<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
 
-										<a href="{$link}">
-											<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
-										</a>
+								{elseif $item.userInitials}
 
-									{elseif $item.userInitials}
-
-										<span class="user-avatar-image">
-											<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
-												<span>{$item.userInitials}</span>
-											</div>
-										</span>
-									{/if}
-								{else}
-                                    <img src="{$item.icon}"/>
+									<span class="user-avatar-image">
+										<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+											<span>{$item.userInitials}</span>
+										</div>
+									</span>
 								{/if}
+							{elseif ($item.typeKey == 'tool')}
+
+								<span>
+									{$item.icon}
+								</span>
+
 							{else}
                                 <svg role="img">
                                     <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#{$item.icon}"/>

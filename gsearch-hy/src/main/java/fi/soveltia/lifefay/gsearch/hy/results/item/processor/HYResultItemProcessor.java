@@ -14,6 +14,7 @@ import com.liferay.journal.service.JournalArticleService;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
@@ -41,6 +42,8 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
+import fi.helsinki.flamma.profile.tools.model.ProfileTool;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -347,6 +350,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 			if (DLFileEntry.class.getName().equals(entryClassName)) {
 
+				addContentGroup(resultItem);
 				resultItem.put("typeKey", "file");
 				resultItem.put("icon", "icon-file-text");
 				resultItem.put(
@@ -359,6 +363,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			}
 			else if (FeedEntry.class.getName().equals(entryClassName)) {
 
+				addContentGroup(resultItem);
 				resultItem.put("typeKey", "feed-entry");
 				// resultItem.put("icon", "icon-feed");
 				resultItem.put(
@@ -370,6 +375,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			}
 			else if (isNewsArticle(queryContext, document)) {
 
+				addContentGroup(resultItem);
 				resultItem.put("typeKey", "news");
 				resultItem.put("icon", "icon-news");
 				resultItem.put(
@@ -381,22 +387,30 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			}
 			else if (JournalArticle.class.getName().equals(entryClassName)) {
 
+				addContentGroup(resultItem);
 				resultItem.put("typeKey", "content");
 				resultItem.put("icon", "icon-content");
-				resultItem.put(
-					"breadcrumbs",
-					getJournalArticleBreadcrumbs(
-						portletRequest, portletResponse, queryContext, document,
-						resultItemBuilder));
+				resultItem.put("breadcrumbs",
+					getJournalArticleBreadcrumbs(portletRequest, portletResponse, queryContext, document, resultItemBuilder));
 			}
-			// TODO add else branch for processing tools and people, set group etc (now only group 'content' is supported)
-			resultItem.put("group", "content");
-			List<String> facets = new ArrayList<>();
-			facets.add("news");
-			facets.add("contents");
-			facets.add("feeds");
-			facets.add("documents");
-			resultItem.put("facets", facets);
+            else if (ExpertSearchContact.class.getName().equals(entryClassName)) {
+
+                addPersonGroup(resultItem);
+                resultItem.put("typeKey", "person");
+                resultItem.put("icon", "icon-person");
+                resultItem.put(
+                    "breadcrumbs",
+                    getExpertSearchContactBreadcrumbs(portletRequest.getLocale(), document.get(Field.USER_NAME)));
+            }
+            else if (ProfileTool.class.getName().equals(entryClassName)) {
+
+                addToolGroup(resultItem);
+                resultItem.put("typeKey", "tool");
+                resultItem.put("icon", document.get(Field.TITLE).substring(0, 1).toUpperCase());
+                resultItem.put(
+                    "breadcrumbs",
+                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(Field.TITLE)));
+            }
 		}
 		catch (Exception e) {
 
@@ -404,7 +418,41 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		}
 	}
 
-	private String getDLFileEntryLink(PortletRequest portletRequest, Document document) {
+	private void addContentGroup(JSONObject resultItem) {
+		resultItem.put("group", "content");
+		List<String> facets = new ArrayList<>();
+		facets.add("news");
+		facets.add("contents");
+		facets.add("feeds");
+		facets.add("documents");
+		resultItem.put("facets", facets);
+	}
+
+	private void addPersonGroup(JSONObject resultItem) {
+		resultItem.put("group", "person");
+		List<String> facets = new ArrayList<>();
+		facets.add("users");
+		resultItem.put("facets", facets);
+	}
+
+    private void addToolGroup(JSONObject resultItem) {
+        resultItem.put("group", "tool");
+        List<String> facets = new ArrayList<>();
+        facets.add("tools");
+        resultItem.put("facets", facets);
+    }
+
+    private String getExpertSearchContactBreadcrumbs(Locale locale, String name) {
+		String expertSearchTitle = LanguageUtil.get(locale, "person-search");
+		return String.format("%s / %s", expertSearchTitle, name);
+	}
+
+    private String getToolBreadcrumbs(Locale locale, String name) {
+        String toolsTitle = LanguageUtil.get(locale, "tools");
+        return String.format("%s / %s", toolsTitle, name);
+    }
+
+    private String getDLFileEntryLink(PortletRequest portletRequest, Document document) {
 		StringBundler sb = new StringBundler();
 		sb.append(PortalUtil.getPortalURL(portletRequest));
 		sb.append("/documents/");

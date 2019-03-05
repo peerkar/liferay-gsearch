@@ -96,6 +96,8 @@ public class GetContentSuggestionsMVCResourceCommand
 				ParameterNames.VIEW_RESULTS_IN_CONTEXT,
 				_moduleConfiguration.isViewResultsInContext());
 
+			queryContext.setParameter(
+				ParameterNames.INCLUDE_USER_PORTRAIT, true);
 		}
 		catch (PortalException e) {
 
@@ -207,7 +209,7 @@ public class GetContentSuggestionsMVCResourceCommand
 			JSONObject resultItem = items.getJSONObject(i);
 
 			resultItem.put(
-				"group", getLocalization("suggestion.group." +
+				"group_localized", getLocalization("suggestion.group." +
 					resultItem.getString("group").toLowerCase(), locale));
 		}
 	}
