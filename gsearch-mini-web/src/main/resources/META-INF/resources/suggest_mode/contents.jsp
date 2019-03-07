@@ -99,43 +99,40 @@
 
 					// Icon
 
-					let iconDiv = $('<div/>').addClass('item-icon col-md-1 col-lg-1');
+					let iconDiv = '';
 
-					if (suggestion.data.typeKey === 'tool') {
-						let span = $('<span/>');
-						iconDiv.addClass('tool');
-						span.html(suggestion.data.icon);
-						span.addClass('tool-icon');
-						iconDiv.append(span);
-					} else if (suggestion.data.typeKey === 'person') {
+					if (suggestion.data.typeKey === 'tool' || suggestion.data.typeKey === 'person') {
 
-						if ((typeof suggestion.data.userPortraitUrl !== 'undefined') && (suggestion.data.userPortraitUrl !== '')) {
-							let img = $('<img/>');
-							img.prop('alt', suggestion.data.userInitials);
-							img.addClass('user-icon-color-9 user-icon-lg user-icon user-icon-default');
-							img.prop('title', suggestion.data.userName);
-							img.prop('src', suggestion.data.userPortraitUrl);
-							iconDiv.append(img);
-						} else {
-							let spanOuter = $('<span/>');
-							spanOuter.addClass('user-avatar-image');
-							let div = $('<div/>');
-							div.prop('title', suggestion.data.userName);
-							div.addClass('user-icon-color-9 user-icon user-icon-lg user-icon-default');
-							let spanInner = $('<span/>');
-							spanInner.html(suggestion.data.userInitials);
-							div.append(spanInner);
-							spanOuter.append(div);
-							iconDiv.append(spanOuter);
+						iconDiv = $('<div/>').addClass('item-icon col-md-1 col-lg-1');
+
+						if (suggestion.data.typeKey === 'tool') {
+							let span = $('<span/>');
+							iconDiv.addClass('tool');
+							span.html(suggestion.data.icon);
+							span.addClass('tool-icon');
+							iconDiv.append(span);
+						} else if (suggestion.data.typeKey === 'person') {
+
+							if ((typeof suggestion.data.userPortraitUrl !== 'undefined') && (suggestion.data.userPortraitUrl !== '')) {
+								let img = $('<img/>');
+								img.prop('alt', suggestion.data.userInitials);
+								img.addClass('user-icon-color-9 user-icon-lg user-icon user-icon-default');
+								img.prop('title', suggestion.data.userName);
+								img.prop('src', suggestion.data.userPortraitUrl);
+								iconDiv.append(img);
+							} else {
+								let spanOuter = $('<span/>');
+								spanOuter.addClass('user-avatar-image');
+								let div = $('<div/>');
+								div.prop('title', suggestion.data.userName);
+								div.addClass('user-icon-color-9 user-icon user-icon-lg user-icon-default');
+								let spanInner = $('<span/>');
+								spanInner.html(suggestion.data.userInitials);
+								div.append(spanInner);
+								spanOuter.append(div);
+								iconDiv.append(spanOuter);
+							}
 						}
-
-					} else {
-						let svg = $('<svg/>');
-						svg.attr('role', 'img');
-						let use = $('<use/>');
-						use.attr('xlink:href', '/o/flamma-theme/images/flamma/svg/svg.svg#' + suggestion.data.icon);
-						svg.append(use);
-						iconDiv.append(svg);
 					}
 
 					// Data
