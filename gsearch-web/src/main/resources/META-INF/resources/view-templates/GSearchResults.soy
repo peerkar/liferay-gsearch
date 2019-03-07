@@ -140,6 +140,12 @@
 
 				<div class="heading">
 					<h4>
+                        {if ($item.typeKey == 'file')}
+                            <svg role="presentation">
+                                <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
+                            </svg>
+                        {/if}
+
 						<a class="highlightable"  href="{$item.link}">{$item.title}</a>
 					</h4>
 

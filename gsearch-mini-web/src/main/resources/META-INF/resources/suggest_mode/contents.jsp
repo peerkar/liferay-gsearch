@@ -137,11 +137,20 @@
 
 					// Data
 
-					let dataDiv = $('<div/>').addClass('item-data  col-md-11 col-lg-11');
+					let dataDiv = $('<div/>').addClass('item-data  col-md-12 col-lg-12');
 
 					// Title
 
 					let titleDiv = $('<div/>').addClass('search-suggestion-item-title').html(suggestion.value);
+
+					if (suggestion.data.typeKey === 'file') {
+						let svg = $('<svg/>');
+						svg.attr('role', 'img');
+						let use = $('<use/>');
+						use.attr('xlink:href', '/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text');
+						svg.append(use);
+						titleDiv.prepend(svg);
+					}
 
 					// Description
 
