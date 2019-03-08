@@ -114,18 +114,31 @@
 						} else if (suggestion.data.typeKey === 'person') {
 
 							if ((typeof suggestion.data.userPortraitUrl !== 'undefined') && (suggestion.data.userPortraitUrl !== '')) {
+
+								let userPortrait = $('<div/>');
+								userPortrait.addClass('user-portrait');
+								let imgHolderOneToOne = $('<div/>');
+								imgHolderOneToOne.addClass('image-holder one-to-one');
+								let portraitContent = $('<div/>');
+								portraitContent.addClass('content');
+
 								let img = $('<img/>');
 								img.prop('alt', suggestion.data.userInitials);
-								img.addClass('user-icon-color-9 user-icon-lg user-icon user-icon-default');
+								<%--img.addClass('user-icon user-icon-default');--%>
 								img.prop('title', suggestion.data.userName);
 								img.prop('src', suggestion.data.userPortraitUrl);
-								iconDiv.append(img);
+
+								portraitContent.append(img);
+								imgHolderOneToOne.append(portraitContent);
+								userPortrait.append(imgHolderOneToOne);
+
+								iconDiv.append(userPortrait);
 							} else {
 								let spanOuter = $('<span/>');
 								spanOuter.addClass('user-avatar-image');
 								let div = $('<div/>');
 								div.prop('title', suggestion.data.userName);
-								div.addClass('user-icon-color-9 user-icon user-icon-lg user-icon-default');
+								div.addClass('user-icon user-icon-default');
 								let spanInner = $('<span/>');
 								spanInner.html(suggestion.data.userInitials);
 								div.append(spanInner);
