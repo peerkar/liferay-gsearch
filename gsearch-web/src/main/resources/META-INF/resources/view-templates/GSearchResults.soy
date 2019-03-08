@@ -99,12 +99,18 @@
 
 								{if $item.userPortraitUrl}
 
-									<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+								<div class="user-portrait">
+                                    <div class="image-holder one-to-one">
+                                        <div class="content">
+                                            <img alt="{$item.userInitials}" class="" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+                                        </div>
+                                    </div>
+								</div>
 
 								{elseif $item.userInitials}
 
 									<span class="user-avatar-image">
-										<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+										<div class="user-icon user-icon-default" title="{$item.userName}">
 											<span>{$item.userInitials}</span>
 										</div>
 									</span>
