@@ -20,29 +20,34 @@
 						{call .hy_hf_menu}
 							{param portletNamespace: $portletNamespace /}
 							{param facet: $item /}
-						{/call} 
+						{/call}
 					</div>
-					
+
 					<div class="stats" id="{$portletNamespace}Stats">
 						{if $results and length($results.items) > 0}
 							{msg desc=""}page-{$results.paging.currentPage}-{$results.meta.totalPages}-of-{$results.meta.totalHits}-total{/msg}
 						{/if}
 					</div>
-										
-					{call .hy_time_menu}
-						{param portletNamespace: $portletNamespace /}
-					{/call}
-										
-				{elseif $item.param_name == 'unit'}
-
-					{call .hy_unit_menu}
-						{param portletNamespace: $portletNamespace /}
-						{param facet: $item /}
-					{/call}
-
 				{/if}
-				
+
 			{/foreach}
+
+			<div class="filterMenus">
+
+			{foreach $item in $results.facets}
+                {if $item.param_name == 'unit'}
+                    {call .hy_unit_menu}
+                        {param portletNamespace: $portletNamespace /}
+                        {param facet: $item /}
+                    {/call}
+                {/if}
+			{/foreach}
+
+            {call .hy_time_menu}
+                {param portletNamespace: $portletNamespace /}
+            {/call}
+
+			 </div>
 		{/if}
 	</div>
 		
