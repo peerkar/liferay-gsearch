@@ -316,6 +316,15 @@ class GSearchHYMenus extends Component {
 			event.preventDefault();
 			
 		});
+
+        $(document).on('mouseup keyup',function (e) {
+            if (!$('.gsearch-dropdown .dropdown-menu').is(e.target) && $('.gsearch-dropdown .dropdown-menu').has(e.target).length === 0 &&
+                !$('.gsearch-dropdown .dropdown-toggle').is(e.target) && $('.gsearch-dropdown .dropdown-toggle').has(e.target).length === 0) {
+                _self.unitsMenuOpen = false;
+                _self.timeMenuOpen = false;
+                $('.gsearch-dropdown').removeClass('open');
+            }
+        });
 		 
 		// After rerender, open the menu if it was left open.
 		
