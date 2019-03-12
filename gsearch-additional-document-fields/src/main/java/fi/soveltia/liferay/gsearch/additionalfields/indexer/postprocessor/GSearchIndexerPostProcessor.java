@@ -6,6 +6,7 @@ import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModel;
@@ -14,7 +15,6 @@ import com.liferay.portal.kernel.search.BaseIndexerPostProcessor;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
-import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.wiki.model.WikiPage;
 
@@ -30,7 +30,7 @@ import fi.soveltia.liferay.gsearch.additionalfields.configuration.ModuleConfigur
 
 /**
  * Adds additional document fields for improving relevancy.
- * 
+ *
  * @author Petteri Karttunen
  */
 @Component(
@@ -71,15 +71,15 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 	 * Add localized version of asset tags. Storing those in localized fields
 	 * forces language analysis. These fields can then be used for searhing in
 	 * stemmed form.
-	 * 
+	 *
 	 * @param obj
 	 * @param document
 	 */
 	private void adddAssetTagNames(Object obj, Document document) {
 
-		
+
 		BaseModel<?> baseModel = (BaseModel<?>)obj;
-		
+
 		String className = baseModel.getModelClassName();
 
 		long classPK = 0;
@@ -97,7 +97,7 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 
 		List<AssetTag> assetTags =
 			AssetTagLocalServiceUtil.getTags(classNameId, classPK);
-		
+
 		// It may happen that thread local is not available.
 
 		if (assetTags == null || assetTags.size() == 0) {
@@ -105,17 +105,20 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 		}
 
 		String[] tagsArray = new String[assetTags.size()];
-		
+
 		for (int i = 0; i < assetTags.size(); i++) {
 			tagsArray[i] = assetTags.get(i).getName();
 		}
-						
-		try {
-			Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
 
-			document.addText(
-				"gsearch_" + Field.ASSET_TAG_NAMES + "_" + locale.toString(),
-				tagsArray);
+		try {
+			// assetTags are not localized as such, all translations are just all added to the same field
+
+			for (Locale locale : LanguageUtil.getAvailableLocales()) {
+				document.addText(
+					"gsearch_" + Field.ASSET_TAG_NAMES + "_" + locale.toString(),
+					tagsArray);
+			}
+
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -125,7 +128,7 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 	/**
 	 * Adds numeric version to document. By default version numbers are stored
 	 * as keywords and cannot be used by function score queries.
-	 * 
+	 *
 	 * @param object
 	 * @param document
 	 */
