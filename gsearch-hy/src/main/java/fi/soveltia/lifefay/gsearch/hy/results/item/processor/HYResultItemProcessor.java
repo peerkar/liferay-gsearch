@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -411,6 +412,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                     "breadcrumbs",
                     getToolBreadcrumbs(portletRequest.getLocale(), document.get(Field.TITLE)));
             }
+            resultItem.put("title_escaped", HtmlUtil.escape(resultItem.getString("title_raw")));
 		}
 		catch (Exception e) {
 
