@@ -241,7 +241,7 @@
 						        	description = description.substring(0, 75) + '...';
 						        }
 
-								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div>';
+								var value = '<div title="' +  dataItem.title_escaped + '" class="title">' + dataItem.title_escaped + '</div>';
 
 				                return {
 				                	value: value, data: dataItem
