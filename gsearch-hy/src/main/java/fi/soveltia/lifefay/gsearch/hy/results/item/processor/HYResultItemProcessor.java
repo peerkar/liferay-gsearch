@@ -45,6 +45,7 @@ import javax.portlet.PortletResponse;
 
 import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
 import fi.helsinki.flamma.profile.tools.model.ProfileTool;
+import fi.soveltia.lifefay.gsearch.hy.util.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -210,7 +211,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
             FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
             User user = getUser(feedEntry.getUserId());
             if (user != null) {
-                return String.format("%s / %s.%s / %s", "VIRTA", user.getFirstName().toUpperCase(), user.getLastName().toUpperCase(), entryClassPK);
+                return String.format("%s / %s", _localizationHelper.getLocalization(portletRequest.getLocale(), "breadcrumb-feed"), user.getFullName());
             }
         } catch (PortalException e) {
             _log.error(String.format("Cannot get feed entry for '%s'", entryClassPK));
@@ -566,4 +567,6 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	@Reference
 	private FeedEntryLocalService feedEntryLocalService;
 
+	@Reference
+	private LocalizationHelper _localizationHelper;
 }

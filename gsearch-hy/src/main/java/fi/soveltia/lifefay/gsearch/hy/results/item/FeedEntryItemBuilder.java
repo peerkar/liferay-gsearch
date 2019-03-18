@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.soveltia.lifefay.gsearch.hy.util.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -76,8 +77,11 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
-		return document.get(Field.USER_NAME);
+		String prefix = _localizationHelper.getLocalization(portletRequest.getLocale(), "title-prefix-feed");
+
+		return String.format("(%s) %s", prefix, document.get(Field.USER_NAME));
 	}
+
 
 	private static final Log log =
 		LogFactoryUtil.getLog(FeedEntryItemBuilder.class);
@@ -95,5 +99,8 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 
 	@Reference
 	private UserLocalService userLocalService;
+
+	@Reference
+	private LocalizationHelper _localizationHelper;
 
 }
