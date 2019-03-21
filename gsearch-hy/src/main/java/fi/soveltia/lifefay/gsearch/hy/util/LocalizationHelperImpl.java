@@ -8,7 +8,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Localization helper util implementation.
@@ -22,13 +24,13 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 	public String getLocalization(
 		Locale locale, String key, Object... objects) {
 
-		if (_resourceBundle == null) {
-			_resourceBundle =
-				_resourceBundleLoader.loadResourceBundle(locale.toString());
+		if (!_resourceBundles.containsKey(locale)) {
+			_resourceBundles.put(locale,
+				_resourceBundleLoader.loadResourceBundle(locale.toString()));
 		}
 
 		String value =
-			ResourceBundleUtil.getString(_resourceBundle, key, objects);
+			ResourceBundleUtil.getString(_resourceBundles.get(locale), key, objects);
 
 		return value == null ? _language.format(locale, key, objects) : value;
 	}
@@ -36,7 +38,7 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 	@Reference
 	private Language _language;
 
-	private ResourceBundle _resourceBundle;
+	private Map<Locale, ResourceBundle> _resourceBundles = new ConcurrentHashMap<>();
 
 	@Reference(
 		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.hy)",
