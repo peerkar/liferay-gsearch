@@ -18,6 +18,7 @@ import com.liferay.portal.kernel.util.WebKeys;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
@@ -141,13 +142,13 @@ public class GetContentSuggestionsMVCResourceCommand
 	protected String getLocalization(
 		String key, Locale locale, Object... objects) {
 
-		if (_resourceBundle == null) {
-			_resourceBundle =
-				_resourceBundleLoader.loadResourceBundle(locale.toString());
+		if (!_resourceBundles.containsKey(locale)) {
+			_resourceBundles.put(locale,
+				_resourceBundleLoader.loadResourceBundle(locale.toString()));
 		}
 
 		String value =
-			ResourceBundleUtil.getString(_resourceBundle, key, objects);
+			ResourceBundleUtil.getString(_resourceBundles.get(locale), key, objects);
 
 		return value == null ? _language.format(locale, key, objects) : value;
 	}
@@ -202,10 +203,10 @@ public class GetContentSuggestionsMVCResourceCommand
 	@Reference
 	private QueryContextBuilder _queryContextBuilder;
 
-	private ResourceBundle _resourceBundle;
+	private Map<Locale, ResourceBundle> _resourceBundles = new ConcurrentHashMap<>();
 
 	@Reference(
-		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)", 
+		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)",
 		unbind = "-"
 	)
 	private ResourceBundleLoader _resourceBundleLoader;
