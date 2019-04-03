@@ -28,7 +28,7 @@ public class ProfileToolItemBuilder extends BaseResultItemBuilder
 	public String getLink(
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document, QueryContext queryContext) {
-		return document.get(Field.URL);
+		return document.get(portletRequest.getLocale(), Field.URL);
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class ProfileToolItemBuilder extends BaseResultItemBuilder
 		PortletRequest portletRequest, PortletResponse portletResponse,
 		Document document, boolean isHighlight)
 		throws NumberFormatException {
-		return document.get(Field.TITLE);
+		return document.get(portletRequest.getLocale(), Field.TITLE);
 	}
 
     @Override

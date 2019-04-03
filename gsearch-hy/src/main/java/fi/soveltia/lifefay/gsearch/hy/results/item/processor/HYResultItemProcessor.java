@@ -411,7 +411,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put("icon", document.get(Field.TITLE).substring(0, 1).toUpperCase());
                 resultItem.put(
                     "breadcrumbs",
-                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(Field.TITLE)));
+                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(portletRequest.getLocale(), Field.TITLE)));
             }
             resultItem.put("title_escaped", HtmlUtil.escape(resultItem.getString("title_raw")));
 		}
