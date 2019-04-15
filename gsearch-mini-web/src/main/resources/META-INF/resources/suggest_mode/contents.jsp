@@ -173,13 +173,13 @@
 
 					if (suggestion.data.breadcrumbs) {
 
-						let breadcrumbSpan = $('<span/>').addClass('breadcrumb').html(suggestion.data.breadcrumbs);
+						let breadcrumbSpan = $('<span/>').addClass('suggestion-breadcrumb').html(suggestion.data.breadcrumbs);
 		                descriptionDiv.append(breadcrumbSpan);
 					}
 
 	                // Date
 
-	                if ((suggestion.data.date !== '') && (suggestion.data.typeKey !== 'person') && (suggestion.data.typeKey !== 'tool')) {
+	                if ((suggestion.data.date !== '') && (suggestion.data.typeKey === 'news')) {
 	                    let dateSpan = $('<span/>').addClass('date').html(suggestion.data.date);
 	                	descriptionDiv.append(dateSpan)
 					}
