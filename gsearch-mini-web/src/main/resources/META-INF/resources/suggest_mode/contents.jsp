@@ -34,6 +34,21 @@
 
 	<div class="autocomplete-suggestion" id="gsearchPastSearchTemplate" style="display: none;">
 		<div class="search-suggestion-item">
+			<div class="item-icon col-md-1 col-lg-1" style="display: none;">
+				<div class="user-portrait" style="display: none;">
+					<div class="image-holder one-to-one">
+						<div class="content">
+							<img alt="" title="" src="">
+						</div>
+					</div>
+				</div>
+				<span class="user-avatar-image" style="display: none;">
+					<div title="" class="user-icon user-icon-default">
+						<span></span>
+					</div>
+				</span>
+				<span class="tool-icon" style="display: none;"></span>
+			</div>
 			<div class="item-data col-md-12 col-lg-12">
 				<div class="search-suggestion-item-title">
 					<div title="" class="title"></div>
@@ -54,19 +69,22 @@
 	    function(portletId, node) {
 			if ('<portlet:namespace/>'.includes(portletId)) {
 				<portlet:namespace />initAutocomplete();
-				<portlet:namespace />initPastSearches();
 
 				$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
 					<portlet:namespace />handleKeyUp(event);
 				});
 
-				$('#<portlet:namespace />MiniSearchField').on('keydown', function(event) {
-					<portlet:namespace />handleKeyDown(event);
-				});
+				if ('<%=pastSearchesEnabled%>' === 'true') {
+					<portlet:namespace />initPastSearches();
 
-				$('#<portlet:namespace />MiniSearchField').on('click', function(event) {
-					<portlet:namespace />showPastSearches();
-				});
+					$('#<portlet:namespace />MiniSearchField').on('keydown', function(event) {
+						<portlet:namespace />handleKeyDown(event);
+					});
+
+					$('#<portlet:namespace />MiniSearchField').on('click', function(event) {
+						<portlet:namespace />showPastSearches();
+					});
+				}
 
 				$('#<portlet:namespace />MiniSearchButton').on('click', function(event) {
 					<portlet:namespace />doSearch();
@@ -128,38 +146,60 @@
 			'z-index': 9999,
 		    'top': miniSearchField.css('height'),
 	    	'left': '0px',
-			'width': '340px'
+			'width': miniSearchField.css('width')
 		});
-
 
 		pastSearchesDiv.addClass('autocomplete-suggestions');
 		pastSearchesDiv.append($('<div class="autocomplete-group"><span class="category"><liferay-ui:message key="past-searches"/></span></div>'));
 
-
 		if (pastSearches.length > 0) {
 			for (var i = 0; i < pastSearches.length; i++) {
-				var pastSearchItem = $('#gsearchPastSearchTemplate').clone();
-				pastSearchItem.show();
-				pastSearchItem.find('.title').html(pastSearches[i].title_escaped);
-				pastSearchItem.append($('<div class="hidden past-search-link">' + pastSearches[i].link + '</div>'));
-				pastSearchItem.click(function(event) {
+				var currentItemData = pastSearches[i];
+				var currentItemElement = $('#gsearchPastSearchTemplate').clone();
+				if (currentItemData.typeKey === 'person') {
+					currentItemElement.find('.item-icon').show();
+					if (currentItemData.hasOwnProperty('userPortraitUrl')) {
+						var img = currentItemElement.find('img');
+						img.attr('alt', currentItemData.userInitials);
+						img.attr('title', currentItemData.title_escaped);
+						img.attr('src', currentItemData.userPortraitUrl);
+						currentItemElement.find('.user-portrait').show();
+					} else {
+						var userIcon = currentItemElement.find('.user-icon');
+						userIcon.attr('title', currentItemData.title_escaped);
+						userIcon.find('span').html(currentItemData.userInitials);
+						currentItemElement.find('.user-avatar-image').show();
+
+					}
+				} else if (currentItemData.typeKey === 'tool') {
+					var toolIcon = currentItemElement.find('.tool-icon');
+					toolIcon.html(currentItemData.icon);
+					toolIcon.css('display', 'flex');
+					var itemIcon = currentItemElement.find('.item-icon');
+					itemIcon.addClass('tool');
+					itemIcon.show();
+				}
+				currentItemElement.show();
+				currentItemElement.find('.title').html(currentItemData.title_escaped);
+				currentItemElement.append($('<div class="hidden past-search-link">' + currentItemData.link + '</div>'));
+				currentItemElement.click(function(event) {
 					window.location.href = $(event.currentTarget).find('.past-search-link').html();
 				});
-				pastSearchItem.find('.suggestion-breadcrumb').html(pastSearches[i].breadcrumbs);
-				pastSearchesDiv.append(pastSearchItem);
+				currentItemElement.find('.suggestion-breadcrumb').html(currentItemData.breadcrumbs);
+				pastSearchesDiv.append(currentItemElement);
 			}
+
+			pastSearchesDiv.appendTo(miniSearchField.parent());
+
+			$(document).on('click', function(event) {
+				var eventTarget = $(event.target);
+				if (!($.contains(pastSearchesDiv[0], eventTarget[0]) ||
+						pastSearchesDiv[0] === eventTarget[0] ||
+						eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
+					<portlet:namespace/>hidePastSearches();
+				}
+			});
 		}
-
-		pastSearchesDiv.appendTo(miniSearchField.parent());
-
-		$(document).on('click', function(event) {
-			var eventTarget = $(event.target);
-			if (!($.contains(pastSearchesDiv[0], eventTarget[0]) ||
-				  pastSearchesDiv[0] === eventTarget[0] ||
-				  eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
-				<portlet:namespace/>hidePastSearches();
-			}
-		});
 
 	}
 
@@ -177,25 +217,25 @@
 	function <portlet:namespace />handleKeyUp(event) {
 
         var keycode = (event.keyCode ? event.keyCode : event.which);
+		let q = $('#<portlet:namespace />MiniSearchField').val();
 
-		if ((keycode !== 9) && (keycode !== 16)) {
-			<portlet:namespace/>hidePastSearches();
-		} else {
-			var eventTarget = $(event.target);
-			if (eventTarget.is('#<portlet:namespace/>MiniSearchField')) {
-				<portlet:namespace/>showPastSearches()
+		if ('<%=pastSearchesEnabled%>' === 'true') {
+			if ((keycode !== 9) && (keycode !== 16)) {
+				<portlet:namespace/>hidePastSearches();
+			} else {
+				var eventTarget = $(event.target);
+				if (eventTarget.is('#<portlet:namespace/>MiniSearchField')) {
+					<portlet:namespace/>showPastSearches()
+				}
+			}
+			var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+			if (q.length === 0) {
+				pastSearchesDiv.removeClass('past-searches-prevented');
+			} else {
+				pastSearchesDiv.addClass('past-searches-prevented');
 			}
 		}
-
-		let q = $('#<portlet:namespace />MiniSearchField').val();
-		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
-
-		if (q.length === 0) {
-			pastSearchesDiv.removeClass('past-searches-prevented');
-		} else {
-			pastSearchesDiv.addClass('past-searches-prevented');
-		}
-
 
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -329,19 +369,22 @@
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
 
-					var pastSearches = [];
+					if ('<%=pastSearchesEnabled%>' === 'true') {
+						var pastSearches = [];
 
-					if (localStorage["pastSearches"]) {
-						pastSearches = JSON.parse(localStorage["pastSearches"]);
+						if (localStorage["pastSearches"]) {
+							pastSearches = JSON.parse(localStorage["pastSearches"]);
+						}
+
+						pastSearches.unshift(suggestion.data);
+
+						if (pastSearches.length > 5) {
+							pastSearches.pop();
+						}
+
+						localStorage["pastSearches"] = JSON.stringify(pastSearches);
+
 					}
-
-					pastSearches.unshift(suggestion.data);
-
-					if (pastSearches.length > 5) {
-						pastSearches.pop();
-					}
-
-					localStorage["pastSearches"] = JSON.stringify(pastSearches);
 
 			    	var link = suggestion.data.link;
 
