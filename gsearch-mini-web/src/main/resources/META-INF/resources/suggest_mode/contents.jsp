@@ -5,7 +5,7 @@
 		<input
 			autofocus
 			autocomplete="off"
-			class="form-control input-lg textinput"
+			class="form-control input-lg textinput minisearch-input"
 			id="<portlet:namespace />MiniSearchField"
 			name="<portlet:namespace />MiniSearchField"
 			maxlength="100"
@@ -37,17 +37,23 @@
 	Liferay.Portlet.ready(
 
 
-
 	    function(portletId, node) {
-			<portlet:namespace />initAutocomplete();
+			if ('<portlet:namespace/>'.includes(portletId)) {
+				<portlet:namespace />initAutocomplete();
+				<portlet:namespace />initPastSearches();
 
-			$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
-				<portlet:namespace />handleKeyUp(event);
-			});
+				$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
+					<portlet:namespace />handleKeyUp(event);
+				});
 
-			$('#<portlet:namespace />MiniSearchButton').on('click', function(event) {
-				<portlet:namespace />doSearch();
-			});
+				$('#<portlet:namespace />MiniSearchField').on('click', function(event) {
+					<portlet:namespace />showPastSearches();
+				});
+
+				$('#<portlet:namespace />MiniSearchButton').on('click', function(event) {
+					<portlet:namespace />doSearch();
+				});
+			}
 	    }
 	);
 
@@ -68,12 +74,91 @@
 		window.location.href = url;
 	}
 
+	function <portlet:namespace />showPastSearches() {
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+		if (!pastSearchesDiv.hasClass('past-searches-prevented')) {
+			pastSearchesDiv.show();
+		}
+	}
+
+	function <portlet:namespace />hidePastSearches() {
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+		pastSearchesDiv.hide();
+	}
+
+	function <portlet:namespace />initPastSearches() {
+
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+		var pastSearches = [];
+
+		if (localStorage["pastSearches"]) {
+			pastSearches = JSON.parse(localStorage["pastSearches"]);
+		}
+
+		if (pastSearchesDiv.length == 0) {
+			pastSearchesDiv = $('<div class="past-searches" id="<portlet:namespace/>gsearchPastSearches"></div>');
+		} else {
+			pastSearchesDiv.empty();
+		}
+
+	// todo also create proper content and styles to pastsearchesdiv
+
+	//todo fix element positioning so that top, left and width are determined dynamically
+
+		pastSearchesDiv.css({
+			'display': 'none',
+			'position': 'absolute',
+			'z-index': 9999,
+			'top': '185px',
+			'left': '629.5px',
+			'width': '340px'
+		});
+
+
+		if (pastSearches.length > 0) {
+			for (var i = 0; i < pastSearches.length; i++) {
+				pastSearchesDiv.append($('<div><span>' + pastSearches[i].title_escaped + '</span></div>'));
+			}
+		}
+
+		pastSearchesDiv.appendTo(document.body);
+
+		$(document).on('click', function(event) {
+				var eventTarget = $(event.target);
+			if (!($.contains(pastSearchesDiv[0], eventTarget[0]) || eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
+				<portlet:namespace/>hidePastSearches();
+			}
+		});
+
+	}
+
 	/**
 	 * Handle keyup  events.
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
 
         var keycode = (event.keyCode ? event.keyCode : event.which);
+
+		if (keycode !== 9) {
+			<portlet:namespace/>hidePastSearches();
+		} else {
+			var eventTarget = $(event.target);
+			if (eventTarget.is('#<portlet:namespace/>MiniSearchField')) {
+				<portlet:namespace/>showPastSearches()
+			}
+		}
+
+		let q = $('#<portlet:namespace />MiniSearchField').val();
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+		if (q.length === 0) {
+			pastSearchesDiv.removeClass('past-searches-prevented');
+		} else {
+			pastSearchesDiv.addClass('past-searches-prevented');
+		}
+
 
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -206,6 +291,20 @@
 				noCache: false,
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
+
+					var pastSearches = [];
+
+					if (localStorage["pastSearches"]) {
+						pastSearches = JSON.parse(localStorage["pastSearches"]);
+					}
+
+					pastSearches.unshift(suggestion.data);
+
+					if (pastSearches.length > 5) {
+						pastSearches.pop();
+					}
+
+					localStorage["pastSearches"] = JSON.stringify(pastSearches);
 
 			    	var link = suggestion.data.link;
 
