@@ -30,13 +30,27 @@
 	<%-- Hidden element for anchoring messages tooltip  --%>
 
 	<div class="message-wrapper" data-title="" id="<portlet:namespace />MiniSearchFieldMessage"></div>
+
+
+	<div class="autocomplete-suggestion" id="gsearchPastSearchTemplate" style="display: none;">
+		<div class="search-suggestion-item">
+			<div class="item-data col-md-12 col-lg-12">
+				<div class="search-suggestion-item-title">
+					<div title="" class="title"></div>
+				</div>
+				<div class="search-suggestion-item-description">
+					<span class="suggestion-breadcrumb"></span>
+					<span class="date"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <aui:script>
 
 	Liferay.Portlet.ready(
-
-
 	    function(portletId, node) {
 			if ('<portlet:namespace/>'.includes(portletId)) {
 				<portlet:namespace />initAutocomplete();
@@ -44,6 +58,10 @@
 
 				$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
 					<portlet:namespace />handleKeyUp(event);
+				});
+
+				$('#<portlet:namespace />MiniSearchField').on('keydown', function(event) {
+					<portlet:namespace />handleKeyDown(event);
 				});
 
 				$('#<portlet:namespace />MiniSearchField').on('click', function(event) {
@@ -65,7 +83,7 @@
 		let q = $('#<portlet:namespace />MiniSearchField').val();
 
 		if (q.length < <%=queryMinLength %>) {
-			<portlet:namespace />showMessage(Liferay.Language.get('min-character-count-is') + ' <%=queryMinLength %> ');
+			<portlet:namespace />showMessage("<liferay-ui:message key="min-character-count-is"/>" + ' <%=queryMinLength %> ');
 			return false;
 		}
 
@@ -83,7 +101,6 @@
 
 	function <portlet:namespace />hidePastSearches() {
 		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
-
 		pastSearchesDiv.hide();
 	}
 
@@ -103,27 +120,37 @@
 			pastSearchesDiv.empty();
 		}
 
-	// todo also create proper content and styles to pastsearchesdiv
-
-	//todo fix element positioning so that top, left and width are determined dynamically
+		var miniSearchField = $('#<portlet:namespace />MiniSearchField');
 
 		pastSearchesDiv.css({
 			'display': 'none',
 			'position': 'absolute',
 			'z-index': 9999,
-			'top': '185px',
-			'left': '629.5px',
+		    'top': miniSearchField.css('height'),
+	    	'left': '0px',
 			'width': '340px'
 		});
 
 
+		pastSearchesDiv.addClass('autocomplete-suggestions');
+		pastSearchesDiv.append($('<div class="autocomplete-group"><span class="category"><liferay-ui:message key="past-searches"/></span></div>'));
+
+
 		if (pastSearches.length > 0) {
 			for (var i = 0; i < pastSearches.length; i++) {
-				pastSearchesDiv.append($('<div><span>' + pastSearches[i].title_escaped + '</span></div>'));
+				var pastSearchItem = $('#gsearchPastSearchTemplate').clone();
+				pastSearchItem.show();
+				pastSearchItem.find('.title').html(pastSearches[i].title_escaped);
+				pastSearchItem.append($('<div class="hidden past-search-link">' + pastSearches[i].link + '</div>'));
+				pastSearchItem.click(function(event) {
+					window.location.href = $(event.currentTarget).find('.past-search-link').html();
+				});
+				pastSearchItem.find('.suggestion-breadcrumb').html(pastSearches[i].breadcrumbs);
+				pastSearchesDiv.append(pastSearchItem);
 			}
 		}
 
-		pastSearchesDiv.appendTo(document.body);
+		pastSearchesDiv.appendTo(miniSearchField.parent());
 
 		$(document).on('click', function(event) {
 				var eventTarget = $(event.target);
@@ -134,6 +161,14 @@
 
 	}
 
+	function <portlet:namespace />handleKeyDown(event) {
+		var keycode = (event.keyCode ? event.keyCode : event.which);
+
+		if (keycode === 9) {
+			<portlet:namespace/>hidePastSearches();
+		}
+	}
+
 	/**
 	 * Handle keyup  events.
 	 */
@@ -141,7 +176,7 @@
 
         var keycode = (event.keyCode ? event.keyCode : event.which);
 
-		if (keycode !== 9) {
+		if ((keycode !== 9) && (keycode !== 16)) {
 			<portlet:namespace/>hidePastSearches();
 		} else {
 			var eventTarget = $(event.target);
