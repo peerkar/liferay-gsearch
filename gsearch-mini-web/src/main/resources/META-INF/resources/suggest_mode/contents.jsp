@@ -153,8 +153,10 @@
 		pastSearchesDiv.appendTo(miniSearchField.parent());
 
 		$(document).on('click', function(event) {
-				var eventTarget = $(event.target);
-			if (!($.contains(pastSearchesDiv[0], eventTarget[0]) || eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
+			var eventTarget = $(event.target);
+			if (!($.contains(pastSearchesDiv[0], eventTarget[0]) ||
+				  pastSearchesDiv[0] === eventTarget[0] ||
+				  eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
 				<portlet:namespace/>hidePastSearches();
 			}
 		});
