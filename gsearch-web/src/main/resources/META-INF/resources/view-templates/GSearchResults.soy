@@ -47,6 +47,14 @@
 							{param results: $results /}
 						{/call}
 
+					{elseif $results.resultsLayout == 'preview'}
+
+						// Preview layout
+
+						{call GSearchPreviewResultLayout.render}
+							{param results: $results /}
+						{/call}
+
 					{else}
 
 						// Default result layout rendering.

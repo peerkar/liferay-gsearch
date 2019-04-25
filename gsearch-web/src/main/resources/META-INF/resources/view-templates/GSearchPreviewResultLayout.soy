@@ -1,18 +1,15 @@
-{namespace GSearchImageResultLayout}
+{namespace GSearchPreviewResultLayout}
 
 /**
- * Print image result layout.
+ * Print preview result layout.
  *
- * @param appendRedirect
  * @param results
  */
 {template .render}
 
 	<ul class="display-class-icon list-unstyled row">
-	
 		{foreach $item in $results.items}
 			{call .item}
-				{param appendRedirect: $appendRedirect /}
 				{param item: $item /}
 				{param index: index($item) /}
 			{/call}
@@ -22,33 +19,33 @@
 
 
 /**
- * Print one image result item.
+ * Print one preview result item.
  *
- * @param appendRedirect
  * @param item
  * @param index
  */
 {template .item}
 
-	{let $link: $appendRedirect ? ($item.link + $item.redirect) : $item.link /}
+	{let $link: $item.link /}
+
 
 	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
 
-	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2 item">
-	
+	<li class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 item preview">
+
 		<a href="{$link}" title="{$item.title}" data-index="{$index}">
-		
+
 		<div class="card">
 
 			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$itemImage}');">
-				<img class="sr-only" alt="{$item.title}" src="{$itemImage}" title="{$item.title}">
+				<img class="sr-only" alt="{$item.title_escaped}" src="{$itemImage}" title="{$item.title_escaped}">
 				<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
 			</div>
 
 			<div class="card-row card-row-padded card-row-valign-top">
 				<div class="card-col-content">
 					<span class="truncate-text date">{$item.date}</span>
-					<span class="truncate-text title highlightable">{$item.title_raw}</span>
+					<span class="truncate-text title highlightable">{$item.title_escaped}</span>
 					<span class="truncate-text dimensions">{$item.metadata.dimensions}</span>
 					<span class="truncate-text size">{$item.metadata.size}</span>
 				</div>
