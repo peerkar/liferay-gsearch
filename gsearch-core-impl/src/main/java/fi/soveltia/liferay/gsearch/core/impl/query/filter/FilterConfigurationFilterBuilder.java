@@ -48,15 +48,14 @@ public class FilterConfigurationFilterBuilder implements FilterBuilder {
 			return;
 		}
 
-		BooleanQuery filterQuery = new BooleanQueryImpl();
-
 		List<FilterParameter> filters =
 			(List<FilterParameter>) preFilter.getAttribute("filters");
 
-		for (FilterParameter filter : filters) {
+		BooleanQuery filterQuery = new BooleanQueryImpl();
+
+		for (FilterParameter filter : filters) {			
 
 			String fieldName = filter.getFieldName();
-			
 			
 			BooleanClauseOccur filterOccur =
 				translateOccur((String) filter.getAttribute("filterOccur"));
@@ -70,19 +69,15 @@ public class FilterConfigurationFilterBuilder implements FilterBuilder {
 
 			if (fieldName.equals("entryClassName")) {
 
-				for (String className : values) {
+				for (String value : values) {
 
 					// Handle journal article separately.
 
-					if (className.equals(JournalArticle.class.getName())) {
+					if (value.equals(JournalArticle.class.getName())) {
 						addJournalArticleClassCondition(query);
-
 					}
 					else {
-
-						TermQuery condition = new TermQueryImpl(
-							Field.ENTRY_CLASS_NAME, className);
-						query.add(condition, valueOccur);
+						query.addTerm(fieldName, value, false, valueOccur);
 					}
 				}
 
@@ -90,14 +85,11 @@ public class FilterConfigurationFilterBuilder implements FilterBuilder {
 			else {
 
 				for (String value : values) {
-
-					TermQuery condition = new TermQueryImpl(fieldName, value);
-					query.add(condition, valueOccur);
+					query.addTerm(fieldName, value, false, valueOccur);
 				}
 			}
 
 			filterQuery.add(query, filterOccur);
-
 		}
 
 		QueryFilter queryFilter = new QueryFilter(filterQuery);

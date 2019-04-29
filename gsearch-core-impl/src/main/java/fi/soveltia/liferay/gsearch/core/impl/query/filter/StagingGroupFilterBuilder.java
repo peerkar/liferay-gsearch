@@ -1,8 +1,19 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query.filter;
 
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.search.BooleanClauseOccur;
+import com.liferay.portal.kernel.search.BooleanQuery;
 import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.ParseException;
+import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
+import com.liferay.portal.kernel.search.filter.QueryFilter;
+import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
+import com.liferay.portal.kernel.search.generic.TermQueryImpl;
+
+import java.util.Date;
 
 import javax.portlet.PortletRequest;
 
@@ -28,8 +39,14 @@ public class StagingGroupFilterBuilder implements FilterBuilder {
 		BooleanFilter postFilter, QueryContext queryContext)
 		throws Exception {
 
-		// Do not search staging groups.
+		// For other asset types than User, do not search staging groups.
+		
+		BooleanQuery filterQuery = new BooleanQueryImpl();
+		
+		filterQuery.addTerm(Field.ENTRY_CLASS_NAME, User.class.getName(), false, BooleanClauseOccur.SHOULD);
+		filterQuery.addTerm(Field.STAGING_GROUP, "false", false, BooleanClauseOccur.SHOULD);
 
-		preBooleanfilter.addRequiredTerm(Field.STAGING_GROUP, false);
+		QueryFilter queryFilter = new QueryFilter(filterQuery);
+		preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);
 	}
 }
