@@ -143,7 +143,7 @@
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
 						<a href="{$link}" data-index="{$index}">
-							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+							<img alt="{$item.title_escaped}" src="{$item.imageSrc}" title="{$item.title_escaped}" />
 						</a>
 					{/if}
 				</div>
@@ -162,7 +162,7 @@
                             </svg>
                         {/if}
 
-						<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
+						<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title_escaped}</a>
 					</h4>
 
 					{if $item.official_content}
