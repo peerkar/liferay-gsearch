@@ -182,9 +182,7 @@
 				currentItemElement.show();
 				currentItemElement.find('.title').html(currentItemData.title_escaped);
 				currentItemElement.append($('<div class="hidden past-search-link">' + currentItemData.link + '</div>'));
-				currentItemElement.click(function(event) {
-					window.location.href = $(event.currentTarget).find('.past-search-link').html();
-				});
+				<portlet:namespace/>addPastSearchClickHandler(currentItemElement, currentItemData);
 				currentItemElement.find('.suggestion-breadcrumb').html(currentItemData.breadcrumbs);
 				pastSearchesDiv.append(currentItemElement);
 			}
@@ -200,6 +198,14 @@
 				}
 			});
 		}
+
+	}
+
+	function <portlet:namespace/>addPastSearchClickHandler(element, data) {
+		element.click(function(event) {
+			<portlet:namespace/>storeSearchResultToPastSearches(data);
+			window.location.href = $(event.currentTarget).find('.past-search-link').html();
+		});
 
 	}
 
@@ -370,20 +376,7 @@
 			    onSelect: function (suggestion) {
 
 					if ('<%=pastSearchesEnabled%>' === 'true') {
-						var pastSearches = [];
-
-						if (localStorage["pastSearches"]) {
-							pastSearches = JSON.parse(localStorage["pastSearches"]);
-						}
-
-						pastSearches.unshift(suggestion.data);
-
-						if (pastSearches.length > 5) {
-							pastSearches.pop();
-						}
-
-						localStorage["pastSearches"] = JSON.stringify(pastSearches);
-
+						<portlet:namespace/>storeSearchResultToPastSearches(suggestion.data);
 					}
 
 			    	var link = suggestion.data.link;
@@ -436,6 +429,35 @@
 				triggerSelectOnValidInput: false
 			});
 		});
+	}
+
+	function <portlet:namespace />storeSearchResultToPastSearches(data) {
+		var pastSearches = [];
+
+		if (localStorage["pastSearches"]) {
+			pastSearches = JSON.parse(localStorage["pastSearches"]);
+		}
+
+		var existingIndex = -1;
+		for (var i = 0; i < pastSearches.length; i++) {
+			if (pastSearches[i].link === data.link) {
+				existingIndex = i;
+				break;
+			}
+		}
+
+		if (existingIndex >= 0) {
+			pastSearches.splice(existingIndex, 1);
+		}
+
+		pastSearches.unshift(data);
+
+		if (pastSearches.length > 5) {
+			pastSearches.pop();
+		}
+
+		localStorage["pastSearches"] = JSON.stringify(pastSearches);
+
 	}
 
 	/**

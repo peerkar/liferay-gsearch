@@ -89,6 +89,18 @@ class GSearchResults extends Component {
             pastSearches = JSON.parse(localStorage["pastSearches"]);
         }
 
+        var existingIndex = -1;
+        for (var i = 0; i < pastSearches.length; i++) {
+        	if (pastSearches[i].link === data.link) {
+        		existingIndex = i;
+        		break;
+			}
+		}
+
+		if (existingIndex >= 0) {
+			pastSearches.splice(existingIndex, 1);
+		}
+
         pastSearches.unshift(data);
 
         if (pastSearches.length > 5) {
