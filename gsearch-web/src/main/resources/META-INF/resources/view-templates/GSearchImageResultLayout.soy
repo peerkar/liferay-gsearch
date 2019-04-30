@@ -14,6 +14,7 @@
 			{call .item}
 				{param appendRedirect: $appendRedirect /}
 				{param item: $item /}
+				{param index: index($item) /}
 			{/call}
 		{/foreach}
 	</ul>
@@ -25,6 +26,7 @@
  *
  * @param appendRedirect
  * @param item
+ * @param index
  */
 {template .item}
 
@@ -32,9 +34,9 @@
 
 	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
 
-	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
+	<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3 col-xl-2 item">
 	
-		<a href="{$link}" title="{$item.title}">	
+		<a href="{$link}" title="{$item.title}" data-index="{$index}">
 		
 		<div class="card">
 

@@ -24,4 +24,5 @@
 	String suggestionsURL = (String)request.getAttribute(GSearchMiniWebKeys.SUGGESTIONS_URL);	
 	String suggestMode = (String)request.getAttribute(GSearchMiniWebKeys.SUGGEST_MODE);
 	Boolean appendRedirect = (Boolean)request.getAttribute(GSearchMiniWebKeys.APPEND_REDIRECT);
+	Boolean pastSearchesEnabled = (Boolean)request.getAttribute(GSearchMiniWebKeys.PAST_SEARCHES_ENABLED);
 %>

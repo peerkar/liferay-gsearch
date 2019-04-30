@@ -91,6 +91,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			_portal.getPortalURL(renderRequest) +
 				_moduleConfiguration.searchPortletPage());
 
+		renderRequest.setAttribute(
+			GSearchMiniWebKeys.PAST_SEARCHES_ENABLED,
+			_moduleConfiguration.isPastSearchesEnabled());
+
 		// Set autocomplete/suggestions resource url.
 
 		if (_moduleConfiguration.suggestMode().equals("contents")) {

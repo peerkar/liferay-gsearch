@@ -45,8 +45,10 @@ public class GSearchWebKeys implements WebKeys {
 	public static final String SEARCH_QUERY_TIME = "searchQueryTime";
 
 	public static final String SEARCH_RESULTS_URL = "searchResultsURL";
-	
+
 	public static final String SHOW_ASSET_TAGS = "showAssetTags";
+
+	public static final String PAST_SEARCHES_ENABLED = "pastSearchesEnabled";
 
 	public static final String SUGGESTIONS_URL = "suggestionsURL";
 	

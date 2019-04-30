@@ -56,6 +56,7 @@
 								{param appendRedirect: $appendRedirect /}
 								{param resultsLayout: $results.resultsLayout /}
 								{param item: $item /}
+								{param index: index($item) /}
 							{/call}
 						{/foreach}
 
@@ -79,6 +80,7 @@
  * @param appendRedirect
  * @param item
  * @param resultsLayout
+ * @param index
  */
 {template .default}
 
@@ -93,7 +95,7 @@
 			{if ($item.typeKey == 'tool' or $item.typeKey == 'person') and $resultsLayout == 'list'}
 
                 <div class="item-icon col-md-1 col-lg-1 hidden-xs">
-					<a href="{$item.link}">
+					<a href="{$item.link}" data-index="{$index}">
 						<div class="{$item.typeKey}-icon">
 							{if ($item.typeKey == 'person')}
 
@@ -132,7 +134,7 @@
 
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
-						<a href="{$link}">
+						<a href="{$link}" data-index="{$index}">
 							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
 						</a>
 					{/if}
@@ -152,7 +154,7 @@
                             </svg>
                         {/if}
 
-						<a class="highlightable"  href="{$item.link}">{$item.title}</a>
+						<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
 					</h4>
 
 					{if $item.official_content}

@@ -54,7 +54,7 @@ class GSearchResults extends Component {
 		if (this.debug) {
 			console.log("GSearchResults.rendered()");
 		}
-		
+
 		if (this.results) {
 
 			this.decodeHighlightHTML();
@@ -64,8 +64,52 @@ class GSearchResults extends Component {
 			if (this.showAssetTags) {
 				this.setupTagLinks();
 			}
+
+			if (this.pastSearchesEnabled) {
+				this.setupPastSearches(this.results);
+			}
+
 		}
 	}
+
+	setupPastSearches(results) {
+		var that = this;
+		$('.gsearch-results .item a').each(function() {
+			$(this).click(function(event) {
+				var index = $(event.currentTarget).attr('data-index');
+				that.storeSearchResultToPastSearches(results.items[index]);
+			});
+		});
+	}
+
+	storeSearchResultToPastSearches(data) {
+        let pastSearches = [];
+
+        if (localStorage["pastSearches"]) {
+            pastSearches = JSON.parse(localStorage["pastSearches"]);
+        }
+
+        var existingIndex = -1;
+        for (var i = 0; i < pastSearches.length; i++) {
+        	if (pastSearches[i].link === data.link) {
+        		existingIndex = i;
+        		break;
+			}
+		}
+
+		if (existingIndex >= 0) {
+			pastSearches.splice(existingIndex, 1);
+		}
+
+        pastSearches.unshift(data);
+
+        if (pastSearches.length > 5) {
+            pastSearches.pop();
+        }
+
+        localStorage["pastSearches"] = JSON.stringify(pastSearches);
+
+    }
 	
 	/**
 	 * Set up asset tags links
@@ -125,7 +169,10 @@ GSearchResults.STATE = {
 	},
 	showAssetTags: {
 		value: false
-	}
+	},
+    pastSearchesEnabled: {
+        value: false
+    }
 };
 
 // Register component

@@ -5,7 +5,7 @@
 		<input
 			autofocus
 			autocomplete="off"
-			class="form-control input-lg textinput"
+			class="form-control input-lg textinput minisearch-input"
 			id="<portlet:namespace />MiniSearchField"
 			name="<portlet:namespace />MiniSearchField"
 			maxlength="100"
@@ -30,24 +30,66 @@
 	<%-- Hidden element for anchoring messages tooltip  --%>
 
 	<div class="message-wrapper" data-title="" id="<portlet:namespace />MiniSearchFieldMessage"></div>
+
+
+	<div class="autocomplete-suggestion" id="gsearchPastSearchTemplate" style="display: none;">
+		<div class="search-suggestion-item">
+			<div class="item-icon col-md-1 col-lg-1" style="display: none;">
+				<div class="user-portrait" style="display: none;">
+					<div class="image-holder one-to-one">
+						<div class="content">
+							<img alt="" title="" src="">
+						</div>
+					</div>
+				</div>
+				<span class="user-avatar-image" style="display: none;">
+					<div title="" class="user-icon user-icon-default">
+						<span></span>
+					</div>
+				</span>
+				<span class="tool-icon" style="display: none;"></span>
+			</div>
+			<div class="item-data col-md-12 col-lg-12">
+				<div class="search-suggestion-item-title">
+					<div title="" class="title"></div>
+				</div>
+				<div class="search-suggestion-item-description">
+					<span class="suggestion-breadcrumb"></span>
+					<span class="date"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 
 <aui:script>
 
 	Liferay.Portlet.ready(
-
-
-
 	    function(portletId, node) {
-			<portlet:namespace />initAutocomplete();
+			if ('<portlet:namespace/>'.includes(portletId)) {
+				<portlet:namespace />initAutocomplete();
 
-			$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
-				<portlet:namespace />handleKeyUp(event);
-			});
+				$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
+					<portlet:namespace />handleKeyUp(event);
+				});
 
-			$('#<portlet:namespace />MiniSearchButton').on('click', function(event) {
-				<portlet:namespace />doSearch();
-			});
+				if ('<%=pastSearchesEnabled%>' === 'true') {
+					<portlet:namespace />initPastSearches();
+
+					$('#<portlet:namespace />MiniSearchField').on('keydown', function(event) {
+						<portlet:namespace />handleKeyDown(event);
+					});
+
+					$('#<portlet:namespace />MiniSearchField').on('click', function(event) {
+						<portlet:namespace />showPastSearches();
+					});
+				}
+
+				$('#<portlet:namespace />MiniSearchButton').on('click', function(event) {
+					<portlet:namespace />doSearch();
+				});
+			}
 	    }
 	);
 
@@ -59,7 +101,7 @@
 		let q = $('#<portlet:namespace />MiniSearchField').val();
 
 		if (q.length < <%=queryMinLength %>) {
-			<portlet:namespace />showMessage(Liferay.Language.get('min-character-count-is') + ' <%=queryMinLength %> ');
+			<portlet:namespace />showMessage("<liferay-ui:message key="min-character-count-is"/>" + ' <%=queryMinLength %> ');
 			return false;
 		}
 
@@ -68,12 +110,138 @@
 		window.location.href = url;
 	}
 
+	function <portlet:namespace />showPastSearches() {
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+		if (!pastSearchesDiv.hasClass('past-searches-prevented')) {
+			pastSearchesDiv.show();
+		}
+	}
+
+	function <portlet:namespace />hidePastSearches() {
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+		pastSearchesDiv.hide();
+	}
+
+	function <portlet:namespace />initPastSearches() {
+
+		var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+		var pastSearches = [];
+
+		if (localStorage["pastSearches"]) {
+			pastSearches = JSON.parse(localStorage["pastSearches"]);
+		}
+
+		if (pastSearchesDiv.length == 0) {
+			pastSearchesDiv = $('<div class="past-searches" id="<portlet:namespace/>gsearchPastSearches"></div>');
+		} else {
+			pastSearchesDiv.empty();
+		}
+
+		var miniSearchField = $('#<portlet:namespace />MiniSearchField');
+
+		pastSearchesDiv.css({
+			'display': 'none',
+			'position': 'absolute',
+			'z-index': 9999,
+		    'top': miniSearchField.css('height'),
+	    	'left': '0px',
+			'width': miniSearchField.css('width')
+		});
+
+		pastSearchesDiv.addClass('autocomplete-suggestions');
+		pastSearchesDiv.append($('<div class="autocomplete-group"><span class="category"><liferay-ui:message key="past-searches"/></span></div>'));
+
+		if (pastSearches.length > 0) {
+			for (var i = 0; i < pastSearches.length; i++) {
+				var currentItemData = pastSearches[i];
+				var currentItemElement = $('#gsearchPastSearchTemplate').clone();
+				if (currentItemData.typeKey === 'person') {
+					currentItemElement.find('.item-icon').show();
+					if (currentItemData.hasOwnProperty('userPortraitUrl')) {
+						var img = currentItemElement.find('img');
+						img.attr('alt', currentItemData.userInitials);
+						img.attr('title', currentItemData.title_escaped);
+						img.attr('src', currentItemData.userPortraitUrl);
+						currentItemElement.find('.user-portrait').show();
+					} else {
+						var userIcon = currentItemElement.find('.user-icon');
+						userIcon.attr('title', currentItemData.title_escaped);
+						userIcon.find('span').html(currentItemData.userInitials);
+						currentItemElement.find('.user-avatar-image').show();
+
+					}
+				} else if (currentItemData.typeKey === 'tool') {
+					var toolIcon = currentItemElement.find('.tool-icon');
+					toolIcon.html(currentItemData.icon);
+					toolIcon.css('display', 'flex');
+					var itemIcon = currentItemElement.find('.item-icon');
+					itemIcon.addClass('tool');
+					itemIcon.show();
+				}
+				currentItemElement.show();
+				currentItemElement.find('.title').html(currentItemData.title_escaped);
+				currentItemElement.append($('<div class="hidden past-search-link">' + currentItemData.link + '</div>'));
+				<portlet:namespace/>addPastSearchClickHandler(currentItemElement, currentItemData);
+				currentItemElement.find('.suggestion-breadcrumb').html(currentItemData.breadcrumbs);
+				pastSearchesDiv.append(currentItemElement);
+			}
+
+			pastSearchesDiv.appendTo(miniSearchField.parent());
+
+			$(document).on('click', function(event) {
+				var eventTarget = $(event.target);
+				if (!($.contains(pastSearchesDiv[0], eventTarget[0]) ||
+						pastSearchesDiv[0] === eventTarget[0] ||
+						eventTarget.is('#<portlet:namespace/>MiniSearchField'))) {
+					<portlet:namespace/>hidePastSearches();
+				}
+			});
+		}
+
+	}
+
+	function <portlet:namespace/>addPastSearchClickHandler(element, data) {
+		element.click(function(event) {
+			<portlet:namespace/>storeSearchResultToPastSearches(data);
+			window.location.href = $(event.currentTarget).find('.past-search-link').html();
+		});
+
+	}
+
+	function <portlet:namespace />handleKeyDown(event) {
+		var keycode = (event.keyCode ? event.keyCode : event.which);
+
+		if (keycode === 9) {
+			<portlet:namespace/>hidePastSearches();
+		}
+	}
+
 	/**
 	 * Handle keyup  events.
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
 
         var keycode = (event.keyCode ? event.keyCode : event.which);
+		let q = $('#<portlet:namespace />MiniSearchField').val();
+
+		if ('<%=pastSearchesEnabled%>' === 'true') {
+			if ((keycode !== 9) && (keycode !== 16)) {
+				<portlet:namespace/>hidePastSearches();
+			} else {
+				var eventTarget = $(event.target);
+				if (eventTarget.is('#<portlet:namespace/>MiniSearchField')) {
+					<portlet:namespace/>showPastSearches()
+				}
+			}
+			var pastSearchesDiv = $('#<portlet:namespace/>gsearchPastSearches');
+
+			if (q.length === 0) {
+				pastSearchesDiv.removeClass('past-searches-prevented');
+			} else {
+				pastSearchesDiv.addClass('past-searches-prevented');
+			}
+		}
 
         if(keycode === 13){
         	<portlet:namespace />doSearch();
@@ -207,6 +375,10 @@
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 			    onSelect: function (suggestion) {
 
+					if ('<%=pastSearchesEnabled%>' === 'true') {
+						<portlet:namespace/>storeSearchResultToPastSearches(suggestion.data);
+					}
+
 			    	var link = suggestion.data.link;
 
 			    	if (<%=appendRedirect%>) {
@@ -257,6 +429,35 @@
 				triggerSelectOnValidInput: false
 			});
 		});
+	}
+
+	function <portlet:namespace />storeSearchResultToPastSearches(data) {
+		var pastSearches = [];
+
+		if (localStorage["pastSearches"]) {
+			pastSearches = JSON.parse(localStorage["pastSearches"]);
+		}
+
+		var existingIndex = -1;
+		for (var i = 0; i < pastSearches.length; i++) {
+			if (pastSearches[i].link === data.link) {
+				existingIndex = i;
+				break;
+			}
+		}
+
+		if (existingIndex >= 0) {
+			pastSearches.splice(existingIndex, 1);
+		}
+
+		pastSearches.unshift(data);
+
+		if (pastSearches.length > 5) {
+			pastSearches.pop();
+		}
+
+		localStorage["pastSearches"] = JSON.stringify(pastSearches);
+
 	}
 
 	/**
