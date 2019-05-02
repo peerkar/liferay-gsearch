@@ -442,7 +442,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                     "breadcrumbs",
                     getToolBreadcrumbs(portletRequest.getLocale(), document.get(portletRequest.getLocale(), Field.TITLE)));
             }
-            resultItem.put("title_escaped", HtmlUtil.escape(resultItem.getString("title_raw")));
+			resultItem.put("title", HtmlUtil.escape(resultItem.getString("title_raw")));
 		}
 		catch (Exception e) {
 

@@ -161,12 +161,12 @@
 					if (currentItemData.hasOwnProperty('userPortraitUrl')) {
 						var img = currentItemElement.find('img');
 						img.attr('alt', currentItemData.userInitials);
-						img.attr('title', currentItemData.title_escaped);
+						img.attr('title', currentItemData.title);
 						img.attr('src', currentItemData.userPortraitUrl);
 						currentItemElement.find('.user-portrait').show();
 					} else {
 						var userIcon = currentItemElement.find('.user-icon');
-						userIcon.attr('title', currentItemData.title_escaped);
+						userIcon.attr('title', currentItemData.title);
 						userIcon.find('span').html(currentItemData.userInitials);
 						currentItemElement.find('.user-avatar-image').show();
 
@@ -180,7 +180,7 @@
 					itemIcon.show();
 				}
 				currentItemElement.show();
-				currentItemElement.find('.title').html(currentItemData.title_escaped);
+				currentItemElement.find('.title').html(currentItemData.title);
 				currentItemElement.append($('<div class="hidden past-search-link">' + currentItemData.link + '</div>'));
 				<portlet:namespace/>addPastSearchClickHandler(currentItemElement, currentItemData);
 				currentItemElement.find('.suggestion-breadcrumb').html(currentItemData.breadcrumbs);
@@ -413,7 +413,7 @@
 						        	description = description.substring(0, 75) + '...';
 						        }
 
-								var value = '<div title="' +  dataItem.title_escaped + '" class="title">' + dataItem.title_escaped + '</div>';
+								var value = '<div title="' +  dataItem.title + '" class="title">' + dataItem.title + '</div>';
 
 				                return {
 				                	value: value, data: dataItem
