@@ -178,12 +178,14 @@
 					var itemIcon = currentItemElement.find('.item-icon');
 					itemIcon.addClass('tool');
 					itemIcon.show();
+				} else if (currentItemData.typeKey === 'news') {
+					currentItemElement.find('.date').html(currentItemData.date);
 				}
-				currentItemElement.show();
 				currentItemElement.find('.title').html(currentItemData.title);
 				currentItemElement.append($('<div class="hidden past-search-link">' + currentItemData.link + '</div>'));
 				<portlet:namespace/>addPastSearchClickHandler(currentItemElement, currentItemData);
 				currentItemElement.find('.suggestion-breadcrumb').html(currentItemData.breadcrumbs);
+				currentItemElement.show();
 				pastSearchesDiv.append(currentItemElement);
 			}
 
