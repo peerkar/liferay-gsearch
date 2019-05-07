@@ -365,13 +365,20 @@
 		}
 
 		.row {
+			display: flex;
+			.item {
+				display: inline-block;
+				width: 100%;
+			}
+		}
 
+		.row-preview {
 			.item {
 				display: inline-block;
 			}
 		}
 
-  		.user-icon {
+		.user-icon {
 			background-color: #03a9f4;
   		}
 
