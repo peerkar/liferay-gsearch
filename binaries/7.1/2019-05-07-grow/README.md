@@ -1,14 +1,14 @@
-# 2019-04-29
+# 2019-05-07
 
-Liferay GSearch application binaries. This build has been tested with the following portal versions:
+Liferay GSearch application binaries for Grow. This build has been tested with the following portal versions:
 
-* DXP 7.1 fixpacks 0,1,2,3,4,5,6
+* DXP 7.1 fixpacks 0,1,2,3,4,5,6,10
 * CE 7.1 GA2 
 * CE 7.1 GA3
 
 # Issues Fixed
 
-* https://github.com/peerkar/liferay-gsearch/issues/15
+* Wrong web module package version.
 
 ## Installation Instructions
 
