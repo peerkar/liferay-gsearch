@@ -17,6 +17,8 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import fi.helsinki.flamma.common.group.FlammaGroupService;
+import fi.soveltia.lifefay.gsearch.hy.util.HYDDMUtil;
+import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.JournalArticleItemBuilder;
@@ -39,7 +41,11 @@ public class HYJournalArticleItemBuilder extends JournalArticleItemBuilder {
 	@Override
 	public boolean canBuild(Document document) {
 
-		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
+		String[] facetConfiguration = _configurationHelper.getFacetConfiguration();
+
+		List<String> newsKeys = HYDDMUtil.getHYNewsDDMStructureKeys(facetConfiguration);
+
+		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME)) && !newsKeys.contains(document.get("ddmStructureKey"));
 	}
 
 
@@ -115,6 +121,9 @@ public class HYJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 		return _journalArticleService.getLatestArticle(entryClassPK);
 	}
+
+	@Reference
+	private ConfigurationHelper _configurationHelper;
 
 	@Reference
 	private JournalArticleService _journalArticleService;
