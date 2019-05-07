@@ -235,22 +235,24 @@ class GSearchHYMenus extends Component {
 
             // Handle everything selection.
             
-            if (value == 'everything') {
+            if (value === 'everything') {
             	
         		_self.setQueryParam(paramName, null, true, true, '');
 
-            }
+			}
             
             let currentValues = _self.getQueryParam(paramName);
 
-            if (currentValues.indexOf(value) > -1) {
-            	
-        		_self.setQueryParam(paramName, null, true, true, value);
+            if (value !== 'everything') {
+                if (currentValues.indexOf(value) > -1) {
 
-            } else {
-            
-            	_self.setQueryParam(paramName, value, true, true);
-            
+                    _self.setQueryParam(paramName, null, true, true, value);
+
+                } else {
+
+                    _self.setQueryParam(paramName, value, true, true);
+
+                }
             }
 
             let clickTarget = $(event.currentTarget);

@@ -47,6 +47,14 @@
 							{param results: $results /}
 						{/call}
 
+					{elseif $results.resultsLayout == 'preview'}
+
+						// Preview layout
+
+						{call GSearchPreviewResultLayout.render}
+							{param results: $results /}
+						{/call}
+
 					{else}
 
 						// Default result layout rendering.
@@ -90,105 +98,104 @@
 
 		<div class="item">
 
-		<div class="row">
+			<div class="row">
 
-			{if ($item.typeKey == 'tool' or $item.typeKey == 'person') and $resultsLayout == 'list'}
+				{if ($item.typeKey == 'tool' or $item.typeKey == 'person') and ($resultsLayout == 'list' or $resultsLayout == 'thumbnailList')}
 
-                <div class="item-icon col-md-1 col-lg-1 hidden-xs">
-					<a href="{$item.link}" data-index="{$index}">
-						<div class="{$item.typeKey}-icon">
-							{if ($item.typeKey == 'person')}
+					<div class="item-icon col-md-1 col-lg-1 hidden-xs">
+						<a href="{$item.link}" data-index="{$index}">
+							<div class="{$item.typeKey}-icon">
+								{if ($item.typeKey == 'person')}
 
-								{if $item.userPortraitUrl}
+									{if $item.userPortraitUrl}
 
-								<div class="user-portrait">
-                                    <div class="image-holder one-to-one">
-                                        <div class="content">
-                                            <img alt="{$item.userInitials}" class="" src="{$item.userPortraitUrl}" title="{$item.userName}" />
-                                        </div>
-                                    </div>
-								</div>
-
-								{elseif $item.userInitials}
-
-									<span class="user-avatar-image">
-										<div class="user-icon user-icon-default" title="{$item.userName}">
-											<span>{$item.userInitials}</span>
+									<div class="user-portrait">
+										<div class="image-holder one-to-one">
+											<div class="content">
+												<img alt="{$item.userInitials}" class="" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+											</div>
 										</div>
+									</div>
+
+									{elseif $item.userInitials}
+
+										<span class="user-avatar-image">
+											<div class="user-icon user-icon-default" title="{$item.userName}">
+												<span>{$item.userInitials}</span>
+											</div>
+										</span>
+									{/if}
+								{elseif ($item.typeKey == 'tool')}
+
+									<span>
+										{$item.icon}
 									</span>
+
 								{/if}
-							{elseif ($item.typeKey == 'tool')}
-
-								<span>
-									{$item.icon}
-								</span>
-
-							{/if}
-						</div>
-					</a>
-                </div>
-
-				<div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 content">
-
-			{elseif $item.imageSrc}
-
-				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					{if $item.imageSrc != ''}
-						<a href="{$link}" data-index="{$index}">
-							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+							</div>
 						</a>
-					{/if}
-				</div>
-
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">
-
-			{else}
-				<div class="content col-xs-12">
-			{/if}
-
-				<div class="heading">
-					<h4>
-                        {if ($item.typeKey == 'file')}
-                            <svg role="presentation">
-                                <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
-                            </svg>
-                        {/if}
-
-						<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
-					</h4>
-
-					{if $item.official_content}
-						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
-					{/if}
-				</div>
-
-				<div class="description ">
-					{if $item.description != ''}
-						<span class="highlightable">{$item.description}</span>
-					{/if}
-				</div>
-
-				<div class="breadcrumbs">
-					{if $item.breadcrumbs != ''}
-						<span class="breadcrumbs">{$item.breadcrumbs}</span>
-					{/if}
-					{if ($item.date != '') and ($item.typeKey == 'news')}
-                        <span class="date">{$item.date}</span>
-					{/if}
-				</div>
-
-				{if $item.categories}
-					<div class="categories">
-						{foreach $cat in $item.categories}
-							<span class="category" {if $cat.colorCode != ''} style="background: {$cat.colorCode}" {/if}>{$cat.name}</span>
-						{/foreach}
 					</div>
+
+					<div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 content">
+
+				{elseif $item.imageSrc}
+
+					<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+						{if $item.imageSrc != ''}
+							<a href="{$link}" data-index="{$index}">
+								<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+							</a>
+						{/if}
+					</div>
+
+					<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">
+
+				{else}
+					<div class="content col-xs-12">
 				{/if}
 
-				</div>
+						<div class="heading">
+							<h4>
+								{if ($item.typeKey == 'file')}
+									<svg role="presentation">
+										<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
+									</svg>
+								{/if}
+
+								<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
+							</h4>
+
+							{if $item.official_content}
+								<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
+							{/if}
+						</div>
+
+						<div class="description ">
+							{if $item.description != ''}
+								<span class="highlightable">{$item.description}</span>
+							{/if}
+						</div>
+
+						<div class="breadcrumbs">
+							{if $item.breadcrumbs != ''}
+								<span class="breadcrumbs">{$item.breadcrumbs}</span>
+							{/if}
+							{if ($item.date != '') and ($item.typeKey == 'news')}
+								<span class="date">{$item.date}</span>
+							{/if}
+						</div>
+
+						{if $item.categories}
+							<div class="categories">
+								{foreach $cat in $item.categories}
+									<span class="category" {if $cat.colorCode != ''} style="background: {$cat.colorCode}" {/if}>{$cat.name}</span>
+								{/foreach}
+							</div>
+						{/if}
+
+					</div>
 
 			</div>
 		</div>
-
 	</div>
 {/template}

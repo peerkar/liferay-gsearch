@@ -4,6 +4,7 @@ import core from 'metal/src/core';
 
 import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
 import GSearchImageResultLayout from './GSearchImageResultLayout.soy';
+import GSearchPreviewResultLayout from './GSearchPreviewResultLayout.soy';
 import GSearchMapsResultLayout from './GSearchMapsResultLayout.es';
 import templates from './GSearchResults.soy';
 

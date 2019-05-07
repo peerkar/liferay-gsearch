@@ -336,6 +336,7 @@
 
 			img {
 				max-width: 30px;
+				max-height: 30px;
 				padding: 4px;
 			}
 		}
@@ -365,14 +366,19 @@
 
 		.row {
 			display: flex;
-
 			.item {
 				display: inline-block;
 				width: 100%;
 			}
 		}
 
-  		.user-icon {
+		.row-preview {
+			.item {
+				display: inline-block;
+			}
+		}
+
+		.user-icon {
 			background-color: #03a9f4;
   		}
 
