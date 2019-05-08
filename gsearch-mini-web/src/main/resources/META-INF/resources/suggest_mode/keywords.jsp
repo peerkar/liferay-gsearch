@@ -18,8 +18,9 @@
 			<button 
 				class="btn btn-secondary" 
 				id="<portlet:namespace />MiniSearchButton" 
-				type="button">
-				<svg class="lexicon-icon">
+				type="button"
+				aria-label="<liferay-ui:message key='do-search'/>">
+				<svg class="lexicon-icon" role="presentation">
 			        <use xlink:href="/o/classic-theme/images/lexicon/icons.svg#search" />
 				</svg>
 			</button>
