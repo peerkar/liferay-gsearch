@@ -3,7 +3,6 @@
 	<div class="input-group">
 
 		<input
-			autofocus
 			autocomplete="off"
 			class="form-control input-lg textinput minisearch-input"
 			id="<portlet:namespace />MiniSearchField"

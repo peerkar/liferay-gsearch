@@ -2,8 +2,7 @@
 
 	<div class="input-group">
 	
-		<input 
-			autofocus 
+		<input
 			autocomplete="off"
 			class="form-control input-lg textinput" 
 			id="<portlet:namespace />MiniSearchField" 
