@@ -67,7 +67,7 @@
 
 	Liferay.Portlet.ready(
 	    function(portletId, node) {
-			if ('<portlet:namespace/>'.includes(portletId)) {
+			if ('<portlet:namespace/>'.indexOf(portletId) >= 0) {
 				<portlet:namespace />initAutocomplete();
 
 				$('#<portlet:namespace />MiniSearchField').on('keyup', function(event) {
