@@ -218,7 +218,7 @@ class GSearchUtils {
 				GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value);
 			}
 
-			GSearchUtils.setOptionListTriggerElementText(optionMenu, null, paramName);
+			GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
 
 			event.preventDefault();
 		});			
