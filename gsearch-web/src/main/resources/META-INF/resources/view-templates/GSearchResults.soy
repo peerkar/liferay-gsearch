@@ -104,10 +104,8 @@
 
 			{elseif $item.userPortraitUrl}
 			
-				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<a href="{$link}">
-						<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
-					</a>
+				<div class="userimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+					<a href="{$link}" style="background-image: url('{$item.userPortraitUrl}');" title="{$item.userName}"></a>
 				</div>
 
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
@@ -116,7 +114,7 @@
 			
 				<div class="col-md-2 col-lg-2 hidden-xs hidden-sm">
 					<span class="user-avatar-image"> 
-						<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+						<div class="user-icon-color-10 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
 							<span>{$item.userInitials}</span>
 						</div> 
 					</span>
