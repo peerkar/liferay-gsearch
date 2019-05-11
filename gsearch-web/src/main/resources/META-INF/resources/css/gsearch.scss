@@ -251,12 +251,27 @@
 			
 			.count {
 				margin-left: 10px;
+				vertical-align: top;
 			}
 			
 			.groupname {
 				font-size: 60%;
 				margin-left: 10px;
 			}
+			
+			.dropdown-item, 
+			.dropdown-menu > li > a, 
+			.dropdown-menu .link-list > li > a {
+				white-space: nowrap;
+			}
+			
+			.text {
+				display: inline-block;
+				max-width: 85%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				vertical-align: top;
+			}			
 		}
 		
 		.item::first-child {

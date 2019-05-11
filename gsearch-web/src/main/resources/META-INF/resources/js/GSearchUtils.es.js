@@ -204,22 +204,22 @@ class GSearchUtils {
 			let currentValues = component.getQueryParam(paramName);
 			
 			let value = $(this).attr('data-value');
+			
+			let selectedItems = null;
 
 			if (currentValues.indexOf(value) < 0) {
 
 				component.setQueryParam(paramName, value, true, isMultiValued);
 
-				let selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, [value], isMultiValued);
-				
-				if (selectedItems.length > 0) {
-					
-					GSearchUtils.setOptionListTriggerElementText(optionMenu, selectedItems, paramName);
-				}
-				
+				selectedItems = GSearchUtils.setOptionListSelectedItems(component, optionMenu, paramName, [value], isMultiValued);
+								
 			} else {
 
 				GSearchUtils.unsetOptionListSelectedItem(component, optionMenu, paramName, isMultiValued, value);
 			}
+
+			GSearchUtils.setOptionListTriggerElementText(optionMenu, null, paramName);
+
 			event.preventDefault();
 		});			
 	}
@@ -304,30 +304,38 @@ class GSearchUtils {
 	 * @param {String} paramName
 	 */
 	static setOptionListTriggerElementText(optionMenu, selectedItems, paramName) {
-						
-		if (selectedItems.length > 1) {
+					
+		let text = '';
+		
+		if (selectedItems && selectedItems.length > 1) {
 			
-			let html = $(optionMenu).attr('data-multipleoption');
+			text = $(optionMenu).attr('data-multipleoption');
 
 			// Fallback translation. See ResultItemBuilder.
 			
 			if (!html) {
-				html = "multiple " + paramName.toLowerCase();
+				text = "multiple " + paramName.toLowerCase();
 			}
 			
-			$(optionMenu).find(' .selection').html('[<i> ' + html + ' </i>]');
+			$(optionMenu).find(' .selection').html('[<i> ' + text + ' </i>]');
 			
 			return;
-		}
+			
+		} else if (selectedItems) {
 
-		let textElement = $(selectedItems[0]).find('.text');
-		
-		let text = null;
-		
-		if (textElement.length > 0) {
-			text = $(textElement).html();
+			let textElement = $(selectedItems[0]).find('.text');
+			
+			if (textElement.length > 0) {
+				text = $(textElement).html();
+			} else {
+				text = $(selectedItems[0]).html();
+			}
+			
 		} else {
-			text = $(selectedItems[0]).html();
+			
+			let defaultItem = $(optionMenu).find('li.default a');
+			
+			text = defaultItem.html();
 		}
 
 		$(optionMenu).find('.selection').html(text);

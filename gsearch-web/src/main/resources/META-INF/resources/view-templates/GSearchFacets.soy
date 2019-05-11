@@ -70,7 +70,7 @@
 	{foreach $item in $options}
 		<li>
 			<a data-facet="{$facetName}" data-value="{$item.term}" href="#">
-				<span class="text">{$item.name}</span>
+				<span class="text" title="{$item.name}">{$item.name}</span>
 
 				{if $item.groupName}
 					<span class="groupname">({$item.group_name})</span>
