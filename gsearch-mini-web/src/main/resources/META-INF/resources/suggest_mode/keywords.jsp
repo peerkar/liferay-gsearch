@@ -57,7 +57,7 @@
 		var q = $('#<portlet:namespace />MiniSearchField').val();
 		
 		if (q.length < <%=queryMinLength%>) {
-			<portlet:namespace />showMessage(Liferay.Language.get('min-character-count-is') + '<%=queryMinLength %>');
+			<portlet:namespace />showMessage('<liferay-ui:message key="min-character-count-is" />' + ' <%=queryMinLength %> ');
 			return false;
 		}
 		
