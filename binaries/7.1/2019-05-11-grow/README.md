@@ -1,4 +1,4 @@
-# 2019-05-07
+# 2019-05-11
 
 Liferay GSearch application binaries for Grow. This build has been tested with the following portal versions:
 
@@ -8,7 +8,11 @@ Liferay GSearch application binaries for Grow. This build has been tested with t
 
 # Issues Fixed
 
-* Wrong web module package version.
+* Long facet names fix in dropdown menus
+* Time range filter layout improvement
+* Mini search minimum keyword length localization
+* User image list layout improvement
+* Fixed filters unselection on click
 
 ## Installation Instructions
 
