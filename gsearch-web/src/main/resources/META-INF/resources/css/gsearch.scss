@@ -267,7 +267,7 @@
 			
 			.text {
 				display: inline-block;
-				max-width: 85%;
+				max-width: 80%;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				vertical-align: top;
@@ -464,6 +464,22 @@
 					max-width: 110px;
 					width: 100%;
 			    }
+			}
+			
+			.userinitials {
+				height: 100%;
+				
+				a {
+					height: 100%;
+					max-height: 110px;
+					max-width: 110px;
+					width: 100%;				
+				}
+				
+				.initials {
+					position: relative;
+					top: 40%;
+				}
 			}
 					
 			.content {

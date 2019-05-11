@@ -313,7 +313,7 @@ class GSearchUtils {
 
 			// Fallback translation. See ResultItemBuilder.
 			
-			if (!html) {
+			if (!text) {
 				text = "multiple " + paramName.toLowerCase();
 			}
 			
