@@ -97,27 +97,14 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 		String description = null;
 
 		description = document.get(
-			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT,
-			Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
-
-		if (Validator.isNull(description)) {
-			description = document.get(
-				locale, Field.CONTENT,
-				Field.CONTENT);
-			
-			// Limit description length in case we needed to grab the content.
-			
-			if(description.length() > DESCRIPTION_MAX_LENGTH) {
-				description = description.substring(0, DESCRIPTION_MAX_LENGTH);
-			}
-		}
-
+			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
+		
 		if (Validator.isNull(description)) {
 			
 			description = getSummary(
-				portletRequest, portletResponse, document, true).getContent();
+				portletRequest, portletResponse, document, true, DESCRIPTION_MAX_LENGTH).getContent();
 		}
-				
+		
 		// Be sure to remove html tags. This should be fixed in adapter.
 		
 		description = description.replaceAll("<liferay-hl>", "---LR-HL-START---");
@@ -236,27 +223,26 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			
 			title = document.get(
 				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
-				Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE);
+				Field.TITLE);
 		}
 		
 		if (Validator.isNull(title)) {
 
 			title = document.get(
-				locale, Field.TITLE,
-				Field.TITLE);
+				locale, Field.TITLE);
 		}
 
 		if (Validator.isNull(title)) {
 
 			title = document.get(
-				locale, "localized" + StringPool.UNDERLINE + Field.TITLE,
-				Field.TITLE);
+				locale, "localized" + StringPool.UNDERLINE + Field.TITLE);
 		}
 
 		if (Validator.isNull(title)) {
 			title = getSummary(
 				portletRequest, portletResponse, document,
-				isHighlight).getTitle();
+				isHighlight, DESCRIPTION_MAX_LENGTH).getTitle();
+
 		}
 		return title;
 	}
@@ -336,7 +322,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 */
 	protected Summary getSummary(
 		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, boolean isHighlight)
+		Document document, boolean isHighlight, int maxContentLength)
 		throws SearchException {
 
 		Indexer<?> indexer = getIndexer(document.get(Field.ENTRY_CLASS_NAME));
@@ -348,6 +334,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			Summary summary = indexer.getSummary(
 				document, snippet, portletRequest, portletResponse);
 
+			summary.setMaxContentLength(maxContentLength);
 			summary.setHighlight(isHighlight);
 
 			return summary;
