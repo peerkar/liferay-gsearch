@@ -40,7 +40,7 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfi
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
+	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.KeywordSuggesterConfiguration", 
 	immediate = true, 
 	service = QueryPostProcessor.class
 )
@@ -60,7 +60,7 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 		if (!_keywordSuggesterConfiguration.isQuerySuggestionsEnabled()) {
 			return true;
 		}
-
+		
 		if (_log.isDebugEnabled()) {
 			_log.debug("QuerySuggestions are enabled.");
 		}
