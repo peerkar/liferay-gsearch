@@ -55,7 +55,7 @@ public class KeywordParameterBuilder implements ParameterBuilder {
 			sb.append(" ");
 		}
 				
-		queryContext.setKeywords(sb.toString());
+		queryContext.setKeywords(sb.toString().trim());
 	}
 
 	/**
