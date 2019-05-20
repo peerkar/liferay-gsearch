@@ -34,5 +34,5 @@ public interface ModuleConfiguration {
 	    name = "version-field-name",
 		required = false
 	)
-	public String versionField();
+	public String versionField();	
 }

@@ -55,8 +55,6 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 
 		addVersionCount(obj, document);
 
-		adddAssetTagNames(obj, document);
-
 	}
 
 	@Activate
@@ -65,61 +63,6 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 
 		_moduleConfiguration = ConfigurableUtil.createConfigurable(
 			ModuleConfiguration.class, properties);
-	}
-
-	/**
-	 * Add localized version of asset tags. Storing those in localized fields
-	 * forces language analysis. These fields can then be used for searhing in
-	 * stemmed form.
-	 * 
-	 * @param obj
-	 * @param document
-	 */
-	private void adddAssetTagNames(Object obj, Document document) {
-
-		
-		BaseModel<?> baseModel = (BaseModel<?>)obj;
-		
-		String className = baseModel.getModelClassName();
-
-		long classPK = 0;
-
-		if (baseModel instanceof ResourcedModel) {
-			ResourcedModel resourcedModel = (ResourcedModel) baseModel;
-
-			classPK = resourcedModel.getResourcePrimKey();
-		}
-		else {
-			classPK = (Long) baseModel.getPrimaryKeyObj();
-		}
-
-		long classNameId = PortalUtil.getClassNameId(className);
-
-		List<AssetTag> assetTags =
-			AssetTagLocalServiceUtil.getTags(classNameId, classPK);
-		
-		// It may happen that thread local is not available.
-
-		if (assetTags == null || assetTags.size() == 0) {
-			return;
-		}
-
-		String[] tagsArray = new String[assetTags.size()];
-		
-		for (int i = 0; i < assetTags.size(); i++) {
-			tagsArray[i] = assetTags.get(i).getName();
-		}
-						
-		try {
-			Locale locale = LocaleThreadLocal.getThemeDisplayLocale();
-
-			document.addText(
-				"gsearch_" + Field.ASSET_TAG_NAMES + "_" + locale.toString(),
-				tagsArray);
-		}
-		catch (Exception e) {
-			_log.error(e, e);
-		}
 	}
 
 	/**
