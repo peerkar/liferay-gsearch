@@ -44,6 +44,12 @@ public class FilterParameterBuilder implements ParameterBuilder {
 			JSONObject item =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
+			// Avoid breaking on an empty config item.
+			
+			if (item.length() == 0) {
+				continue;
+			}
+			
 			boolean enabled = item.getBoolean("filter_enabled", true);
 
 			if (!enabled) {
