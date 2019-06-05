@@ -47,8 +47,9 @@
  */
 {template .page}
 	{let $selected: $page.selected ? 'selected' : '' /}
+	{let $ariaCurrent: $page.selected ? 'true' : '' /}
 	<span class="page {$selected}">
-		<a data-value="{$page.start}" href="#">{$page.number}</a>
+		<a data-value="{$page.start}" href="#" aria-label="{msg desc=""}results-page{/msg} {$page.number}" aria-current="{$ariaCurrent}">{$page.number}</a>
 	</span>
 {/template}
 
