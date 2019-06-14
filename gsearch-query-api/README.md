@@ -4,10 +4,3 @@ This module extends the Liferay portal search query api bringing support to Func
 
 This module is required by the custom Elasticsearch Adapter.
 
-## Module Prerequisites
-
-None.
-
-## Module Configuration
-
-None.
