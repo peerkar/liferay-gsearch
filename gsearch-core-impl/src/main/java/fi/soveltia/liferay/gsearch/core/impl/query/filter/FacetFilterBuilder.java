@@ -10,8 +10,6 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 
 import java.util.List;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +32,12 @@ public class FacetFilterBuilder implements FilterBuilder {
 
 	@Override
 	public void addFilters(
-		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
-		BooleanFilter postFilter, QueryContext queryContext)
+		QueryContext queryContext, BooleanFilter preBooleanfilter,
+		BooleanFilter postFilter)
 		throws Exception {
 
-		List<FacetParameter> facetParameters = queryContext.getFacetParameters();
+		List<FacetParameter> facetParameters =
+			queryContext.getFacetParameters();
 
 		if (facetParameters == null) {
 			return;
@@ -48,25 +47,23 @@ public class FacetFilterBuilder implements FilterBuilder {
 		BooleanQueryImpl postFilterQuery = new BooleanQueryImpl();
 
 		for (FacetParameter f : facetParameters) {
-			
+
 			BooleanQueryImpl query = new BooleanQueryImpl();
 
 			for (String value : f.getValues()) {
 
 				if (_log.isDebugEnabled()) {
 					_log.debug(
-						"Adding facet " + f.getFieldName() + ":" +
-							value);
+						"Adding facet " + f.getFieldName() + ":" + value);
 				}
 
 				TermQuery condition;
-				condition =
-					new TermQueryImpl(f.getFieldName(), value);
+				condition = new TermQueryImpl(f.getFieldName(), value);
 
-				// Check operator if we have multiple values
+				// Check operator if we have multiple values.
 
 				BooleanClauseOccur occur;
-				
+
 				if (f.getValues().size() > 1) {
 					occur = ("or").equals(f.getMultiValueOperator())
 						? BooleanClauseOccur.SHOULD : BooleanClauseOccur.MUST;
@@ -74,7 +71,7 @@ public class FacetFilterBuilder implements FilterBuilder {
 				else {
 					occur = BooleanClauseOccur.MUST;
 				}
-				
+
 				query.add(condition, occur);
 
 			}
@@ -84,14 +81,14 @@ public class FacetFilterBuilder implements FilterBuilder {
 			if (query.hasClauses()) {
 
 				if ("pre".equals(f.getFilterMode())) {
-					
+
 					preFilterQuery.add(query, BooleanClauseOccur.MUST);
 				}
 				else {
-					
-					// Using SHOULD allows to make "conflicting" facet selections
-					// like web-content and pdf
-					
+
+					// Using SHOULD allows to make "conflicting" facet
+					// selections like web-content and pdf
+
 					postFilterQuery.add(query, BooleanClauseOccur.SHOULD);
 				}
 			}
@@ -107,7 +104,7 @@ public class FacetFilterBuilder implements FilterBuilder {
 			postFilter.add(post, BooleanClauseOccur.MUST);
 		}
 	}
-	
+
 	private static final Logger _log =
 		LoggerFactory.getLogger(QueryBuilderImpl.class);
 }

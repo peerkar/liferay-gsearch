@@ -4,6 +4,7 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item.processor;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -27,6 +27,7 @@ import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.api.results.item.processor.ResultItemProcessor;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Check if any extra fields should be added to the results items.
@@ -51,7 +52,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void process(
-		PortletRequest portletRequest, PortletResponse portletResponse, QueryContext queryContext,
+		QueryContext queryContext,
 		Document document, ResultItemBuilder resultItemBuilder,
 		JSONObject resultItem)
 		throws Exception {
@@ -95,7 +96,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 			queryContext.getParameter(ParameterNames.INCLUDE_THUMBNAIL))) {
 
 			includeThumbnail(
-				portletRequest, document, resultItemBuilder, resultItem);
+				queryContext, document, resultItemBuilder, resultItem);
 
 		}
 
@@ -104,7 +105,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 		if (GetterUtil.getBoolean(
 			queryContext.getParameter(ParameterNames.INCLUDE_USER_PORTRAIT))) {
 
-			includeUserPortrait(portletRequest, document, resultItem);
+			includeUserPortrait(queryContext, document, resultItem);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 	 * @param resultItem
 	 */
 	private void includeUserPortrait(
-		PortletRequest portletRequest, Document document,
+		QueryContext queryContext, Document document,
 		JSONObject resultItem) {
 
 		try {
@@ -127,19 +128,40 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 
 			User user = _userLocalService.getUser(userId);
 
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay) portletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
 			if (user.getPortraitId() != 0) {
-				resultItem.put(
-					"userPortraitUrl", user.getPortraitURL(themeDisplay));
+
+				String userPortraitUrl = null;
+	
+				PortletRequest portletRequest = GSearchUtil.getPortletRequestFromContext(queryContext);
+				
+				if (portletRequest != null) {
+				
+					ThemeDisplay themeDisplay =
+						(ThemeDisplay) portletRequest.getAttribute(
+							WebKeys.THEME_DISPLAY);
+		
+					userPortraitUrl = user.getPortraitURL(themeDisplay);
+	
+				} else {
+						userPortraitUrl = UserConstants.getPortraitURL((String)queryContext.getParameter(ParameterNames.PATH_IMAGE), user.isMale(), user.getPortraitId(), user.getUserUuid());
+				}
+	
+				if (userPortraitUrl != null ) {
+				
+					resultItem.put(
+						"userPortraitUrl", userPortraitUrl);
+				}
 			}
+			
 			resultItem.put(
 				"userInitials", user.getFirstName().substring(0, 1) +
 					user.getLastName().substring(0, 1));
 
 			resultItem.put("userName", user.getFullName());
+			
+			
+			
+			
 		}
 		catch (PortalException e) {
 
@@ -159,19 +181,19 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 	 * Include thumbnail. To optimize the speed and reduce unnecessary DB calls,
 	 * thumbnails are not included in the result items by default.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @param document
 	 * @param resultItemBuilder
 	 * @param resultItem
 	 */
 	private void includeThumbnail(
-		PortletRequest portletRequest, Document document,
+		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder, JSONObject resultItem) {
 
 		try {
 			resultItem.put(
 				"imageSrc",
-				resultItemBuilder.getThumbnail(portletRequest, document));
+				resultItemBuilder.getThumbnail(queryContext, document));
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage(), e);

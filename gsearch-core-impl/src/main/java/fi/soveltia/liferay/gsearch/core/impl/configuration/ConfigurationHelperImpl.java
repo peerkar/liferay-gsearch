@@ -2,14 +2,14 @@
 package fi.soveltia.liferay.gsearch.core.impl.configuration;
 
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.portlet.PortletRequest;
+import java.util.Locale;
 
 import org.apache.felix.cm.file.ConfigurationHandler;
 import org.osgi.service.cm.Configuration;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationItemHelper;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
@@ -79,7 +80,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 			setDefaultConfiguration(
 				KeywordSuggesterItemHelper.CONFIGURATION_PID);
 		}
-		
+
 		return _keywordSuggestertConfigurationHelper.getConfiguration();
 	}
 
@@ -88,7 +89,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	 */
 	@Override
 	public String[] getFilterConfiguration() {
-		
+
 		String[] config = _filterConfigurationHelper.getConfiguration();
 
 		if (config == null || config.length == 0 || config[0].length() == 0) {
@@ -98,7 +99,7 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 
 		return _filterConfigurationHelper.getConfiguration();
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -120,18 +121,22 @@ public class ConfigurationHelperImpl implements ConfigurationHelper {
 	 */
 	@Override
 	public String parseConfigurationVariables(
-		PortletRequest portletRequest, QueryContext queryParams, String input) {
+		 QueryContext queryContext, String input) {
 
 		input = input.replace(
 			"$_now_yyyy-mm-dd_$", NOW_YYYY_MM_DD.format(new Date()));
 
-		if (queryParams != null && queryParams.getKeywords() != null) {
+		if (Validator.isNotNull(queryContext.getKeywords())) {
 
-			input = input.replace("$_keywords_$", queryParams.getKeywords());
+			input = input.replace("$_keywords_$", queryContext.getKeywords());
 		}
 
-		input = input.replace(
-			"$_language_id_$", portletRequest.getLocale().toString());
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
+
+		if (locale != null) {
+			input = input.replace("$_language_id_$", locale.toString());
+		}
 
 		return input;
 	}

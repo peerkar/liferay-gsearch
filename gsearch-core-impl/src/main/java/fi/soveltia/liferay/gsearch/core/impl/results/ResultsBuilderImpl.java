@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -51,7 +48,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 */
 	@Override
 	public JSONObject buildResults(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, SearchContext searchContext, Hits hits) {
 
 		JSONObject resultsObject = JSONFactoryUtil.createJSONObject();
@@ -62,7 +58,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 		resultsObject.put(
 			"items", createItemsArray(
-				portletRequest, portletResponse, queryContext, hits));
+				queryContext, hits));
 
 		// Create meta info array
 
@@ -162,7 +158,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @return JSON array of result items
 	 */
 	protected JSONArray createItemsArray(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+
 		QueryContext queryContext, Hits hits) {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
@@ -181,7 +177,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			Document document = docs[i];
 
 			try {
-
+				
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						"##############################################");
@@ -204,22 +200,22 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				jsonObject.put(
 					"title", resultItemBuilder.getTitle(
-						portletRequest, portletResponse, document, true));
+						queryContext, document, true));
 				jsonObject.put(
 					"title_raw", resultItemBuilder.getTitle(
-						portletRequest, portletResponse, document, false));
+						queryContext, document, false));
 
 				// Date.
 
 				jsonObject.put(
 					"date",
-					resultItemBuilder.getDate(portletRequest, document));
+					resultItemBuilder.getDate(queryContext, document));
 
 				// Description.
 
 				jsonObject.put(
 					"description", resultItemBuilder.getDescription(
-						portletRequest, portletResponse, document));
+						queryContext, document));
 
 				// Type.
 
@@ -229,25 +225,29 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				// Link.
 
 				String link = resultItemBuilder.getLink(
-					portletRequest, portletResponse, document, queryContext);
+					queryContext, document);
 
 				jsonObject.put("link", link);
 
 				// Redirect
-
-				jsonObject.put(
-					"redirect", GSearchUtil.getRedirect(portletRequest, link));
-
+				// In headless access we might not have the link at all.
+				
+				if (link != null) {
+				
+					jsonObject.put(
+						"redirect", GSearchUtil.getRedirect(queryContext, link));
+				}
+			
 				// Additional metadata.
 
 				jsonObject.put(
 					"metadata",
-					resultItemBuilder.getMetadata(portletRequest, document));
+					resultItemBuilder.getMetadata(queryContext, document));
 
 				// Execute result item processors
 
 				executeResultItemProcessors( 
-					portletRequest, portletResponse, queryContext, document, resultItemBuilder,
+					queryContext, document, resultItemBuilder,
 					jsonObject);
 
 				// Put single item to result array
@@ -390,7 +390,6 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * @param resultItem
 	 */
 	protected void executeResultItemProcessors(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext,
 		Document document, ResultItemBuilder resultItemBuilder,
 		JSONObject resultItem) {
@@ -409,7 +408,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 
 				try {
 					r.process(
-						portletRequest, portletResponse, queryContext, document,
+						queryContext, document,
 						resultItemBuilder, resultItem);
 				}
 				catch (Exception e) {

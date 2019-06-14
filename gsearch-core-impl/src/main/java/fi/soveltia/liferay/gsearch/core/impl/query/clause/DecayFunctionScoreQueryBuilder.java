@@ -6,8 +6,6 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -34,8 +32,7 @@ public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		PortletRequest portletRequest, JSONObject configuration,
-		QueryContext queryContext)
+		QueryContext queryContext, JSONObject configuration)
 		throws Exception {
 
 		String fieldName = configuration.getString("field_name");
@@ -115,7 +112,7 @@ public class DecayFunctionScoreQueryBuilder implements ClauseBuilder {
 			if (configuration.getString("origin_type").equals("date")) {
 				functionScoreQuery.setOrigin(
 					_configurationHelper.parseConfigurationVariables(
-						portletRequest, queryContext, configuration.getString("origin")));
+						queryContext, configuration.getString("origin")));
 			}
 		}
 

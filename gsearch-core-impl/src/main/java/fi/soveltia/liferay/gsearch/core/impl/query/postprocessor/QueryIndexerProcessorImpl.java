@@ -12,8 +12,6 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -51,8 +49,7 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 
 	@Override
 	public boolean process(
-		PortletRequest portletRequest, SearchContext searchContext,
-		QueryContext queryContext, Hits hits)
+		QueryContext queryContext, SearchContext searchContext, Hits hits)
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
@@ -67,7 +64,8 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			_log.debug("QueryIndexer is enabled");
 		}
 
-		if (hits.getLength() >= _keywordSuggesterConfiguration.queryIndexingThreshold()) {
+		if (Validator.isNotNull(queryContext.getKeywords()) &&
+				hits.getLength() >= _keywordSuggesterConfiguration.queryIndexingThreshold()) {
 
 			// Filter words.
 
@@ -90,7 +88,7 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 		else {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
-					"QueryIndexing threshold wasn't exceeded. Not indexing keywords.");
+					"QueryIndexing threshold wasn't exceeded or no keywords. Not indexing.");
 			}
 		}
 		return true;
@@ -110,7 +108,7 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 	 * @param keywords
 	 * @return
 	 */
-	protected String filterKeywords(String keywords) {
+	protected String filterKeywords(String keywords) throws Exception {
 
 		String[] excludedWords = _keywordSuggesterConfiguration.excludedWords();
 

@@ -8,8 +8,6 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -33,8 +31,7 @@ public class TermQueryClauseBuilder implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		PortletRequest portletRequest, JSONObject configuration,
-		QueryContext queryContext)
+		QueryContext queryContext, JSONObject configuration)
 		throws Exception {
 
 		String fieldName = configuration.getString("field_name");
@@ -50,7 +47,7 @@ public class TermQueryClauseBuilder implements ClauseBuilder {
 			keywords = configuration.getString("query");
 
 			keywords = _configurationHelper.parseConfigurationVariables(
-				portletRequest, queryContext, keywords);
+				queryContext, keywords);
 		}
 
 		if (Validator.isNull(keywords)) {

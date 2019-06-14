@@ -9,8 +9,6 @@ import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 
 import java.util.Date;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
@@ -31,16 +29,17 @@ public class ModificationTimeFilterBuilder implements FilterBuilder {
 
 	@Override
 	public void addFilters(
-		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
-		BooleanFilter postFilter, QueryContext queryContext)
+		QueryContext queryContext, BooleanFilter preBooleanfilter,
+		BooleanFilter postFilter)
 		throws Exception {
 
-		FilterParameter filter = queryContext.getFilterParameter(ParameterNames.TIME);
-		
+		FilterParameter filter =
+			queryContext.getFilterParameter(ParameterNames.TIME);
+
 		if (filter == null) {
 			return;
 		}
-		
+
 		Date from = (Date) filter.getAttribute("timeFrom");
 		Date to = (Date) filter.getAttribute("timeTo");
 
@@ -51,24 +50,25 @@ public class ModificationTimeFilterBuilder implements FilterBuilder {
 
 			QueryFilter queryFilter = new QueryFilter(query);
 			preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);
-		
-		} else {
-		
+
+		}
+		else {
+
 			if (from != null) {
-	
+
 				BooleanQuery query = new BooleanQueryImpl();
 				query.addRangeTerm(
 					"modified_sortable", from.getTime(), Long.MAX_VALUE);
-	
+
 				QueryFilter queryFilter = new QueryFilter(query);
 				preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);
 			}
-	
+
 			if (to != null) {
 				BooleanQuery query = new BooleanQueryImpl();
 				query.addRangeTerm(
 					"modified_sortable", to.getTime(), Long.MAX_VALUE);
-	
+
 				QueryFilter queryFilter = new QueryFilter(query);
 				preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);
 			}

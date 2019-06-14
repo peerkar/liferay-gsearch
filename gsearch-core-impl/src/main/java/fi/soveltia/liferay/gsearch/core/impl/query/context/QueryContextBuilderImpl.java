@@ -3,8 +3,10 @@ package fi.soveltia.liferay.gsearch.core.impl.query.context;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -13,6 +15,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
@@ -33,81 +36,125 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	 */
 	@Override
 	public QueryContext buildQueryContext(
-		PortletRequest portletRequest, int pageSize)
+		HttpServletRequest httpServletRequest, long companyId, Locale locale,
+		String keywords)
 		throws Exception {
 
-		return buildQueryContext(
-			portletRequest, null, null, null, null, pageSize);
+		QueryContext queryContext = new QueryContext();
+		
+		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
+		queryContext.setParameter(ParameterNames.COMPANY_ID, companyId);
+		queryContext.setParameter(ParameterNames.LOCALE, locale);
+		queryContext.setParameter(ParameterNames.KEYWORDS, keywords);
+		
+		return queryContext;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public QueryContext buildQueryContext(
-		PortletRequest portletRequest, String[] filterConfiguration,
+	public QueryContext buildQueryContext(HttpServletRequest httpServletRequest,
+		String[] filterConfiguration,
 		String[] clauseConfiguration, String[] facetConfiguration,
-		String[] sortConfiguration, int pageSize)
+		String[] sortConfiguration, String[] suggesterConfiguration)
+		throws Exception {
+		 
+		QueryContext queryContext = new QueryContext();
+		
+		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
+		
+		if (filterConfiguration == null) {
+			filterConfiguration = _configurationHelper.getFilterConfiguration();
+		}
+		queryContext.setConfiguration(ConfigurationKeys.FILTER, filterConfiguration);
+
+		if (clauseConfiguration == null) {
+			clauseConfiguration = _configurationHelper.getClauseConfiguration();
+		}
+		queryContext.setConfiguration(ConfigurationKeys.CLAUSE, clauseConfiguration);
+
+		if (facetConfiguration == null) {
+			facetConfiguration = _configurationHelper.getFacetConfiguration();
+		}
+		queryContext.setConfiguration(ConfigurationKeys.FACET, facetConfiguration);
+
+		if (sortConfiguration == null) {
+			sortConfiguration = _configurationHelper.getSortConfiguration();
+		}
+		queryContext.setConfiguration(ConfigurationKeys.SORT, sortConfiguration);
+		
+		if (suggesterConfiguration == null) {
+			suggesterConfiguration = _configurationHelper.getKeywordSuggesterConfiguration();
+		}
+		queryContext.setConfiguration(ConfigurationKeys.SUGGESTER, suggesterConfiguration);
+		
+		return queryContext;
+	}
+
+	@Override
+	public QueryContext buildSuggesterQueryContext(
+		HttpServletRequest httpServletRequest, String[] suggesterConfiguration, 
+		long companyId, long groupId, Locale locale, String keywords)
 		throws Exception {
 
 		QueryContext queryContext = new QueryContext();
-
-		queryContext.setPageSize(pageSize);
-
-		setConfigurations(
-			queryContext, filterConfiguration, clauseConfiguration,
-			facetConfiguration, sortConfiguration);
+		
+		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
+		
+		if (suggesterConfiguration == null) {
+			queryContext.setConfiguration(ConfigurationKeys.SUGGESTER,
+				_configurationHelper.getKeywordSuggesterConfiguration());
+		}
+		
+		queryContext.setParameter(ParameterNames.COMPANY_ID, companyId);
+		queryContext.setParameter(ParameterNames.GROUP_ID, groupId);
+		queryContext.setParameter(ParameterNames.LOCALE, locale);
+		queryContext.setKeywords(keywords);
+		
+		return queryContext;
+	}
+	
+	@Override
+	public void parseParameters(QueryContext queryContext, Map<String, Object> parameterMap)
+		throws Exception {
 
 		// Run parameter builders
 
 		if (_parameterBuilders == null) {
-			throw new RuntimeException();
+			throw new RuntimeException("No parameter builders.");
+		}
+
+		if (parameterMap == null) {
+			return;
 		}
 
 		for (ParameterBuilder parameterBuilder : _parameterBuilders) {
 
-			if (parameterBuilder.validate(portletRequest)) {
-				parameterBuilder.addParameter(portletRequest, queryContext);
+			if (parameterBuilder.validate(queryContext, parameterMap)) {
+				parameterBuilder.addParameter(queryContext, parameterMap);
 			}
 		}
+	}	
 
-		return queryContext;
-	}
+	@Override
+	public void parseParameters(QueryContext queryContext)
+		throws Exception {
 
-	/**
-	 * Set configurations.
-	 * 
-	 * @param assetTypeConfiguration
-	 * @param clauseConfiguration
-	 * @param facetConfiguration
-	 * @param sortConfiguration
-	 */
-	protected void setConfigurations(
-		QueryContext queryContext, String[] filterConfiguration,
-		String[] clauseConfiguration, String[] facetConfiguration,
-		String[] sortConfiguration) {
+		// Run parameter builders
 
-		if (filterConfiguration == null) {
-			queryContext.setConfiguration(ConfigurationKeys.FILTER,
-				_configurationHelper.getFilterConfiguration());
+		if (_parameterBuilders == null) {
+			throw new RuntimeException("No parameter builders.");
 		}
 
-		if (clauseConfiguration == null) {
-			queryContext.setConfiguration(ConfigurationKeys.CLAUSE,
-				_configurationHelper.getClauseConfiguration());
-		}
+		for (ParameterBuilder parameterBuilder : _parameterBuilders) {
 
-		if (facetConfiguration == null) {
-			queryContext.setConfiguration(ConfigurationKeys.FACET,
-				_configurationHelper.getFacetConfiguration());
+			if (parameterBuilder.validate(queryContext)) {
+				parameterBuilder.addParameter(queryContext);
+			}
 		}
-
-		if (sortConfiguration == null) {
-			queryContext.setConfiguration(ConfigurationKeys.SORT,
-				_configurationHelper.getSortConfiguration());
-		}
-	}
-
+	}	
+	
 	/**
 	 * Add parameter builder.
 	 * 

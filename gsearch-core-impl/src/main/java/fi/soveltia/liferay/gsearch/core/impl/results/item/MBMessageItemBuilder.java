@@ -26,6 +26,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * MB message result item builder.
@@ -52,9 +53,19 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 */
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext,
+		Document document)
 		throws Exception {
+
+		PortletRequest portletRequest =
+						GSearchUtil.getPortletRequestFromContext(queryContext);
+
+		if (portletRequest == null) {
+			return null;
+		}
+
+		PortletResponse portletResponse =
+			GSearchUtil.getPortletResponseFromContext(queryContext);
 
 		long classNameId =
 			GetterUtil.getLong(document.get(Field.CLASS_NAME_ID));
@@ -81,7 +92,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 		}
 
 		return super.getLink(
-			portletRequest, portletResponse, document, queryContext);
+			queryContext, document);
 
 	}
 
@@ -90,7 +101,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	 */
 	@Override
 	public String getTitle(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryContext,
 		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
@@ -119,7 +130,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 			}
 		}
 		return super.getTitle(
-			portletRequest, portletResponse, document, isHighlight);
+			queryContext, document, isHighlight);
 	}
 
 	protected String getDLFileEntryCommentLink() {
@@ -145,7 +156,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 
 		String link = null;
 
-		if (viewResultsInContext) {
+		if (viewResultsInContext || assetPublisherPageFriendlyURL == null) {
 
 			link = assetRenderer.getURLViewInContext(
 				(LiferayPortletRequest) portletRequest,
@@ -200,6 +211,4 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 
 	@Reference
 	private Portal _portal;
-
-
 }

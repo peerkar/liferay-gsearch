@@ -77,9 +77,6 @@ public class ClauseConditionHandlerFactoryImpl
 		_clauseConditionHandlers.remove(clauseConditionHandler);
 	}
 
-	private static final Logger _log =
-		LoggerFactory.getLogger(ClauseConditionHandlerFactoryImpl.class);
-
 	@Reference(
 		bind = "addClauseConditionHandler", 
 		cardinality = ReferenceCardinality.MULTIPLE, 
@@ -89,4 +86,7 @@ public class ClauseConditionHandlerFactoryImpl
 	)
 	private volatile List<ClauseConditionHandler> _clauseConditionHandlers =
 		null;
+	
+	private static final Logger _log =
+					LoggerFactory.getLogger(ClauseConditionHandlerFactoryImpl.class);
 }

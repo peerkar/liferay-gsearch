@@ -7,8 +7,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.portlet.PortletRequest;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 
@@ -31,7 +30,28 @@ public class FilterParameterBuilder implements ParameterBuilder {
 
 	@Override
 	public void addParameter(
-		PortletRequest portletRequest, QueryContext queryContext)
+		QueryContext queryContext)
+		throws Exception {
+		
+		addFilters(queryContext);
+	}
+	
+	@Override
+	public void addParameter(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws Exception {
+		
+		addFilters(queryContext);
+	}
+		
+	/**
+	 * Add filters from the configuration.
+	 * 
+	 * @param queryContext
+	 * @throws Exception
+	 */
+	private void addFilters(
+		QueryContext queryContext)
 		throws Exception {
 
 		String[] configuration =
@@ -77,7 +97,6 @@ public class FilterParameterBuilder implements ParameterBuilder {
 			filterParameters.add(filter);
 		}
 		
-		
 		if (filterParameters.size() > 0) {
 			
 			FilterParameter filter = new FilterParameter("filterConfiguration");
@@ -88,10 +107,17 @@ public class FilterParameterBuilder implements ParameterBuilder {
 	}
 
 	@Override
-	public boolean validate(PortletRequest portletRequest)
+	public boolean validate(QueryContext queryContext)
 		throws ParameterValidationException {
 
 		return true;
 	}
 
+	@Override
+	public boolean validate(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws ParameterValidationException {
+
+		return true;
+	}
 }

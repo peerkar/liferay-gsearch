@@ -6,11 +6,10 @@ import com.liferay.blogs.kernel.service.BlogsEntryService;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
 /**
@@ -30,12 +29,12 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 
 		return NAME.equals(document.get(Field.ENTRY_CLASS_NAME));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getThumbnail(PortletRequest portletRequest, Document document)
+	public String getThumbnail(QueryContext queryContext, Document document)
 		throws Exception {
 
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
@@ -48,9 +47,6 @@ public class BlogsEntryItemBuilder extends BaseResultItemBuilder
 	@Reference
 	private BlogsEntryService _blogsEntryService;
 
-	// 7.1 
+	private static final String NAME = BlogsEntry.class.getName();
 
-	// private static final String NAME = BlogsEntry.class.getName();
-	
-	private static final String NAME = "com.liferay.blogs.kernel.model.BlogsEntry";
 }

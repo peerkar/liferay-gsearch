@@ -4,8 +4,11 @@ package fi.soveltia.liferay.gsearch.core.impl.params;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
+
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
@@ -18,6 +21,7 @@ import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationException;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Sort parameter builder.
@@ -31,15 +35,54 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public class SortParameterBuilder implements ParameterBuilder {
 
 	@Override
-	public void addParameter(
-		PortletRequest portletRequest, QueryContext queryContext)
+	public void addParameter(QueryContext queryContext)
 		throws Exception {
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
 
 		String sortField =
 			ParamUtil.getString(portletRequest, ParameterNames.SORT_FIELD);
 
 		String sortDirection =
 			ParamUtil.getString(portletRequest, ParameterNames.SORT_DIRECTION);
+
+		addSortParameter(queryContext, sortField, sortDirection);
+	}
+
+	@Override
+	public void addParameter(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws Exception {
+
+		String sortField =
+			GetterUtil.getString(parameters.get(ParameterNames.SORT_FIELD));
+
+		String sortDirection =
+			GetterUtil.getString(parameters.get(ParameterNames.SORT_DIRECTION));
+
+		addSortParameter(queryContext, sortField, sortDirection);
+	}
+
+	@Override
+	public boolean validate(
+		QueryContext queryContext)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	@Override
+	public boolean validate(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	protected void addSortParameter(
+		QueryContext queryContext, String sortField, String sortDirection)
+		throws Exception {
 
 		Sort sort1 = null;
 		Sort sort2 = null;
@@ -59,18 +102,18 @@ public class SortParameterBuilder implements ParameterBuilder {
 		String fieldName = null;
 		Integer fieldType = null;
 
-		String[] configuration = queryContext.getConfiguration(
-			ConfigurationKeys.SORT);
+		String[] configuration =
+			queryContext.getConfiguration(ConfigurationKeys.SORT);
 
 		for (int i = 0; i < configuration.length; i++) {
 
 			JSONObject item =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
 
-			if (item.getString("key").equals(sortField)) {
+			if (sortField != null && item.getString("key").equals(sortField)) {
 
 				fieldName = _configurationHelper.parseConfigurationVariables(
-					portletRequest, queryContext, item.getString("field_name"));
+					queryContext, item.getString("field_name"));
 
 				fieldType = Integer.valueOf(item.getString("field_type"));
 
@@ -81,8 +124,7 @@ public class SortParameterBuilder implements ParameterBuilder {
 
 				defaultFieldName =
 					_configurationHelper.parseConfigurationVariables(
-						portletRequest, queryContext,
-						item.getString("field_name"));
+						queryContext, item.getString("field_name"));
 
 				defaultFieldType =
 					Integer.valueOf(item.getString("field_type"));
@@ -110,16 +152,10 @@ public class SortParameterBuilder implements ParameterBuilder {
 			sort2 = new Sort(null, Sort.SCORE_TYPE, reverse);
 		}
 
-		queryContext.setSorts(new Sort[] {
-			sort1, sort2
-		});
-	}
-
-	@Override
-	public boolean validate(PortletRequest portletRequest)
-		throws ParameterValidationException {
-
-		return true;
+		queryContext.setSorts(
+			new Sort[] {
+				sort1, sort2
+			});
 	}
 
 	// Modification date field name in the index.

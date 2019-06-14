@@ -4,8 +4,6 @@ package fi.soveltia.liferay.gsearch.core.impl.query.clause.condition;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.query.clause.ClauseConditionHandler;
@@ -31,7 +29,7 @@ public class KeywordMatchClauseConditionHandler
 
 	@Override
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryContext queryContext,
+		QueryContext queryContext,
 		JSONObject configuration)
 		throws Exception {
 

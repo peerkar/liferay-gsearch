@@ -54,12 +54,11 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDate(PortletRequest portletRequest, Document document)
+	public String getDate(QueryContext queryContext, Document document)
 		throws ParseException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		Locale locale = themeDisplay.getLocale();
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
 
 		String dateString = "";
 
@@ -85,33 +84,46 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getDescription(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+	public String getDescription(QueryContext queryContext, Document document)
 		throws SearchException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		Locale locale = themeDisplay.getLocale();
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
 
 		String description = null;
 
 		description = document.get(
 			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
-		
+
 		if (Validator.isNull(description)) {
+
+			PortletRequest portletRequest = GSearchUtil.getPortletRequestFromContext(queryContext);
 			
-			description = getSummary(
-				portletRequest, portletResponse, document, true, DESCRIPTION_MAX_LENGTH).getContent();
+			if (portletRequest != null) {
+			
+				description = getSummary(
+					queryContext, document, true,
+					DESCRIPTION_MAX_LENGTH).getContent();
+			} else {
+				description = document.get(Field.CONTENT);
+				if (description.length() > DESCRIPTION_MAX_LENGTH) {
+					description = description.substring(0, DESCRIPTION_MAX_LENGTH).concat("...");
+				}
+			}
+				
 		}
-		
+
 		// Be sure to remove html tags. This should be fixed in adapter.
-		
-		description = description.replaceAll("<liferay-hl>", "---LR-HL-START---");
-		description = description.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
+
+		description =
+			description.replaceAll("<liferay-hl>", "---LR-HL-START---");
+		description =
+			description.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
 		description = HtmlUtil.stripHtml(description);
-		description = description.replaceAll("---LR-HL-START---", "<liferay-hl>");
-		description = description.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
+		description =
+			description.replaceAll("---LR-HL-START---", "<liferay-hl>");
+		description =
+			description.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
 		
 		return description;
 	}
@@ -120,27 +132,39 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
-		throws Exception { 
+	public String getLink(QueryContext queryContext, Document document)
+		throws Exception {
+
+		// Don't even try to create links if we do not have a portletrequest.
+		
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
+
+		if (portletRequest == null) {
+			return null;
+		}
+
+		PortletResponse portletResponse =
+			GSearchUtil.getPortletResponseFromContext(queryContext);
 
 		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		StringBundler sb = new StringBundler();
-			
+
 		if (viewResultsInContext) {
-			
-			sb.append(getAssetRenderer(document).getURLViewInContext(
-			(LiferayPortletRequest) portletRequest,
-			(LiferayPortletResponse) portletResponse, ""));
-		} else {
+
+			sb.append(
+				getAssetRenderer(document).getURLViewInContext(
+					(LiferayPortletRequest) portletRequest,
+					(LiferayPortletResponse) portletResponse, ""));
+		}
+		else {
 			sb.append(
 				getAssetRenderer(document).getURLView(
 					(LiferayPortletResponse) portletResponse,
 					WindowState.MAXIMIZED));
 		}
-		
+
 		return sb.toString();
 	}
 
@@ -149,7 +173,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 */
 	@Override
 	public Map<String, String> getMetadata(
-		PortletRequest portletRequest, Document document)
+		QueryContext queryContext, Document document)
 		throws Exception {
 
 		return null;
@@ -198,7 +222,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 * @throws Exception
 	 */
 	@Override
-	public String getThumbnail(PortletRequest portletRequest, Document document)
+	public String getThumbnail(QueryContext queryContext, Document document)
 		throws Exception {
 
 		return null;
@@ -209,27 +233,24 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	 */
 	@Override
 	public String getTitle(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, boolean isHighlight)
+		QueryContext queryContext, Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		Locale locale = themeDisplay.getLocale();
+		Locale locale =
+			(Locale) queryContext.getParameter(ParameterNames.LOCALE);
 
 		String title = null;
-		
+
 		if (isHighlight) {
-			
+
 			title = document.get(
 				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.TITLE,
 				Field.TITLE);
 		}
-		
+
 		if (Validator.isNull(title)) {
 
-			title = document.get(
-				locale, Field.TITLE);
+			title = document.get(locale, Field.TITLE);
 		}
 
 		if (Validator.isNull(title)) {
@@ -238,12 +259,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 				locale, "localized" + StringPool.UNDERLINE + Field.TITLE);
 		}
 
-		if (Validator.isNull(title)) {
-			title = getSummary(
-				portletRequest, portletResponse, document,
-				isHighlight, DESCRIPTION_MAX_LENGTH).getTitle();
-
-		}
 		return title;
 	}
 
@@ -258,10 +273,10 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 	protected String getAssetPublisherPageURL(QueryContext queryContext) {
 
-		return (String)queryContext.getParameter(
+		return (String) queryContext.getParameter(
 			ParameterNames.ASSET_PUBLISHER_URL);
 	}
-	
+
 	/**
 	 * Get asset renderer.
 	 * 
@@ -313,18 +328,23 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 	/**
 	 * Get document summary.
 	 * 
-	 * @param portletRequest
-	 * @param portletResponse
+	 * @param queryContext
 	 * @param document
 	 * @param isHighlight
 	 * @return
 	 * @throws SearchException
 	 */
 	protected Summary getSummary(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, boolean isHighlight, int maxContentLength)
+		QueryContext queryContext, Document document, boolean isHighlight,
+		int maxContentLength)
 		throws SearchException {
 
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
+
+		PortletResponse portletResponse =
+			GSearchUtil.getPortletResponseFromContext(queryContext);
+		
 		Indexer<?> indexer = getIndexer(document.get(Field.ENTRY_CLASS_NAME));
 
 		if (indexer != null) {
@@ -342,15 +362,16 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 
 		return null;
 	}
-	
+
 	protected boolean isViewInContext(QueryContext queryContext) {
-		
-		return GetterUtil.getBoolean(queryContext.getParameter(
-			ParameterNames.VIEW_RESULTS_IN_CONTEXT), true);
+
+		return GetterUtil.getBoolean(
+			queryContext.getParameter(ParameterNames.VIEW_RESULTS_IN_CONTEXT),
+			true);
 	}
-	
+
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
-	
+
 	private static final int DESCRIPTION_MAX_LENGTH = 400;
 }

@@ -1,7 +1,7 @@
 Bundle-Activator: fi.soveltia.liferay.gsearch.core.impl.bundle.CoreBundleActivator
 Bundle-Name: Liferay GSearch Core Implementation
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.core.impl
-Bundle-Version: 6.1.1
+Bundle-Version: 7.0.0
 Include-Resource:\
 	@commons-lang3-3.7.jar
 Export-Package: fi.soveltia.liferay.gsearch.core.impl.results.item

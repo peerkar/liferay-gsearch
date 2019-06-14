@@ -11,6 +11,7 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
@@ -18,8 +19,10 @@ import javax.portlet.PortletResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * JournalArticle item type result builder.
@@ -40,28 +43,58 @@ public class JournalArticleItemBuilder extends BaseResultItemBuilder
 	}
 
 	@Override
-	public String getThumbnail(PortletRequest portletRequest, Document document)
+	public String getThumbnail(QueryContext queryContext, Document document)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
 
-		return getJournalArticle(document).getArticleImageURL(themeDisplay);
+		if (portletRequest != null) {
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			return getJournalArticle(document).getArticleImageURL(themeDisplay);
+
+		} else {
+		
+			// Headless access.
+
+			long smallImageId = getJournalArticle(document).getSmallImageId();
+			
+			return StringBundler.concat(
+				queryContext.getParameter(ParameterNames.PATH_IMAGE) + "/journal/article?img_id=",
+				String.valueOf(smallImageId), "&t=",
+				WebServerServletTokenUtil.getToken(smallImageId));		
+		}
 	}
 
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext, Document document)
 		throws Exception {
 
+		PortletRequest portletRequest =
+						GSearchUtil.getPortletRequestFromContext(queryContext);
+
+		if (portletRequest == null) {
+			return null;
+		}
+
+		PortletResponse portletResponse =
+			GSearchUtil.getPortletResponseFromContext(queryContext);
+		
 		boolean viewResultsInContext = isViewInContext(queryContext);
 
 		String assetPublisherPageURL = getAssetPublisherPageURL(queryContext);
+		
+		if (assetPublisherPageURL == null) {
+			return null;
+		}
 
 		StringBundler sb = new StringBundler();
 
-		if (viewResultsInContext) {
+		if (viewResultsInContext ) {
 
 			sb.append(
 				getAssetRenderer(document).getURLViewInContext(

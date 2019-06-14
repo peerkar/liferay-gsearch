@@ -13,8 +13,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -49,8 +47,8 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean process(
-		PortletRequest portletRequest, SearchContext searchContext,
-		QueryContext queryParams, Hits hits)
+		QueryContext queryContext, SearchContext searchContext,
+		Hits hits)
 		throws Exception {
 
 		if (_log.isDebugEnabled()) {
@@ -81,16 +79,16 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 		// Have to put keywords here to searchcontext because
 		// suggestKeywordQueries() expects them to be there
 
-		searchContext.setKeywords(queryParams.getKeywords());
+		searchContext.setKeywords(queryContext.getKeywords());
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Original keywords: " + queryParams.getKeywords());
+			_log.debug("Original keywords: " + queryContext.getKeywords());
 		}
 
 		// Get suggestions
 
 		String[] querySuggestions =
-			_gSearchKeywordSuggester.getSuggestionsAsStringArray(portletRequest);
+			_gSearchKeywordSuggester.getSuggestionsAsStringArray(queryContext);
 
 		querySuggestions =
 			ArrayUtil.remove(querySuggestions, searchContext.getKeywords());
@@ -109,15 +107,15 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 
 			// New keywords is plainly the first in the list.
 
-			queryParams.setOriginalKeywords(queryParams.getKeywords());
+			queryContext.setOriginalKeywords(queryContext.getKeywords());
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Using querySuggestions[0] for alternative search.");
 			}
 
-			queryParams.setKeywords(querySuggestions[0]);
+			queryContext.setKeywords(querySuggestions[0]);
 
-			Query query = _queryBuilder.buildQuery(portletRequest, queryParams);
+			Query query = _queryBuilder.buildQuery(queryContext);
 
 			BooleanClause<?> booleanClause = BooleanClauseFactoryUtil.create(
 				query, BooleanClauseOccur.MUST.getName());

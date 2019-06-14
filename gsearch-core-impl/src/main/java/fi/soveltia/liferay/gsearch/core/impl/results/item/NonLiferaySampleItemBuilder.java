@@ -6,9 +6,6 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
@@ -37,7 +34,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	 */
 	@Override
 	public String getDescription(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryContext,
 		Document document)
 		throws SearchException {
 
@@ -48,7 +45,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getThumbnail(PortletRequest portletRequest, Document document)
+	public String getThumbnail(QueryContext queryContext, Document document)
 		throws Exception {
 
 		return DEFAULT_IMAGE;
@@ -59,8 +56,8 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 	 */
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext,
+		Document document)
 		throws Exception {
 
 		return document.get("treePath");
@@ -68,7 +65,7 @@ public class NonLiferaySampleItemBuilder extends BaseResultItemBuilder
 
 	@Override
 	public String getTitle(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+		QueryContext queryContext,
 		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 

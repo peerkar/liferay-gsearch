@@ -1,6 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
@@ -22,6 +24,7 @@ import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationExcepti
 import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Modification time parameter builder.
@@ -35,12 +38,81 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 public class ModificationTimeParameterBuilder implements ParameterBuilder {
 
 	@Override
-	public void addParameter(
-		PortletRequest portletRequest, QueryContext queryContext)
+	public void addParameter(QueryContext queryContext)
 		throws Exception {
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
 
 		String timeFilterType =
 			ParamUtil.getString(portletRequest, ParameterNames.TIME);
+
+		if ("range".equals(timeFilterType)) {
+
+			String timeStartParameter = ParamUtil.getString(
+				portletRequest, ParameterNames.TIME_FROM, "");
+			String timeEndParameter =
+				ParamUtil.getString(portletRequest, ParameterNames.TIME_TO, "");
+			String datePickerFormat = ParamUtil.getString(
+				portletRequest, ParameterNames.DATE_FORMAT, "yyyy-MM-dd");
+
+			addTimeParameters(
+				queryContext, timeFilterType, timeStartParameter,
+				timeEndParameter, datePickerFormat);
+		}
+		else {
+			addTimeParameters(queryContext, timeFilterType, null, null, null);
+		}
+	}
+
+	@Override
+	public void addParameter(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws Exception {
+
+		String timeFilterType = GetterUtil.getString(ParameterNames.TIME);
+
+		if ("range".equals(timeFilterType)) {
+
+			String timeStartParameter = GetterUtil.getString(
+				parameters.get(ParameterNames.TIME_FROM), "");
+			String timeEndParameter = GetterUtil.getString(
+				parameters.get(ParameterNames.TIME_TO), "");
+			String datePickerFormat = GetterUtil.getString(
+				parameters.get(ParameterNames.DATE_FORMAT), "yyyy-MM-dd");
+
+			addTimeParameters(
+				queryContext, timeFilterType, timeStartParameter,
+				timeEndParameter, datePickerFormat);
+		}
+		else {
+			addTimeParameters(queryContext, timeFilterType, null, null, null);
+		}
+
+	}
+	
+	@Override
+	public boolean validate(QueryContext queryContext)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	@Override
+	public boolean validate(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	protected void addTimeParameters(
+		QueryContext queryContext, String timeFilterType,
+		String timeStartParameter, String timeEndParameter,
+		String datePickerFormat
+
+	)
+		throws Exception {
 
 		Date timeFrom = null;
 
@@ -48,21 +120,12 @@ public class ModificationTimeParameterBuilder implements ParameterBuilder {
 
 		if ("range".equals(timeFilterType)) {
 
-			String timeStartParameter = ParamUtil.getString(
-				portletRequest, ParameterNames.TIME_FROM, "");
-
-			String timeEndParameter =
-				ParamUtil.getString(portletRequest, ParameterNames.TIME_TO, "");
-
-			String datePickerFormat = ParamUtil.getString(
-				portletRequest, ParameterNames.DATEPICKER_FORMAT, "yyyy-MM-dd");
-
 			DateTimeFormatter rangeDateFormatter =
 				DateTimeFormatter.ofPattern(datePickerFormat);
 
 			timeFrom = getDateFromString(
 				rangeDateFormatter, timeStartParameter, false);
-			
+
 			timeTo =
 				getDateFromString(rangeDateFormatter, timeEndParameter, true);
 		}
@@ -102,9 +165,9 @@ public class ModificationTimeParameterBuilder implements ParameterBuilder {
 		}
 
 		if (timeFrom != null || timeTo != null) {
-		
+
 			FilterParameter filter = new FilterParameter(ParameterNames.TIME);
-			
+
 			if (timeFrom != null) {
 				filter.setAttribute("timeFrom", timeFrom);
 			}
@@ -112,16 +175,9 @@ public class ModificationTimeParameterBuilder implements ParameterBuilder {
 			if (timeTo != null) {
 				filter.setAttribute("timeTo", timeTo);
 			}
-			
+
 			queryContext.addFilterParameter(ParameterNames.TIME, filter);
 		}
-	}
-
-	@Override
-	public boolean validate(PortletRequest portletRequest)
-		throws ParameterValidationException {
-
-		return true;
 	}
 
 	/**

@@ -14,8 +14,6 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Locale;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -40,8 +38,7 @@ public class MatchQueryBuilder implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		PortletRequest portletRequest, JSONObject configuration,
-		QueryContext queryContext)
+		QueryContext queryContext, JSONObject configuration)
 		throws Exception {
 		
 		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
@@ -59,7 +56,7 @@ public class MatchQueryBuilder implements ClauseBuilder {
 			keywords = configuration.getString("query");
 
 			keywords = _configurationHelper.parseConfigurationVariables(
-				portletRequest, queryContext, keywords);
+				queryContext, keywords);
 		}
 
 		if (Validator.isNull(keywords)) {

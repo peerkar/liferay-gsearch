@@ -1,13 +1,9 @@
-
 package fi.soveltia.liferay.gsearch.core.impl.params;
 
-import com.liferay.portal.kernel.model.GroupConstants;
-import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletRequest;
@@ -22,7 +18,7 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
- * Locale parameter builder.
+ * Company parameter builder.
  * 
  * @author Petteri Karttunen
  */
@@ -30,20 +26,20 @@ import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 	immediate = true, 
 	service = ParameterBuilder.class
 )
-public class LocaleParameterBuilder implements ParameterBuilder {
+public class UserParameterBuilder implements ParameterBuilder {
 
 	@Override
 	public void addParameter(QueryContext queryContext)
 		throws Exception {
 
 		PortletRequest portletRequest =
-			GSearchUtil.getPortletRequestFromContext(queryContext);
+						GSearchUtil.getPortletRequestFromContext(queryContext);
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		
-		queryContext.setParameter(
-			ParameterNames.LOCALE, themeDisplay.getLocale());
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay) portletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
+
+			queryContext.setParameter(ParameterNames.USER_ID, themeDisplay.getUserId());
 	}
 
 	@Override
@@ -51,27 +47,10 @@ public class LocaleParameterBuilder implements ParameterBuilder {
 		QueryContext queryContext, Map<String, Object> parameters)
 		throws Exception {
 
-		if (parameters.containsKey(ParameterNames.LOCALE)) {
-			queryContext.setParameter(
-				ParameterNames.LOCALE,
-				(Locale) parameters.get(ParameterNames.LOCALE));
-		}
-		else {
-			
-			// Set at least the default 
-
-			if (parameters.containsKey(ParameterNames.COMPANY_ID)) {
-
-				long companyId =
-					(long) parameters.get(ParameterNames.COMPANY_ID);
-
-				long guestGroupId = _groupLocalService.getGroup(companyId, GroupConstants.GUEST).getGroupId();
-				
-				queryContext.setParameter(
-					ParameterNames.LOCALE,
-					_portal.getSiteDefaultLocale(guestGroupId));
-			}
-		}
+		// We have to have the userId. Let it crash if we don't.
+		
+		queryContext.setParameter(
+			ParameterNames.USER_ID, (long)parameters.get(ParameterNames.USER_ID));
 	}
 
 	@Override
@@ -88,11 +67,7 @@ public class LocaleParameterBuilder implements ParameterBuilder {
 
 		return true;
 	}
-
+	
 	@Reference
-	Portal _portal;
-
-	@Reference
-	GroupLocalService _groupLocalService;
-
+	protected Portal _portal;
 }

@@ -20,6 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
+import javax.portlet.PortletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * GSearch utility class.
@@ -36,9 +42,15 @@ public class GSearchUtil {
 	 * @return
 	 * @throws PortalException
 	 */
-	public static String getRedirect(PortletRequest portletRequest, String url)
+	public static String getRedirect(QueryContext queryContext, String url)
 		throws PortalException {
 
+		PortletRequest portletRequest = getPortletRequestFromContext(queryContext);
+		
+		if (portletRequest == null) {
+			return "";
+		}
+		
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
@@ -158,10 +170,11 @@ public class GSearchUtil {
 			int position1 = layoutFriendlyURL.indexOf("/", 1);
 
 			int position2 = layoutFriendlyURL.indexOf("/", position1);
-			
+
 			int position3 = position1 + position2 + 1;
 
-			String groupFriendlyURL = layoutFriendlyURL.substring(position1, position3);
+			String groupFriendlyURL =
+				layoutFriendlyURL.substring(position1, position3);
 
 			Group group = GroupLocalServiceUtil.getFriendlyURLGroup(
 				themeDisplay.getCompanyId(), groupFriendlyURL);
@@ -178,6 +191,46 @@ public class GSearchUtil {
 				themeDisplay.getScopeGroupId(),
 				themeDisplay.getLayout().isPrivateLayout(), layoutFriendlyURL);
 		}
+	}
+
+	public static PortletRequest getPortletRequestFromContext(QueryContext queryContext) {
+	
+		HttpServletRequest httpServletRequest =
+						(HttpServletRequest) queryContext.getParameter(
+							ParameterNames.HTTP_SERVLET_REQUEST);
+		
+		if (httpServletRequest != null) {
+			return 	GSearchUtil.getPortletRequest(httpServletRequest);
+		}
+		
+		return null;
+	}
+	
+	public static PortletResponse getPortletResponseFromContext(QueryContext queryContext) {
+	
+		HttpServletRequest httpServletRequest =
+						(HttpServletRequest) queryContext.getParameter(
+							ParameterNames.HTTP_SERVLET_REQUEST);
+		
+		if (httpServletRequest != null) {
+			return 	GSearchUtil.getPortletResponse(httpServletRequest);
+		}
+		
+		return null;
+	}
+
+	public static PortletRequest getPortletRequest(
+		HttpServletRequest httpServletRequest) {
+
+		return (PortletRequest) httpServletRequest.getAttribute(
+			"javax.portlet.request");
+	}
+
+	public static PortletResponse getPortletResponse(
+		HttpServletRequest httpServletRequest) {
+
+		return (PortletResponse) httpServletRequest.getAttribute(
+			"javax.portlet.response");
 	}
 
 	/**

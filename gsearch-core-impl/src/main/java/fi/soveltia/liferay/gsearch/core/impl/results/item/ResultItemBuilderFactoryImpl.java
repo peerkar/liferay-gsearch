@@ -61,12 +61,7 @@ public class ResultItemBuilderFactoryImpl implements ResultItemBuilderFactory {
 		return resultItemBuilder;
 	}
 
-	@Reference(
-		cardinality = ReferenceCardinality.MULTIPLE, 
-		policy = ReferencePolicy.DYNAMIC, 
-		service = ResultItemBuilder.class, 
-		unbind = "removeResultItemBuilder"
-	)
+	@Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, service = ResultItemBuilder.class, unbind = "removeResultItemBuilder")
 	protected synchronized void addResultItemBuilder(
 		ResultItemBuilder resultItemBuilder, Map<String, Object> properties) {
 

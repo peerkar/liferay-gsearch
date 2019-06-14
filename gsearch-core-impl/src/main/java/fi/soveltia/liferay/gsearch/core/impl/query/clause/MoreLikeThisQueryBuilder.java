@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
@@ -36,24 +34,23 @@ public class MoreLikeThisQueryBuilder implements ClauseBuilder {
 	 */
 	@Override
 	public Query buildClause(
-		PortletRequest portletRequest, JSONObject configuration,
-		QueryContext queryContext)
+		QueryContext queryContext, JSONObject configuration)
 		throws Exception {
 		
-		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
+		String[] docUID = (String[])queryContext.getParameter(ParameterNames.DOC_UID);
 
-		MoreLikeThisQuery moreLikeThisQuery =
-			new MoreLikeThisQuery((long)queryContext.getParameter(ParameterNames.COMPANY_ID));
-		
-		String docUID = (String)queryContext.getParameter(ParameterNames.DOC_UID);
-		
 		if (docUID == null) {
 			return null;
 		}
 
+		MoreLikeThisQuery moreLikeThisQuery =
+			new MoreLikeThisQuery((long)queryContext.getParameter(ParameterNames.COMPANY_ID));
+		
 		// Add a single like -document.
 
-		moreLikeThisQuery.addDocumentUID(docUID);
+		moreLikeThisQuery.addDocumentUIDs(docUID);
+
+		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
 
 		// Fields configuration
 

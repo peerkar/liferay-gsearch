@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
@@ -20,6 +21,7 @@ import fi.soveltia.liferay.gsearch.core.api.facet.FacetProcessorFactory;
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Parses facet parameters.
@@ -34,8 +36,41 @@ public class FacetParameterBuilder implements ParameterBuilder {
 
 	@Override
 	public void addParameter(
-		PortletRequest portletRequest, QueryContext queryContext)
+		QueryContext queryContext, Map<String, Object> parameters)
 		throws Exception {
+
+		addFacetParameters(queryContext, null, parameters);
+
+	}
+
+	@Override
+	public void addParameter(QueryContext queryContext)
+		throws Exception {
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequestFromContext(queryContext);
+
+		addFacetParameters(queryContext, portletRequest, null);
+
+	}
+
+	@Override
+	public boolean validate(QueryContext queryContext)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	@Override
+	public boolean validate(
+		QueryContext queryContext, Map<String, Object> parameters)
+		throws ParameterValidationException {
+
+		return true;
+	}
+
+	protected void addFacetParameters(
+		QueryContext queryContext, PortletRequest portletRequest, Map<String, Object> parameters) throws Exception {
 
 		List<FacetParameter> facetParams = new ArrayList<FacetParameter>();
 
@@ -43,7 +78,9 @@ public class FacetParameterBuilder implements ParameterBuilder {
 			queryContext.getConfiguration(ConfigurationKeys.FACET);
 
 		// Loop through configured facets
-		
+
+		String[] fieldValues = null;
+
 		for (int i = 0; i < configuration.length; i++) {
 
 			JSONObject facetConfiguration =
@@ -51,34 +88,37 @@ public class FacetParameterBuilder implements ParameterBuilder {
 
 			String fieldParam = facetConfiguration.getString("param_name");
 
-			String processorName = facetConfiguration.getString("processor_name");
+			String processorName =
+				facetConfiguration.getString("processor_name");
 
-			String[] fieldValues = ParamUtil.getStringValues(portletRequest, fieldParam);
+			fieldValues = null;
 			
-			if (fieldValues.length > 0) {
+			if (parameters != null) {
+				fieldValues = (String[]) parameters.get(fieldParam);
+			} else {
+				fieldValues =
+					ParamUtil.getStringValues(portletRequest, fieldParam);
+			}
+
+			if (fieldValues != null && fieldValues.length > 0) {
 
 				FacetProcessor facetProcessor =
 					_facetProcessorFactory.getProcessor(processorName);
-				
-				if (facetProcessor == null ) {
-					facetProcessor = _facetProcessorFactory.getProcessor("default");
+
+				if (facetProcessor == null) {
+					facetProcessor =
+						_facetProcessorFactory.getProcessor("default");
 				}
-				
+
 				facetProcessor.processFacetParameters(
-						facetParams, fieldValues, facetConfiguration);
+					facetParams, fieldValues, facetConfiguration);
 			}
 		}
-		
+
 		queryContext.setFacetParameters(facetParams);
-	}
-
-	@Override
-	public boolean validate(PortletRequest portletRequest)
-		throws ParameterValidationException {
-
-		return true;
 	}
 
 	@Reference
 	private FacetProcessorFactory _facetProcessorFactory;
+
 }

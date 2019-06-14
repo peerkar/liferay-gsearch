@@ -12,6 +12,7 @@ import com.liferay.portal.kernel.search.TermQuery;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -23,8 +24,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 
 /**
  * Permission query filter builder implementation.
@@ -43,16 +46,26 @@ public class PermissionFilterQueryBuilderImpl
 	 */
 	@Override
 	public Query buildPermissionQuery(
-		PortletRequest portletRequest, QueryContext queryContext)
+		QueryContext queryContext)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		long companyId = (long)queryContext.getParameter(ParameterNames.COMPANY_ID);
 		
-		long companyId = themeDisplay.getCompanyId();
+		PortletRequest portletRequest = GSearchUtil.getPortletRequestFromContext(queryContext);
+		
+		User user;
+		long userId;
+		
+		if (portletRequest != null) {
+			
+			ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			user = themeDisplay.getUser();
+			userId = user.getUserId();
 
-		User user = themeDisplay.getUser();
-		long userId = user.getUserId();
+		} else {
+			userId = (long)queryContext.getParameter(ParameterNames.USER_ID);
+			user = _userLocalService.getUser(userId);
+		}
 
 		// Don't add conditions to company admin. Return.
 
@@ -69,7 +82,7 @@ public class PermissionFilterQueryBuilderImpl
 
 		// Show guest content for logged in users.
 
-		if (themeDisplay.isSignedIn()) {
+		if (userId != 0) {
 			TermQuery termQuery = new TermQueryImpl(
 				Field.ROLE_ID, String.valueOf(guestRole.getRoleId()));
 			query.add(termQuery, BooleanClauseOccur.SHOULD);
@@ -138,5 +151,8 @@ public class PermissionFilterQueryBuilderImpl
 
 	@Reference
 	private RoleLocalService _roleLocalService;
+	
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

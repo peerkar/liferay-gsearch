@@ -9,8 +9,6 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.search.generic.BooleanQueryImpl;
 import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
@@ -34,18 +32,18 @@ public class GroupFilterBuilder implements FilterBuilder {
 	 */
 	@Override
 	public void addFilters(
-		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
-		BooleanFilter postFilter, QueryContext queryContext)
+		QueryContext queryContext, BooleanFilter preBooleanfilter,
+		BooleanFilter postFilter)
 		throws Exception {
 
-		FilterParameter filter = queryContext.getFilterParameter(ParameterNames.GROUP_ID);
-		
+		FilterParameter filter =
+			queryContext.getFilterParameter(ParameterNames.GROUP_ID);
+
 		if (filter == null) {
 			return;
 		}
 
-		long[] groupIds =
-			(long[]) filter.getAttribute("values");
+		long[] groupIds = (long[]) filter.getAttribute("values");
 
 		if (groupIds != null && groupIds.length > 0) {
 
@@ -56,7 +54,7 @@ public class GroupFilterBuilder implements FilterBuilder {
 					new TermQueryImpl(Field.SCOPE_GROUP_ID, String.valueOf(l));
 				query.add(condition, BooleanClauseOccur.SHOULD);
 			}
-			
+
 			QueryFilter queryFilter = new QueryFilter(query);
 
 			preBooleanfilter.add(queryFilter, BooleanClauseOccur.MUST);

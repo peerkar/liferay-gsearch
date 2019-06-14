@@ -15,8 +15,6 @@ import com.liferay.portal.kernel.search.generic.TermQueryImpl;
 import java.util.Date;
 import java.util.List;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 
 import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
@@ -37,8 +35,8 @@ public class FilterConfigurationFilterBuilder implements FilterBuilder {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addFilters(
-		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
-		BooleanFilter postFilter, QueryContext queryContext)
+		QueryContext queryContext, BooleanFilter preBooleanfilter,
+		BooleanFilter postFilter)
 		throws Exception {
 
 		FilterParameter preFilter =

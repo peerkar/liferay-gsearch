@@ -1,7 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.impl.query;
 
-import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -17,13 +16,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import javax.portlet.PortletRequest;
-
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -41,7 +35,6 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.contributor.QueryContributor;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.FilterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.filter.PermissionFilterQueryBuilder;
-import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
 
 /**
  * Query builder implementation.
@@ -49,7 +42,6 @@ import fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration;
  * @author Petteri Karttunen
  */
 @Component(
-	configurationPid = "fi.soveltia.liferay.gsearch.core.impl.configuration.ModuleConfiguration", 
 	immediate = true, 
 	service = QueryBuilder.class
 )
@@ -59,35 +51,26 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Query buildQuery(
-		PortletRequest portletRequest, QueryContext queryContext)
+	public Query buildQuery(QueryContext queryContext)
 		throws Exception {
 
 		// Build query.
 
 		BooleanQuery query =
-			constructQuery(portletRequest, queryContext);
+			constructQuery(queryContext);
 
 		// Process query contributors.
 
 		if (queryContext.isQueryContributorsEnabled()) {
 
-			processQueryContributors(portletRequest, query);
+			processQueryContributors(queryContext, query);
 		}
 
 		// Add filters.
 		
-		addFilters(portletRequest, queryContext, query);
+		addFilters(queryContext, query);
 						
 		return query;
-	}
-
-	@Activate
-	@Modified
-	protected void activate(Map<String, Object> properties) {
-
-		_moduleConfiguration = ConfigurableUtil.createConfigurable(
-			ModuleConfiguration.class, properties);
 	}
 
 	/**
@@ -98,7 +81,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * @param query
 	 * @throws Exception
 	 */
-	protected void addFilters(PortletRequest portletRequest, QueryContext queryContext, Query query) throws Exception {
+	protected void addFilters(QueryContext queryContext, Query query) throws Exception {
 
 		BooleanFilter preFilter = new BooleanFilter();
 
@@ -106,13 +89,13 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 		for (FilterBuilder f : _filterBuilders) {
 
-			f.addFilters(portletRequest, preFilter, postFilter, queryContext);
+			f.addFilters(queryContext, preFilter, postFilter);
 		}
 		
 		// Add permission clauses.
 		
 		Query permissionQuery = _permissionFilterQueryBuilder.buildPermissionQuery(
-			portletRequest, queryContext);
+			queryContext);
 		
 		if (permissionQuery != null) {
 			QueryFilter permissionFilter = new QueryFilter(permissionQuery);
@@ -151,7 +134,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	}
 
 	protected boolean checkConditions(
-		PortletRequest portletRequest, QueryContext queryParams,
+		QueryContext queryContext,
 		JSONArray conditionsArray)
 		throws Exception {
 
@@ -185,7 +168,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 					condition.getJSONObject("handler_parameters");
 
 				if (clauseConditionHandler.isTrue(
-					portletRequest, queryParams, handlerParameters)) {
+					queryContext, handlerParameters)) {
 
 					isValid = true;
 
@@ -218,8 +201,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * @return
 	 * @throws Exception
 	 */
-	protected BooleanQuery constructQuery(
-		PortletRequest portletRequest, QueryContext queryContext)
+	protected BooleanQuery constructQuery(QueryContext queryContext)
 		throws Exception {
 
 		BooleanQuery query = new BooleanQueryImpl();
@@ -255,7 +237,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 			try {
 
 				applyClauses = checkConditions(
-					portletRequest, queryContext, conditionsArray);
+					queryContext, conditionsArray);
 
 			}
 			catch (Exception e) {
@@ -307,9 +289,9 @@ public class QueryBuilderImpl implements QueryBuilder {
 					if (clauseBuilder != null) {
 
 						clause = clauseBuilder.buildClause(
-							portletRequest,
-							clauseItem.getJSONObject("query_configuration"),
-							queryContext);
+							queryContext,
+							clauseItem.getJSONObject("query_configuration")
+							);
 
 						if (clause != null) {
 							query.add(clause, occur);
@@ -329,7 +311,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 	 * @param query
 	 */
 	protected void processQueryContributors(
-		PortletRequest portletRequest, BooleanQuery query) {
+		QueryContext queryContext, BooleanQuery query) {
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Processing query contributors.");
@@ -354,7 +336,7 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 			try {
 				Query contributorQuery =
-					queryContributor.buildQuery(portletRequest);
+					queryContributor.buildQuery(queryContext);
 
 				if (contributorQuery != null) {
 					query.add(contributorQuery, queryContributor.getOccur());
@@ -383,14 +365,6 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 		_queryContributors.remove(queryContributor);
 	}
-
-	public static final DateFormat INDEX_DATE_FORMAT =
-		new SimpleDateFormat("yyyyMMddHHmmss");
-
-	private static final Logger _log =
-		LoggerFactory.getLogger(QueryBuilderImpl.class);
-
-	protected volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
 	private ClauseBuilderFactory _clauseBuilderFactory;
@@ -423,5 +397,11 @@ public class QueryBuilderImpl implements QueryBuilder {
 		unbind = "removePermissionFilterQueryBuilder"
 	)
 	private volatile PermissionFilterQueryBuilder _permissionFilterQueryBuilder;
+	
+	public static final DateFormat INDEX_DATE_FORMAT =
+			new SimpleDateFormat("yyyyMMddHHmmss");
+
+	private static final Logger _log =
+		LoggerFactory.getLogger(QueryBuilderImpl.class);
 	
 }
