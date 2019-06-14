@@ -5,8 +5,6 @@ import com.liferay.content.targeting.service.UserSegmentLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 
-import javax.portlet.PortletRequest;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -37,11 +35,11 @@ public class AudienceTargetingClauseConditionHandler
 
 	@Override
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryContext queryParams,
+		QueryContext queryContext,
 		JSONObject configuration)
 		throws Exception {
-
-		long[] userSegmentIds = (long[]) portletRequest.getAttribute(
+		
+		long[] userSegmentIds = (long[])queryContext.getParameter(
 			GSearchAudienceTargetingConstants.USER_SEGMENT_ID_PARAM);
 
 		if (_log.isDebugEnabled()) {
