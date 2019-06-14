@@ -1,14 +1,14 @@
 # Liferay GSearch More Like This
 
-Liferay GSearch recommendation engine enabling to show contents similar to content shown on Asset Publisher or to a manually defined content.
+Liferay GSearch portlet to show contents similar to a content shown on Asset Publisher. It's also possible to manually define a content for which to base the similarity on.
 
-## Prerequisites
+## Requirements
 
-None.
+The provided, custom Elasticsearch adapter.
 
 ## Configuration
 
-This portlet has per instance configuration and you can access that from portlet's option menu.
+This portlet has per instance configuration and you can access that from portlet's option menu. 
 
 There are two clause configurations: 
 
@@ -38,4 +38,13 @@ The default configuration for resolving the UID:
 
 This configuration tries to resolve the asset entry id of a content shown on Asset Publisher and an entryClassPK for that. You can also set there a fixed entryClassPK or any other criteria to manually set a content to measure similarity against.
 
-The recommendations query is configured like the general GSearc clause configuration. You can stack there conditions and clauses. The default configuration has a MLT query and also a sample boosting clause for results having a sample tag.
+The recommendation clauses are configured like the general GSearch clause configuration. You can stack there conditions and clauses. 
+
+Default configuration is provided but you have to save it once.
+
+## Changelog
+
+### 2019-06-13 (Version 3.0)
+
+* Recommendations logic moved to a separate *gsearch-recommender* module.
+

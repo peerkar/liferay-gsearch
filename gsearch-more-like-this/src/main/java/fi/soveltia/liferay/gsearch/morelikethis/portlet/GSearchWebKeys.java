@@ -10,7 +10,5 @@ import com.liferay.portal.kernel.util.WebKeys;
  */
 public class GSearchWebKeys implements WebKeys {
 
-	public static final String INCLUDE_DOC_UID = "includeDocUID";
-
 	public static final String SEARCH_RESULTS_URL = "searchResultsURL";
 }

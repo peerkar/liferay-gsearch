@@ -6,7 +6,7 @@
 	String moreLikeThisClauses = preferences.getValue("moreLikeThisClauses", ConfigurationUtil.getDefaultConfigurationValue("moreLikeThisClauses"));
 	String resultLayout = preferences.getValue("resultLayout", "list");
 	String itemsToShow = preferences.getValue("itemsToShow", "5");
-	String entryClassNames = preferences.getValue("entryClassNames", ConfigurationUtil.getDefaultConfigurationValue("entryClassNames"));
+	String filters = preferences.getValue("filters", ConfigurationUtil.getDefaultConfigurationValue("filters"));
 	String assetPublisherPage = preferences.getValue("assetPublisherPage", "/viewasset");
 	boolean showResultsInContext = GetterUtil.getBoolean(preferences.getValue("showResultsInContext", "true"));
 %>
@@ -43,7 +43,7 @@
 		
 				<aui:input label="more-like-this-clause-configuration-name" name="preferences--moreLikeThisClauses--" type="textarea" value="<%=moreLikeThisClauses %>" />
 		
-				<aui:input label="entryclassnames-configuration-name" name="preferences--entryClassNames--" type="textarea" value="<%=entryClassNames %>" />
+				<aui:input label="filters-configuration-name" name="preferences--filters--" type="textarea" value="<%=filters %>" />
 		
 				<aui:select label="result-layout-name" name="preferences--resultLayout--" >
 				    <aui:option selected='<%=resultLayout.equals("list") ? true : false %>' value="list">Plain list</aui:option>
