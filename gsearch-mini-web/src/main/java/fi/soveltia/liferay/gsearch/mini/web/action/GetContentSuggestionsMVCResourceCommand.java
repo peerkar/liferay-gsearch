@@ -3,26 +3,19 @@ package fi.soveltia.liferay.gsearch.mini.web.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.portlet.JSONPortletResponseUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 
-import javax.portlet.PortletRequest;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -36,6 +29,7 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
+import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import fi.soveltia.liferay.gsearch.mini.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniResourceKeys;
@@ -80,18 +74,19 @@ public class GetContentSuggestionsMVCResourceCommand
 
 		try {
 
-			// Build basic params.
+			HttpServletRequest httpServletRequest = 
+				PortalUtil.getHttpServletRequest(resourceRequest);
 
-			queryContext = _queryContextBuilder.buildQueryContext(
-				resourceRequest,
-				_moduleConfiguration.contentSuggestionsCount());
+			queryContext = _queryContextBuilder.buildQueryContext(httpServletRequest,
+				null, null, null, null, null);
 			
-
+			_queryContextBuilder.parseParameters(queryContext);
+			
+			queryContext.setPageSize(_moduleConfiguration.contentSuggestionsCount());
+			
 			queryContext.setParameter(
 				ParameterNames.ASSET_PUBLISHER_URL,
 				_moduleConfiguration.assetPublisherPage());
-
-			// Show results in context.
 
 			queryContext.setParameter(
 				ParameterNames.VIEW_RESULTS_IN_CONTEXT,
@@ -110,12 +105,13 @@ public class GetContentSuggestionsMVCResourceCommand
 		JSONObject responseObject = null;
 
 		try {
-			responseObject = _gSearch.getSearchResults(
-				resourceRequest, resourceResponse, queryContext);
+			responseObject = _gSearch.getSearchResults(queryContext);
 
 			// Localize result types.
 
-			setResultTypeLocalizations(resourceRequest, responseObject);
+			ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
+			
+			_localizationHelper.setResultTypeLocalizations(themeDisplay.getLocale(), responseObject);
 
 		}
 		catch (Exception e) {
@@ -131,61 +127,6 @@ public class GetContentSuggestionsMVCResourceCommand
 			resourceRequest, resourceResponse, responseObject);
 	}
 
-	/**
-	 * Get localization.
-	 * 
-	 * @param key
-	 * @param locale
-	 * @param objects
-	 * @return
-	 */
-	protected String getLocalization(
-		String key, Locale locale, Object... objects) {
-
-		if (!_resourceBundles.containsKey(locale)) {
-			_resourceBundles.put(locale,
-				_resourceBundleLoader.loadResourceBundle(locale.toString()));
-		}
-
-		String value =
-			ResourceBundleUtil.getString(_resourceBundles.get(locale), key, objects);
-
-		return value == null ? _language.format(locale, key, objects) : value;
-	}
-
-	/**
-	 * Localize result types This is not in the templates because of
-	 * https://issues.liferay.com/browse/LPS-75141
-	 * 
-	 * @param portletRequest
-	 * @param responseObject
-	 * @throws JSONException
-	 */
-	protected void setResultTypeLocalizations(
-		PortletRequest portletRequest, JSONObject responseObject)
-		throws JSONException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		Locale locale = themeDisplay.getLocale();
-
-		JSONArray items = responseObject.getJSONArray("items");
-
-		if (items == null || items.length() == 0) {
-			return;
-		}
-
-		for (int i = 0; i < items.length(); i++) {
-
-			JSONObject resultItem = items.getJSONObject(i);
-
-			resultItem.put(
-				"type", getLocalization(
-					resultItem.getString("type").toLowerCase(), locale));
-		}		
-	}
-
 	private static final Logger _log =
 		LoggerFactory.getLogger(GetContentSuggestionsMVCResourceCommand.class);
 
@@ -195,19 +136,11 @@ public class GetContentSuggestionsMVCResourceCommand
 	@Reference
 	private GSearch _gSearch;
 
-	@Reference
-	private Language _language;
-
 	private volatile ModuleConfiguration _moduleConfiguration;
 
 	@Reference
 	private QueryContextBuilder _queryContextBuilder;
 
-	private Map<Locale, ResourceBundle> _resourceBundles = new ConcurrentHashMap<>();
-
-	@Reference(
-		target = "(bundle.symbolic.name=fi.soveltia.liferay.gsearch.mini.web)",
-		unbind = "-"
-	)
-	private ResourceBundleLoader _resourceBundleLoader;
+	@Reference
+	private LocalizationHelper _localizationHelper;
 }
