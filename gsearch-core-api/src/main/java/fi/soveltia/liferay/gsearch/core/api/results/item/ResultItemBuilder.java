@@ -5,24 +5,18 @@ import com.liferay.portal.kernel.search.Document;
 
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
- * Builds a single result item. 
+ * Builds a single result item.
  * 
  * @author Petteri Karttunen
  */
 public interface ResultItemBuilder {
 
 	/**
-	 * Checks whether this builder can build the result item 
-	 * for the index document. 
-	 * 
-	 * This is usually based on asset type but can be any condition.
-	 * 
+	 * Checks whether this builder can build the result item for the index
+	 * document. This is usually based on asset type but can be any condition.
 	 * 
 	 * @param document
 	 * @return
@@ -30,81 +24,73 @@ public interface ResultItemBuilder {
 	public boolean canBuild(Document document);
 
 	/**
-	 * Gets item date. 
+	 * Gets item date.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @param document
 	 * @return string representation of item date
 	 * @throws Exception
 	 */
-	public String getDate(PortletRequest portletRequest, Document document)
+	public String getDate(QueryContext queryContext, Document document)
 		throws Exception;
 
 	/**
 	 * Gets item description.
 	 * 
-	 * @param portletRequest
-	 * @param portletResponse
+	 * @param queryContext
 	 * @param document
 	 * @return item description
 	 * @throws Exception
 	 */
-	public String getDescription(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document)
+	public String getDescription(QueryContext queryContext, Document document)
 		throws Exception;
 
 	/**
 	 * Gets item link.
 	 * 
-	 * @param portletRequest
-	 * @param portletResponse
+	 * @param httpServletRequest
 	 * @param document
 	 * @param queryContext
 	 * @return item url
 	 * @throws Exception
 	 */
-	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+	public String getLink(QueryContext queryContext, Document document)
 		throws Exception;
 
 	/**
 	 * Gets item additional metadata.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @param document
 	 * @return item metadata
 	 * @throws Exception
 	 */
 	public Map<String, String> getMetadata(
-		PortletRequest portletRequest, Document document)
+		QueryContext queryContext, Document document)
 		throws Exception;
 
 	/**
 	 * Gets thumbnail (src) for a result item.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @param document
 	 * @return thumbnail src
 	 * @throws Exception
 	 */
-	public String getThumbnail(PortletRequest portletRequest, Document document)
+	public String getThumbnail(QueryContext queryContext, Document document)
 		throws Exception;
 
 	/**
 	 * Gets item title.
 	 * 
-	 * @param portletRequest
-	 * @param portletResponse
+	 * @param queryContext
 	 * @param document
 	 * @param highlight
 	 * @return item title
 	 * @throws Exception
 	 */
 	public String getTitle(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, boolean highlight)
+		QueryContext queryContext, Document document, boolean highlight)
 		throws Exception;
 
 	/**

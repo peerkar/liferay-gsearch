@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.core.api.configuration;
 
-import javax.portlet.PortletRequest;
-
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
@@ -54,11 +52,10 @@ public interface ConfigurationHelper {
 	 * 
 	 * For example $_language_id_$ could be translated to current language id.
 	 *  
-	 * @param portletRequest
-	 * @param queryParams
+	 * @param queryContext
 	 * @param input
 	 * @return
 	 */
 	public String parseConfigurationVariables(
-		PortletRequest portletRequest, QueryContext queryParams, String input);
+		QueryContext queryContext, String input);
 }

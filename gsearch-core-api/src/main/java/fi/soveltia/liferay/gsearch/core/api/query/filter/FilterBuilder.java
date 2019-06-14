@@ -3,8 +3,6 @@ package fi.soveltia.liferay.gsearch.core.api.query.filter;
 
 import com.liferay.portal.kernel.search.filter.BooleanFilter;
 
-import javax.portlet.PortletRequest;
-
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
@@ -21,14 +19,14 @@ public interface FilterBuilder {
 	/**
 	 * Process filter and add it to the main filter.
 	 * 
-	 * @param portletRequest
-	 * @param filter
 	 * @param queryContext
+	 * @param preBooleanfilter
+	 * @param postFilter
 	 * @throws Exception
 	 */
 	public void addFilters(
-		PortletRequest portletRequest, BooleanFilter preBooleanfilter,
-		BooleanFilter postFilter, QueryContext queryContext)
+		QueryContext queryContext, BooleanFilter preBooleanfilter,
+		BooleanFilter postFilter)
 		throws Exception;
 
 }

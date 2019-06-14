@@ -14,13 +14,17 @@ public class ParameterNames {
 	
 	public static final String COMPANY_ID = "companyId";
 	
-	public static final String DATEPICKER_FORMAT = "datePickerFormat";
+	public static final String DATE_FORMAT = "datePickerFormat";
 	
 	public static final String DOC_UID = "docUID";
 
 	public static final String END = "end";
 
 	public static final String GROUP_ID = "groupId";
+
+	public static final String HTTP_SERVLET_REQUEST = "httpServletRequest";
+
+	public static final String INCLUDE_DOC_UID = "includeDocUID";
 
 	public static final String INCLUDE_THUMBNAIL = "includeThumbnail";
 
@@ -31,6 +35,8 @@ public class ParameterNames {
 	public static final String LOCALE = "locale";
 
 	public static final String PAGE_SIZE = "pageSize";
+
+	public static final String PATH_IMAGE = "pathImage";
 
 	public static final String SCOPE = "scope";
 
@@ -47,6 +53,8 @@ public class ParameterNames {
 	public static final String TIME_TO = "timeTo";
 
 	public static final String TIME_FROM = "timeFrom";
+	
+	public static final String USER_ID = "userId";
 
 	public static final String VIEW_RESULTS_IN_CONTEXT = "viewResultsInContext";
 

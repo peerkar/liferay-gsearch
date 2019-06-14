@@ -25,14 +25,13 @@ public interface ClauseConditionHandler {
 	/**
 	 * Is this condition true.
 	 * 
-	 * @param portletRequest
 	 * @param queryContext
 	 * @param parameters
 	 * @return
 	 * @throws Exception
 	 */
 	public boolean isTrue(
-		PortletRequest portletRequest, QueryContext queryContext,
+		QueryContext queryContext,
 		JSONObject parameters)
 		throws Exception;
 }

@@ -2,11 +2,13 @@
 package fi.soveltia.liferay.gsearch.core.api.query.context;
 
 import com.liferay.portal.kernel.search.Sort;
+import com.liferay.portal.kernel.util.StringBundler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import fi.soveltia.liferay.gsearch.core.api.params.FacetParameter;
 import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
@@ -32,16 +34,6 @@ public class QueryContext {
 			_configurations = new HashMap<String, String[]>();
 		}
 		_configurations.put(key, value);
-	}
-
-	public int getEnd() {
-
-		return _end;
-	}
-
-	public void setEnd(int end) {
-
-		_end = end;
 	}
 
 	public void addFacetParameters(FacetParameter facetParameter) {
@@ -114,7 +106,7 @@ public class QueryContext {
 		_parameters.put(key, value);
 	}
 
-	public int getPageSize() {
+	public Integer getPageSize() {
 
 		return _pageSize;
 	}
@@ -155,7 +147,7 @@ public class QueryContext {
 		_sorts = sorts;
 	}
 
-	public int getStart() {
+	public Integer getStart() {
 
 		return _start;
 	}
@@ -164,7 +156,31 @@ public class QueryContext {
 
 		_start = start;
 	}
+	
 
+	@Override
+	public String toString() {
+
+		StringBundler sb = new StringBundler();
+		
+		sb.append("Keywords: " + _keywords);
+		sb.append("Original keywords: " + _originalKeywords);
+		sb.append("Start: " + _start);
+		sb.append("Page size:" + _pageSize);
+		
+		if (!_parameters.isEmpty()) {
+			
+			sb.append("Parameters:");
+			sb.append("===========");
+			
+			for (Entry<String, Object>entry : _parameters.entrySet()) {
+				sb.append(entry.getKey() + ":" + entry.getValue());
+			}
+		}
+
+		return sb.toString();
+	}
+	
 	private String _keywords;
 	private String _originalKeywords;
 
@@ -179,9 +195,8 @@ public class QueryContext {
 
 	// Paging and sorting
 
-	private int _start;
-	private int _end;
-	private int _pageSize;
+	private Integer _start;
+	private Integer _pageSize;
 	private Sort[] _sorts;
 	
 }

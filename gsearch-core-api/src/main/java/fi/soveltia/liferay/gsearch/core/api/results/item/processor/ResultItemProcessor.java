@@ -4,9 +4,6 @@ package fi.soveltia.liferay.gsearch.core.api.results.item.processor;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Document;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 
@@ -30,16 +27,13 @@ public interface ResultItemProcessor {
 	/**
 	 * Processes the item.
 	 * 
-	 * @param portletRequest
-	 * @param portletResponse
-	 * @param queryParams
+	 * @param queryContext
 	 * @param document
 	 * @param resultItemBuilder
 	 * @param resultItem
 	 */
 	public void process(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		QueryContext queryParams, Document document,
+		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder, JSONObject resultItem)
 		throws Exception;
 }

@@ -3,7 +3,7 @@ package fi.soveltia.liferay.gsearch.core.api.suggest;
 
 import com.liferay.portal.kernel.json.JSONArray;
 
-import javax.portlet.PortletRequest;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Keyword suggester service.
@@ -15,20 +15,20 @@ public interface GSearchKeywordSuggester {
 	/**
 	 * Gets keyword suggestions as JSON array.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @return suggestions JSON array
 	 * @throws Exception
 	 */
-	public JSONArray getSuggestions(PortletRequest portletRequest)
+	public JSONArray getSuggestions(QueryContext queryContext)
 		throws Exception;
 
 	/**
 	 * Gets keyword suggestions as string array.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @return suggestions JSON array
 	 * @throws Exception
 	 */
-	public String[] getSuggestionsAsStringArray(PortletRequest portletRequest)
+	public String[] getSuggestionsAsStringArray(QueryContext queryContext)
 		throws Exception;
 }

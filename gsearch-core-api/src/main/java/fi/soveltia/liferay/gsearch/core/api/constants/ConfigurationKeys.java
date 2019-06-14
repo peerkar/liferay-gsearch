@@ -15,4 +15,6 @@ public class ConfigurationKeys {
 	public static final String FILTER = "filter";
 
 	public static final String SORT = "sort";
+	
+	public static final String SUGGESTER = "suggester";
 }

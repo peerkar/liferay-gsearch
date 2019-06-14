@@ -1,7 +1,7 @@
 
 package fi.soveltia.liferay.gsearch.core.api.params;
 
-import javax.portlet.PortletRequest;
+import java.util.Map;
 
 import fi.soveltia.liferay.gsearch.core.api.exception.ParameterValidationException;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
@@ -17,20 +17,43 @@ public interface ParameterBuilder {
 	/**
 	 * Process parameter and add it to query context.
 	 * 
-	 * @param portletRequest
-	 * @param filter
 	 * @param queryContext
 	 * @throws Exception
 	 */
 	public void addParameter(
-		PortletRequest portletRequest, QueryContext queryContext)
+		QueryContext queryContext)
 		throws Exception;
 
 	/**
+	 * Process parameter and add it to query context.
+	 * 
+	 * @param parameters
+	 * @param queryContext
+	 * @throws Exception
+	 */
+	public void addParameter(
+		QueryContext queryContext, Map<String, Object>parameters)
+		throws Exception;
+	
+	/**
 	 * Validate parameter
 	 * 
+	 * @param queryContext
 	 * @return
+	 * @throws ParameterValidationException
 	 */
-	public boolean validate(PortletRequest portletRequest)
+	public boolean validate(QueryContext queryContext)
 		throws ParameterValidationException;
+	
+	/**
+	 * Validate parameter
+	 * 
+	 * @param queryContext
+	 * @param parameters
+	 * @return
+	 * @throws ParameterValidationException
+	 */
+	public boolean validate(QueryContext queryContext, Map<String, Object>parameters)
+		throws ParameterValidationException;
+
 }

@@ -4,8 +4,6 @@ package fi.soveltia.liferay.gsearch.core.api.query.clause;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.Query;
 
-import javax.portlet.PortletRequest;
-
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
@@ -18,15 +16,13 @@ public interface ClauseBuilder {
 	/**
 	 * Builds clause.
 	 * 
-	 * @param portletRequest
-	 * @param configuration
 	 * @param queryContext
+	 * @param configuration
 	 * @return Query object
 	 * @throws Exception
 	 */
 	public Query buildClause(
-		PortletRequest portletRequest, JSONObject configuration,
-		QueryContext queryContext)
+		QueryContext queryContext, JSONObject configuration)
 		throws Exception;
 
 	/**

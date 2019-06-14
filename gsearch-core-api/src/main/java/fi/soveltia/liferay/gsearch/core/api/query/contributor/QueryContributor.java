@@ -4,7 +4,7 @@ package fi.soveltia.liferay.gsearch.core.api.query.contributor;
 import com.liferay.portal.kernel.search.BooleanClauseOccur;
 import com.liferay.portal.kernel.search.Query;
 
-import javax.portlet.PortletRequest;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Adds clauses/subqueries/signals to the main query. 
@@ -20,11 +20,11 @@ public interface QueryContributor {
 	/**
 	 * Builds query.
 	 * 
-	 * @param portletRequest
+	 * @param queryContext
 	 * @return Query
 	 * @throws Exception
 	 */
-	public Query buildQuery(PortletRequest portletRequest)
+	public Query buildQuery(QueryContext queryContext)
 		throws Exception;
 
 	/**
