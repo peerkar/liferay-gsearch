@@ -27,11 +27,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchResourceKeys;
 import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
-import fi.soveltia.liferay.gsearch.web.portlet.util.LocalizationHelper;
 
 /**
  * Resource command for getting the help text.

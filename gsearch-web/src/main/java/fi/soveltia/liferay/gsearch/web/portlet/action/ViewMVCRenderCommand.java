@@ -398,7 +398,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		// Datepicker format
 
 		template.put(
-			ParameterNames.DATEPICKER_FORMAT,
+			ParameterNames.DATE_FORMAT,
 			_moduleConfiguration.datePickerFormat());
 	}
 
