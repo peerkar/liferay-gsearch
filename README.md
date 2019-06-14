@@ -6,14 +6,14 @@ This application gives you full control over queries sent from Liferay to the se
 
 While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which extends the standard query type support.
 
-The application has multiple extension points for customization and you can just choose to use the backend modules and create your own UI implementation.
+The application has multiple extension points for customization and you can just choose to use the backend modules and create your own UI implementation. Headless [REST API](https://github.com/peerkar/liferay-gsearch/tree/master/gsearch-rest) is also available.
 
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
 
 ## News
+* __(2019-02-06)__ [Core version 7.0 available with REST API](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * __(2019-02-06)__ [Core version 6.1 available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 * __(2019-01-29)__ [New Custom Elasticsearch adapters for 7.0 and 7.1 (CE and DXP) available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
-* __(2019-01-27)__ [Core version 6.0.0 with DXP 7.0 backport and lots of improvements now available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 
 ## Documentation
 
@@ -102,9 +102,9 @@ If you are willing to contribute or have problems or questions, ping me filing a
 
 ## Known Issues (important)
 
-1. For keyword suggester to work, you have to update the custom Elasticsearch adapter OSGi bundle. Run "update BUNDLE_ID" in Gogo shell and you're good.
+1. For keyword suggester to work, you have to restart the custom Elasticsearch adapter OSGi bundle whenever you restart the portal. Run "update BUNDLE_ID" in Gogo shell and you're good.
 
-1. There's currently a bug in 7.1 Soy framework generating lots of log data. For now please set a logging level for  com.liferay.portal.portlet.bridge.soy.internal.SoyPortlet to "OFF". Issue can be found here: https://issues.liferay.com/browse/LPS-85186 
+1. There's currently a bug in 7.1 Soy framework generating lots of log data: https://issues.liferay.com/browse/LPS-85186. Soy logger been silenced by configuration because of this.
  
 ## Important Note About Permissions
 
