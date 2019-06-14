@@ -9,9 +9,6 @@ import com.liferay.portal.kernel.search.geolocation.GeoLocationPoint;
 
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -48,7 +45,6 @@ public class GeoLocationResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public void process(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryParams, Document document,
 		ResultItemBuilder resultItemBuilder, JSONObject resultItem)
 		throws Exception {

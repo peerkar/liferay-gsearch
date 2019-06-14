@@ -12,13 +12,15 @@ import com.liferay.portal.kernel.util.Validator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.contributor.QueryContributor;
 import fi.soveltia.liferay.gsearch.geolocation.configuration.ModuleConfiguration;
 import fi.soveltia.liferay.gsearch.geolocation.service.GeoLocationService;
@@ -37,14 +39,14 @@ import fi.soveltia.liferay.gsearch.query.DecayFunctionScoreQuery;
 public class GeolocationQueryContributor implements QueryContributor {
 
 	@Override
-	public Query buildQuery(PortletRequest portletRequest)
+	public Query buildQuery(QueryContext queryContext)
 		throws Exception {
 
 		if (!isEnabled()) {
 			return null;
 		}
 
-		String ipAddress = getIpAddress(portletRequest);
+		String ipAddress = getIpAddress(queryContext);
 
 		Float[] coordinates = _geolocationService.getCoordinates(ipAddress);
 
@@ -106,8 +108,11 @@ public class GeolocationQueryContributor implements QueryContributor {
 
 	/**
 	 * Get ipaddress to extract the geolocation data from.
+	 * 
+	 * @param queryContext
+	 * @return
 	 */
-	protected String getIpAddress(PortletRequest portletRequest) {
+	protected String getIpAddress(QueryContext queryContext) {
 
 		// Check if there's a configured test address
 
@@ -116,17 +121,17 @@ public class GeolocationQueryContributor implements QueryContributor {
 		if (Validator.isNotNull(ipAddress)) {
 			return ipAddress;
 		}
+		
+		HttpServletRequest httpServletRequest = 
+				(HttpServletRequest)queryContext.getParameter(ParameterNames.HTTP_SERVLET_REQUEST);
 
 		// Get the ip
 
-		return _portal.getHttpServletRequest(portletRequest).getRemoteAddr();
+		return httpServletRequest.getRemoteAddr();
 
 	}
 
 	protected volatile ModuleConfiguration _moduleConfiguration;
-
-	@Reference
-	Portal _portal;
 
 	@Reference
 	private GeoLocationService _geolocationService;
