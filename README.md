@@ -58,7 +58,8 @@ Deploy the GSearch portlet from Widgets menu to a portal page.
 
 ### Step 4
 
-Create a page with friendly URL "/viewasset" on a same site as the search portlet and place an Asset Publisher on it. 
+Create a page with friendly URL "/viewasset" on a same site as the search portlet and place an Asset Publisher on it. In configuration, check "Set as the Default Asset Publisher for This Page".
+
 
 ### Step 5 
 
