@@ -116,6 +116,10 @@ public class RecommenderServiceImpl implements RecommenderService {
 		QueryContext queryContext, AssetEntry assetEntry)
 		throws Exception {
 
+		if (assetEntry == null) {
+			return null;
+		}
+		
 		// Use default config if not set.
 
 		if (queryContext.getConfiguration(ConfigurationKeys.CLAUSE) == null) {
