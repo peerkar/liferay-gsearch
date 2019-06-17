@@ -1,6 +1,8 @@
 
 package fi.soveltia.liferay.gsearch.rest.application;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -9,8 +11,10 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -60,14 +64,14 @@ public class GSearchRestApplication extends Application {
 	}
 
 	@GET
-	@Path("/recommendations/{languageId}/{assetEntryId}")
+	@Path("/recommendations/{languageId}")
 	@Produces({
 		MediaType.APPLICATION_JSON
 	})
 	public String getRecommendations(
 		@Context HttpServletRequest httpServletRequest,
 		@PathParam("languageId") String languageId,
-		@PathParam("assetEntryId") Long assetEntryId,
+		@QueryParam("assetEntryId") Long[] assetEntryId,
 		@QueryParam("count") Integer count,
 		@QueryParam("includeAssetTags") Boolean includeAssetTags,
 		@QueryParam("includeAssetCategories") Boolean includeAssetCategories,
@@ -76,7 +80,7 @@ public class GSearchRestApplication extends Application {
 
 		JSONObject results = JSONFactoryUtil.createJSONObject();
 
-		if (Validator.isNull(languageId) || Validator.isNull(assetEntryId)) {
+		if (Validator.isNull(languageId)) {
 			return results.toString();
 		}
 
@@ -91,56 +95,75 @@ public class GSearchRestApplication extends Application {
 			
 			queryContext.setParameter(ParameterNames.USER_ID, user.getUserId());
 
-			String docUID = _recommenderService.resolveDocUIDByAssetEntryId(
-				queryContext, assetEntryId);
+			String[]docUIDs = null;
 
-			if (docUID == null) {
+			if (assetEntryId != null) {
+				
+				List<String> ids = new ArrayList<String>();
+				
+				String docUID = null;
+				
+				for (int i = 0; i < assetEntryId.length; i++) {
+
+					docUID = _recommenderService.resolveDocUIDByAssetEntryId(
+						queryContext, assetEntryId[i]);
+					
+					if (docUID != null) {
+						ids.add(docUID);
+					}
+				}
+				
+				docUIDs = ids.stream().toArray(String[]::new);
+			}
+			
+			
+			if (docUIDs == null) {
 				return results.toString();
 			}
 
-			if (docUID != null) {
+			queryContext = _queryContextBuilder.buildQueryContext(
+				httpServletRequest, companyId, locale, null);
 
-				queryContext = _queryContextBuilder.buildQueryContext(
-					httpServletRequest, companyId, locale, null);
-				
-				queryContext.setParameter(ParameterNames.USER_ID, user.getUserId());
-				queryContext.setPageSize(GetterUtil.getInteger(count, 5));
-				queryContext.setStart(0);
-				
-				queryContext.setParameter(
-					ParameterNames.INCLUDE_THUMBNAIL,
-					GetterUtil.getBoolean(includeThumbnail, false));
+			queryContext.setParameter(ParameterNames.PATH_IMAGE, "/image");
 
-				queryContext.setParameter(
-					ParameterNames.INCLUDE_USER_PORTRAIT,
-					GetterUtil.getBoolean(includeUserPortrait, false));
+			queryContext.setParameter(ParameterNames.USER_ID, user.getUserId());
+			queryContext.setPageSize(GetterUtil.getInteger(count, 5));
+			queryContext.setStart(0);
+			
+			queryContext.setParameter(
+				ParameterNames.INCLUDE_THUMBNAIL,
+				GetterUtil.getBoolean(includeThumbnail, false));
 
-				Map<String, Class<?>> additionalResultFields =
-					new HashMap<String, Class<?>>();
+			queryContext.setParameter(
+				ParameterNames.INCLUDE_USER_PORTRAIT,
+				GetterUtil.getBoolean(includeUserPortrait, false));
 
-				if (GetterUtil.get(includeAssetCategories, false)) {
-					additionalResultFields.put(
-						"assetCategoryTitles", String[].class);
-				}
-				if (GetterUtil.get(includeAssetTags, false)) {
-					additionalResultFields.put("assetTagNames", String[].class);
-				}
-				additionalResultFields.put("entryClassName", String.class);
-				additionalResultFields.put("entryClassPK", String.class);
-				
-				queryContext.setParameter(
-					ParameterNames.ADDITIONAL_RESULT_FIELDS,
-					additionalResultFields);
+			Map<String, Class<?>> additionalResultFields =
+				new HashMap<String, Class<?>>();
 
-				results = _recommenderService.getRecommendationsByDocUID(
-					queryContext, new String[] {
-						docUID
-					});
-
-				_localizationHelper.setResultTypeLocalizations(locale, results);
-				_localizationHelper.setFacetLocalizations(locale, results);
+			if (GetterUtil.get(includeAssetCategories, false)) {
+				additionalResultFields.put(
+					"assetCategoryTitles_en_US", String[].class);
 			}
+			if (GetterUtil.get(includeAssetTags, false)) {
+				additionalResultFields.put("assetTagNames", String[].class);
+			}
+			additionalResultFields.put("entryClassName", String.class);
+			additionalResultFields.put("entryClassPK", String.class);
+			additionalResultFields.put("readCount", String.class);
+			additionalResultFields.put("userName", String.class);
+			
+			queryContext.setParameter(
+				ParameterNames.ADDITIONAL_RESULT_FIELDS,
+				additionalResultFields);
 
+			results = _recommenderService.getRecommendationsByDocUID(
+				queryContext, docUIDs);
+
+			_localizationHelper.setResultTypeLocalizations(locale, results);
+			_localizationHelper.setFacetLocalizations(locale, results);
+
+			formatRecommendationsForGrow(locale, results);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -277,6 +300,63 @@ public class GSearchRestApplication extends Application {
 		}
 		return results.toString();
 	}
+	
+	/**
+	 * Grow.
+	 * 
+	 * @param locale
+	 * @param results
+	 */
+	private void formatRecommendationsForGrow(Locale locale, JSONObject results) {
+
+		JSONArray items = results.getJSONArray("items");
+
+		if (items == null || items.length() == 0) {
+			return;
+		}
+
+		for (int i = 0; i < items.length(); i++) {
+
+			JSONObject resultItem = items.getJSONObject(i);
+						
+			resultItem.put(
+				"articleAuthor", resultItem.getString("userName"));
+
+			resultItem.put(
+				"authorAvatar", resultItem.getString("userPortraitUrl"));
+
+			resultItem.put(
+				"createDate", resultItem.getString("date"));
+
+			resultItem.put(
+				"articleTitle", resultItem.getString("title_raw"));
+
+			resultItem.put(
+				"articleContent", resultItem.getString("description"));
+
+			resultItem.put(
+				"tags", resultItem.get("assetTagNames"));
+
+			resultItem.put(
+				"articleCategory", resultItem.get("assetCategoryTitles_en_US"));
+
+			String entryClassName = resultItem.getString("entryClassName");
+
+			String entryClassPK = resultItem.getString("entryClassPK");
+			
+			try {
+				AssetEntry entry = _assetEntryService.fetchEntry(entryClassName, Long.valueOf(entryClassPK));
+				
+				resultItem.put("id", entry.getEntryId());
+
+			} catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
+		}		
+	}
+	
+	@Reference
+	private AssetEntryLocalService _assetEntryService;
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
