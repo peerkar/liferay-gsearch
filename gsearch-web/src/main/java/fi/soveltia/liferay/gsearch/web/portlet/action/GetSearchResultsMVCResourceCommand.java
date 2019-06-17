@@ -199,9 +199,12 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 
 		// Asset categories.
+		
+		Locale locale = (Locale)queryContext.getParameter(ParameterNames.LOCALE);
 
 		if (_moduleConfiguration.isAssetCategoriesVisible()) {
-			additionalResultFields.put("assetCategoryTitles", String[].class);
+			additionalResultFields.put(
+				"assetCategoryTitles_" + locale.toString(), String[].class);
 		}
 
 		// Username.
