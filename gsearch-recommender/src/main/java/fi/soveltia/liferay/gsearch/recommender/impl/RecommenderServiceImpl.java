@@ -5,6 +5,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.params.FilterParameter;
+import fi.soveltia.liferay.gsearch.core.api.params.ParameterBuilder;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContextBuilder;
 import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
@@ -72,13 +74,17 @@ public class RecommenderServiceImpl implements RecommenderService {
 				_configurationHelper.getFacetConfiguration());
 		}
 
+		// Parse filter parameters from config.
+		
+		_filterParamBuilder.addParameter(queryContext);
+		
 		queryContext.setParameter(ParameterNames.DOC_UID, docUID);
 
 		queryContext.setQueryPostProcessorsEnabled(false);
 		
 		// Try to get search results.
 
-		JSONObject responseObject = null;
+		JSONObject responseObject = JSONFactoryUtil.createJSONObject();
 
 		try {
 			responseObject = _gSearch.getSearchResults(queryContext);
@@ -176,6 +182,11 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
+
+	@Reference(
+		target = "(param.name=filters)"
+	)
+	private ParameterBuilder _filterParamBuilder;
 
 	@Reference
 	private GSearch _gSearch;
