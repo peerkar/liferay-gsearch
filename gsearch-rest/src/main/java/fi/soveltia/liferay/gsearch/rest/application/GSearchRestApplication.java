@@ -1,8 +1,6 @@
 
 package fi.soveltia.liferay.gsearch.rest.application;
 
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -150,8 +148,6 @@ public class GSearchRestApplication extends Application {
 			}
 			additionalResultFields.put("entryClassName", String.class);
 			additionalResultFields.put("entryClassPK", String.class);
-			additionalResultFields.put("readCount", String.class);
-			additionalResultFields.put("userName", String.class);
 			
 			queryContext.setParameter(
 				ParameterNames.ADDITIONAL_RESULT_FIELDS,
@@ -162,8 +158,6 @@ public class GSearchRestApplication extends Application {
 
 			_localizationHelper.setResultTypeLocalizations(locale, results);
 			_localizationHelper.setFacetLocalizations(locale, results);
-
-			formatRecommendationsForGrow(locale, results);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -301,63 +295,6 @@ public class GSearchRestApplication extends Application {
 		return results.toString();
 	}
 	
-	/**
-	 * Grow.
-	 * 
-	 * @param locale
-	 * @param results
-	 */
-	private void formatRecommendationsForGrow(Locale locale, JSONObject results) {
-
-		JSONArray items = results.getJSONArray("items");
-
-		if (items == null || items.length() == 0) {
-			return;
-		}
-
-		for (int i = 0; i < items.length(); i++) {
-
-			JSONObject resultItem = items.getJSONObject(i);
-						
-			resultItem.put(
-				"articleAuthor", resultItem.getString("userName"));
-
-			resultItem.put(
-				"authorAvatar", resultItem.getString("userPortraitUrl"));
-
-			resultItem.put(
-				"createDate", resultItem.getString("date"));
-
-			resultItem.put(
-				"articleTitle", resultItem.getString("title_raw"));
-
-			resultItem.put(
-				"articleContent", resultItem.getString("description"));
-
-			resultItem.put(
-				"tags", resultItem.get("assetTagNames"));
-
-			resultItem.put(
-				"articleCategory", resultItem.get("assetCategoryTitles_en_US"));
-
-			String entryClassName = resultItem.getString("entryClassName");
-
-			String entryClassPK = resultItem.getString("entryClassPK");
-			
-			try {
-				AssetEntry entry = _assetEntryService.fetchEntry(entryClassName, Long.valueOf(entryClassPK));
-				
-				resultItem.put("id", entry.getEntryId());
-
-			} catch (Exception e) {
-				_log.error(e.getMessage(), e);
-			}
-		}		
-	}
-	
-	@Reference
-	private AssetEntryLocalService _assetEntryService;
-
 	@Reference
 	private ConfigurationHelper _configurationHelper;
 
