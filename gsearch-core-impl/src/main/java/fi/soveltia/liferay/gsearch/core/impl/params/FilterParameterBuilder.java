@@ -24,6 +24,9 @@ import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
  */
 @Component(
 	immediate = true, 
+	property = {
+		"param.name=filters"
+	},
 	service = ParameterBuilder.class
 )
 public class FilterParameterBuilder implements ParameterBuilder {
