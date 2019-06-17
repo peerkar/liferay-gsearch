@@ -71,8 +71,9 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			_log.warn("Assetentry not found.");
 		}
+		
 
-		JSONObject responseObject = null;
+		JSONObject responseObject = JSONFactoryUtil.createJSONObject();
 
 		try {
 			ThemeDisplay themeDisplay =
