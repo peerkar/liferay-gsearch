@@ -1,8 +1,8 @@
 # Liferay GSearch REST API
 
-Liferay GSearch REST API providing methods for keyword suggestions, search and recommendations based on an assetentry to compare:
+Liferay GSearch REST API providing methods for keyword suggestions, search and recommendations:
 
-* /recommendations/{languageId}/{assetEntryId}
+* /recommendations/{languageId}
 * /search/{languageId}/{keywords}
 * /suggestions/{companyId}/{groupId}/{languageId}/{keywords}
 
