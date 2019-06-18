@@ -53,7 +53,6 @@ import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true,
 	property = {
 		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
 		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
@@ -121,7 +120,8 @@ public class GSearchRestApplication extends Application {
 				
 				docUIDs = ids.stream().toArray(String[]::new);
 			}
-						
+			
+			
 			if (docUIDs == null) {
 				return results.toString();
 			}
@@ -155,6 +155,8 @@ public class GSearchRestApplication extends Application {
 			}
 			additionalResultFields.put("entryClassName", String.class);
 			additionalResultFields.put("entryClassPK", String.class);
+			additionalResultFields.put("readCount", String.class);
+			additionalResultFields.put("userName", String.class);
 			
 			queryContext.setParameter(
 				ParameterNames.ADDITIONAL_RESULT_FIELDS,
@@ -165,6 +167,8 @@ public class GSearchRestApplication extends Application {
 
 			_localizationHelper.setResultTypeLocalizations(locale, results);
 			_localizationHelper.setFacetLocalizations(locale, results);
+
+			formatRecommendationsForGrow(locale, results);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
