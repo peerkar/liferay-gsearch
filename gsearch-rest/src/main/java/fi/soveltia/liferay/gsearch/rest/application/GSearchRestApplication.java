@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.rest.application;
 
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -10,6 +11,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.wiki.model.WikiPage;
+import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +54,8 @@ import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
  */
 @Component(
 	property = {
+		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
+		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
 		JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=/gsearch-rest",
 		JaxrsWhiteboardConstants.JAX_RS_NAME + "=Gsearch.Rest"
 	}, 
@@ -337,17 +342,19 @@ public class GSearchRestApplication extends Application {
 			resultItem.put(
 				"tags", resultItem.get("assetTagNames"));
 
-			resultItem.put(
-				"articleCategory", resultItem.get("assetCategoryTitles_en_US"));
-
 			String entryClassName = resultItem.getString("entryClassName");
 
 			String entryClassPK = resultItem.getString("entryClassPK");
 			
 			try {
-				AssetEntry entry = _assetEntryService.fetchEntry(entryClassName, Long.valueOf(entryClassPK));
+				AssetEntry assetEntry = 
+					_assetEntryLocalService.fetchEntry(entryClassName, Long.valueOf(entryClassPK));
 				
-				resultItem.put("id", entry.getEntryId());
+				resultItem.put("id", assetEntry.getEntryId());
+				
+				resultItem.put(
+					"articleCategory", getGrowArticleCategory(locale, assetEntry));
+
 
 			} catch (Exception e) {
 				_log.error(e.getMessage(), e);
@@ -355,8 +362,55 @@ public class GSearchRestApplication extends Application {
 		}		
 	}
 	
+	/**
+	 * Grow.
+	 * 
+	 * @param locale
+	 * @param assetEntry
+	 * @return
+	 * @throws PortalException
+	 */
+	private String getGrowArticleCategory(Locale locale, AssetEntry assetEntry) throws PortalException {
+				
+		if (!assetEntry.getClassName().equals(WikiPage.class.getName())) {
+			return "Share";
+		}
+		
+		WikiPage wikiPage = _wikiPageLocalService.getPage(assetEntry.getClassPK());
+
+		String category = wikiPage.getTitle();
+
+		if (!category.equals("Learn") && 
+			!category.equals("Share") && 
+			!category.equals("People") &&    
+			!category.equals("Excellence")) {
+
+			category = wikiPage.getParentTitle();
+
+			while (Validator.isNotNull(category) && 
+				!category.equals("Learn") && 
+				!category.equals("Share") && 
+				!category.equals("People") &&
+				!category.equals("Excellence")) {
+
+				wikiPage = wikiPage.getParentPage();
+
+				category = wikiPage.getParentTitle();
+			}
+		}
+
+		if (!category.equals("Excellence") && 
+			!category.equals("Learn") && 
+			!category.equals("Share") &&                           
+			!category.equals("People")) {
+			category = "Share";
+		}	
+		
+		return category;
+	}
+	
 	@Reference
-	private AssetEntryLocalService _assetEntryService;
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private ConfigurationHelper _configurationHelper;
@@ -376,6 +430,9 @@ public class GSearchRestApplication extends Application {
 	@Reference
 	private RecommenderService _recommenderService;
 
+	@Reference
+	private WikiPageLocalService _wikiPageLocalService;
+	
 	private static final Logger _log = 
 					LoggerFactory.getLogger(GSearchRestApplication.class);
 }
