@@ -49,6 +49,8 @@ import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
  */
 @Component(
 	property = {
+		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
+		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
 		JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=/gsearch-rest",
 		JaxrsWhiteboardConstants.JAX_RS_NAME + "=Gsearch.Rest"
 	}, 
