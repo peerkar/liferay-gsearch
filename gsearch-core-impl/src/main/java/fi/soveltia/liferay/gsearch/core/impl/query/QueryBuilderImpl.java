@@ -219,6 +219,12 @@ public class QueryBuilderImpl implements QueryBuilder {
 
 			JSONObject clauseObject =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
+			
+			// Avoid breaking on an empty config item.
+			
+			if (clauseObject.length() == 0) {
+				continue;
+			}
 
 			// Check if this clause is enabled
 				
