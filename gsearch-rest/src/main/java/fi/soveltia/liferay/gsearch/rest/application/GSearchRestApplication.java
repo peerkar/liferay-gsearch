@@ -48,6 +48,7 @@ import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
  * @author Petteri Karttunen
  */
 @Component(
+	immediate = true,
 	property = {
 		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
 		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
@@ -115,8 +116,7 @@ public class GSearchRestApplication extends Application {
 				
 				docUIDs = ids.stream().toArray(String[]::new);
 			}
-			
-			
+						
 			if (docUIDs == null) {
 				return results.toString();
 			}
