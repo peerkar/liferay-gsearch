@@ -10,7 +10,7 @@ import aQute.bnd.annotation.metatype.Meta;
 @Meta.OCD(
 	id = "fi.soveltia.liferay.gsearch.recommender.configuration.ModuleConfiguration",
 	localization = "content/Language",
-	name = "clause-configuration"
+	name = "recommender-configuration"
 )
 public interface ModuleConfiguration {
 
