@@ -97,9 +97,17 @@ Check configurations in Control Panel -> System Settings -> GSearch.
 
 __Notice__ that More Like This portlet has a portlet instance configuration.
 
-### Step 11
+### Step 11 - Troubleshooting
 
-If you are willing to contribute or have problems or questions, ping me filing a ticket. I'm doing the project almost completely as a hobby, so the installation or configuration instructions are at times minimal. Sorry for that.
+If it doesn't work, check the following:
+
+1. Are you using compatible module versions?
+1. Is the failing module requiring the custom ES adapter (see module README)`
+1. Did you restart the portal after the first custom adapter deployment?
+
+If it still doesn't work and you are getting JSON configuration errors in the log, you were probably upgrading the modules and the old configuration is incompatible. Try resetting the default configuration values and restart the affected bundles or easier, the portal.
+
+If you are willing to contribute or have problems or questions, please feel free ping or file  a ticket. I'm doing the project almost completely as a hobby, so the installation or configuration instructions are at times minimal. Sorry for that.
 
 ## Known Issues (important)
 
