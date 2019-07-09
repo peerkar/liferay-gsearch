@@ -150,17 +150,23 @@
 			}
 		}
 		
+		.meta-title {
+			color: #000;
+			font-weight: bold;
+		}
+		
 		.tags {
 			
-			color: #aaa;
 			font-size: 0.9em;
-			margin-top: 4px;
+			margin: 10px 0 10px 0;
 					
 			span {
 				margin-right: 10px;
 			}
 			
 			.tag {
+				border-color: #89A7E0;
+				color: #2E5AAC;
 				word-break: break-word;
 			}
 			
@@ -202,6 +208,7 @@
 	
 		.strip-container {
 			overflow-x: auto;
+			padding-right: 80px;
 			white-space: nowrap;
 		}
 

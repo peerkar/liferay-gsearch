@@ -127,12 +127,14 @@
 		}
 		html += '</div>';
 
-		if (item.tags) {
+		if (item.assetTagNames) {
 			html += '<div class="tags">';
-			html += '<span>' + Liferay.Language.get('tags') + ':</span>';
+			html += '<span class="meta-title">' + Liferay.Language.get('tags') + ':</span>';
 
-			for (var tag in item.tags) {
-				html += '<span class="tag">' + tag + '</span>';
+			let length = item.assetTagNames.length;
+			
+			for (let i = 0; i < length; i++) {
+				html += '<span class="label label-lg text-uppercase tag">' + item.assetTagNames[i] + '</span>';
 			}
 			html += '</div>';
 		}

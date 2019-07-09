@@ -3,8 +3,11 @@ import Soy from 'metal-soy/src/Soy';
 import core from 'metal/src/core';
 
 import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
-import GSearchImageResultLayout from './GSearchImageResultLayout.soy';
-import GSearchMapsResultLayout from './GSearchMapsResultLayout.es';
+import GSearchListResultLayout from './result-layouts/GSearchListResultLayout.soy';
+import GSearchImageResultLayout from './result-layouts/GSearchImageResultLayout.soy';
+import GSearchMapsResultLayout from './result-layouts/GSearchMapsResultLayout.es';
+import GSearchUserImageResultLayout from './result-layouts/GSearchUserImageResultLayout.soy';
+
 import templates from './GSearchResults.soy';
 
 /**
