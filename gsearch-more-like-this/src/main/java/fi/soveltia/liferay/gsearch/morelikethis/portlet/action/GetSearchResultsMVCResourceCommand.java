@@ -16,6 +16,9 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.portlet.PortletPreferences;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
@@ -95,19 +98,27 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			// Try to get search results.
 
+			String[] docUIDs = null;
+			
+			// Fall back to other queries even if there are no docUIDs
+			
 			if (docUID != null) {
-
-				QueryContext searchQueryContext = buildSearchQueryContext(
-					httpServletRequest, themeDisplay, preferences);
-
-				responseObject = _recommenderService.getRecommendationsByDocUID(
-					searchQueryContext, new String[] {
-						docUID
-					});
 				
-				_localizationHelper.setResultTypeLocalizations(
-					themeDisplay.getLocale(), responseObject);
+				docUIDs = new String[] { docUID };
+
+			} else {
+				
+				docUIDs = new String[0];
 			}
+
+			QueryContext searchQueryContext = buildSearchQueryContext(
+				httpServletRequest, themeDisplay, preferences);
+
+			responseObject = _recommenderService.getRecommendationsByDocUID(
+				searchQueryContext, docUIDs);
+			
+			_localizationHelper.setResultTypeLocalizations(
+				themeDisplay.getLocale(), responseObject);
 
 		}
 		catch (Exception e) {
@@ -180,9 +191,20 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		queryContext.setParameter(
 			ParameterNames.VIEW_RESULTS_IN_CONTEXT, GetterUtil.getBoolean(
 				preferences.getValue("showResultsInContext", "true")));
-	
-		return queryContext;
 
+		
+		// Asset tags.
+
+		Map<String, Class<?>> additionalResultFields =
+			new HashMap<String, Class<?>>();
+
+		additionalResultFields.put("assetTagNames", String[].class);
+		
+		queryContext.setParameter(
+			ParameterNames.ADDITIONAL_RESULT_FIELDS,
+			additionalResultFields);		
+
+		return queryContext;
 	}
 
 	/**

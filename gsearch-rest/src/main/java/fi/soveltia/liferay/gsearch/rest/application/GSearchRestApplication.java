@@ -1,6 +1,9 @@
 
 package fi.soveltia.liferay.gsearch.rest.application;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -8,6 +11,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.wiki.model.WikiPage;
+import com.liferay.wiki.service.WikiPageLocalService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +53,6 @@ import fi.soveltia.liferay.gsearch.recommender.api.RecommenderService;
  * @author Petteri Karttunen
  */
 @Component(
-	immediate = true,
 	property = {
 		"auth.verifier.auth.verifier.BasicAuthHeaderAuthVerifier.urls.includes=/*",
 		"auth.verifier.auth.verifier.PortalSessionAuthVerifier.urls.includes=/*",
@@ -116,7 +120,8 @@ public class GSearchRestApplication extends Application {
 				
 				docUIDs = ids.stream().toArray(String[]::new);
 			}
-						
+			
+			
 			if (docUIDs == null) {
 				return results.toString();
 			}
@@ -150,6 +155,8 @@ public class GSearchRestApplication extends Application {
 			}
 			additionalResultFields.put("entryClassName", String.class);
 			additionalResultFields.put("entryClassPK", String.class);
+			additionalResultFields.put("readCount", String.class);
+			additionalResultFields.put("userName", String.class);
 			
 			queryContext.setParameter(
 				ParameterNames.ADDITIONAL_RESULT_FIELDS,
@@ -160,6 +167,8 @@ public class GSearchRestApplication extends Application {
 
 			_localizationHelper.setResultTypeLocalizations(locale, results);
 			_localizationHelper.setFacetLocalizations(locale, results);
+
+			formatRecommendationsForGrow(locale, results);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -297,6 +306,112 @@ public class GSearchRestApplication extends Application {
 		return results.toString();
 	}
 	
+	/**
+	 * Grow.
+	 * 
+	 * @param locale
+	 * @param results
+	 */
+	private void formatRecommendationsForGrow(Locale locale, JSONObject results) {
+
+		JSONArray items = results.getJSONArray("items");
+
+		if (items == null || items.length() == 0) {
+			return;
+		}
+
+		for (int i = 0; i < items.length(); i++) {
+
+			JSONObject resultItem = items.getJSONObject(i);
+						
+			resultItem.put(
+				"articleAuthor", resultItem.getString("userName"));
+
+			resultItem.put(
+				"authorAvatar", resultItem.getString("userPortraitUrl"));
+
+			resultItem.put(
+				"createDate", resultItem.getString("date"));
+
+			resultItem.put(
+				"articleTitle", resultItem.getString("title_raw"));
+
+			resultItem.put(
+				"articleContent", resultItem.getString("description"));
+
+			resultItem.put(
+				"tags", resultItem.get("assetTagNames"));
+
+			String entryClassName = resultItem.getString("entryClassName");
+
+			String entryClassPK = resultItem.getString("entryClassPK");
+			
+			try {
+				AssetEntry assetEntry = 
+					_assetEntryLocalService.fetchEntry(entryClassName, Long.valueOf(entryClassPK));
+				
+				resultItem.put("id", assetEntry.getEntryId());
+				
+				resultItem.put(
+					"articleCategory", getGrowArticleCategory(locale, assetEntry));
+
+
+			} catch (Exception e) {
+				_log.error(e.getMessage(), e);
+			}
+		}		
+	}
+	
+	/**
+	 * Grow.
+	 * 
+	 * @param locale
+	 * @param assetEntry
+	 * @return
+	 * @throws PortalException
+	 */
+	private String getGrowArticleCategory(Locale locale, AssetEntry assetEntry) throws PortalException {
+				
+		if (!assetEntry.getClassName().equals(WikiPage.class.getName())) {
+			return "Share";
+		}
+		
+		WikiPage wikiPage = _wikiPageLocalService.getPage(assetEntry.getClassPK());
+
+		String category = wikiPage.getTitle();
+
+		if (!category.equals("Learn") && 
+			!category.equals("Share") && 
+			!category.equals("People") &&    
+			!category.equals("Excellence")) {
+
+			category = wikiPage.getParentTitle();
+
+			while (Validator.isNotNull(category) && 
+				!category.equals("Learn") && 
+				!category.equals("Share") && 
+				!category.equals("People") &&
+				!category.equals("Excellence")) {
+
+				wikiPage = wikiPage.getParentPage();
+
+				category = wikiPage.getParentTitle();
+			}
+		}
+
+		if (!category.equals("Excellence") && 
+			!category.equals("Learn") && 
+			!category.equals("Share") &&                           
+			!category.equals("People")) {
+			category = "Share";
+		}	
+		
+		return category;
+	}
+	
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
 	@Reference
 	private ConfigurationHelper _configurationHelper;
 
@@ -315,6 +430,9 @@ public class GSearchRestApplication extends Application {
 	@Reference
 	private RecommenderService _recommenderService;
 
+	@Reference
+	private WikiPageLocalService _wikiPageLocalService;
+	
 	private static final Logger _log = 
 					LoggerFactory.getLogger(GSearchRestApplication.class);
 }

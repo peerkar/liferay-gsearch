@@ -1,0 +1,130 @@
+{namespace GSearchUserImageResultLayout}
+
+/**
+ * Print user image list results
+ *
+ * @param appendRedirect
+ * @param results
+ */
+{template .render}
+	
+	// Default result layout rendering.
+
+	{foreach $item in $results.items}
+		{call .item}
+			{param appendRedirect: $appendRedirect /}
+			{param item: $item /}
+		{/call}
+	{/foreach}
+
+{/template}
+
+/**
+ * Print one result item.
+ *
+ * @param appendRedirect
+ * @param item
+ */
+{template .item}
+
+	{let $link: $appendRedirect == true ? ($item.link + $item.redirect) : $item.link /}
+
+	<div class="row">
+	
+		<div class="item">
+
+			{if $item.userPortraitUrl}
+			
+				<div class="userimage col-md-2 col-lg-1 hidden-xs hidden-sm">
+					<a href="{$link}" >
+						<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+					</a>
+				</div>
+
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-11 content">				
+
+			{elseif $item.userInitials}
+			
+				<div class="userinitials col-md-2 col-lg-1 hidden-xs hidden-sm">
+					<span class="user-avatar-image"> 
+						<div class="user-icon-color-10 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+							<span class="initials">{$item.userInitials}</span>
+						</div> 
+					</span>
+				</div>
+
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-11 content">				
+
+			{else}
+				<div class="content">
+			{/if}
+
+
+				<div class="heading">
+				
+					// Type.
+					
+					{if $item.type != ''}
+						<span class="type"><a href="{$link}">[{$item.type}]</a></span>
+					{/if}		
+							
+					<h1>
+						<a class="highlightable" href="{$link}">{$item.title}</a>
+					</h1>
+					
+					// An example of item tagged by Result Item Tagger plugin.
+					
+					{if $item.official_content}
+						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
+					{/if} 
+				</div>
+				
+				<div class="link">
+					<a class="highlightable" href="{$link}">{$item.link}</a>
+				</div>
+
+				// Description.
+
+				<div class="description ">
+					{if $item.date != ''}
+						<strong>{$item.date} </strong>
+					{/if}
+					{if $item.description != ''}
+						- <span class="highlightable">{$item.description}</span>
+					{/if}
+				</div>
+				
+				// Tags.
+				
+				{if $item.assetTagNames}
+					<div class="meta tags">
+						<span class="key">{msg desc=""}tags{/msg}:</span>
+						{foreach $tag in $item.assetTagNames}
+							<span class="label label-lg text-uppercase tag value tag">{$tag}</span>
+						{/foreach}
+					</div>							
+				{/if}
+				
+				// Categories.
+				
+				{if $item.assetCategoryTitles}
+					<div class="meta categories">
+						<span class="key">{msg desc=""}categories{/msg}:</span>
+						{foreach $category in $item.assetCategoryTitles}
+							<span class="label label-lg text-uppercase value category">{$category}</span>
+						{/foreach}
+					</div>							
+				{/if}
+
+				// Last author.
+								
+				{if $item.userName}
+					<div class="meta author">
+						<span class="key">{msg desc=""}author{/msg}:</span>
+						<span class="value">{$item.userName}</span>
+					</div>							
+				{/if}
+			</div>
+		</div>
+	</div>
+{/template}

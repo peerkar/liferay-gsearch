@@ -1,22 +1,20 @@
-{namespace GSearchMapsResultLayout}
+{namespace GSearchListResultLayout}
 
 /**
- * Print maps result layout.
+ * List result layout.
  *
  * @param appendRedirect
  * @param results
  */
 {template .render}
-
-	<div class="maps-layout-map" id="gsearch-map"></div>
-
+	
 	{foreach $item in $results.items}
 		{call .item}
 			{param appendRedirect: $appendRedirect /}
 			{param item: $item /}
 		{/call}
 	{/foreach}
-
+				
 {/template}
 
 /**
@@ -27,7 +25,7 @@
  */
 {template .item}
 
-	{let $link: $appendRedirect ? ($item.link + $item.redirect) : $item.link /}
+	{let $link: $appendRedirect == true ? ($item.link + $item.redirect) : $item.link /}
 
 	<div class="row">
 	
@@ -36,6 +34,8 @@
 			// Do we have a thumbnail?
 
 			{if $item.imageSrc}
+
+				{let $contentClasses: 'col-xs-12 col-sm-12 col-md-10 col-lg-10 ' /}
 
 				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
 					{if $item.imageSrc != ''}
@@ -47,24 +47,22 @@
 
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
 
-			{elseif $item.userInitials}
+			{elseif $item.userPortraitUrl}
 			
-				<div class="col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<span class="user-avatar-image"> 
-						<div class="user-icon-color-9 user-icon user-icon-lg user-icon-default">
-							<span>{$item.userInitials}</span>
-						</div> 
-					</span>
+				<div class="userimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+					<a href="{$link}" style="background-image: url('{$item.userPortraitUrl}');" title="{$item.userName}"></a>
 				</div>
 
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
 
-			{elseif $item.userPortraitUrl}
+			{elseif $item.userInitials}
 			
-				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<a href="{$link}">
-						<img alt="{$item.title}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.title}" />
-					</a>
+				<div class="userinitials col-md-2 col-lg-2 hidden-xs hidden-sm">
+					<span class="user-avatar-image"> 
+						<div class="user-icon-color-10 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
+							<span class="initials">{$item.userInitials}</span>
+						</div> 
+					</span>
 				</div>
 
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
@@ -86,9 +84,9 @@
 						<a class="highlightable" href="{$link}">{$item.title}</a>
 					</h1>
 					
-					// Highlighted item.
+					// An example of item tagged by Result Item Tagger plugin.
 					
-					{if $item.highlight}
+					{if $item.official_content}
 						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
 					{/if} 
 				</div>
@@ -110,11 +108,11 @@
 				
 				// Tags.
 				
-				{if $item.tags}
-					<div class="tags">
-						<span>{msg desc=""}tags{/msg}:</span>
-						{foreach $tag in $item.tags}
-							<span class="tag">{$tag}</span>
+				{if $item.assetTagNames}
+					<div class="meta tags">
+						<span class="key">{msg desc=""}tags{/msg}:</span>
+						{foreach $tag in $item.assetTagNames}
+							<span class="label label-lg text-uppercase tag value tag">{$tag}</span>
 						{/foreach}
 					</div>							
 				{/if}
@@ -125,7 +123,7 @@
 					<div class="meta categories">
 						<span class="key">{msg desc=""}categories{/msg}:</span>
 						{foreach $category in $item.assetCategoryTitles}
-							<span class="value category">{$category}</span>
+							<span class="label label-lg text-uppercase value category">{$category}</span>
 						{/foreach}
 					</div>							
 				{/if}
@@ -137,7 +135,7 @@
 						<span class="key">{msg desc=""}author{/msg}:</span>
 						<span class="value">{$item.userName}</span>
 					</div>							
-				{/if}				
+				{/if}
 			</div>
 		</div>
 	</div>

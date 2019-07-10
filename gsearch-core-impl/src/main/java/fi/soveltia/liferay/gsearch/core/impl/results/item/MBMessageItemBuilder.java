@@ -4,7 +4,7 @@ package fi.soveltia.liferay.gsearch.core.impl.results.item;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
-import com.liferay.message.boards.kernel.model.MBMessage;
+import com.liferay.message.boards.model.MBMessage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
@@ -94,43 +94,6 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 		return super.getLink(
 			queryContext, document);
 
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getTitle(
-		QueryContext queryContext,
-		Document document, boolean isHighlight)
-		throws NumberFormatException, PortalException {
-
-		long classNameId =
-			GetterUtil.getLong(document.get(Field.CLASS_NAME_ID));
-
-		if (classNameId > 0) {
-
-			String className = _portal.getClassName(classNameId);
-
-			if (JournalArticle.class.getName().equals(className) ||
-				WikiPage.class.getName().equals(className)) {
-
-				String title = document.get(Field.CONTENT);
-
-				if (title.length() > TITLE_MAXLENGTH) {
-					title = title.substring(0, TITLE_MAXLENGTH) + "...";
-				}
-
-				// Using Apache commons as it works better than HTMLUtils
-
-				title = StringEscapeUtils.unescapeHtml4(title);
-				title = HtmlUtil.stripHtml(title);
-
-				return title;
-			}
-		}
-		return super.getTitle(
-			queryContext, document, isHighlight);
 	}
 
 	protected String getDLFileEntryCommentLink() {
