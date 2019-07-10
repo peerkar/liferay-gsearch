@@ -98,28 +98,18 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			// Try to get search results.
 
-			String[] docUIDs = null;
-			
-			// Fall back to other queries even if there are no docUIDs
-			
 			if (docUID != null) {
 				
-				docUIDs = new String[] { docUID };
+				QueryContext searchQueryContext = buildSearchQueryContext(
+					httpServletRequest, themeDisplay, preferences);
 
-			} else {
-				
-				docUIDs = new String[0];
-			}
-
-			QueryContext searchQueryContext = buildSearchQueryContext(
-				httpServletRequest, themeDisplay, preferences);
-
-			responseObject = _recommenderService.getRecommendationsByDocUID(
-				searchQueryContext, docUIDs);
-			
-			_localizationHelper.setResultTypeLocalizations(
-				themeDisplay.getLocale(), responseObject);
-
+				responseObject = _recommenderService.getRecommendationsByDocUID(
+					searchQueryContext, new String[] {
+						docUID
+					});
+				_localizationHelper.setResultTypeLocalizations(
+					themeDisplay.getLocale(), responseObject);
+			}			
 		}
 		catch (Exception e) {
 			_log.error(e, e);

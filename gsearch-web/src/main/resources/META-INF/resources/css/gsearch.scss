@@ -321,10 +321,6 @@
 	/* Results layout */
 	
 	.gsearch-results-layout {
-	
-		float: right;
-		padding-right: 0;
-		text-align: right;
 		
 		.options { 
 			float: right;
@@ -341,7 +337,7 @@
 			a {
 				display: inline-block;
 				margin-right: 8px;
-				border: 1px solid #1a0dab;
+				border: 1px solid #dcdcdc;
 				box-shadow: 4px 4px 1px -1px #b8bcc1;
 				
 				@include media-query(null, 467px) {
@@ -547,6 +543,18 @@
 		}
 
 		.tags {
+	
+			margin-top: 15px;
+		
+			.tag {
+			    border-color: #9ba0ad;
+			    color: #8792a7;
+			}
+			
+			.tag.active {
+				background: #9ba0ad;
+				color: #fff;
+			}
 			
 			.tag:hover {
 				cursor: pointer;
@@ -607,17 +615,22 @@
 			overflow: hidden; 
 			padding: 0;
 		}
-		
+				
 		li {
+			background: #9ba0ad;
 			border: 1px solid #999;
-			border-radius: 6px;
-			color: #888;
+			border-radius: 2px;
+			color: #fff;		
 			float: left;
 			list-style-type: none; 
 			margin-bottom: 15px;
 			margin-right: 15px;
-			padding: 9px 9px 9px 17px;
+			padding: 5px 5px 6px 14px;
 			text-transform: capitalize;
+			
+			.glyphicon {
+				color: #fff;
+			}
 		}
 		
 		a {
@@ -683,4 +696,3 @@
 	font-weight: bold; 
 	color: #000; 
 }
-

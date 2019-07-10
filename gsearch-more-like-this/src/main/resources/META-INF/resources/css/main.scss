@@ -10,7 +10,7 @@
 .gsearch-more-like-this-portlet {
 	
 	a { 
-		/* color:#1a0dab; */
+		color:#1a0dab;
 	}
 	
 	.row {
@@ -165,14 +165,15 @@
 			}
 			
 			.tag {
-				border-color: #89A7E0;
-				color: #2E5AAC;
+			    border-color: #9ba0ad;
+			    color: #8792a7;
 				word-break: break-word;
-			}
+				}
 			
 			.tag.active {
-				color: #222;
-			}
+				background: #9ba0ad;
+				color: #fff;
+			}			
 		}
 		
 		.no-results {
