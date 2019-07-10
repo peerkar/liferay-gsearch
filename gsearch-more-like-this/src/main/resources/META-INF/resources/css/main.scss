@@ -10,7 +10,7 @@
 .gsearch-more-like-this-portlet {
 	
 	a { 
-		color:#1a0dab;
+		/* color:#1a0dab; */
 	}
 	
 	.row {
@@ -172,10 +172,6 @@
 			
 			.tag.active {
 				color: #222;
-			}
-
-			.tag:hover {
-				cursor: pointer;
 			}
 		}
 		
