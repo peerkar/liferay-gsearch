@@ -105,8 +105,10 @@
 				},
 				formatGroup: function(suggestion, category) {
 					
-					var link = '<%= searchPageURL %>' + '?type=' + 
-						suggestion.data.key + '&q=' + 
+					console.log(suggestion);
+					
+					var link = '<%= searchPageURL %>' + '?entryClassName=' + 
+						suggestion.data.entryClassName + '&q=' + 
 						$('#<portlet:namespace />MiniSearchField').val();
 
 			        return '<div class="autocomplete-group">' +

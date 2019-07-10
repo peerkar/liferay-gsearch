@@ -11,6 +11,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.ResourceRequest;
@@ -91,6 +93,15 @@ public class GetContentSuggestionsMVCResourceCommand
 			queryContext.setParameter(
 				ParameterNames.VIEW_RESULTS_IN_CONTEXT,
 				_moduleConfiguration.isViewResultsInContext());
+			
+			Map<String, Class<?>> additionalResultFields =
+							new HashMap<String, Class<?>>();
+
+			additionalResultFields.put("entryClassName", String.class);
+
+			queryContext.setParameter(
+				ParameterNames.ADDITIONAL_RESULT_FIELDS,
+				additionalResultFields);
 
 		}
 		catch (PortalException e) {
