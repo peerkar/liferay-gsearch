@@ -96,43 +96,6 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getTitle(
-		QueryContext queryContext,
-		Document document, boolean isHighlight)
-		throws NumberFormatException, PortalException {
-
-		long classNameId =
-			GetterUtil.getLong(document.get(Field.CLASS_NAME_ID));
-
-		if (classNameId > 0) {
-
-			String className = _portal.getClassName(classNameId);
-
-			if (JournalArticle.class.getName().equals(className) ||
-				WikiPage.class.getName().equals(className)) {
-
-				String title = document.get(Field.CONTENT);
-
-				if (title.length() > TITLE_MAXLENGTH) {
-					title = title.substring(0, TITLE_MAXLENGTH) + "...";
-				}
-
-				// Using Apache commons as it works better than HTMLUtils
-
-				title = StringEscapeUtils.unescapeHtml4(title);
-				title = HtmlUtil.stripHtml(title);
-
-				return title;
-			}
-		}
-		return super.getTitle(
-			queryContext, document, isHighlight);
-	}
-
 	protected String getDLFileEntryCommentLink() {
 
 		return null;
