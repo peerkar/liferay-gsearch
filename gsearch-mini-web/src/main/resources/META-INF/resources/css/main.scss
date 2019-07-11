@@ -129,6 +129,17 @@
 	.autocomplete-selected { 
 		background: #F0F0F0; 
 	}
+	
+	.show-all {
+	    color: #708eb7;
+	    font-size: 0.9em;
+	    margin-top: 30px;
+   	}
+	
+	.show-all:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
 }
 
 .gsearch-mini-suggestions strong { 

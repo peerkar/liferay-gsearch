@@ -99,13 +99,11 @@
 
 		            return suggestion.value;
 				},
-				formatResult: function (suggestion, currentValue) {
-
-		            return suggestion.value;
-				},
 				formatGroup: function(suggestion, category) {
-					
-					console.log(suggestion);
+
+					if (category == 'show-more') {
+						return '';
+					}
 					
 					var link = '<%= searchPageURL %>' + '?entryClassName=' + 
 						suggestion.data.entryClassName + '&q=' + 
@@ -117,7 +115,7 @@
 			    	    			'<a href="#" onClick="<portlet:namespace />openMoreLink(\'' + link + '\')">' + 
 			       					 	Liferay.Language.get('more') + 
 		       				'</a></span></div>';
-			    },				
+			    },					
 				groupBy: 'type',
 				minChars: <%=queryMinLength %>,
 				noCache: false,
@@ -143,27 +141,49 @@
 						// Sort array by type.
 						
 					    response.items.sort(<portlet:namespace />sortByType);
+
+						let results =  $.map(response.items, function(dataItem) {
+
+			            	// Shorten to (for now) fixed 75 chars.
+				        	
+							var description = dataItem.description;
+			            	
+							description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '');
+							
+					        if (description.length > 75) {
+					        	description = description.substring(0, 75) + '...';
+					        }
+							
+							var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';
+			            	
+			                return {
+			                	value: value, data: dataItem
+			                };
+			            });
+
+						// Show all link
+						
+						if (results.length > 0) {
+						
+							let q = $('#<portlet:namespace />MiniSearchField').val();
+	
+							let url = "<%= searchPageURL %>?q=" + q;
+							
+							let showAllLink = {
+								value: '<div title="" class="show-all">&raquo; <%=LanguageUtil.get(request, "show-all-results") %></div>',
+								data: {
+									entryClassName: '',
+									link: url,
+									redirect: '',
+									type: 'show-more'
+								}
+							}
+							
+							results.push(showAllLink);
+						}
 						
 						return {
-							
-				            suggestions: $.map(response.items, function(dataItem) {
-
-				            	// Shorten to (for now) fixed 75 chars.
-					        	
-								var description = dataItem.description;
-				            	
-								description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '');
-								
-						        if (description.length > 75) {
-						        	description = description.substring(0, 75) + '...';
-						        }
-								
-								var value = '<div title="' +  dataItem.title_raw + '" class="title">' + dataItem.title_raw + '</div><div class="description">' + description + '</div>';
-				            	
-				                return {
-				                	value: value, data: dataItem
-				                };
-				            })
+							suggestions: results
 				        };						
 	    			} else {
 	    				return {
