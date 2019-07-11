@@ -140,6 +140,11 @@
 		cursor: pointer;
 		text-decoration: underline;
 	}
+	
+	.show-all::after {
+		content: "\00BB";
+		margin-left: 5px;
+	}
 }
 
 .gsearch-mini-suggestions strong { 

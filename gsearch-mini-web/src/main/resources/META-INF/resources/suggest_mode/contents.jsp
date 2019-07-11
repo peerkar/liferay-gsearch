@@ -170,7 +170,7 @@
 							let url = "<%= searchPageURL %>?q=" + q;
 							
 							let showAllLink = {
-								value: '<div title="" class="show-all">&raquo; <%=LanguageUtil.get(request, "show-all-results") %></div>',
+								value: '<div title="" class="show-all"><%=LanguageUtil.get(request, "show-all-results") %></div>',
 								data: {
 									entryClassName: '',
 									link: url,
