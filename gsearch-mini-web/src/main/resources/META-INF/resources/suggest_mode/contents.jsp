@@ -72,11 +72,17 @@
 	 * Handle keyup  events.
 	 */
 	function <portlet:namespace />handleKeyUp(event) {
+		
 
-        var keycode = (event.keyCode ? event.keyCode : event.which);
+		var keycode = (event.keyCode ? event.keyCode : event.which);
         
         if(keycode === 13){
-        	<portlet:namespace />doSearch();
+        	
+        	// If enter is hit on suggestion, do the default.
+        	
+    		if (!$('.gsearch-mini-suggestions .autocomplete-selected').length) {
+            	<portlet:namespace />doSearch();
+    		}
 	    }
 	}
 	
