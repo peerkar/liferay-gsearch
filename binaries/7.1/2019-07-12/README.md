@@ -1,4 +1,4 @@
-# 2019-07-10
+# 2019-07-12
 
 Liferay GSearch application binaries. This build has been tested with the following portal versions:
 
@@ -7,6 +7,10 @@ Liferay GSearch application binaries. This build has been tested with the follow
 It might work with previous fixpacks and CE, too. Just not tested.
 
 # Changelog
+
+## 2019-07-12
+
+* Miniportlet styling 
 
 ## 2019-07-10
 
