@@ -125,6 +125,10 @@
 	.autocomplete-selected { 
 		background: #F0F0F0; 
 	}
+
+	.autocomplete-selected:last-child { 
+		background: transparent; 
+	}
 	
 	.show-all {
 	    color: #708eb7;
