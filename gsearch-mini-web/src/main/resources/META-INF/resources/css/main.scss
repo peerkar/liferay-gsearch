@@ -80,7 +80,7 @@
 	
 	.autocomplete-suggestion { 
 		
-	    padding: 0;
+	    padding: 5px;
 	    margin: 0 0 15px 0;
 	    white-space: normal;
 	
@@ -93,10 +93,6 @@
 	
 	    &:last-child {
 	      margin: 0;
-	    }
-	
-	    &.autocomplete-selected {
-	      background: white;
 	    }
 	
 		.item-icon {
@@ -133,7 +129,7 @@
 	.show-all {
 	    color: #708eb7;
 	    font-size: 0.9em;
-	    margin-top: 30px;
+	    padding: 5px;
    	}
 	
 	.show-all:hover {
