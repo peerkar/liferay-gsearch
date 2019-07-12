@@ -322,6 +322,10 @@
 	
 	.gsearch-results-layout {
 		
+		float: right;
+		padding-right: 0;
+		text-align: right;
+					
 		.options { 
 			float: right;
 			list-style-type: none;
