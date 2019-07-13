@@ -102,6 +102,8 @@ public class GetContentSuggestionsMVCResourceCommand
 			queryContext.setParameter(
 				ParameterNames.ADDITIONAL_RESULT_FIELDS,
 				additionalResultFields);
+						
+			queryContext.setQueryPostProcessorsEnabled(false);
 
 		}
 		catch (PortalException e) {
