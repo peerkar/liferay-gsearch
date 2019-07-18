@@ -1,12 +1,26 @@
-# 2019-06-19
+# 2019-07-18
 
-Liferay GSearch application binaries for Grow. This build has been tested with the following portal versions:
+Liferay GSearch application binaries. This build has been tested with the following portal versions:
 
 * DXP 7.1 fixpacks 10
 
 It might work with previous fixpacks and CE, too. Just not tested.
 
 # Changelog
+
+## 2019-07-18
+
+* Result layouts CSS configuration property typo fix.
+
+## 2019-07-12
+
+* Miniportlet styling 
+
+## 2019-07-10
+
+* Fixed MBMessage results links and titles not generating properly.
+* Fixed "More" link on the results list not filtering the type correctly (Mini Search)
+* Styling changes for GSearch portlet and More Like This
 
 ## 2019-06-19
 

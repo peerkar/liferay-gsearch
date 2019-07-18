@@ -1,4 +1,4 @@
-# 2019-07-02-grow
+# 2019-07-18-grow
 
 Liferay GSearch application binaries for Grow. This build has been tested with the following portal versions:
 
@@ -7,6 +7,10 @@ Liferay GSearch application binaries for Grow. This build has been tested with t
 It might work with previous fixpacks and CE, too. Just not tested.
 
 # Changelog
+
+## 2019-07-18
+
+* Result layouts CSS configuration property typo fix.
 
 ## 2019-07-12
 
