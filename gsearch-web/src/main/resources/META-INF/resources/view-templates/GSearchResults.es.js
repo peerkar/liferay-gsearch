@@ -70,7 +70,21 @@ class GSearchResults extends Component {
 				this.setupPastSearches(this.results);
 			}
 
+			this.setupLinkPreviews(this.results);
 		}
+	}
+
+	setupLinkPreviews(results) {
+		var linkButtons = $('.file-link');
+		linkButtons.each(function() {
+			var toggleLink = $(this);
+			toggleLink.click(function(e) {
+				var linkView = toggleLink.next();
+				if(linkView) {
+					linkView.toggle();
+				}
+			});
+		});
 	}
 
 	setupPastSearches(results) {

@@ -163,6 +163,15 @@
 								{/if}
 
 								<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
+
+								{if ($item.typeKey == 'file')}
+									<svg role="presentation" class="file-link">
+										<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
+									</svg>
+									<div style="display: none" class="file-link-preview">
+										<input type="text" readonly value="{$item.link}"/>
+									</div>
+								{/if}
 							</h4>
 
 							{if $item.official_content}
