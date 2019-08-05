@@ -386,7 +386,6 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 				
 			string = temp.concat("...");
 		}
-		string = string.concat("..aaaa.");
 		
 		return string;
 	}
