@@ -70,11 +70,11 @@ class GSearchResults extends Component {
 				this.setupPastSearches(this.results);
 			}
 
-			this.setupLinkPreviews(this.results);
+			this.setupLinkPreviews();
 		}
 	}
 
-	setupLinkPreviews(results) {
+	setupLinkPreviews() {
 		var linkButtons = $('.file-link');
 		linkButtons.each(function() {
 			var toggleLink = $(this);
@@ -83,7 +83,21 @@ class GSearchResults extends Component {
 				if(linkView) {
 					linkView.toggle();
 				}
+				$('.file-link-preview').each(function() {
+					if(!$(this).is(linkView)) {
+						$(this).hide();
+					}
+				})
 			});
+		});
+
+		$(document).on('mouseup keyup',function (e) {
+			if(!$(e.target).hasClass('file-link-input') && !$(e.target).hasClass('file-link-preview')
+				&& !(String($(e.target).attr('class')) === 'file-link')) {
+				$('.file-link-preview').each(function() {
+					$(this).hide();
+				})
+			}
 		});
 	}
 
