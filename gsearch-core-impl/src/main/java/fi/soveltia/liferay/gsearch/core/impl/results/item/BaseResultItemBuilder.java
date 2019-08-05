@@ -106,26 +106,10 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 					DESCRIPTION_MAX_LENGTH).getContent();
 			} else {
 				description = document.get(Field.CONTENT);
-				if (description.length() > DESCRIPTION_MAX_LENGTH) {
-					description = description.substring(0, DESCRIPTION_MAX_LENGTH).concat("...");
-				}
 			}
-				
 		}
 
-		// Be sure to remove html tags. This should be fixed in adapter.
-
-		description =
-			description.replaceAll("<liferay-hl>", "---LR-HL-START---");
-		description =
-			description.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
-		description = HtmlUtil.stripHtml(description);
-		description =
-			description.replaceAll("---LR-HL-START---", "<liferay-hl>");
-		description =
-			description.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
-		
-		return description;
+		return stripHTML(description, DESCRIPTION_MAX_LENGTH);
 	}
 
 	/**
@@ -259,7 +243,7 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 				locale, "localized" + StringPool.UNDERLINE + Field.TITLE);
 		}
 
-		return title;
+		return stripHTML(title, -1);
 	}
 
 	/**
@@ -370,8 +354,46 @@ public abstract class BaseResultItemBuilder implements ResultItemBuilder {
 			true);
 	}
 
+	/**
+	 * Replace other than highlight HTML.
+	 * 
+	 * (Should be done in the adapter)
+	 * 
+	 * @param html
+	 * @param length
+	 * @return
+	 */
+	protected String stripHTML(String string, int length) {
+
+		// Replace other than highlight tags.
+		
+		string = string.replaceAll("<liferay-hl>", "---LR-HL-START---");
+		string = string.replaceAll("</liferay-hl>", "---LR-HL-STOP---");
+		string = HtmlUtil.stripHtml(string);
+		string = string.replaceAll("---LR-HL-START---", "<liferay-hl>");
+		string = string.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
+					
+		if (length > -1 && string.length() > length) {
+			
+			String temp = string.substring(0, length);
+
+			// Check that we are not breaking the HTML.
+			
+			if (temp.lastIndexOf("<") > temp.lastIndexOf(">")) {
+			
+				temp = string.substring(0, 1 + string.indexOf('>', temp.lastIndexOf('<')));
+			}
+				
+			string = temp.concat("...");
+		}
+		string = string.concat("..aaaa.");
+		
+		return string;
+	}
+	
 	private static final Log _log =
 		LogFactoryUtil.getLog(BaseResultItemBuilder.class);
 
 	private static final int DESCRIPTION_MAX_LENGTH = 400;
+
 }

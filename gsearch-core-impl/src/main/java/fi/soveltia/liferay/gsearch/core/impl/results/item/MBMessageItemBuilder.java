@@ -5,13 +5,11 @@ import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;
 import com.liferay.message.boards.model.MBMessage;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.wiki.model.WikiPage;
@@ -20,7 +18,6 @@ import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 import javax.portlet.WindowState;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -166,8 +163,6 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 	}
 
 	private static final String NAME = MBMessage.class.getName();
-
-	private static final int TITLE_MAXLENGTH = 80;
 
 	@Reference
 	private JournalArticleService _journalArticleService;
