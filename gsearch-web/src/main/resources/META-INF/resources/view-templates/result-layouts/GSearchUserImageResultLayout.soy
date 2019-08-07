@@ -36,9 +36,7 @@
 			{if $item.userPortraitUrl}
 			
 				<div class="userimage col-md-2 col-lg-1 hidden-xs hidden-sm">
-					<a href="{$link}" >
-						<img alt="{$item.userInitials}" class="user-icon-color-9 user-icon-lg user-icon user-icon-default" src="{$item.userPortraitUrl}" title="{$item.userName}" />
-					</a>
+					<a href="{$link}" style="background-image: url('{$item.userPortraitUrl}');" title="{$item.userName}"></a>
 				</div>
 
 				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-11 content">				
