@@ -1,4 +1,4 @@
-# 2019-08-05
+# 2019-08-07
 
 Liferay GSearch application binaries. This build has been tested with the following portal versions:
 
@@ -7,6 +7,10 @@ Liferay GSearch application binaries. This build has been tested with the follow
 It might work with previous fixpacks and CE, too. Just not tested.
 
 # Changelog
+
+## 2019-08-07
+
+* Userimage styling on results list.
 
 ## 2019-08-05
 
