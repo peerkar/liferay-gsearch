@@ -83,6 +83,13 @@ class GSearchResults extends Component {
 				if(linkView) {
 					linkView.toggle();
 				}
+
+                if (toggleLink.attr( 'aria-expanded') === 'true') {
+                    toggleLink.attr( 'aria-expanded', 'false');
+                } else {
+                    toggleLink.attr( 'aria-expanded', 'true');
+                }
+
 				$('.file-link-preview').each(function() {
 					if(!$(this).is(linkView)) {
 						$(this).hide();
@@ -94,6 +101,7 @@ class GSearchResults extends Component {
 		$(document).on('mouseup keyup',function (e) {
 			if(!$(e.target).hasClass('file-link-input') && !$(e.target).hasClass('file-link-preview')
 				&& !(String($(e.target).attr('class')) === 'file-link')) {
+                $('.file-link').attr( 'aria-expanded', 'false');
 				$('.file-link-preview').each(function() {
 					$(this).hide();
 				})

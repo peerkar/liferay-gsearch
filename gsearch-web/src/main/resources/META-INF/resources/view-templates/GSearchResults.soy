@@ -153,8 +153,11 @@
 				{else}
 					<div class="content col-xs-12">
 				{/if}
-
-						<div class="heading">
+                        {if ($item.typeKey == 'file')}
+						<div class="heading file">
+                        {else}
+                        <div class="heading">
+                        {/if}
 							<h4>
 								{if ($item.typeKey == 'file')}
 									<svg role="presentation">
@@ -165,10 +168,11 @@
 								<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
 
 								{if ($item.typeKey == 'file')}
-                                    <button class="file-link" aria-label="">
+                                    <button class="file-link" aria-label="" aria-haspopup="true" aria-expanded="false">
                                         <i class="icon-link" aria-hidden="true"></i>
                                     </button>
 									<div style="display: none" class="file-link-preview">
+									    <div class="dialog-pointer"></div>
 										<input type="text" class="file-link-input" readonly value="{$item.link}"/>
 									</div>
 								{/if}
