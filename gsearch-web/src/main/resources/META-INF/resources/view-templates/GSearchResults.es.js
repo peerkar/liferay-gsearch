@@ -82,6 +82,7 @@ class GSearchResults extends Component {
 				var linkView = toggleLink.next();
 				if(linkView) {
 					linkView.toggle();
+                    linkView.children('input').select();
 				}
 
                 if (toggleLink.attr( 'aria-expanded') === 'true') {
