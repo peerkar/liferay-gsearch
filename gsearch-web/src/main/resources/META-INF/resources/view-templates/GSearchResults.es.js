@@ -70,7 +70,44 @@ class GSearchResults extends Component {
 				this.setupPastSearches(this.results);
 			}
 
+			this.setupLinkPreviews();
 		}
+	}
+
+	setupLinkPreviews() {
+		var linkButtons = $('.file-link');
+		linkButtons.each(function() {
+			var toggleLink = $(this);
+			toggleLink.click(function(e) {
+				var linkView = toggleLink.next();
+				if(linkView) {
+					linkView.toggle();
+                    linkView.children('input').select();
+				}
+
+                if (toggleLink.attr( 'aria-expanded') === 'true') {
+                    toggleLink.attr( 'aria-expanded', 'false');
+                } else {
+                    toggleLink.attr( 'aria-expanded', 'true');
+                }
+
+				$('.file-link-preview').each(function() {
+					if(!$(this).is(linkView)) {
+						$(this).hide();
+					}
+				})
+			});
+		});
+
+		$(document).on('mouseup keyup',function (e) {
+			if(!$(e.target).hasClass('file-link-input') && !$(e.target).hasClass('file-link-preview')
+				&& !(String($(e.target).attr('class')) === 'file-link')) {
+                $('.file-link').attr( 'aria-expanded', 'false');
+				$('.file-link-preview').each(function() {
+					$(this).hide();
+				})
+			}
+		});
 	}
 
 	setupPastSearches(results) {
