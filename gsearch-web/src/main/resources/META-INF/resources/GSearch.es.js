@@ -46,6 +46,25 @@ class GSearch extends Component {
 			this.query.oldParameters = [];
 			this.query.parameters = [];
 		}
+
+		let context = this;
+
+		function onPopstate() {
+			if (window.history.state != null) {
+				let searchfield = $('#' + context.portletNamespace + 'SearchField');
+				let searchbutton = $('#' + context.portletNamespace + 'SearchButton');
+				if (searchfield.length && searchbutton.length) {
+					searchfield.val(window.history.state);
+					searchbutton.click();
+				}
+			} else {
+				window.history.back();
+			}
+		}
+		$(window).on('popstate', function(event) {
+			window.setTimeout(onPopstate, 0);
+		});
+
 	}
 
 	/**
@@ -234,8 +253,11 @@ class GSearch extends Component {
 	 * @param {address} key
 	 */
 	updateAddressBar(address) {
-		if (window.history.replaceState) {
-			window.history.replaceState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+		if (window.history.pushState) {
+			let q = this.query.getParameterValue('q');
+			if (window.history.state !== q) {
+				window.history.pushState(q, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+			}
 		} else {
 			document.location.hash = address;
 		}		
