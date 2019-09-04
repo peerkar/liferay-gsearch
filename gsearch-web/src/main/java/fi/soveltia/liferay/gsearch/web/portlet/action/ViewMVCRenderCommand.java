@@ -389,6 +389,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 			GSearchWebKeys.SHOW_ASSET_TAGS,
 			_moduleConfiguration.isAssetTagsVisible());
 
+		template.put(
+			GSearchWebKeys.PAST_SEARCHES_ENABLED,
+			_moduleConfiguration.isPastSearchesEnabled());
+
 		// Google maps API key
 
 		template.put(

@@ -22,4 +22,6 @@ public class GSearchMiniWebKeys {
 	public static final String SUGGEST_MODE = "miniSuggestMode";
 
 	public static final String SUGGESTIONS_URL = "miniSuggestionsURL";
+
+	public static final String PAST_SEARCHES_ENABLED = "pastSearchesEnabled";
 }

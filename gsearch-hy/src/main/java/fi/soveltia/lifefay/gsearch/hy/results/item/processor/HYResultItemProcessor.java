@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
 
+import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
 import fi.helsinki.flamma.profile.tools.model.ProfileTool;
 import fi.soveltia.lifefay.gsearch.hy.util.LocalizationHelper;
@@ -280,6 +281,12 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 		String link = resultItemBuilder.getLink(
 			portletRequest, portletResponse, document, queryContext);
+
+		Long viewGroupId = getArticleViewGroupId(link);
+		if (viewGroupId != null) {
+			groupId = viewGroupId;
+		}
+
 		Layout layout = getAssetLayout(groupId, link);
 
 		if (layout != null) {
@@ -292,6 +299,28 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		Collections.reverse(breadcrumbs);
 
 		return String.join(" / ", breadcrumbs);
+	}
+
+	private Long getArticleViewGroupId(String link) {
+		Long viewGroupId = null;
+		if (link != null) {
+			String regex = ".*https?://[\\w.-]+/group(/[\\w-]+).*";
+
+			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(link);
+
+			if (matcher.matches()) {
+				String groupFriendlyUrl = matcher.group(1);
+
+				Group group = _groupLocalService.fetchFriendlyURLGroup(PortalUtil.getDefaultCompanyId(), groupFriendlyUrl);
+				if (group != null) {
+					viewGroupId = group.getGroupId();
+				}
+			} else {
+				viewGroupId = flammaGroupService.getFlammaGroupId();
+			}
+		}
+		return viewGroupId;
 	}
 
 	/**
@@ -411,9 +440,9 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put("icon", document.get(Field.TITLE).substring(0, 1).toUpperCase());
                 resultItem.put(
                     "breadcrumbs",
-                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(Field.TITLE)));
+                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(portletRequest.getLocale(), Field.TITLE)));
             }
-            resultItem.put("title_escaped", HtmlUtil.escape(resultItem.getString("title_raw")));
+			resultItem.put("title", HtmlUtil.escape(resultItem.getString("title_raw")));
 		}
 		catch (Exception e) {
 
@@ -569,4 +598,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	@Reference
 	private LocalizationHelper _localizationHelper;
+
+	@Reference
+	private FlammaGroupService flammaGroupService;
 }

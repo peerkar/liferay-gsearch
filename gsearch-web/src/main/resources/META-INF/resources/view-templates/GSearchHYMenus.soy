@@ -63,7 +63,7 @@
 {template .hy_hf_menu}
 
 		<div class="gsearch-tabs optionmenu hfmenu" data-paramname="type" data-ismultivalued="true">
-			<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle hidden"
+			<button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}TypeFilterOptions" class="btn btn-link dropdown-toggle hidden"
 				data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
 				<span class="selection"></span>
 				<span class="caret"></span>
@@ -95,11 +95,11 @@
     <div class="dropdown gsearch-dropdown optionmenu hy-dropdown unitmenu" id="{$portletNamespace}UnitMenu" 
     	data-paramname="{$facet.param_name}" data-ismultivalued="true">
 
-        <button aria-expanded="true" aria-haspopup="true" class="btn-link dropdown-toggle"
+        <button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}UnitFilterOptions" class="btn-link dropdown-toggle"
        		id="{$portletNamespace}UnitFilter" type="button">
      
             <span class="text selection">{msg desc=""}by-unit{/msg}</span>
-            <svg class="navi-arrow" role="img">
+            <svg class="navi-arrow" role="presentation">
                 <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
             </svg>
         </button>
@@ -126,11 +126,11 @@
 	<div class="dropdown gsearch-dropdown optionmenu hy-dropdown timemenu" id="{$portletNamespace}TimeMenu" 
 		data-paramname="time" data-ismultivalued="false">
 		
-		<button aria-expanded="true" aria-haspopup="true" class="btn btn-link dropdown-toggle" 
+		<button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}TimeFilterOptions" class="btn btn-link dropdown-toggle"
 			 id="{$portletNamespace}TimeFilter" type="button">
 		
 			<span class="selection">{msg desc=""}by-time{/msg}</span> 
-	        <svg class="navi-arrow" role="img">
+	        <svg class="navi-arrow" role="presentation">
 	            <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
 	        </svg>
 		</button>

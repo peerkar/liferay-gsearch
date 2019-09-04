@@ -11,8 +11,7 @@
 	
 		<div class="input-group">
 
-			<input 
-				autofocus 
+			<input
 				autocomplete="off"
 				class="form-control input-lg" 
 				data-onkeyup="handleKeyUp" 				
@@ -30,8 +29,9 @@
 					class="btn btn-primary input-lg" 
 					data-onclick="doSearch" 
 					id="{$portletNamespace}SearchButton" 
-					type="button">
-					{msg desc=""}search{/msg}
+					type="button"
+					aria-label="{msg desc=""}do-search{/msg}">
+					{msg desc=""}do-search{/msg}
 				</button>
 			</span>
 		</div>

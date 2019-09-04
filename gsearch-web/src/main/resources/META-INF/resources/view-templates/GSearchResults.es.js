@@ -4,6 +4,7 @@ import core from 'metal/src/core';
 
 import GSearchQuerySuggestions from './GSearchQuerySuggestions.soy';
 import GSearchImageResultLayout from './GSearchImageResultLayout.soy';
+import GSearchPreviewResultLayout from './GSearchPreviewResultLayout.soy';
 import GSearchMapsResultLayout from './GSearchMapsResultLayout.es';
 import templates from './GSearchResults.soy';
 
@@ -54,7 +55,7 @@ class GSearchResults extends Component {
 		if (this.debug) {
 			console.log("GSearchResults.rendered()");
 		}
-		
+
 		if (this.results) {
 
 			this.decodeHighlightHTML();
@@ -64,8 +65,89 @@ class GSearchResults extends Component {
 			if (this.showAssetTags) {
 				this.setupTagLinks();
 			}
+
+			if (this.pastSearchesEnabled) {
+				this.setupPastSearches(this.results);
+			}
+
+			this.setupLinkPreviews();
 		}
 	}
+
+	setupLinkPreviews() {
+		var linkButtons = $('.file-link');
+		linkButtons.each(function() {
+			var toggleLink = $(this);
+			toggleLink.click(function(e) {
+				var linkView = toggleLink.next();
+				if(linkView) {
+					linkView.toggle();
+                    linkView.children('input').select();
+				}
+
+                if (toggleLink.attr( 'aria-expanded') === 'true') {
+                    toggleLink.attr( 'aria-expanded', 'false');
+                } else {
+                    toggleLink.attr( 'aria-expanded', 'true');
+                }
+
+				$('.file-link-preview').each(function() {
+					if(!$(this).is(linkView)) {
+						$(this).hide();
+					}
+				})
+			});
+		});
+
+		$(document).on('mouseup keyup',function (e) {
+			if(!$(e.target).hasClass('file-link-input') && !$(e.target).hasClass('file-link-preview')
+				&& !(String($(e.target).attr('class')) === 'file-link')) {
+                $('.file-link').attr( 'aria-expanded', 'false');
+				$('.file-link-preview').each(function() {
+					$(this).hide();
+				})
+			}
+		});
+	}
+
+	setupPastSearches(results) {
+		var that = this;
+		$('.gsearch-results .item a').each(function() {
+			$(this).click(function(event) {
+				var index = $(event.currentTarget).attr('data-index');
+				that.storeSearchResultToPastSearches(results.items[index]);
+			});
+		});
+	}
+
+	storeSearchResultToPastSearches(data) {
+        let pastSearches = [];
+
+        if (localStorage["pastSearches"]) {
+            pastSearches = JSON.parse(localStorage["pastSearches"]);
+        }
+
+        var existingIndex = -1;
+        for (var i = 0; i < pastSearches.length; i++) {
+        	if (pastSearches[i].link === data.link) {
+        		existingIndex = i;
+        		break;
+			}
+		}
+
+		if (existingIndex >= 0) {
+			pastSearches.splice(existingIndex, 1);
+		}
+
+        pastSearches.unshift(data);
+
+        if (pastSearches.length > 5) {
+            pastSearches.pop();
+        }
+
+        localStorage["pastSearches"] = JSON.stringify(pastSearches);
+
+    }
 	
 	/**
 	 * Set up asset tags links
@@ -125,7 +207,10 @@ GSearchResults.STATE = {
 	},
 	showAssetTags: {
 		value: false
-	}
+	},
+    pastSearchesEnabled: {
+        value: false
+    }
 };
 
 // Register component

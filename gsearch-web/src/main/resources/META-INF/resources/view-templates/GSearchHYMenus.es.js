@@ -156,12 +156,19 @@ class GSearchHYMenus extends Component {
 		$('#' + this.portletNamespace + 'TimeFilter').on('click', function(event) {
 			
 			$('#' + _self.portletNamespace + 'TimeMenu').toggleClass('open');
+
+            if ($(this).attr( 'aria-expanded') === 'true') {
+                $(this).attr( 'aria-expanded', 'false');
+            } else {
+                $(this).attr( 'aria-expanded', 'true');
+            }
 			
 			_self.timeMenuOpen = _self.timeMenuOpen ? false : true;
 			
 			if (_self.timeMenuOpen) {
 				_self.unitsMenuOpen = false;
 				$('#' + _self.portletNamespace + 'UnitMenu').removeClass('open');
+                $('#' + _self.portletNamespace  + 'UnitFilter').attr( 'aria-expanded', 'false');
 			}
 
 			event.preventDefault();
@@ -172,6 +179,7 @@ class GSearchHYMenus extends Component {
 		
 		if (this.timeMenuOpen) {
 			$('#' + this.portletNamespace + 'TimeMenu').addClass('open');
+            $('#' + this.portletNamespace + 'TimeFilter').attr( 'aria-expanded', 'true');
 		}
     }
 	
@@ -235,22 +243,24 @@ class GSearchHYMenus extends Component {
 
             // Handle everything selection.
             
-            if (value == 'everything') {
+            if (value === 'everything') {
             	
         		_self.setQueryParam(paramName, null, true, true, '');
 
-            }
+			}
             
             let currentValues = _self.getQueryParam(paramName);
 
-            if (currentValues.indexOf(value) > -1) {
-            	
-        		_self.setQueryParam(paramName, null, true, true, value);
+            if (value !== 'everything') {
+                if (currentValues.indexOf(value) > -1) {
 
-            } else {
-            
-            	_self.setQueryParam(paramName, value, true, true);
-            
+                    _self.setQueryParam(paramName, null, true, true, value);
+
+                } else {
+
+                    _self.setQueryParam(paramName, value, true, true);
+
+                }
             }
 
             let clickTarget = $(event.currentTarget);
@@ -304,13 +314,19 @@ class GSearchHYMenus extends Component {
 		$('#' + triggerElementId).on('click', function(event) {
 			
 			$('#' + _self.portletNamespace + 'UnitMenu').toggleClass('open');
-			
-			
+
 			_self.unitsMenuOpen = _self.unitsMenuOpen ? false : true;
+
+            if ($(this).attr( 'aria-expanded') === 'true') {
+                $(this).attr( 'aria-expanded', 'false');
+            } else {
+                $(this).attr( 'aria-expanded', 'true');
+            }
 			
 			if (_self.unitsMenuOpen) {
 				_self.timeMenuOpen = false;
 				$('#' + _self.portletNamespace + 'TimeMenu').removeClass('open');
+                $('#' + _self.portletNamespace + 'TimeFilter').attr('aria-expanded', 'false');
 			}
 
 			event.preventDefault();
@@ -323,6 +339,7 @@ class GSearchHYMenus extends Component {
                 _self.unitsMenuOpen = false;
                 _self.timeMenuOpen = false;
                 $('.gsearch-dropdown').removeClass('open');
+                $('.gsearch-dropdown .dropdown-toggle').attr('aria-expanded', 'false');
             }
         });
 		 
@@ -330,6 +347,7 @@ class GSearchHYMenus extends Component {
 		
 		if (this.unitsMenuOpen) {
 			$('#' + this.portletNamespace + 'UnitMenu').addClass('open');
+            $('#' + this.portletNamespace + 'UnitFilter').attr('aria-expanded', 'true');
 		}
 		
 		// Setup selected items.
