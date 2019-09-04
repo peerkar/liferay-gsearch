@@ -165,7 +165,7 @@ public class AdditionalResultFieldsProcessor implements ResultItemProcessor {
 		}
 		catch (PortalException e) {
 
-			_log.warn(e.getMessage());
+			_log.debug(e.getMessage());
 
 			String name = document.get(Field.USER_NAME);
 

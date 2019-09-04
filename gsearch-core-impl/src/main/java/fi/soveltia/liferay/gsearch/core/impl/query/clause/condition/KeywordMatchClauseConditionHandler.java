@@ -72,8 +72,10 @@ public class KeywordMatchClauseConditionHandler
 	}
 
 	/**
-	 * Handle full word matching case. Values for match_occur: should | must
-	 * 
+	 * Handle full word matching case. Values for match_occur: should | must | must_not
+	 *
+	 * FIXME should and must are now treated equally, should probably be treated separately
+	 *
 	 * @param configuration
 	 * @param keywords
 	 * @return
@@ -88,39 +90,25 @@ public class KeywordMatchClauseConditionHandler
 		String matchOccur = configuration.getString("match_occur", "should");
 
 		String[] keywordArray = keywords.split(splitter);
-		
-		for (String keyword : keywordArray) {
 
-			boolean isWordMatch = false;
-			
-			for (int i = 0; i < matchWords.length(); i++) {
 
+		for (int i = 0; i < matchWords.length(); i++) {
+
+			for (String keyword : keywordArray) {
 				if (matchWords.getString(i).equals(keyword)) {
 
 					if ("must_not".equals(matchOccur)) {
-
 						return false;
-					}		
-					else if ("should".equals(matchOccur)) {
-
+					} else {
 						return true;
-					}
-					else {
-	
-						isWordMatch = true;
-
-						break;
 					}
 				}
 			}
-			
-			if ("must".equals(matchOccur) && !isWordMatch) {
-				
-				return false;
-			}
+
 		}
-		
-		return true;
+
+		// none of the keywords were found in match_words
+		return "must_not".equals(matchOccur);
 	}
 
 	private static final String HANDLER_NAME = "keyword_match";
