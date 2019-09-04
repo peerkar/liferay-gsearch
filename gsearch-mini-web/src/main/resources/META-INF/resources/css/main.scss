@@ -80,7 +80,7 @@
 	
 	.autocomplete-suggestion { 
 		
-	    padding: 5px;
+	    padding: 0;
 	    margin: 0 0 15px 0;
 	    white-space: normal;
 	
@@ -94,13 +94,15 @@
 	    &:last-child {
 	      margin: 0;
 	    }
-	
+
+	    &.autocomplete-selected {
+	      background: white;
+	    }
+
 		.item-icon {
-			margin: 0 10px 0 0;
-			padding: 0;
 			svg {
-				height: 28px;
-				width: 28px;
+				height: 26px;
+				width: 26px;
 			}
 		}
 	
@@ -116,8 +118,12 @@
 			color: #999;
 			font-size: 11px;
 		}
+
+		.suggestion-breadcrumb {
+			padding-right: 10px;
+		}
 	}
-	
+
 	.autocomplete-suggestion:hover {
 		cursor: pointer;
 	}

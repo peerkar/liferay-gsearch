@@ -23,4 +23,7 @@ public interface LocalizationHelper {
 
 	public void setResultTypeLocalizations(
 		Locale locale, JSONObject responseObject);
+
+	public void setGroupingLocalizations(
+		Locale locale, JSONObject responseObject);
 }

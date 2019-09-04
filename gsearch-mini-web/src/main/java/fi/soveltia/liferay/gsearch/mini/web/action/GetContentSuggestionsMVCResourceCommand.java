@@ -100,6 +100,9 @@ public class GetContentSuggestionsMVCResourceCommand
 			additionalResultFields.put("entryClassName", String.class);
 
 			queryContext.setParameter(
+				ParameterNames.INCLUDE_USER_PORTRAIT, true);
+				
+			queryContext.setParameter(
 				ParameterNames.ADDITIONAL_RESULT_FIELDS,
 				additionalResultFields);
 						
@@ -125,6 +128,8 @@ public class GetContentSuggestionsMVCResourceCommand
 			ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(WebKeys.THEME_DISPLAY);
 			
 			_localizationHelper.setResultTypeLocalizations(themeDisplay.getLocale(), responseObject);
+			
+			_localizationHelper.setGroupingLocalizations(themeDisplay.getLocale(), responseObject);
 
 		}
 		catch (Exception e) {

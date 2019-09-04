@@ -116,6 +116,27 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 					locale, resultItem.getString("type").toLowerCase()));
 		}
 	}
+
+	protected void setGroupingLocalizations(
+		Locale locale, JSONObject responseObject)
+		throws JSONException {
+
+		JSONArray items = responseObject.getJSONArray("items");
+
+		if (items == null || items.length() == 0) {
+			return;
+		}
+
+		for (int i = 0; i < items.length(); i++) {
+
+			JSONObject resultItem = items.getJSONObject(i);
+
+			resultItem.put(
+				"group_localized", getLocalization("suggestion.group." +
+					resultItem.getString("group").toLowerCase(), locale));
+		}
+	}
+
 	
 	@Reference
 	private Language _language;
