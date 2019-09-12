@@ -96,7 +96,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			
 			// Set other context parameters
 
-			setContextParameters(queryContext, resultLayout);
+			setContextParameters(queryContext, resultLayout, getPageSize(resourceRequest));
 
 		}
 		catch (PortalException e) {
@@ -159,7 +159,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		throws JSONException {
 
 		String resultsLayoutParam =
-			ParamUtil.getString(portletRequest, GSearchWebKeys.RESULTS_LAYOUT);
+			ParamUtil.getString(portletRequest, GSearchWebKeys.RESULTS_LAYOUT, "list");
 
 		String[] configuration = _moduleConfiguration.resultLayouts();
 
@@ -169,6 +169,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 			JSONObject item =
 				JSONFactoryUtil.createJSONObject(configuration[i]);
+
+
+			if (!shouldShowResultLayout(portletRequest, resultsLayoutParam, item)) {
+				resultsLayoutParam = "list";
+			}
 
 			if (resultsLayoutParam.equals(item.getString("key"))) {
 				return resultsLayoutParam;
@@ -221,6 +226,14 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		}
 	}
 
+	private int getPageSize(ResourceRequest resourceRequest) {
+		int pageSize = ParamUtil.getInteger(resourceRequest, "pageSize", -1);
+		if (pageSize == -1) {
+			pageSize = _moduleConfiguration.pageSize();
+		}
+		return Math.min(pageSize, MAX_PAGE_SIZE); // make sure to return a sensible value
+	}
+
 	/**
 	 * Set context parameters.
 	 * 
@@ -228,11 +241,11 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 	 * @param resultLayout
 	 */
 	protected void setContextParameters(
-		QueryContext queryContext, String resultLayout) {
+		QueryContext queryContext, String resultLayout, int pageSize) {
 
 		// Page size.
 		
-		queryContext.setPageSize(_moduleConfiguration.pageSize());
+		queryContext.setPageSize(pageSize);
 		
 		// Datepicker format.
 
@@ -255,17 +268,22 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		// Layout specific options.
 
 		if (resultLayout.equals("thumbnailList") ||
-			resultLayout.equals("image")) {
+			resultLayout.equals("image") ||
+			resultLayout.equals("preview")) {
 			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
-
+/*
 		if (resultLayout.equals("userImageList") ||
 			 resultLayout.equals("maps")) {
 
 			queryContext.setParameter(
 				ParameterNames.INCLUDE_USER_PORTRAIT, true);
 		}
-		
+*/
+		// HY
+		queryContext.setParameter(
+			ParameterNames.INCLUDE_USER_PORTRAIT, true);
+
 		// Set additional fields to include in results.
 
 		setAdditionalResultFields(queryContext);
@@ -326,15 +344,15 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		PortletRequest portletRequest, String resultLayout, JSONObject configurationItem) {
 
 		// Is enabled
-		
+
 		if (!configurationItem.getBoolean("enabled", true)) {
 			return false;
 		}
-		
+
 		// Don't show maps layout if Google Maps API key not defined.
 
-		if ("maps".equals(configurationItem.getString("key")) && 
-				Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
+		if ("maps".equals(configurationItem.getString("key")) &&
+			Validator.isNull(_moduleConfiguration.googleMapsAPIKey())) {
 			return false;
 		}
 
@@ -343,13 +361,21 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		JSONArray paramFiltersArray =
 			configurationItem.getJSONArray("param_filters");
 
-		String paramFilterOperator =
-			"and".equals(configurationItem.getString("param_filter_operator"))
-				? "and" : "or";
-
 		if (paramFiltersArray == null || paramFiltersArray.length() == 0) {
 			return true;
 		}
+
+		if ("and".equals(configurationItem.getString("param_filter_operator"))) {
+			return isParamFilterMatchWithAND(portletRequest, paramFiltersArray);
+		} else {
+			return isParamFilterMatchWithOR(portletRequest, paramFiltersArray);
+		}
+	}
+
+	// must match exactly with all parameters and values
+	private boolean isParamFilterMatchWithAND(PortletRequest portletRequest, JSONArray paramFiltersArray) {
+
+		Map<String, List<String>> paramFilters = new HashMap<>();
 
 		for (int i = 0; i < paramFiltersArray.length(); i++) {
 
@@ -358,24 +384,42 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			String matchParameter = filter.getString("parameter");
 			String matchValue = filter.getString("value");
 
-			String paramValue =
-				ParamUtil.getString(portletRequest, matchParameter, null);
-
-			if (matchValue.equals(paramValue)) {
-
-				if (paramFilterOperator.equals("or")) {
-					return true;
-				}
-
-				if (i == paramFiltersArray.length() - 1) {
-					return true;
-				}
-
+			if (paramFilters.containsKey(matchParameter)) {
+				paramFilters.get(matchParameter).add(matchValue);
+			} else {
+				List<String> matchValues = new ArrayList<>();
+				matchValues.add(matchValue);
+				paramFilters.put(matchParameter, matchValues);
 			}
-			else {
+		}
 
-				if (paramFilterOperator.equals("and")) {
-					return false;
+		for (Map.Entry<String, List<String>> entry : paramFilters.entrySet()) {
+			String matchParameter = entry.getKey();
+			List<String> matchValues = entry.getValue();
+			List<String> requestParamValues = Arrays.asList(ParamUtil.getStringValues(portletRequest, matchParameter, new String[]{}));
+			if (requestParamValues.size() != matchValues.size()) {
+				return false;
+			}
+			if (!new HashSet<>(requestParamValues).equals(new HashSet<>(paramFilters.get(matchParameter)))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isParamFilterMatchWithOR(PortletRequest portletRequest, JSONArray paramFiltersArray) {
+		for (int i = 0; i < paramFiltersArray.length(); i++) {
+
+			JSONObject filter = paramFiltersArray.getJSONObject(i);
+
+			String matchParameter = filter.getString("parameter");
+			String matchValue = filter.getString("value");
+
+			String[] paramValues = ParamUtil.getStringValues(portletRequest, matchParameter, new String[]{});
+
+			for (String paramValue : paramValues) {
+				if (matchValue.equals(paramValue)) {
+					return true;
 				}
 			}
 		}

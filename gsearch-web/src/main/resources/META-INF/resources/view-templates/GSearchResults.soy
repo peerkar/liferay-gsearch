@@ -16,7 +16,7 @@
 		
 				// Wider layout for images.
 				
-				{let $widthlg: $results.resultsLayout == 'image' ? '10' : '10' /}
+				{let $widthlg: $results.resultsLayout == 'image' ? '12' : '12' /}
 				{let $widthsm: $results.resultsLayout == 'image' ? '12' : '12' /}
 				
 				<div class="col-xs-{$widthsm} col-sm-{$widthsm} col-md-{$widthlg} col-lg-{$widthlg} gsearch-centered gsearch-results" id="{$portletNamespace}SearchResults">
@@ -57,7 +57,15 @@
 							{param appendRedirect: $appendRedirect /}
 							{param results: $results /}
 						{/call}
+						
+					{elseif $results.resultsLayout == 'preview'}
 
+						// Preview layout
+
+						{call GSearchPreviewResultLayout.render}
+							{param results: $results /}
+						{/call}
+						
 					{else}	
 
 						// Default

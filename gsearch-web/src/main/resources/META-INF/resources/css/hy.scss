@@ -1,0 +1,140 @@
+@import "mixins";
+
+.gsearch-portlet {
+
+	.gsearch-searchfield {
+		.row {
+			margin-left: -15px;
+			margin-right: -15px;
+		}
+	}
+	
+	.gsearch-hy {
+	
+		.facets {
+			background: transparent;
+		}
+
+		.hfmenu {
+			li {
+				position: static;
+			}
+		}		
+
+		.menu1 {
+			border-bottom: 1px solid #ccc;
+			margin-bottom: 20px;
+			padding-bottom: 20px;
+		}
+		
+		.stats {
+			float: left;
+			margin-bottom: 20px;
+		}
+		
+		.hy-dropdown {
+		
+			margin-right: 0;
+			position: static;
+		
+			button {
+				border: 0;
+				font-weight: bold;
+				font-size: 12px;
+				text-transform: uppercase;
+				padding: 0;
+				margin: 0;		
+			}
+		
+			.navi-arrow {
+			    height: 8px;
+			    width: 12px;
+			    margin-left: 5px;			
+			}
+			
+	        &.open {
+	            .navi-arrow {
+	              transform: rotate(180deg);
+				}
+			}
+						
+			.dropdown-menu {
+			    padding: 25px;
+			    border: 0;
+			    background: white;
+			    box-shadow: 0 1px 10px -1px rgba(109, 109, 109, 0.3);
+			    right: 0;
+			    left: auto;
+			    max-width: 380px;
+			    width: 100%;
+			    border-radius: 0;
+			    max-height: none;
+			    margin: 0 0 25px 0;
+			    
+			    ul {
+				    list-style-type: none;
+			    }
+			}		
+
+			ul li:first-child label {
+			    margin-top: 0;
+			}	
+		}
+
+		.unitmenu {
+			float: right;
+			margin-right: 80px;
+			
+			@include media-query(null, $screen-xs-max) {
+				margin-right: 35px;
+			}
+		}
+		
+		.timemenu{
+			float: right;
+		}
+	}
+ 	
+	.gsearch-results-layout {
+		margin-top: 15px;
+		//padding-right: inherit;
+		
+		.options a {
+ 		   border: 1px solid #cad5de;
+		}
+	}
+	
+	.gsearch-results {
+	
+		.item {
+			.type {
+				display: none;
+			}		
+			.link {
+				display: none;
+			}
+			
+			.item-icon	{
+			 	margin: 0 !important;
+			
+				/* Fixme */
+
+				svg {
+			    	width: 50px !important;
+			    	height: 50px !important;			
+				}
+			}
+		}
+	}
+	
+	.gsearch-dropdown {
+
+		li.selected a {
+			font-weight: bold;
+		}
+			
+		li.selected a:before {
+    		content: '';
+		}	
+	}
+}

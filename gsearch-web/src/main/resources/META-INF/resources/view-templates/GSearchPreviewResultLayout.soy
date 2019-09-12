@@ -1,0 +1,57 @@
+{namespace GSearchPreviewResultLayout}
+
+/**
+ * Print preview result layout.
+ *
+ * @param results
+ */
+{template .render}
+
+	<ul class="display-class-icon list-unstyled row-preview">
+		{foreach $item in $results.items}
+			{call .item}
+				{param item: $item /}
+				{param index: index($item) /}
+			{/call}
+		{/foreach}
+	</ul>
+{/template}
+
+
+/**
+ * Print one preview result item.
+ *
+ * @param item
+ * @param index
+ */
+{template .item}
+
+	{let $link: $item.link /}
+
+
+	{let $itemImage: $item.imageSrc != '' ? $item.imageSrc : '/o/gsearch-web/images/no-preview.png'/}
+
+	<li class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 item preview">
+
+		<a href="{$link}" title="{$item.title}" data-index="{$index}">
+
+		<div class="card">
+
+			<div class="aspect-ratio aspect-ratio-bg-center aspect-ratio-bg-cover" style="background-image: url('{$itemImage}');">
+				<img class="sr-only" alt="{$item.title}" src="{$itemImage}" title="{$item.title}">
+				<span class="sticker sticker-bottom sticker-warning">{$item.metadata.format}</span>
+			</div>
+
+			<div class="card-row card-row-padded card-row-valign-top">
+				<div class="card-col-content">
+					<span class="truncate-text date">{$item.date}</span>
+					<span class="truncate-text title highlightable">{$item.title}</span>
+					<span class="truncate-text dimensions">{$item.metadata.dimensions}</span>
+					<span class="truncate-text size">{$item.metadata.size}</span>
+				</div>
+			</div>
+		</div>
+		</a>
+	</li>
+
+{/template}

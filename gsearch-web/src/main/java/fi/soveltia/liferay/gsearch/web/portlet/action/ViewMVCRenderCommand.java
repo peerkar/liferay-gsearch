@@ -392,6 +392,10 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 		// Google maps API key
 
 		template.put(
+			GSearchWebKeys.PAST_SEARCHES_ENABLED,
+			_moduleConfiguration.isPastSearchesEnabled());
+
+		template.put(
 			GSearchWebKeys.GMAPS_API_KEY,
 			_moduleConfiguration.googleMapsAPIKey());
 

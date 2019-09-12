@@ -1,0 +1,173 @@
+{namespace GSearchHYMenus}
+
+/**
+ * Print HY menus.
+ *
+ * @param portletNamespace
+ * @param? results
+ */
+{template .render}
+
+	<div class="row facets" id="{$portletNamespace}Facets">
+
+		{if $results and $results.facets and length($results.facets) > 0}
+			
+			{foreach $item in $results.facets}
+
+				{if $item.param_name == 'hf'}
+
+					<div class="menu1">
+						{call .hy_hf_menu}
+							{param portletNamespace: $portletNamespace /}
+							{param facet: $item /}
+						{/call}
+					</div>
+
+					<div class="stats" id="{$portletNamespace}Stats">
+						{if $results and length($results.items) > 0}
+							{msg desc=""}page-{$results.paging.currentPage}-{$results.meta.totalPages}-of-{$results.meta.totalHits}-total{/msg}
+						{/if}
+					</div>
+				{/if}
+
+			{/foreach}
+
+			<div class="filterMenus">
+
+			{foreach $item in $results.facets}
+                {if $item.param_name == 'unit'}
+                    {call .hy_unit_menu}
+                        {param portletNamespace: $portletNamespace /}
+                        {param facet: $item /}
+                    {/call}
+                {/if}
+			{/foreach}
+
+            {call .hy_time_menu}
+                {param portletNamespace: $portletNamespace /}
+            {/call}
+
+			 </div>
+		{/if}
+	</div>
+		
+{/template}
+
+
+/**
+ * Print HY composite facet menu.
+ *
+ * @param portletNamespace
+ * @param facet
+ */
+{template .hy_hf_menu}
+
+		<div class="gsearch-tabs optionmenu hfmenu" data-paramname="type" data-ismultivalued="true">
+			<button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}TypeFilterOptions" class="btn btn-link dropdown-toggle hidden"
+				data-toggle="dropdown" id="{$portletNamespace}TypeFilter" type="button">
+				<span class="selection"></span>
+				<span class="caret"></span>
+			</button>
+			<ul aria-labelledby="{$portletNamespace}TypeFilter" class="nav nav-tabs tabs-menu" id="{$portletNamespace}TypeFilterOptions">
+				<li class="selected default">
+                    <label for="{$portletNamespace}type-everything" class="type-selection checkbox">
+                        <span class="text">{msg desc=""}search-everything{/msg}</span><span class="count"></span>
+                        <input type="checkbox" id="{$portletNamespace}type-everything" value="everything" checked="checked" data-value="everything" />
+                        <span class="checkmark"></span>
+                    </label>
+                </li>
+				{call .hy_cb_options}
+					{param portletNamespace: $portletNamespace /}
+					{param options: $facet.values /}
+				{/call} 
+			</ul>
+		</div>
+{/template}
+
+/**
+ * Unit menu.
+ *
+ * @param portletNamespace
+ * @param facet
+ */
+{template .hy_unit_menu}
+
+    <div class="dropdown gsearch-dropdown optionmenu hy-dropdown unitmenu" id="{$portletNamespace}UnitMenu" 
+    	data-paramname="{$facet.param_name}" data-ismultivalued="true">
+
+        <button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}UnitFilterOptions" class="btn-link dropdown-toggle"
+       		id="{$portletNamespace}UnitFilter" type="button">
+     
+            <span class="text selection">{msg desc=""}by-unit{/msg}</span>
+            <svg class="navi-arrow" role="presentation">
+                <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
+            </svg>
+        </button>
+        <div aria-labelledby="{$portletNamespace}UnitFilter" class="dropdown-menu" id="{$portletNamespace}UnitFilterOptions">
+            <ul class="list-group row">
+				{call .hy_cb_options}
+					{param portletNamespace: $portletNamespace /}
+					{param options: $facet.values /}
+				{/call} 
+            </ul>
+        </div>
+    </div>
+{/template}
+        
+/**
+ * Time filter.
+ *
+ * @param portletNamespace
+ */
+{template .hy_time_menu}
+        
+  	// Time filter
+	  
+	<div class="dropdown gsearch-dropdown optionmenu hy-dropdown timemenu" id="{$portletNamespace}TimeMenu" 
+		data-paramname="time" data-ismultivalued="false">
+		
+		<button aria-expanded="false" aria-haspopup="true" aria-controls="{$portletNamespace}TimeFilterOptions" class="btn btn-link dropdown-toggle"
+			 id="{$portletNamespace}TimeFilter" type="button">
+		
+			<span class="selection">{msg desc=""}by-time{/msg}</span> 
+	        <svg class="navi-arrow" role="presentation">
+	            <use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-arrow-down"/>
+	        </svg>
+		</button>
+		<ul aria-labelledby="{$portletNamespace}TimeFilter" class="dropdown-menu" id="{$portletNamespace}TimeFilterOptions">
+			<li class="selected default"><a href="#">{msg desc=""}anytime{/msg}</a></li>
+			<li><a data-value="last-week" href="#">{msg desc=""}last-week{/msg}</a></li>
+			<li><a data-value="last-month" href="#">{msg desc=""}last-month{/msg}</a></li>
+			<li><a data-value="last-year" href="#">{msg desc=""}last-year{/msg}</a></li>
+			<li>
+				<div class="datepicker-wrapper">
+					<div class="datepicker-title" id="{$portletNamespace}RangeSelectionTitle">{msg desc=""}time-range{/msg}</div>
+					<div class="datepicker-container" id="{$portletNamespace}RangeSelection">
+					    <input type="text" class="actual-range start">
+					    <span class="range-divider">-</span>
+					    <input type="text" class="actual-range end">
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>        
+{/template}
+	
+/**
+ * Print checkbox options.
+ *
+ * @param portletNamespace
+ * @param options
+ */ 
+{template .hy_cb_options}
+
+	{foreach $item in $options}
+		<li>
+            <label for="{$portletNamespace}-type-{$item.name}" class="type-selection checkbox">
+                <span class="text">{$item.name}</span><span class="count">({$item.frequency})</span>
+                <input type="checkbox" id="{$portletNamespace}-type-{$item.name}" value="{$item.name}" data-value="{$item.term}" />
+                <span class="checkmark"></span>
+            </label>
+		</li>
+	{/foreach}
+{/template}

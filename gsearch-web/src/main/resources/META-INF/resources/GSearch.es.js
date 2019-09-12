@@ -4,15 +4,10 @@ import Soy from 'metal-soy/src/Soy';
 
 import GSearchQuery from './view-templates/GSearchQuery.es';
 import GSearchField from './view-templates/GSearchField.es';
-import GSearchFilters from './view-templates/GSearchFilters.es';
-import GSearchFacets from './view-templates/GSearchFacets.es';
-import GSearchFacetSelections from './view-templates/GSearchFacetSelections.es';
-import GSearchHelp from './view-templates/GSearchHelp.es';
+import GSearchHYMenus from './view-templates/GSearchHYMenus.es';
 import GSearchPaging from './view-templates/GSearchPaging.es';
 import GSearchResults from './view-templates/GSearchResults.es';
 import GSearchResultLayoutOptions from './view-templates/GSearchResultLayoutOptions.es';
-import GSearchSort from './view-templates/GSearchSort.es';
-import GSearchStats from './view-templates/GSearchStats.es';
 
 import templates from './GSearch.soy';
 
@@ -51,6 +46,25 @@ class GSearch extends Component {
 			this.query.oldParameters = [];
 			this.query.parameters = [];
 		}
+
+		let context = this;
+
+		function onPopstate() {
+			if (window.history.state != null) {
+				let searchfield = $('#' + context.portletNamespace + 'SearchField');
+				let searchbutton = $('#' + context.portletNamespace + 'SearchButton');
+				if (searchfield.length && searchbutton.length) {
+					searchfield.val(window.history.state);
+					searchbutton.click();
+				}
+			} else {
+				window.history.back();
+			}
+		}
+		$(window).on('popstate', function(event) {
+			window.setTimeout(onPopstate, 0);
+		});
+
 	}
 
 	/**
@@ -180,25 +194,7 @@ class GSearch extends Component {
 				}
 				
 				// Component updates
-
-				// Refresh the selections
 				
-				this.components.facetSelectionsComponent.update = Date.now();
-				this.components.facetComponent.facets = results.facets;
-
-				this.components.statsComponent.results = results;
-				this.components.resultsComponent.results = results;
-				this.components.pagingComponent.paging = results.paging;
-				
-				if (results.items && results.items.length > 0) {
-					this.components.resultLayoutOptionsComponent.resultLayoutOptions = results.resultLayoutOptions;
-					this.components.sortComponent.visible = true;
-				} else {
-					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
-					this.components.sortComponent.visible = false;
-				}
-				
-				/*// FIXME
 
 				this.components.resultsComponent.results = results;
 				this.components.pagingComponent.paging = results.paging;
@@ -211,8 +207,6 @@ class GSearch extends Component {
 					$('#' + this.portletNamespace + 'Stats').hide();
 					this.components.resultLayoutOptionsComponent.resultLayoutOptions = null;
 				}
-
-				 */
 				
 			} else {
 				
@@ -259,8 +253,11 @@ class GSearch extends Component {
 	 * @param {address} key
 	 */
 	updateAddressBar(address) {
-		if (window.history.replaceState) {
-			window.history.replaceState(null, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+		if (window.history.pushState) {
+			let q = this.query.getParameterValue('q');
+			if (window.history.state !== q) {
+				window.history.pushState(q, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+			}
 		} else {
 			document.location.hash = address;
 		}		

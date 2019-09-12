@@ -402,10 +402,10 @@ GSearchQuery.STATE = {
 		value: []
 	},
 	queryClearingParameters: {
-		value: ['q', 'type']
+		value: ['q']
 	},
 	basicParameters: {
-		value: ['q', 'type', 'resultsLayout', 'sortField', 'sortDirection']
+		value: ['q', 'resultsLayout', 'sortField', 'sortDirection']
 	},
 	isInitialQuery: {
 		value: false
@@ -419,6 +419,6 @@ GSearchQuery.STATE = {
 	clearPaging: {
 		value: false
 	}
-}
+};
 
 export default GSearchQuery;

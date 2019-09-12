@@ -156,5 +156,13 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public String datePickerFormat();
+
+	@Meta.AD(
+		deflt = "false",
+		description = "past-searches-desc",
+		name = "past-searches-name",
+		required = false
+	)
+	public boolean isPastSearchesEnabled();
 }
 
