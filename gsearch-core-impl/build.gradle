@@ -1,10 +1,10 @@
 dependencies {
 	compileOnly group: 'com.liferay', name: 'com.liferay.asset.publisher.api', version: '1.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.blogs.api', version: '4.0.0'
-	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api', version: '4.2.1'
+	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api', version: '4.6.9'
 	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api', version: '3.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.message.boards.api', version: '4.0.0'
-	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype", version: "2.0.12"
 	compileOnly group: 'com.liferay', name: 'com.liferay.petra.string', version: '2.0.0'
 	compileOnly group: 'com.liferay', name: 'com.liferay.wiki.api', version: '3.0.0'
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
