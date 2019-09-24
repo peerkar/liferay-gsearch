@@ -1,6 +1,7 @@
 package fi.soveltia.liferay.gsearch.localization;
 
 import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.Language;
@@ -117,9 +118,9 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 		}
 	}
 
-	protected void setGroupingLocalizations(
-		Locale locale, JSONObject responseObject)
-		throws JSONException {
+	@Override
+	public void setGroupingLocalizations(
+		Locale locale, JSONObject responseObject) {
 
 		JSONArray items = responseObject.getJSONArray("items");
 
@@ -132,8 +133,8 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 			JSONObject resultItem = items.getJSONObject(i);
 
 			resultItem.put(
-				"group_localized", getLocalization("suggestion.group." +
-					resultItem.getString("group").toLowerCase(), locale));
+				"group_localized", getLocalization(locale, "suggestion.group." +
+					resultItem.getString("group").toLowerCase()));
 		}
 	}
 

@@ -6,13 +6,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.UserLocalService;
+
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.WebKeys;
-
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
-import fi.soveltia.lifefay.gsearch.hy.util.LocalizationHelper;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
+import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -24,6 +23,9 @@ import fi.helsinki.flamma.feed.util.ListableFeedEntry;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.BaseResultItemBuilder;
+
+import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 @Component(
 	immediate = true,
@@ -40,12 +42,18 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext, Document document)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest) queryContext.getParameter(
+				ParameterNames.HTTP_SERVLET_REQUEST);
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequest(httpServletRequest);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
 		String url = "";
 		try {
 			long feedEntryId = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
@@ -72,12 +80,11 @@ public class FeedEntryItemBuilder extends BaseResultItemBuilder
 	}
 
 	@Override
-	public String getTitle(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+	public String getTitle(QueryContext queryContext,
 		Document document, boolean isHighlight)
 		throws NumberFormatException, PortalException {
 
-		String prefix = _localizationHelper.getLocalization(portletRequest.getLocale(), "title-prefix-feed");
+		String prefix = _localizationHelper.getLocalization(queryContext.getLocale(), "title-prefix-feed");
 
 		return String.format("(%s) %s", prefix, document.get(Field.USER_NAME));
 	}

@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -156,7 +157,22 @@ public class QueryContext {
 
 		_start = start;
 	}
-	
+
+	public Locale getLocale() {
+		return _locale;
+	}
+
+	public void setLocale(Locale locale) {
+		this._locale = locale;
+	}
+
+	public String getPortalUrl() {
+		return _portalUrl;
+	}
+
+	public void setPortalUrl(String portalUrl) {
+		this._portalUrl = portalUrl;
+	}
 
 	@Override
 	public String toString() {
@@ -167,7 +183,9 @@ public class QueryContext {
 		sb.append("Original keywords: " + _originalKeywords);
 		sb.append("Start: " + _start);
 		sb.append("Page size:" + _pageSize);
-		
+		sb.append("Locale:" + _locale);
+		sb.append("Portal URL:" + _portalUrl);
+
 		if (!_parameters.isEmpty()) {
 			
 			sb.append("Parameters:");
@@ -198,5 +216,8 @@ public class QueryContext {
 	private Integer _start;
 	private Integer _pageSize;
 	private Sort[] _sorts;
+
+	private Locale _locale;
+	private String _portalUrl;
 	
 }

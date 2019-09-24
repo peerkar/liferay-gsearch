@@ -23,11 +23,9 @@ import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringBundler;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.ArrayList;
@@ -40,13 +38,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
 import fi.helsinki.flamma.profile.tools.model.ProfileTool;
-import fi.soveltia.lifefay.gsearch.hy.util.LocalizationHelper;
+import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -71,28 +66,22 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	 */
 	@Override
 	public boolean isEnabled() {
-
 		return true;
 	}
 
 	@Override
 	public void process(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder, JSONObject resultItem)
 		throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
 		// Set categories to result item.
 
-		setCategories(document, themeDisplay.getLocale(), resultItem);;
+		setCategories(document, queryContext.getLocale(), resultItem);;
 
 		// Set type, icon and breadcrumbs.
 
-		setAdditionalProperties(
-			portletRequest, portletResponse, queryContext, document,
+		setAdditionalProperties(queryContext, document,
 			resultItemBuilder, resultItem);
 	}
 
@@ -158,8 +147,6 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	/**
 	 * Get breadcrumbs for DLFileEntry.
 	 *
-	 * @param portletRequest
-	 * @param portletResponse
 	 * @param queryContext
 	 * @param document
 	 * @param resultItemBuilder
@@ -167,24 +154,21 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	 * @throws Exception
 	 */
 	private String getDLFileEntryBreadcrumbs(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder)
 		throws Exception {
-
-		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
 
 		long groupId = getAssetRenderer(
 			DLFileEntry.class.getName(), entryClassPK).getGroupId();
 
-		Locale locale = themeDisplay.getLocale();
-
 		final List<String> breadcrumbs = new ArrayList<>();
 
+		Locale locale = queryContext.getLocale();
+
 		String link = resultItemBuilder.getLink(
-			portletRequest, portletResponse, document, queryContext);
+			queryContext, document);
 
 		Layout layout = getAssetLayout(groupId, link);
 
@@ -201,9 +185,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	}
 
 	private String getFeedBreadcrumbs(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
-		ResultItemBuilder resultItemBuilder)
+		ResultItemBuilder resultItemBuilder, Locale locale)
 		throws Exception {
 
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
@@ -212,7 +195,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
             FeedEntry feedEntry = feedEntryLocalService.getFeedEntry(entryClassPK);
             User user = getUser(feedEntry.getUserId());
             if (user != null) {
-                return String.format("%s / %s", _localizationHelper.getLocalization(portletRequest.getLocale(), "breadcrumb-feed"), user.getFullName());
+                return String.format("%s / %s", _localizationHelper.getLocalization(locale, "breadcrumb-feed"), user.getFullName());
             }
         } catch (PortalException e) {
             _log.error(String.format("Cannot get feed entry for '%s'", entryClassPK));
@@ -261,26 +244,21 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	/**
 	 * Get journal article breadcrumbs.
 	 *
-	 * @param portletRequest
-	 * @param portletResponse
 	 * @param document
 	 * @return
 	 * @throws Exception
 	 */
 	private String getJournalArticleBreadcrumbs(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
-		ResultItemBuilder resultItemBuilder)
+		ResultItemBuilder resultItemBuilder, Locale locale)
 		throws Exception {
 
 		long groupId = Long.valueOf(document.get(Field.GROUP_ID));
 
-		Locale locale = portletRequest.getLocale();
-
 		final List<String> breadcrumbs = new ArrayList<>();
 
 		String link = resultItemBuilder.getLink(
-			portletRequest, portletResponse, document, queryContext);
+			queryContext, document);
 
 		Long viewGroupId = getArticleViewGroupId(link);
 		if (viewGroupId != null) {
@@ -326,21 +304,16 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	/**
 	 * Get news article breadcrumbs.
 	 *
-	 * @param portletRequest
-	 * @param portletResponse
 	 * @param document
 	 * @return
 	 * @throws Exception
 	 */
 	private String getNewsArticleBreadcrumbs(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
-		ResultItemBuilder resultItemBuilder)
+		ResultItemBuilder resultItemBuilder, Locale locale)
 		throws Exception {
 
 		long groupId = Long.valueOf(document.get(Field.GROUP_ID));
-
-		Locale locale = portletRequest.getLocale();
 
 		return getGroupName(groupId, locale);
 	}
@@ -371,12 +344,12 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	 * @param resultItem
 	 */
 	private void setAdditionalProperties(
-		PortletRequest portletRequest, PortletResponse portletResponse,
 		QueryContext queryContext, Document document,
 		ResultItemBuilder resultItemBuilder, JSONObject resultItem) {
 
 		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
 
+		Locale locale = queryContext.getLocale();
 		try {
 
 			if (DLFileEntry.class.getName().equals(entryClassName)) {
@@ -387,10 +360,10 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				resultItem.put(
 					"breadcrumbs",
 					getDLFileEntryBreadcrumbs(
-						portletRequest, portletResponse, queryContext, document,
+						queryContext, document,
 						resultItemBuilder));
 				resultItem.put("link",
-					getDLFileEntryLink(portletRequest, document));
+					getDLFileEntryLink(queryContext.getPortalUrl(), document));
 			}
 			else if (FeedEntry.class.getName().equals(entryClassName)) {
 
@@ -400,8 +373,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				resultItem.put(
 					"breadcrumbs",
 					getFeedBreadcrumbs(
-						portletRequest, portletResponse, queryContext, document,
-						resultItemBuilder));
+						queryContext, document,
+						resultItemBuilder, locale));
 
 			}
 			else if (isNewsArticle(queryContext, document)) {
@@ -411,9 +384,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				resultItem.put("icon", "icon-news");
 				resultItem.put(
 					"breadcrumbs",
-					getNewsArticleBreadcrumbs(
-						portletRequest, portletResponse, queryContext, document,
-						resultItemBuilder));
+					getNewsArticleBreadcrumbs(queryContext, document,
+						resultItemBuilder, locale));
 
 			}
 			else if (JournalArticle.class.getName().equals(entryClassName)) {
@@ -422,7 +394,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				resultItem.put("typeKey", "content");
 				resultItem.put("icon", "icon-content");
 				resultItem.put("breadcrumbs",
-					getJournalArticleBreadcrumbs(portletRequest, portletResponse, queryContext, document, resultItemBuilder));
+					getJournalArticleBreadcrumbs(queryContext, document, resultItemBuilder, locale));
 			}
             else if (ExpertSearchContact.class.getName().equals(entryClassName)) {
 
@@ -431,7 +403,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put("icon", "icon-person");
                 resultItem.put(
                     "breadcrumbs",
-                    getExpertSearchContactBreadcrumbs(portletRequest.getLocale(), document.get(Field.USER_NAME)));
+                    getExpertSearchContactBreadcrumbs(locale, document.get(Field.USER_NAME)));
             }
             else if (ProfileTool.class.getName().equals(entryClassName)) {
 
@@ -440,7 +412,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put("icon", document.get(Field.TITLE).substring(0, 1).toUpperCase());
                 resultItem.put(
                     "breadcrumbs",
-                    getToolBreadcrumbs(portletRequest.getLocale(), document.get(portletRequest.getLocale(), Field.TITLE)));
+                    getToolBreadcrumbs(locale, document.get(locale, Field.TITLE)));
             }
 			resultItem.put("title", HtmlUtil.escape(resultItem.getString("title_raw")));
 		}
@@ -484,9 +456,9 @@ public class HYResultItemProcessor implements ResultItemProcessor {
         return String.format("%s / %s", toolsTitle, name);
     }
 
-    private String getDLFileEntryLink(PortletRequest portletRequest, Document document) {
+    private String getDLFileEntryLink(String portalUrl, Document document) {
 		StringBundler sb = new StringBundler();
-		sb.append(PortalUtil.getPortalURL(portletRequest));
+		sb.append(portalUrl);
 		sb.append("/documents/");
 		sb.append(document.get(Field.SCOPE_GROUP_ID));
 		sb.append("/");

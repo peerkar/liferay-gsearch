@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.portal.kernel.util.PortalUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -46,6 +47,7 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 		queryContext.setParameter(ParameterNames.COMPANY_ID, companyId);
 		queryContext.setParameter(ParameterNames.LOCALE, locale);
 		queryContext.setParameter(ParameterNames.KEYWORDS, keywords);
+		queryContext.setPortalUrl(PortalUtil.getPortalURL(httpServletRequest));
 		
 		return queryContext;
 	}
@@ -63,7 +65,10 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 		QueryContext queryContext = new QueryContext();
 		
 		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
-		
+
+		queryContext.setLocale(httpServletRequest.getLocale());
+		queryContext.setPortalUrl(PortalUtil.getPortalURL(httpServletRequest));
+
 		if (filterConfiguration == null) {
 			filterConfiguration = _configurationHelper.getFilterConfiguration();
 		}
@@ -101,7 +106,10 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 		QueryContext queryContext = new QueryContext();
 		
 		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
-		
+
+		queryContext.setLocale(httpServletRequest.getLocale());
+		queryContext.setPortalUrl(PortalUtil.getPortalURL(httpServletRequest));
+
 		if (suggesterConfiguration == null) {
 			queryContext.setConfiguration(ConfigurationKeys.SUGGESTER,
 				_configurationHelper.getKeywordSuggesterConfiguration());
@@ -158,7 +166,6 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	/**
 	 * Add parameter builder.
 	 * 
-	 * @param clauseBuilder
 	 */
 	protected void addParameterBuilder(ParameterBuilder parameterBuilder) {
 

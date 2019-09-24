@@ -11,17 +11,13 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import javax.portlet.PortletRequest;
-import javax.portlet.PortletResponse;
-
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -32,6 +28,9 @@ import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.JournalArticleItemBuilder;
+
+import javax.portlet.PortletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 @Component(
 	immediate = true,
@@ -57,11 +56,18 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext, Document document)
 		throws Exception {
 
 		long entryClassPK = Long.valueOf(document.get(Field.ENTRY_CLASS_PK));
+
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest) queryContext.getParameter(
+				ParameterNames.HTTP_SERVLET_REQUEST);
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequest(httpServletRequest);
+
 
 		try {
 			JournalArticle article = getJournalArticle(document);
@@ -78,17 +84,11 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 	}
 
 	@Override
-	public String getDescription(
-		PortletRequest portletRequest, PortletResponse portletResponse,
+	public String getDescription(QueryContext queryContext,
 		Document document)
 		throws SearchException {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay) portletRequest.getAttribute(WebKeys.THEME_DISPLAY);
-
-		Locale locale = themeDisplay.getLocale();
-
-		String languageId = locale.toString();
+		String languageId = queryContext.getLocale().toString();
 
 		for (Long ddmStructureId : DDM_STRUCTURE_IDS) {
 			String ingress = document.get(
@@ -99,7 +99,7 @@ public class NewsJournalArticleItemBuilder extends JournalArticleItemBuilder {
 			}
 		}
 
-		return super.getDescription(portletRequest, portletResponse, document);
+		return super.getDescription(queryContext, document);
 	}
 
 	@Override

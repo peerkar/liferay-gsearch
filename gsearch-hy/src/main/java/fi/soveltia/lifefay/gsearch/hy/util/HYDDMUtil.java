@@ -77,7 +77,6 @@ public class HYDDMUtil {
 	/**
 	 * Get HY news DDM structure keys.
 	 * 
-	 * @param queryContext
 	 * @return
 	 */
 	public static List<String> getHYNewsDDMStructureKeys(

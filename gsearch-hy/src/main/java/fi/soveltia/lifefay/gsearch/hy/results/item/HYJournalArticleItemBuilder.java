@@ -19,14 +19,17 @@ import com.liferay.portal.kernel.util.WebKeys;
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.soveltia.lifefay.gsearch.hy.util.HYDDMUtil;
 import fi.soveltia.liferay.gsearch.core.api.configuration.ConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 import fi.soveltia.liferay.gsearch.core.api.results.item.ResultItemBuilder;
 import fi.soveltia.liferay.gsearch.core.impl.results.item.JournalArticleItemBuilder;
+import fi.soveltia.liferay.gsearch.core.impl.util.GSearchUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Component(
@@ -51,8 +54,7 @@ public class HYJournalArticleItemBuilder extends JournalArticleItemBuilder {
 
 	@Override
 	public String getLink(
-		PortletRequest portletRequest, PortletResponse portletResponse,
-		Document document, QueryContext queryContext)
+		QueryContext queryContext, Document document)
 		throws Exception {
 
 		boolean viewResultsInContext = isViewInContext(queryContext);
@@ -60,6 +62,15 @@ public class HYJournalArticleItemBuilder extends JournalArticleItemBuilder {
 		String assetPublisherPageURL = getAssetPublisherPageURL(queryContext);
 
 		StringBundler sb = new StringBundler();
+
+		HttpServletRequest httpServletRequest =
+			(HttpServletRequest) queryContext.getParameter(
+				ParameterNames.HTTP_SERVLET_REQUEST);
+
+		PortletRequest portletRequest =
+			GSearchUtil.getPortletRequest(httpServletRequest);
+		PortletResponse portletResponse =
+			GSearchUtil.getPortletResponseFromContext(queryContext);
 
 		if (viewResultsInContext) {
 

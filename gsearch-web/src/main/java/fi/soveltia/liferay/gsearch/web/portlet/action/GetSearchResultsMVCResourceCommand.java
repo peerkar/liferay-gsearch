@@ -17,7 +17,11 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,6 +63,8 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchWebKeys;
 	service = MVCResourceCommand.class
 )
 public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
+
+	private static final int MAX_PAGE_SIZE = 30;
 
 	@Activate
 	@Modified
