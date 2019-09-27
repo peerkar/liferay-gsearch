@@ -290,7 +290,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 			if (matcher.matches()) {
 				String groupFriendlyUrl = matcher.group(1);
 
-				Group group = _groupLocalService.fetchFriendlyURLGroup(PortalUtil.getDefaultCompanyId(), groupFriendlyUrl);
+				Group group = _groupLocalService.fetchFriendlyURLGroup(flammaGroupService.getFlammaCompanyId(), groupFriendlyUrl);
 				if (group != null) {
 					viewGroupId = group.getGroupId();
 				}
