@@ -1,0 +1,13 @@
+.gsearch-portlet {
+
+    .gsearch-errors {
+	margin-bottom: 20px;
+    }
+
+    .gsearch-error {
+        .trigger:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    }
+}

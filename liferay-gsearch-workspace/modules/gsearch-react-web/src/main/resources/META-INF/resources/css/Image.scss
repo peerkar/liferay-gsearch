@@ -1,0 +1,26 @@
+.gsearch-portlet {
+  
+  .gsearch-thumbnail {
+    height: 150px;
+    overflow: hidden;
+    width: 200px;
+
+    img {
+      height: 100% !important;
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      width: auto !important;
+    }
+  }
+
+  /* Portrait mode */
+
+  .gsearch-thumbnail.portrait img {
+    height: auto !important;
+    width: 100% !important;
+  }
+}

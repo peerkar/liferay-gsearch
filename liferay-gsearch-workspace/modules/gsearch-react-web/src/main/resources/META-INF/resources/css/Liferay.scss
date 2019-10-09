@@ -1,0 +1,43 @@
+/* Liferay styles compatibility */
+
+html,
+body {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+body {
+  background: inherit !important;
+  color: inherit !important;
+  font-family: inherit !important;
+}
+
+i.icon {
+  font-family: fontawesome-alloy;
+}
+
+i.icon.delete:before {
+  content: "\F00D";
+}
+
+.modal {
+  height: unset;
+  left: unset;
+  top: unset;
+}
+
+.gsearch-container {
+  .menu {
+    position: unset;
+  }
+
+  .label {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
+
+  .pagination {
+    display: inherit;
+  }
+}

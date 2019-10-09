@@ -1,0 +1,18 @@
+.gsearch-portlet {
+  
+  .gsearch-query-suggestions {
+    font-size: 1.3em;
+    margin: 35px 0 30px 0;
+
+    .no-results-message,
+    .alternate-search {
+      margin: 10px 0;
+    }
+
+    .other-suggestions {
+      font-size: 1.1em;
+      font-weight: bold;
+      margin: 40px 0 10px;
+    }
+  }
+}

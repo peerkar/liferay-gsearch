@@ -1,0 +1,42 @@
+.gsearch-portlet {
+  
+  .gsearch-filters {
+    margin-top: 15px;
+
+    .gsearch-filter {
+      border: 0 none !important;
+      margin-right: 30px;
+
+      .menu {
+        box-shadow: 2px 5px 20px 3px rgba(49, 53, 56, 0.15) !important;
+        /* min-width: 330px !important; */
+      }
+    }
+
+    .gsearch-filter:last-child {
+      margin-right: 0;
+    }
+
+    .gsearch-filter.compact.dropdown > .text {
+      color: #999;
+      font-weight: bold;
+    }
+
+    .gsearch-time-filter-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .gsearch-filter.time-filter .menu {
+      min-height: 350px;
+    }
+
+    .gsearch-datepicker {
+      position: absolute;
+      z-index: 200;
+      margin-left: -105px;
+      margin-top: 14px;
+      box-shadow: 3px 0px 5px 2px #ddd;
+    }
+  }
+}

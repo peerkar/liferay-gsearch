@@ -1,0 +1,20 @@
+.gsearch-portlet {
+  
+  .gsearch-sort-field-menu {
+    margin-right: 40px;
+
+    .gsearch-label {
+      margin-right: 5px;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .gsearch-label {
+        display: none;
+      }
+    }
+  }
+
+  .dropdown.sort-direction > .text {
+    display: none;
+  }
+}

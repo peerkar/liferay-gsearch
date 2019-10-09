@@ -1,0 +1,26 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.frontend.js.loader.modules.extender.api"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib"
+	compileOnly group: "javax.portlet", name: "portlet-api"
+	compileOnly group: "javax.servlet", name: "javax.servlet-api"
+	compileOnly group: "jstl", name: "jstl"
+	compileOnly group: "org.osgi", name: "osgi.cmpn"
+	
+    compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api"
+    compileOnly group: "com.liferay", name: "com.liferay.journal.api"
+ 
+    compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
+    compileOnly group: "org.apache.felix", name: "org.apache.felix.configadmin", version: "1.8.8"
+    compileOnly group: "org.osgi", name: "org.osgi.core"
+    compileOnly group: "org.osgi", name: "org.osgi.service.cm", version: "1.5.0"
+    compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+    compileOnly group: "org.slf4j", name: "slf4j-api"
+
+    compileOnly project(":modules:gsearch-click-tracking:gsearch-click-tracking-api")
+    compileOnly project(":modules:gsearch-core-api")
+    compileOnly project(":modules:gsearch-localization")
+    
+    
+    	compileOnly group: 'com.liferay', name: 'com.liferay.segments.api'
+    }

@@ -1,0 +1,25 @@
+.gsearch-portlet {
+  
+  .gsearch-help-container {
+    margin-bottom: 10px;
+    text-align: right;
+
+    .help-trigger {
+      color: rgb(82, 96, 108);
+    }
+
+    .help-trigger:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+.gsearch-help-loading-wrapper {
+  text-align: center;
+}
+
+.gsearch-help-content {
+  color: #555;
+  margin: 20px;
+}

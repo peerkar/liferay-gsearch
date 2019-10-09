@@ -1,0 +1,49 @@
+.gsearch-portlet {
+  
+  .gsearch-facets {
+    margin-top: 10px;
+    padding-top: 15px;
+
+	  .gsearch-facet {
+	    margin-right: 10px !important;
+	    margin-top: 10px !important;
+	    padding: 8px 30px 8px 8px !important;
+	
+	    .menu .item .text {
+	      text-transform: capitalize;
+	    }
+	  }
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .gsearch-facet {
+      width: 100%;
+    }
+  }
+
+  .gsearch-facet.ui.multiple.dropdown > .label {
+    background-color: #999;
+    color: #fff;
+    text-transform: capitalize;
+  }
+
+  /* When active */
+
+  .gsearch-facet.active.visible {
+    padding: 7px 29px 7px 7px !important;
+  }
+
+  .gsearch-facet.active.visible > .text {
+    color: #999 !important;
+  }
+
+  .gsearch-facet.active.visible > .icon {
+    top: 0.9em !important;
+  }
+
+  .gsearch-facet.active.visible > .icon::before {
+    color: #999;
+    content: "\f002" !important;
+    font-family: Icons !important;
+  }
+}
