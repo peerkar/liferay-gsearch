@@ -1,0 +1,15 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib"
+	compileOnly group: "com.liferay", name: "com.liferay.blogs.api"
+	compileOnly group: "com.liferay", name: "com.liferay.journal.api"
+	compileOnly group: "com.liferay", name: "com.liferay.wiki.api"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: "javax.portlet", name: "portlet-api"
+	compileOnly group: "javax.servlet", name: "javax.servlet-api"
+	compileOnly group: "jstl", name: "jstl"
+	compileOnly group: "org.osgi", name: "org.osgi.core"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+	compileOnly project(":modules:gsearch-core-api")
+	compileOnly project(":modules:gsearch-localization")
+	compileOnly project(":modules:gsearch-recommender")
+}

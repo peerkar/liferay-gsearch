@@ -1,0 +1,79 @@
+[
+  {
+    "description": "Elasticsearch More Like This (MLT) query. By default this is mandatory ('occur:must')",
+    "enabled": true,
+    "conditions": [],
+    "clauses": [
+      {
+        "query_type": "more_like_this",
+        "occur": "must",
+        "configuration": {
+          "boost": 10,
+          "fields": [
+            {
+              "field_name": "title",
+              "localized": true
+            },
+            {
+              "field_name": "content",
+              "localized": true
+            },
+            {
+              "field_name": "assetTagNames.raw",
+              "localized": false
+            }
+          ],
+          "include": false,
+          "max_doc_freq": 100,
+          "max_query_terms": 10,
+          "max_word_length": 0,
+          "min_doc_freq": 5,
+          "min_term_freq": 2,
+          "min_word_length": 2,
+          "minimum_should_match": "20%",
+          "stop_words": []
+        }
+      }
+    ]
+  },
+  {
+    "description": "An example of using Words Of Interest (WOI) configuration variable. Words of Interest are the most frequent, stemmed keywords collected from previous successful queries. By default this is optional (occur=should)",
+    "enabled": true,
+    "conditions": [
+      {
+        "handler_name": "woi",
+        "occur": "should",
+        "configuration": {
+          "woi_condition": "not_null"
+        }
+      }
+    ],
+    "clauses": [
+      {
+        "query_type": "match",
+        "occur": "should",
+        "configuration": {
+          "boost": "2",
+          "field_name": "title_$_context.language_id_$",
+          "query": "$_woi.words_$"
+        }
+      }
+    ]
+  },
+  {
+    "description": "An example of giving boost to results having a certain tag, in this case 'official'.",
+    "conditions": [],
+    "enabled": false,
+    "clauses": [
+      {
+        "query_type": "term",
+        "occur": "should",
+        "configuration": {
+          "boost": "5",
+          "field_name": "assetTagNames.raw",
+          "query": "official"
+        }
+      }
+    ]
+  }
+]
