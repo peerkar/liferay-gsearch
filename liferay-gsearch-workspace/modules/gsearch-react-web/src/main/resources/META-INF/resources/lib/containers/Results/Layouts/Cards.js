@@ -18,6 +18,7 @@ const Cards = ({ items }) => {
             {items.map(function (item, i) {
 
                 let description = ResultItemUtil.getCardItemDescription(item);
+                let header = ResultItemUtil.getCardHeader(item);
                 let key = 'ci_' + item.link;
                 let typeLabel = ResultItemUtil.getCardItemTypeLabel(item);
 
@@ -27,9 +28,7 @@ const Cards = ({ items }) => {
                         <Thumbnail alt={item.title} src={item.imageSrc} />
                         <Card.Content>
                             {typeLabel}
-                            <Card.Header>
-                                <span dangerouslySetInnerHTML={{ __html: item.title }}></span>
-                            </Card.Header>
+                            {header}
                             <Card.Meta className="username">{item.userName}, {item.date}</Card.Meta>
                             {description}
                         </Card.Content>

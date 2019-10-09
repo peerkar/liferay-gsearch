@@ -106,6 +106,31 @@ class ResultItemUtil {
 		return <Label className="type-label" color='orange' attached='top left'>{type}</Label>;
 	}
 
+	static getCardHeader(item) {
+
+		let value = '';
+
+		let href = item.link
+		if (config.get(ConfigKeys.RESULT_ITEM).appendRedirect) {
+			href += item.redirect;
+		}
+
+		if (config.get(ConfigKeys.RESULT_ITEM).showLink) {
+			if (config.get(ConfigKeys.CLICK_TRACKING).enabled) {
+				
+				value = <Card.Header as='a' className="link" href={href} onClick={GSearchCommonUtil.trackClick} data-trackid={item.entryClassPK}>
+							<span dangerouslySetInnerHTML={{ __html: item.title }}></span>
+						</Card.Header>
+
+			} else {
+				value = <Card.Header as='a' className="link" href={href}>
+							<span dangerouslySetInnerHTML={{ __html: item.title }}></span>
+						</Card.Header>
+			}
+		}
+		return value;
+	}	
+	
 	static getDescription(item) {
 		
 		let description = item.content_highlight ? item.content_highlight : item.description;

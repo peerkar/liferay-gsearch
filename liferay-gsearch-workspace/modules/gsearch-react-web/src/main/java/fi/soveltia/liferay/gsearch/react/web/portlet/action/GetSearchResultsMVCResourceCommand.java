@@ -412,7 +412,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		// Layout specific options.
 
 		if (resultLayout.equals("thumbnail") ||
-			resultLayout.equals("image")) {
+			resultLayout.equals("card")) {
 			queryContext.setParameter(ParameterNames.INCLUDE_THUMBNAIL, true);
 		}
 
