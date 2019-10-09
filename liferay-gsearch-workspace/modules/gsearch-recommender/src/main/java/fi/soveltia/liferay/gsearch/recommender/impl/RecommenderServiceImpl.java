@@ -51,6 +51,9 @@ import fi.soveltia.liferay.gsearch.recommender.configuration.ModuleConfiguration
 @Component(
 	configurationPid = "fi.soveltia.liferay.gsearch.recommender.configuration.ModuleConfiguration", 
 	immediate = true, 
+	property = {
+		"param.name=filters"
+	},
 	service = RecommenderService.class
 )
 public class RecommenderServiceImpl implements RecommenderService {
@@ -320,10 +323,8 @@ public class RecommenderServiceImpl implements RecommenderService {
 
 		if (queryContext.getConfiguration(ConfigurationNames.FILTER) == null) {
 			
-			JSONArray configuration = _coreConfigurationHelper.
-					stringArrayToJSONArray(
-							_moduleConfiguration.recommendationClauses());
-
+			JSONArray configuration = _coreConfigurationHelper.getFilters();
+					
 			queryContext.setConfiguration(
 					ConfigurationNames.FILTER, configuration);
 		}
@@ -340,7 +341,9 @@ public class RecommenderServiceImpl implements RecommenderService {
 	@Reference
 	private CoreConfigurationHelper _coreConfigurationHelper;
  
-	@Reference
+	@Reference(
+		target = "(param.name=filters)"
+	)
 	private ParameterBuilder _filterParamBuilder;
 
 	@Reference
