@@ -2,13 +2,13 @@
 
 Miniportlet / search bar you can add to a theme or for example, use as a front page search bar.
 
-Supports keyword and content suggestestions modes.
+Supports keyword and content (default) suggestions modes.
 
-Please see the gsearch-test-theme for an example how to embed into your theme.
+Please see the gsearch-test-theme for an example how to embed into your theme. The theme is for 7.0.0 only but shows an example of embedding tehcnique.
 
 ## Configuration
 
-After the module has been deployed succesfully, please see the configuration options in `Control Panel -> Configuration -> System Settings -> GSearch -> Mini Portlet`.
+After the module has been deployed succesfully, please see the configuration options in `Control Panel -> Configuration -> System Settings -> Liferay sGSearch -> Mini Portlet`.
 
 ## Changelog
 

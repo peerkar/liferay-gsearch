@@ -1,4 +1,0 @@
-Bundle-Name: Liferay GSearch Recommender
-Bundle-SymbolicName: fi.soveltia.liferay.gsearch.recommender
-Bundle-Version: 1.0.1
-Export-package: fi.soveltia.liferay.gsearch.recommender.api

@@ -1,4 +1,0 @@
-Bundle-Name: Liferay GSearch Query API
-Bundle-SymbolicName: fi.soveltia.liferay.gsearch.query
-Bundle-Version: 4.0.0
-Export-package: fi.soveltia.liferay.gsearch.query

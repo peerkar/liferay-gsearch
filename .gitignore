@@ -9,3 +9,5 @@ build/
 .DS_Store
 rebel.xml
 .sass-cache
+RemoteSystemsTempFiles/
+.metadata
