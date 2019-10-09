@@ -123,6 +123,8 @@ In case needed, check the name of the generated index field in the `Raw Document
 
 After the module has been deployed succesfully, see the configuration options in `Control Panel -> Configuration -> System Settings -> Liferay GSearch -> Geolocation`.
 
+Be aware that IP doesn't resolve when running on localhost. When testing, use the test IP address in the configuration.
+
 This feature is disabled by default.
 
 ## Changelog
