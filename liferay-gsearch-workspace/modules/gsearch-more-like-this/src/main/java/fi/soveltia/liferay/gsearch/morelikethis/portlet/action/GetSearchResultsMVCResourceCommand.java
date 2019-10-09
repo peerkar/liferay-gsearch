@@ -30,6 +30,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import fi.soveltia.liferay.gsearch.core.api.configuration.CoreConfigurationHelper;
+import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationKeys;
+import fi.soveltia.liferay.gsearch.core.api.constants.ConfigurationNames;
 import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
 import fi.soveltia.liferay.gsearch.core.api.constants.ResponseKeys;
 import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
@@ -100,7 +102,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			_queryContextBuilder.processQueryContextContributors(queryContext);
 				
 			if (assetEntry != null) {
-
+				
 				List<AssetEntry>assetEntryList = new ArrayList<AssetEntry>();
 				assetEntryList.add(assetEntry);
 				responseObject = _recommenderService.
@@ -142,7 +144,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 
 		JSONArray clauseConfiguration = _getClauseConfiguration(preferences);
 		JSONArray filterConfiguration = _getFilterConfiguration(preferences);
-		
+				
 		String keywords = ParamUtil.getString(httpServletRequest, ParameterNames.KEYWORDS);
 		
 		QueryContext queryContext = _queryContextBuilder.buildQueryContext(
