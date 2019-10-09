@@ -15,7 +15,7 @@ While this application can be used with Liferay embedded Elasticsearch or any se
 
 The application is modular and has multiple extension points for customizations. Headless REST is also available.
 
-![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/gsearch-doc/screenshots/gsearch.gif)
+![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/screenshots/gsearch.gif)
 
 ## News
 * __(2019-10-09)__ [Liferay 7.2 version available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/7.2/2019-10-09)
