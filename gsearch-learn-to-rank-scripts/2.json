@@ -1,0 +1,10 @@
+{
+	"query": {
+		"query_string": {
+			"query": "{{keywords}}",
+			"fields": [
+				"title_en_US"
+			]
+		}
+	}
+}

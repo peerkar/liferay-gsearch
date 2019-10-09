@@ -1,0 +1,2 @@
+1	qid:1	1:0.0	2:6.1985917	3:0.0	4:2.8940465 # com.liferay.journal.model.JournalArticle_PORTLET_43927	camera
+1	qid:2	1:0.0	2:3.2665775	3:0.0	4:2.2323003 # com.liferay.journal.model.JournalArticle_PORTLET_41738	iphone

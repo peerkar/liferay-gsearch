@@ -1,0 +1,4 @@
+# qid:1:	camera
+# qid:2:	iphone
+1	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_43927#
+1	qid:2	 # com.liferay.journal.model.JournalArticle_PORTLET_41738#

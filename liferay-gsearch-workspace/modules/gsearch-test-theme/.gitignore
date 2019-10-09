@@ -1,0 +1,17 @@
+bin
+node_modules
+build
+dist
+liferay-theme.json
+package-lock.json
+.web_bundle_build
+.yo-rc.json
+.classpath
+.gradle
+.project
+.settings/
+.DS_Store
+.sass-cache
+rebel.xml
+
+
