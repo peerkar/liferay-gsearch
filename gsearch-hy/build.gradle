@@ -1,6 +1,7 @@
 dependencies {
 	compileOnly group: 'com.liferay', name: 'com.liferay.dynamic.data.mapping.api'
 	compileOnly group: 'com.liferay', name: 'com.liferay.journal.api'
+	compileOnly group: "com.liferay", name: "com.liferay.asset.category.property.api"
 
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
 

@@ -3,11 +3,11 @@ package fi.soveltia.lifefay.gsearch.hy.results.item.processor;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
-import com.liferay.asset.kernel.model.AssetCategoryProperty;
 import com.liferay.asset.kernel.model.AssetRenderer;
 import com.liferay.asset.kernel.model.AssetRendererFactory;
+import com.liferay.asset.category.property.service.AssetCategoryPropertyLocalService;
+import com.liferay.asset.category.property.model.AssetCategoryProperty;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
-import com.liferay.asset.kernel.service.AssetCategoryPropertyLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.service.JournalArticleService;

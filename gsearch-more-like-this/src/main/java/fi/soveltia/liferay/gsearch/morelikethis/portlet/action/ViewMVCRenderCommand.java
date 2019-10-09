@@ -68,8 +68,7 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		portletURL.setParameter("currentURL", themeDisplay.getURLCurrent());
-
+		portletURL.getResourceParameters().setValue("currentURL", themeDisplay.getURLCurrent());
 		return portletURL.toString();
 	}
 }

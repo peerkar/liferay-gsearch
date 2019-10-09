@@ -29,7 +29,7 @@ public class LocalizationHelperImpl implements LocalizationHelper {
 		if (!_resourceBundles.containsKey(locale)) {
 			_resourceBundles.put(
 				locale,
-				_resourceBundleLoader.loadResourceBundle(locale.toString()));
+				_resourceBundleLoader.loadResourceBundle(locale));
 		}
 
 		String value = ResourceBundleUtil.getString(
