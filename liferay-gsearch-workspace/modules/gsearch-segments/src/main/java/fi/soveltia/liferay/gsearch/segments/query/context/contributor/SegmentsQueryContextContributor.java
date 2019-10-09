@@ -66,8 +66,6 @@ public class SegmentsQueryContextContributor
 
 		long[] segmentsEntryIds = _getSegmentEntryIds(
 			queryContext, userGroupIds);
-
-		System.out.println(segmentsEntryIds.length);
 		
 		if (userGroupIds.length > 0) {
 
