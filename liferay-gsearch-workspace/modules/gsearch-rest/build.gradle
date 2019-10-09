@@ -1,0 +1,11 @@
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: "javax.servlet", name: "javax.servlet-api"
+	compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+	compileOnly group: "org.osgi", name: "org.osgi.service.jaxrs"
+	compileOnly group: "org.slf4j", name: "slf4j-api"
+	compileOnly project(":modules:gsearch-core-api")
+	compileOnly project(":modules:gsearch-localization")
+	compileOnly project(":modules:gsearch-recommender")
+}
