@@ -1,0 +1,10 @@
+Bundle-Name: Liferay GSearch Click Tracking API
+Bundle-SymbolicName: fi.soveltia.liferay.gsearch.click.tracking.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	fi.soveltia.liferay.gsearch.click.tracking.exception,\
+	fi.soveltia.liferay.gsearch.click.tracking.model,\
+	fi.soveltia.liferay.gsearch.click.tracking.service,\
+	fi.soveltia.liferay.gsearch.click.tracking.service.persistence
+-check: EXPORTS
+-includeresource: META-INF/service.xml=../gsearch-click-tracking-service/service.xml

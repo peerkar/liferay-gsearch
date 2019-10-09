@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_2_0.dtd">
+
+<service-builder dependency-injector="ds" package-path="fi.soveltia.liferay.gsearch.click.tracking">
+	<namespace>GSearchClickTracking</namespace>
+
+	<entity local-service="true" name="Clicks" remote-service="true" uuid="true">
+
+		<!-- PK fields -->
+
+		<column name="clickId" primary="true" type="long" />
+
+		<!-- Group instance -->
+
+		<column name="groupId" type="long" />
+
+		<!-- Audit fields -->
+
+		<column name="companyId" type="long" />
+		<column name="createDate" type="Date" />
+		<column name="modifiedDate" type="Date" />
+
+		<!-- Other fields -->
+
+		<column name="keywords" type="String" />
+		<column name="entryClassPK" type="long" />
+		<column name="clickCount" type="int" />
+
+		<!-- Order -->
+
+		<order by="asc">
+			<order-column name="clickCount" />
+		</order>
+
+		<!-- Finder methods -->
+
+		<finder name="C_G_K_E" return-type="Clicks">
+			<finder-column name="companyId" />
+			<finder-column name="groupId" />
+			<finder-column name="keywords" />
+			<finder-column name="entryClassPK" />
+		</finder>
+
+	</entity>
+</service-builder>

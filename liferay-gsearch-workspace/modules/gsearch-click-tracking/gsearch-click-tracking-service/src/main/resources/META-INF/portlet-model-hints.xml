@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="fi.soveltia.liferay.gsearch.click.tracking.model.Clicks">
+		<field name="uuid" type="String" />
+		<field name="clickId" type="long" />
+		<field name="groupId" type="long" />
+		<field name="companyId" type="long" />
+		<field name="createDate" type="Date" />
+		<field name="modifiedDate" type="Date" />
+		<field name="keywords" type="String" />
+		<field name="entryClassPK" type="long" />
+		<field name="clickCount" type="int" />
+	</model>
+</model-hints>
