@@ -1,0 +1,4 @@
+Bundle-Name: Liferay GSearch Localization
+Bundle-SymbolicName: fi.soveltia.liferay.gsearch.localization
+Bundle-Version: 2.0.0
+Export-Package:  fi.soveltia.liferay.gsearch.localization.api
