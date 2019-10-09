@@ -112,21 +112,21 @@ public class OpenNlpQueryContextContributor implements QueryContextContributor {
 
 		// Configuration variables
 		
-		JSONArray locations = _getMetadata(metadata, "locations");
+		JSONArray locations = _openNlpService.getMetadata(metadata, "locations");
 		if (locations != null) {
 			queryContext.addConfigurationVariable(
 					OpenNlpConfigurationVariables.LOCATIONS, 
 					jsonArrayToString(locations));		
 		}
 		
-		JSONArray persons = _getMetadata(metadata, "persons");
+		JSONArray persons = _openNlpService.getMetadata(metadata, "persons");
 		if (persons != null) {
 			queryContext.addConfigurationVariable(
 					OpenNlpConfigurationVariables.PERSONS, 
 					jsonArrayToString(persons));		
 		}
 		
-		JSONArray dates = _getMetadata(metadata, "dates");
+		JSONArray dates = _openNlpService.getMetadata(metadata, "dates");
 		if (dates != null) {
 			queryContext.addConfigurationVariable(
 					OpenNlpConfigurationVariables.DATES, 
@@ -138,45 +138,7 @@ public class OpenNlpQueryContextContributor implements QueryContextContributor {
 		queryContext.setParameter(OpenNlpParameterNames.OPEN_NLP_DATA, metadata);
 		
 	}
-	
-	/**
-	 * Gets the entities object.
-	 * 
-	 * @param metadata
-	 * @return
-	 * @throws Exception
-	 */
-	private JSONObject _getEntitiesObject(JSONObject metadata) 
-			throws Exception {
-		
-		return metadata.getJSONArray("docs").
-				getJSONObject(0).getJSONObject("doc").getJSONObject("_source").
-				getJSONObject("entities");
-		
-	}
 
-	/**
-	 * Gets the named metadata.
-	 * 
-	 * @param metadata
-	 * @param key
-	 * @return
-	 */
-	private JSONArray _getMetadata(JSONObject metadata, String key) {
-
-		try {
-			JSONObject entities = _getEntitiesObject(metadata);
-		
-			if (entities != null) {
-				return  entities.getJSONArray(key);
-			}
-		} catch (Exception e) {
-			_log.error(e.getMessage(), e);
-		}
-		
-		return null;
-	}
-	
 	private String jsonArrayToString(JSONArray array) {
 		
 		StringBundler sb = new StringBundler();

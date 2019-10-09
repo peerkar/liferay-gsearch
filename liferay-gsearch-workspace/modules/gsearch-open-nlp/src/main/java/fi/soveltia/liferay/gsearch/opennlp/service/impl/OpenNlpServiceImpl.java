@@ -71,6 +71,27 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 		return execute(command);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	public JSONArray getMetadata(JSONObject metadata, String key) {
+
+		try {
+			JSONObject entities = _getEntitiesObject(metadata);
+		
+			if (entities != null) {
+				return  entities.getJSONArray(key);
+			}
+		} catch (Exception e) {
+			_log.error("Entities object not found.");
+			if (_log.isDebugEnabled()) {
+				_log.debug(e.getMessage(), e);
+			}
+		}
+		
+		return null;
+	}
+	
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
@@ -171,6 +192,22 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 		
 		return null;
 	}	
+	
+	/**
+	 * Gets the entities object.
+	 * 
+	 * @param metadata
+	 * @return
+	 * @throws Exception
+	 */
+	private JSONObject _getEntitiesObject(JSONObject metadata) 
+			throws Exception {
+		
+		return metadata.getJSONArray("docs").
+				getJSONObject(0).getJSONObject("doc").getJSONObject("_source").
+				getJSONObject("entities");
+		
+	}
 	
 	@Reference(unbind = "-")
 	@SuppressWarnings("unchecked")

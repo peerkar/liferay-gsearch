@@ -19,6 +19,14 @@ public interface ModuleConfiguration {
 		required = false
 	)
 	public boolean isEnabled();
+	
+	@Meta.AD(
+		deflt = "false", 
+		description = "is-indexer-enabled-desc",
+		name = "is-indexer-enabled-name", 
+		required = false
+	)
+	public boolean isIndexerEnabled();
 
 	@Meta.AD(
 		deflt = "http://localhost:9200/_ingest/pipeline/opennlp-pipeline/_simulate", 

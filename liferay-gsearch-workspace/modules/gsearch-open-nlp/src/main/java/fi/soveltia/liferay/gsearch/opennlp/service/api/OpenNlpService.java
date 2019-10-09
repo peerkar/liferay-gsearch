@@ -1,8 +1,7 @@
 package fi.soveltia.liferay.gsearch.opennlp.service.api;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
-
-import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
 
 /**
  * Liferay GSearch Open NLP service.
@@ -22,4 +21,12 @@ public interface OpenNlpService {
 	public JSONObject extractData(String keywords, boolean cache) 
 			throws Exception;
 	
+	/**
+	 * Gets a metadata entity.
+	 * 
+	 * @param metadata
+	 * @param key
+	 * @return
+	 */
+	public JSONArray getMetadata(JSONObject metadata, String key);
 }

@@ -1,6 +1,6 @@
 # Liferay GSearch Open NLP
 
-Exctracts metadata from users' queries making it available for a query clause conditions and clause configuration variables.
+Uses an ingestion pipeline to extract metadata from content users' queries making it available for a query clause conditions and clause configuration variables.
 
 This plugin uses the natural language processing (NLP) provided by the *Elasticsearch OpenNLP Ingest Processor* project. When users sends a request, the keywords are processed by an Elasticsearch Ingestion endpoint and the extracted metadata put to query context. The metadata contains:
 
@@ -14,7 +14,7 @@ Be aware that this plugin has currently some limitations:
 
 ## Open NLP Clause Condition Handler and Configuration Variables
 
-Example clause configuration using the `open_nlp` handler. 
+Example clause configuration using the `open_nlp` handler. If you want to use the 
 
 ```
 {
@@ -53,7 +53,7 @@ See the available configuration variables in `fi.soveltia.liferay.gsearch.opennl
 
 The *Elasticsearch OpenNLP Ingest Processor* Elasticsearch plugin needs to be installed. Follow the instruction at [https://github.com/spinscale/elasticsearch-ingest-opennlp](https://github.com/spinscale/elasticsearch-ingest-opennlp).
 
-For creatin the Liferay GSearch pipeline, use this:
+For creating the Liferay GSearch pipeline, use this:
 
 ```
 PUT _ingest/pipeline/opennlp-pipeline
@@ -72,6 +72,8 @@ PUT _ingest/pipeline/opennlp-pipeline
 ## Configuration
 
 After the module has been deployed succesfully, see the configuration options in `Control Panel -> Configuration -> System Settings -> Liferay GSearch -> Open NLP`.
+
+If you want to enable the indexer post processor and extract the metadata for the content, you have to install the custom ES adapter and reindex. After, you get the full power of this plugin and can for example, extract places from user query and target them in the clause configuration, with the configuration variables, to the corresponding document field. Be aware that enabling the post processor can be resource intensive, if you have the ingestion node in the same index as Liferay.
 
 This feature is disabled by default.
 
