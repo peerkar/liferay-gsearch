@@ -240,18 +240,14 @@ public class DLFileEntryItemBuilder
 			QueryContext queryContext, String key)
 		throws Exception {
 
-		Locale locale = (Locale)queryContext.getParameter(
-			ParameterNames.LOCALE);
-
 		StringBundler sb = new StringBundler();
 
 		sb.append("ddm__text__");
 		sb.append(String.valueOf(getTikaRawStructureId(queryContext)));
 		sb.append("__TIFF_IMAGE_");
 		sb.append(key);
-		sb.append("_");
-		sb.append(locale.toString());
-
+				
+		
 		return sb.toString();
 	}
 

@@ -120,7 +120,7 @@ public class GSearchQueryStringQueryClauseBuilder implements ClauseBuilder {
 				queryStringQuery.setDefaultOperator(Operator.AND);
 			}
 		}
-
+		
 		// Enable position increments
 
 		if (Validator.isNotNull(
