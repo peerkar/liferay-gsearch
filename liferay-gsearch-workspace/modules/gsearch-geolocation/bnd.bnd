@@ -1,0 +1,4 @@
+Bundle-Name: Liferay GSearch Geolocation
+Bundle-SymbolicName: fi.soveltia.liferay.gsearch.geolocation
+Bundle-Version: 4.0.0
+Export-Package: fi.soveltia.liferay.gsearch.geolocation.service.api
