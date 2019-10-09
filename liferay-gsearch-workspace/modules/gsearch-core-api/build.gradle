@@ -1,0 +1,11 @@
+dependencies {
+	compileOnly group: 'com.liferay', name: 'com.liferay.configuration.admin.api'
+	compileOnly group: "com.liferay", name: "com.liferay.portal.search.api"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.search.engine.adapter.api"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel"
+	compileOnly group: "javax.portlet", name: "portlet-api"
+	compileOnly group: "javax.servlet", name: "javax.servlet-api"
+	compileOnly group: "org.osgi", name: "org.osgi.core"
+	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations"
+	compileOnly 'com.liferay:com.liferay.configuration.admin.api'
+}
