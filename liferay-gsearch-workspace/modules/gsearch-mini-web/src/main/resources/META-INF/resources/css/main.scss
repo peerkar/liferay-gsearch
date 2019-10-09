@@ -1,0 +1,154 @@
+.gsearch-miniportlet {
+	
+	.textinput {
+		border: 1px solid #D6DCE2;
+		color: #29353D;
+		font-size: 1em;
+		min-width: 250px;
+		padding: 0 0 0 10px;
+	}
+
+	.textinput:focus {
+		animation: glow 800ms ease-out infinite alternate;
+		color: #000;
+		outline: none;
+	}
+
+	.textinput:focus::-webkit-input-placeholder, 
+	.textinput:focus:-moz-placeholder {
+		color: #efefef;
+	}
+	
+	.btn-secondary {
+		background: transparent;
+		margin-left: 0 !important;
+	}
+	
+	.btn-secondary:active,
+	.btn-secondary:hover,
+	.btn-secondary:focus {
+		outline: none;
+	}
+
+	@keyframes glow {
+		0% {
+			border-color: #D6DCE2;
+			box-shadow: 0 0 1px rgba(56,114,210,.1), 0 0 1px rgba(56,114,210,.1), 0 1px 0 rgba(56,114,210,.1);
+		}	
+		100% {
+			border-color: #869CAD;
+			box-shadow: 0 0 2px rgba(56,114,210,.4), 0 0 2px rgba(56,114,210,.6), 0 1px 10px rgba(56,114,210,.6);
+		}
+	} 
+}
+
+/* ---------- Devbridge autocomplete ---------- */
+
+.gsearch-mini-suggestions {
+
+	background: #fff; 
+	border: none;
+	box-shadow: 0 1px 10px -1px rgba(109, 109, 109, 0.3);
+	max-height: none!important;
+	overflow: auto; 
+	padding: 25px;
+
+	.autocomplete-group {
+
+		border-bottom: 1px solid #999;	
+	    margin: 0 0 15px 0;
+	    padding: 15px 0 10px 0;
+	
+	    &:first-child {
+	      padding-top: 0;
+	    }
+		
+		.category {
+		    font-weight: bold;
+		    text-transform: uppercase;
+		}
+		
+		.more {
+		    float: right;
+		    margin-right: 5px;
+		}
+	
+		strong { 
+			display: block; 
+			border-bottom: 1px solid #000; 
+		}
+	}
+	
+	.autocomplete-suggestion { 
+		
+	    padding: 5px;
+	    margin: 0 0 15px 0;
+	    white-space: normal;
+	
+	    &:hover {
+	      cursor: pointer;
+	      .search-suggestion-item-title {
+	        text-decoration: underline;
+	      }
+	    }
+	
+	    &:last-child {
+	      margin: 0;
+	    }
+	
+		.item-icon {
+			margin: 0 10px 0 0;
+			padding: 0;
+			svg {
+				height: 28px;
+				width: 28px;
+			}
+		}
+	
+		.title {
+			font-weight: 600;
+			overflow-x: hidden;
+			text-overflow: ellipsis;			
+			white-space: nowrap;
+		}
+		
+		.description {
+			break-work: word-break;
+			color: #999;
+			font-size: 11px;
+		}
+	}
+	
+	.autocomplete-suggestion:hover {
+		cursor: pointer;
+	}
+	
+	.autocomplete-selected { 
+		background: #F0F0F0; 
+	}
+
+	.autocomplete-selected:last-child { 
+		background: transparent; 
+	}
+	
+	.show-all {
+	    color: #708eb7;
+	    font-size: 0.9em;
+	    padding: 5px;
+   	}
+	
+	.show-all:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
+	
+	.show-all::after {
+		content: "\00BB";
+		margin-left: 5px;
+	}
+	
+	strong { 
+		font-weight: bold; 
+		color: #000; 
+	}
+}

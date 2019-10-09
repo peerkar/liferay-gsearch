@@ -1,0 +1,18 @@
+{
+	"author": "",
+	"dependencies": {
+		"devbridge-autocomplete": "1.4.10"
+	},
+	"description": "",
+	"devDependencies": {
+		"liferay-npm-bundler": "^2.8.0"
+	},
+	"keywords": [],
+	"license": "ISC",
+	"main": "index.js",
+	"name": "gsearch-mini-web",
+	"scripts": {
+		"build": "liferay-npm-bundler"
+	},
+	"version": "7.0.0"
+}
