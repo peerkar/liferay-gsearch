@@ -8,28 +8,27 @@ This plugin uses the natural language processing (NLP) provided by the *Elastics
 * persons
 * dates
 
-Be aware that this plugin is currently depending on Capitalized words when identifying persons and locations. For example "What happens in Helsinki" works but "What happens in helsinki" not.
+Be aware that this plugin has currently some limitations:
+1. Capitalization: persons and locations in the search phrase need to be capitalized. For example "What happens in Helsinki" works but "What happens in helsinki" not.
+1. English: persons identification works only for english names.
 
 ## Open NLP Clause Condition Handler and Configuration Variables
 
 Example clause configuration using the `open_nlp` handler. 
 
-In the clause configuration below,  the `clauses` are applied only if either person data `Petteri` or `Karttunen` is extracted from users' keywords. The complete persons metadata is used then to query the assetTagNames field:
-
 ```
 {
-  "description": "Example for using Open NLP condition handler and configuration variables: if 'Petteri' or 'Karttunen' is extracted as persons data in the keyword, the clause is applied.",
+  "description": "Example for using Open NLP condition handler and configuration variables: if 'Steve Jobs'  is extracted as persons data in the keyword, the clause is applied.",
   "enabled": true,
   "conditions": [
     {
       "handler_name": "open_nlp",
       "occur": "must",
       "configuration": {
-        "match_property": "persons",
+        "match_property": "person",
         "match_type": "any",
         "match_values": [
-          "Petteri",
-          "Karttunen"
+          "Steve Jobs"
         ]
       }
     }
@@ -39,7 +38,7 @@ In the clause configuration below,  the `clauses` are applied only if either per
       "query_type": "match",
       "occur": "should",
       "configuration": {
-        "boost": 100,
+        "boost": 10.0,
         "field_name": "assetTagNames",
         "query": "$_opennlp.persons_$"
       }
