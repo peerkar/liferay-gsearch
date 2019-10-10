@@ -226,7 +226,7 @@
 
 	function <portlet:namespace />openMoreLink(link) {
 
-		$('#<portlet:namespace />MiniSearchField').autocomplete('dispose');
+		//$('#<portlet:namespace />MiniSearchField').autocomplete('dispose');
 
 		window.location.href = link;
 	}
