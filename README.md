@@ -1,6 +1,8 @@
 
 # Liferay GSearch
 
+![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/screenshots/gsearch.gif)
+
 Liferay GSearch is a highly configurable, modular and multi module Google-like search application for Liferay 7.0+  bringing many features missing in the standard Liferay search portlets available.
 
 This application works on the low level of Liferay search adapter, has a rule based query building engine giving you full control over queries sent from Liferay to the search engine. User contextual information is available for both the query conditions and in the clause configuration template variables. With this application you can bring certain result higher on the list based for example on user's segments, location, frequently used previous keywords or pure keyword matching.
@@ -14,8 +16,6 @@ The main search portlet UI is built on React and provides several result layouts
 While this application can be used with the Liferay embedded Elasticsearch or any search engine and search engine adapter supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but it also extends and improves the standard query type support. 
 
 The application is modular and has multiple extension points for customizations. Headless REST API is also available.
-
-![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/screenshots/gsearch.gif)
 
 ## News
 * __(2019-10-09)__ [Liferay 7.2 version available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/7.2/)
