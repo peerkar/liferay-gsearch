@@ -71,12 +71,15 @@ public class ConfigurationInitializer {
 
 		InputStream inputStream = null;
 
+		StringBundler sb = new StringBundler();
+		sb.append("configs/").append(fileName).append(".config");
+
+		_log.info("Filename: " + sb.toString());
+		
 		try {
 
-			StringBundler sb = new StringBundler();
-			sb.append("configs/").append(fileName).append(".config");
 
-			inputStream = this.getClass().getClassLoader().getResourceAsStream(
+			inputStream = getClass().getClassLoader().getResourceAsStream(
 				sb.toString());
 
 			configuration.update(ConfigurationHandler.read(inputStream));
@@ -102,7 +105,7 @@ public class ConfigurationInitializer {
 	}
 
 	private static final String CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.web.configuration.ModuleConfiguration";
+		"fi.soveltia.liferay.gsearch.react.web.configuration.ModuleConfiguration";
 
 	private static final Logger _log =
 		LoggerFactory.getLogger(ConfigurationInitializer.class);
