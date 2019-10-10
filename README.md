@@ -11,7 +11,7 @@ It uses natural language processing (NLP) for contents and query keywords metada
 
 The main search portlet UI is built on React and provides several result layouts out of the box, like raw document and explain views for debugging or relevancy improvement purposes. A configurable recommendations as well as a search bar mini portlets are also available.
 
-While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but highly increases it's configurability and possibilities.
+While this application can be used with the Liferay embedded Elasticsearch or any search engine and search engine adapter supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but it also extends and improves the standard query type support. 
 
 The application is modular and has multiple extension points for customizations. Headless REST API is also available.
 
