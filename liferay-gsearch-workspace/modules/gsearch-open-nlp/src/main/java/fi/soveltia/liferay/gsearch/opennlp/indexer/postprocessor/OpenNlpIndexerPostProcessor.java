@@ -107,8 +107,6 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 						message.append( "(");
 						message.append(locale.toString());
 						message.append(").");
-						
-						_log.debug(metadata.toString());
 					}
 					
 					JSONArray locations = _openNlpService.getMetadata(metadata, "locations");
@@ -155,8 +153,20 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 		
 	}
 	
+	/**
+	 * Converts JSON array to string array.
+	 * 
+	 * @param array
+	 * @return
+	 */
 	private String[] valuesToStringArray(JSONArray array) {
-		return new String[0];
+		
+		String[]values = new String[array.length()];
+
+		for (int i = 0; i < array.length(); i++) {
+			values[i] = array.getString(i);
+		}
+		return values;
 	}
 
 	private volatile ModuleConfiguration _moduleConfiguration;
