@@ -1,8 +1,13 @@
 # 72-DXP-FIXPACK-1
 
-This custom Elasticsearch adapter version has been tested with following portal versions:
+This custom Elasticsearch adapter version has been tested with following setup:
 
 * DXP 7.2 FIXPACK 1
+* Elasticsearch 6.5.0
+
+## Requirements
+
+A standalone remo Elasticsearch. The Liferay embedded one doesn't work.
 
 ## Installation Instructions
 
