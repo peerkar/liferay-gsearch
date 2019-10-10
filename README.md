@@ -13,7 +13,7 @@ The main search portlet UI is built on React and provides several result layouts
 
 While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but highly increases it's configurability and possibilities.
 
-The application is modular and has multiple extension points for customizations. Headless REST is also available.
+The application is modular and has multiple extension points for customizations. Headless REST API is also available.
 
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/screenshots/gsearch.gif)
 
