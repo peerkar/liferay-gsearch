@@ -26,7 +26,7 @@ The application is modular and has multiple extension points for customizations.
 
 * [Installation](https://github.com/peerkar/liferay-gsearch/wiki/Installation)
 * [Configuration](https://github.com/peerkar/liferay-gsearch/wiki/Configuration)
-* [Modules](https://github.com/peerkar/liferay-gsearch/wiki/Project-Modules)
+* [Modules](https://github.com/peerkar/liferay-gsearch/wiki/Modules)
 * [About the project](https://github.com/peerkar/liferay-gsearch/wiki/About)
 
 ## Disclaimer
