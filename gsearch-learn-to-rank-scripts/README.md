@@ -14,6 +14,7 @@ This is part of the Liferay GSearch LTR functionality, which consists of:
 1. Install the `gsearch-click-tracking` module, if not yet installed.
 1. Enable click tracking in the Liferay GSearch React Portlet settings, in `Control Panel -> System Settings -> Liferay GSearch`
 1. For creating the judgements list i.e. running the Python scripts and grabbing the click data from the Click Tracking service, you need to setup Liferay credentials in `settings.cfg` file. There you can also define the click count threshold values for the judgment list rankings.
+1. Modify the features to match your requirements. Features are defined in files 1-4.json
 
 # GSearch Specific Scripts
 
