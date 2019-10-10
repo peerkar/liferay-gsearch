@@ -335,8 +335,6 @@ public class GSearchUtil {
 		string = string.replaceAll("---LR-HL-START---", "<liferay-hl>");
 		string = string.replaceAll("---LR-HL-STOP---", "</liferay-hl>");
 
-		System.out.println(string);
-		
 		if ((length > -1) && (string.length() > length)) {
 			String temp = string.substring(0, length);
 
@@ -347,7 +345,7 @@ public class GSearchUtil {
 					0, 1 + string.indexOf('>', temp.lastIndexOf('<')));
 			}
 
-			// string = temp.concat("...");
+			string = temp.concat("...");
 		}
 
 		return string;
