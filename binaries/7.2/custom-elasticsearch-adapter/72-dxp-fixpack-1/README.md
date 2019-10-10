@@ -8,6 +8,7 @@ This custom Elasticsearch adapter version has been tested with following portal 
 
 1. Shutdown the portal
 1. Download and copy the JARS in this folder to the deploy folder
+1. Download and copy the `gsearch-query-api` JAR from the Liferay GSearch binaries folder to the deploy folder (required by the adapter)
 1. Copy folder gsearch-synonyms to every active Elasticsearch server node under the *config* folder.
 1. Copy the `com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config` to the `LIFERAY_HOME/osgi/configs` folder to disable the standard adapter 
 1. Restart portal.
