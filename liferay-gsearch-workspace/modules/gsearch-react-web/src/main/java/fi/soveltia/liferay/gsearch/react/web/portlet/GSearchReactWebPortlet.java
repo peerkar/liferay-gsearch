@@ -23,6 +23,7 @@ import fi.soveltia.liferay.gsearch.react.web.constants.GSearchReactWebPortletKey
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.requires-namespaced-parameters=false",
 		"com.liferay.portlet.scopeable=false",
+		"javax.portlet.display-name=gsearch-react-portlet",
 		"javax.portlet.init-param.copy-request-parameters=false",
 		"javax.portlet.init-param.template-path=/",
 		"javax.portlet.init-param.view-template=/view.jsp",
