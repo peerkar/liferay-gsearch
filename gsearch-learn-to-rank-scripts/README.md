@@ -4,9 +4,9 @@ Based on https://github.com/o19s/elasticsearch-learning-to-rank.
 
 This is part of the Liferay GSearch LTR functionality, which consists of:
 
-1. __Click tracking service:__ used to gather result ranking data
+1. __Click tracking service:__ used to gather result ranking data (gsearch-click-tracking module)
 1. __LTR Python scripts (here):__ used to update the judgement list and model to ES
-1. __The custom LTR query type support in the Liferay GSearch core:__ allows to use SLTR queries as rescorers.
+1. __The custom LTR query type support in the Liferay GSearch core:__ allows to use SLTR queries as rescorers (example provided in the Rescorer configuration)
 
 # Installation
 
