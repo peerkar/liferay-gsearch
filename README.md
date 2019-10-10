@@ -7,11 +7,11 @@ This application works on the low level of Liferay search adapter, has a rule ba
 
 Imagine for example that there's a user of 30+ in age, female, from Helsinki, Finland. She's belonging to a user group XYZ and there's a rainy weather, where she's at. She's been frequently searching with a certain word stem and possibly belonging to Liferay Analytics cloud based segments. With this engine you can for example configure that certain clause or clauses get applied only if one, some or all of the previous conditions are satisfied. In another situation, you might for example want to inject users' location or other contextual data to the queries sent. This is also possible.
 
-It user natural language processing (NLP) for contents and query keywords metadata extraction and has a semi automated Learn To Rank (LTR) machine learning integration available.
+It uses natural language processing (NLP) for contents and query keywords metadata extraction and has a semi automated Learn To Rank (LTR) machine learning integration available.
 
 The main search portlet UI is built on React and provides several result layouts out of the box, like raw document and explain views for debugging or relevancy improvement purposes. A configurable recommendations as well as a search bar mini portlets are also available.
 
-While this application can be used with Liferay embedded Elasticsearch or any search engine supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but highly increases it's configurability and possibilities.
+While this application can be used with the Liferay embedded Elasticsearch or any search engine and search engine adapter supported by Liferay, it's designed to be used with the provided, custom Elasticsearch adapter which not only has an improved index configuration but it also extends and improves the standard query type support. 
 
 The application is modular and has multiple extension points for customizations. Headless REST API is also available.
 
@@ -24,10 +24,10 @@ The application is modular and has multiple extension points for customizations.
 
 ## Documentation
 
-* [Installation](https://github.com/peerkar/liferay-gsearch/Installation)
-* [Configuration](https://github.com/peerkar/liferay-gsearch/Configuration)
+* [Installation](https://github.com/peerkar/liferay-gsearch/wiki/Installation)
+* [Configuration](https://github.com/peerkar/liferay-gsearch/wiki/Configuration)
+* [Modules](https://github.com/peerkar/liferay-gsearch/wiki/Modules)
 * [About the project](https://github.com/peerkar/liferay-gsearch/wiki/About)
-* [Modules](https://github.com/peerkar/liferay-gsearch/wiki/Project-Modules)
 
 ## Disclaimer
 
