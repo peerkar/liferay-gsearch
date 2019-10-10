@@ -207,6 +207,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 		if ((items == null) || (items.size() == 0)) {
 			return jsonArray;
 		}
+		
+		
+		int descriptionMaxLength = GetterUtil.getInteger(
+				(Integer)queryContext.getConfiguration(
+						ConfigurationNames.RESULT_DESCRIPTION_MAX_LENGTH), 700);
 
 		for (SearchHit item : items) {
 			Document document = item.getDocument();
@@ -293,7 +298,7 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 				
 				// Set higlight fields
 				
-				setHightlightFields(item, jsonObject);
+				setHightlightFields(item, jsonObject, descriptionMaxLength);
 				
 				// Put single item to result array
 
@@ -451,8 +456,11 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 	 * 
 	 * @param item
 	 * @param resultObject
+	 * @param maxLength
+	 * @throws Exception
 	 */
-	protected void setHightlightFields(SearchHit item, JSONObject resultObject) {
+	protected void setHightlightFields(SearchHit item, JSONObject resultObject, int maxLength) 
+			throws Exception {
 		
 		if (item.getHighlightFieldsMap() == null) {
 			return;
@@ -480,7 +488,10 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			if (key.contains("_")) {
 				key = key.substring(0, key.indexOf("_"));
 			}
-			resultObject.put(key + "_highlight", sb.toString());
+			
+			String cleanedText = GSearchUtil.stripHTML(sb.toString(), maxLength);
+			
+			resultObject.put(key + "_highlight", cleanedText);
 		}
 	}
 

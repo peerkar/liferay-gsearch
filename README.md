@@ -18,7 +18,7 @@ The application is modular and has multiple extension points for customizations.
 ![Liferay GSearch](https://github.com/peerkar/liferay-gsearch/raw/master/screenshots/gsearch.gif)
 
 ## News
-* __(2019-10-09)__ [Liferay 7.2 version available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/7.2/2019-10-01)
+* __(2019-10-09)__ [Liferay 7.2 version available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/7.2/)
 * __(2019-02-06)__ [REST API available](https://github.com/peerkar/liferay-gsearch/tree/master/binaries/7.1/2019-06-19)
 * __(2019-01-29)__ [New Custom Elasticsearch adapters for 7.0 and 7.1 (CE and DXP) available](https://github.com/peerkar/liferay-gsearch/wiki/Changelog)
 
