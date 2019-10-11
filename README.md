@@ -31,4 +31,4 @@ The application is modular and has multiple extension points for customizations.
 
 ## Disclaimer
 
-This application hasn't been thoroughly tested, is to be considered experimental and is provided as is. If you have good development ideas, find bugs or need help in installaing, please leave ticket.
+This application hasn't been thoroughly tested, is to be considered experimental and is provided as is. If you have good development ideas, find bugs or need help in installing it, please leave ticket.
