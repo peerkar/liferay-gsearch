@@ -154,7 +154,6 @@ public class ViewMVCRenderCommand implements MVCRenderCommand {
 	 * bookmarkable and linkable.
 	 * 
 	 * @param renderRequest
-	 * @param template
 	 */
 	protected void setInitialParameters(RenderRequest renderRequest) {
 
