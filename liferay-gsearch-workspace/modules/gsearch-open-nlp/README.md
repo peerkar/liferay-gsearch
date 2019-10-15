@@ -81,6 +81,10 @@ This feature is disabled by default.
 
 (Major changes only)
 
+### 2019-10-15 (Version 1.0.1)
+
+* Fixed issue in indexer post processor
+
 ### 2019-10-01 (Version 1.0.0)
 
 * Initial version
