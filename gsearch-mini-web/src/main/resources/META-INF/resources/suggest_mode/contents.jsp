@@ -368,7 +368,7 @@
 				},
 				formatGroup: function(suggestion, category) {
 
-					if (category == 'show-more') {
+					if ((category === 'show-more') || (typeof category === 'undefined')) {
 						return '';
 					}
 					
@@ -406,7 +406,7 @@
 				serviceUrl: '<%=suggestionsURL %>',
 			    showNoSuggestionNotice: true,
 				transformResult: function(response) {
-	
+
 					if (response) {
 					      
 						// Sort array by type.
