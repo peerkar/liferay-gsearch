@@ -117,7 +117,7 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 						
 						String fieldName = FieldNames.LOCATIONS.concat(
 								StringPool.UNDERLINE).concat(locale.toString());
-						document.addText(fieldName, valuesToStringArray(locations));
+						document.addText(fieldName, _valuesToStringArray(locations));
 					}
 					
 					JSONArray persons = _openNlpService.getMetadata(metadata, "persons");
@@ -129,7 +129,7 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 						String fieldName = FieldNames.PERSONS.concat(
 								StringPool.UNDERLINE).concat(locale.toString());
 
-						document.addText(fieldName, valuesToStringArray(locations));
+						document.addText(fieldName, _valuesToStringArray(persons));
 					}
 					
 					JSONArray dates = _openNlpService.getMetadata(metadata, "dates");
@@ -141,7 +141,7 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 						String fieldName = FieldNames.DATES.concat(
 								StringPool.UNDERLINE).concat(locale.toString());
 						
-						document.addText(fieldName, valuesToStringArray(dates));
+						document.addText(fieldName, _valuesToStringArray(dates));
 					}
 				}
 			}
@@ -159,7 +159,7 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 	 * @param array
 	 * @return
 	 */
-	private String[] valuesToStringArray(JSONArray array) {
+	private String[] _valuesToStringArray(JSONArray array) {
 		
 		String[]values = new String[array.length()];
 
