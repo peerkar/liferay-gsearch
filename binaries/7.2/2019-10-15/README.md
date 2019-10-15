@@ -1,4 +1,4 @@
-# 2019-10-01
+# 2019-10-15
 
 Liferay GSearch application binaries. This build has been tested with the following portal versions:
 
