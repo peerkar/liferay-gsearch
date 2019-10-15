@@ -92,21 +92,26 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 				
 				if (text.length() > 0) {
 					
-					JSONObject metadata = _openNlpService.extractData(text, true);
-					
-					if (metadata == null || metadata.getJSONObject("error") != null) {
-						continue;
-					}
-					
 					if (_log.isDebugEnabled()) {
 						
 						StringBundler message = new StringBundler();
 						message.append("Extracting metadata ");
 						message.append(" for ");
 						message.append(document.get(Field.ENTRY_CLASS_PK));
-						message.append( "(");
+						message.append( " (");
 						message.append(locale.toString());
 						message.append(").");
+						
+						_log.debug(message.toString());
+					}
+					
+					JSONObject metadata = _openNlpService.extractData(text, true);
+
+					if (metadata == null || metadata.getJSONObject("error") != null) {
+						if (_log.isDebugEnabled()) {
+							_log.debug(metadata.toString());
+						}
+						continue;
 					}
 					
 					JSONArray locations = _openNlpService.getMetadata(metadata, "locations");

@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.cache.SingleVMPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.IOException;
@@ -66,9 +67,9 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 			}
 		}
 
-		JSONObject command = createCommand(keywords);
+		JSONObject command = _createCommand(keywords);
 		
-		return execute(command);
+		return _execute(command);
 	}
 	
 	/**
@@ -105,7 +106,7 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 	 * @param queryContext
 	 * @return
 	 */
-	private JSONObject createCommand(String keywords) {
+	private JSONObject _createCommand(String keywords) {
 		
 		JSONObject ingestionCommand = JSONFactoryUtil.createJSONObject();
 
@@ -128,7 +129,7 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 		JSONObject doc1 = JSONFactoryUtil.createJSONObject();
 	
 		JSONObject source = JSONFactoryUtil.createJSONObject();
-		source.put("gsearch_metadata", keywords);
+		source.put("gsearch_metadata", HtmlUtil.escape(keywords));
 	
 		doc1.put("_source", source);
 		docs.put(doc1);
@@ -145,7 +146,7 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 	 * @param command
 	 * @return
 	 */
-	private JSONObject execute(JSONObject command) {
+	private JSONObject _execute(JSONObject command) {
 	
 		String engineURL = _moduleConfiguration.engineURL();
 		
@@ -163,8 +164,8 @@ public class OpenNlpServiceImpl implements OpenNlpService {
 			
 		    HttpPost request = new HttpPost(engineURL);
 
-		    StringEntity params = new StringEntity(command.toString());
-		    request.addHeader("content-type", "application/json");
+		    StringEntity params = new StringEntity(command.toString(), "UTF-8");
+		    request.addHeader("content-type", "application/json;charset=UTF-8");
 		    request.setEntity(params);
 		    
 		    CloseableHttpResponse response = httpClient.execute(request);
