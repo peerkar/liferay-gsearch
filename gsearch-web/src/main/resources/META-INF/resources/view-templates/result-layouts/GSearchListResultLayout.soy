@@ -7,14 +7,15 @@
  * @param results
  */
 {template .render}
-	
+
 	{foreach $item in $results.items}
 		{call .item}
 			{param appendRedirect: $appendRedirect /}
 			{param item: $item /}
+			{param index: index($item) /}
 		{/call}
 	{/foreach}
-				
+
 {/template}
 
 /**
@@ -22,121 +23,131 @@
  *
  * @param appendRedirect
  * @param item
+ * @param index
  */
+
 {template .item}
 
 	{let $link: $appendRedirect == true ? ($item.link + $item.redirect) : $item.link /}
 
 	<div class="row">
-	
+
 		<div class="item">
 
-			// Do we have a thumbnail?
+			<div class="row">
 
-			{if $item.imageSrc}
+				{if ($item.typeKey == 'tool' or $item.typeKey == 'person')}
 
-				{let $contentClasses: 'col-xs-12 col-sm-12 col-md-10 col-lg-10 ' /}
+					<div class="item-icon col-md-1 col-lg-1 hidden-xs">
+						<a href="{$item.link}" data-index="{$index}">
+							<div class="{$item.typeKey}-icon">
+								{if ($item.typeKey == 'person')}
 
-				<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					{if $item.imageSrc != ''}
-						<a href="{$link}">
-							<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+									{if $item.userPortraitUrl}
+
+										<div class="user-portrait">
+											<div class="image-holder one-to-one">
+												<div class="content">
+													<img alt="{$item.userInitials}" class="" src="{$item.userPortraitUrl}" title="{$item.userName}" />
+												</div>
+											</div>
+										</div>
+
+									{elseif $item.userInitials}
+
+										<span class="user-avatar-image">
+											<div class="user-icon user-icon-default" title="{$item.userName}">
+												<span>{$item.userInitials}</span>
+											</div>
+										</span>
+									{/if}
+								{elseif ($item.typeKey == 'tool')}
+
+									<span>
+										{$item.icon}
+									</span>
+
+								{/if}
+							</div>
 						</a>
-					{/if}			
-				</div>
+					</div>
 
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
+				<div class="col-xs-12 col-sm-12 col-md-11 col-lg-11 content">
 
-			{elseif $item.userPortraitUrl}
-			
-				<div class="userimage col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<a href="{$link}" style="background-image: url('{$item.userPortraitUrl}');" title="{$item.userName}"></a>
-				</div>
+				{elseif $item.imageSrc}
 
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
+					<div class="smallimage col-md-2 col-lg-2 hidden-xs hidden-sm">
+						{if $item.imageSrc != ''}
+							<a href="{$link}" data-index="{$index}">
+								<img alt="{$item.title}" src="{$item.imageSrc}" title="{$item.title}" />
+							</a>
+						{/if}
+					</div>
 
-			{elseif $item.userInitials}
-			
-				<div class="userinitials col-md-2 col-lg-2 hidden-xs hidden-sm">
-					<span class="user-avatar-image"> 
-						<div class="user-icon-color-10 user-icon user-icon-lg user-icon-default" title="{$item.userName}">
-							<span class="initials">{$item.userInitials}</span>
-						</div> 
-					</span>
-				</div>
+				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">
 
-				<div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 content">				
+				{else}
+				<div class="content col-xs-12">
+				{/if}
 
-			{else}
-				<div class="content">
-			{/if}
+				{if ($item.typeKey == 'file')}
+					<div class="heading file">
+				{else}
+					<div class="heading">
+				{/if}
 
+						<h4>
+							{if ($item.typeKey == 'file')}
+								<svg role="presentation">
+									<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
+								</svg>
+							{/if}
 
-				<div class="heading">
-				
-					// Type.
-					
-					{if $item.type != ''}
-						<span class="type"><a href="{$link}">[{$item.type}]</a></span>
-					{/if}		
-							
-					<h1>
-						<a class="highlightable" href="{$link}">{$item.title}</a>
-					</h1>
-					
-					// An example of item tagged by Result Item Tagger plugin.
-					
-					{if $item.official_content}
-						<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
-					{/if} 
-				</div>
-				
-				<div class="link">
-					<a class="highlightable" href="{$link}">{$item.link}</a>
-				</div>
+							<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
 
-				// Description.
+							{if ($item.typeKey == 'file')}
+								<button class="file-link" aria-label="" aria-haspopup="true" aria-expanded="false">
+									<i class="icon-link" aria-hidden="true"></i>
+								</button>
+								<div style="display: none" class="file-link-preview">
+									<div class="dialog-pointer"></div>
+									<input type="text" class="file-link-input" readonly value="{$item.link}"/>
+								</div>
+							{/if}
+						</h4>
 
-				<div class="description ">
-					{if $item.date != ''}
-						<strong>{$item.date} </strong>
+						{if $item.official_content}
+							<span title="{msg desc=""}official-article{/msg}" class="glyphicon glyphicon-check"></span>
+						{/if}
+					</div>
+
+					<div class="description ">
+						{if $item.description != ''}
+							<span class="highlightable">{$item.description}</span>
+						{/if}
+					</div>
+
+					<div class="breadcrumbs">
+						{if $item.breadcrumbs != ''}
+							<span class="breadcrumbs">{$item.breadcrumbs}</span>
+						{/if}
+						{if ($item.date != '') and ($item.typeKey == 'news')}
+							<span class="date">{$item.date}</span>
+						{/if}
+					</div>
+
+					{if $item.categories}
+						<div class="categories">
+							{foreach $cat in $item.categories}
+								<span class="category" {if $cat.colorCode != ''} style="background: {$cat.colorCode}" {/if}>{$cat.name}</span>
+							{/foreach}
+						</div>
 					{/if}
-					{if $item.description != ''}
-						- <span class="highlightable">{$item.description}</span>
-					{/if}
-				</div>
-				
-				// Tags.
-				
-				{if $item.assetTagNames}
-					<div class="meta tags">
-						<span class="key">{msg desc=""}tags{/msg}:</span>
-						{foreach $tag in $item.assetTagNames}
-							<span class="label label-lg text-uppercase tag value tag">{$tag}</span>
-						{/foreach}
-					</div>							
-				{/if}
-				
-				// Categories.
-				
-				{if $item.assetCategoryTitles}
-					<div class="meta categories">
-						<span class="key">{msg desc=""}categories{/msg}:</span>
-						{foreach $category in $item.assetCategoryTitles}
-							<span class="label label-lg text-uppercase value category">{$category}</span>
-						{/foreach}
-					</div>							
-				{/if}
 
-				// Last author.
-				
-				{if $item.userName}
-					<div class="meta author">
-						<span class="key">{msg desc=""}author{/msg}:</span>
-						<span class="value">{$item.userName}</span>
-					</div>							
-				{/if}
+				</div>
+
 			</div>
 		</div>
 	</div>
+
 {/template}
