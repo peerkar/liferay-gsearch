@@ -37,8 +37,7 @@ import fi.soveltia.liferay.gsearch.web.constants.GSearchPortletKeys;
 		"javax.portlet.name=" + GSearchPortletKeys.GSEARCH_PORTLET,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.supports.mime-type=text/html",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = SoyPortletRegister.class
 )

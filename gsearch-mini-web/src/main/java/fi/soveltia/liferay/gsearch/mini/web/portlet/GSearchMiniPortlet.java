@@ -38,8 +38,7 @@ import fi.soveltia.liferay.gsearch.mini.web.constants.GSearchMiniPortletKeys;
 		"javax.portlet.name=" + GSearchMiniPortletKeys.GSEARCH_MINIPORTLET,
 		"javax.portlet.resource-bundle=content.Language",
 		"javax.portlet.security-role-ref=guest,power-user,user",
-		"javax.portlet.supports.mime-type=text/html",
-		"javax.portlet.version=3.0"
+		"javax.portlet.supports.mime-type=text/html"
 	},
 	service = Portlet.class
 )
