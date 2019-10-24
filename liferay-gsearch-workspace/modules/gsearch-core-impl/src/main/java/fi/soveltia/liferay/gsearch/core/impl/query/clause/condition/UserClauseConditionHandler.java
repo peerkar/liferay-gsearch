@@ -106,16 +106,22 @@ public class UserClauseConditionHandler implements ClauseConditionHandler {
 			return false;
 		}
 
+		if (_log.isDebugEnabled()) {
+			_log.warn("Checking age.");
+			_log.warn("Matchvalue: " + matchValue);
+			_log.warn("Age: " + age);
+		}
+				
 		switch(matchType) {
 
 			case ClauseConfigurationValues.MATCH_EQ: 
-				return matchValue == age;
+				return age == matchValue ;
 			case ClauseConfigurationValues.MATCH_LT: 
-				return matchValue < age;
+				return age < matchValue;
 			case ClauseConfigurationValues.MATCH_GT: 
-				return matchValue > age;
+				return age > matchValue;
 			case ClauseConfigurationValues.MATCH_NOT: 
-				return matchValue != age;
+				return age != matchValue;
 			default:
 				return false;
 		}
@@ -188,6 +194,12 @@ public class UserClauseConditionHandler implements ClauseConditionHandler {
 				_log.warn("Gender: " + gender);
 			}
 			return false;
+		}
+
+		if (_log.isDebugEnabled()) {
+			_log.warn("Checking gender.");
+			_log.warn("Matchvalue: " + matchValue);
+			_log.warn("Gender: " + gender);
 		}
 		
 		switch(matchType) {
