@@ -116,15 +116,21 @@ public class WeatherClauseConditionHandler implements ClauseConditionHandler {
 			}
 			return false;
 		}
-		
+
+		if (_log.isDebugEnabled()) {
+			_log.warn("Checking temperature.");
+			_log.warn("Matchvalue: " + matchValue);
+			_log.warn("Temperature: " + temperature);
+		}
+
 		switch(matchType) {
 
 			case ClauseConfigurationValues.MATCH_EQ: 
 				return temperature == matchValue;
 			case ClauseConfigurationValues.MATCH_LT: 
-				return temperature > matchValue;
-			case ClauseConfigurationValues.MATCH_GT: 
 				return temperature < matchValue;
+			case ClauseConfigurationValues.MATCH_GT: 
+				return temperature > matchValue;
 			case ClauseConfigurationValues.MATCH_NOT: 
 				return temperature != matchValue;
 			default:
