@@ -12,7 +12,11 @@ After the module has been deployed succesfully, please see the available configu
 
 (Major changes only)
 
-### 2019-08-15 (Version 8.0)
+### 2019-10-24 (Version 8.0.1)
+
+* Fixed broken keyword suggester configuration
+
+### 2019-10-15 (Version 8.0.0)
 
 * Liferay 7.2 upgrade
 
