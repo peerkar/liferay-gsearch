@@ -9,7 +9,9 @@ import com.liferay.portal.kernel.search.BaseIndexerPostProcessor;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Locale;
 import java.util.Map;
@@ -51,7 +53,18 @@ public class OpenNlpIndexerPostProcessor extends BaseIndexerPostProcessor {
 		if (!_moduleConfiguration.isEnabled() || !_moduleConfiguration.isIndexerEnabled()) {
 			return;
 		}
-
+		
+		// Don't reindex on other than publishing event, like recycling.
+		
+		int status = GetterUtil.getInteger(document.get(Field.STATUS));
+		
+		if (status != WorkflowConstants.STATUS_APPROVED) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Not a publishing action. Do nothing.");
+			}
+			return;
+		}
+		
 		_addMetadata(obj, document);
 
 	}
