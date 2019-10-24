@@ -1,7 +1,6 @@
 package fi.soveltia.liferay.gsearch.core.api.configuration;
 
 import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.Locale;
