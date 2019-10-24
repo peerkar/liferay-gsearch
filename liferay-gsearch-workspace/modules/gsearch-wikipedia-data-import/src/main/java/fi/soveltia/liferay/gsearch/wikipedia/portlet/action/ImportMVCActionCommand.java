@@ -319,6 +319,11 @@ public class ImportMVCActionCommand extends BaseMVCActionCommand {
 					).getAsString();
 
 					if (_checkTagValue(value)) {
+						
+						// Replace underscores
+						
+						value = value.replace("_", " ");
+						
 						tags.add(value);
 					}
 				}
