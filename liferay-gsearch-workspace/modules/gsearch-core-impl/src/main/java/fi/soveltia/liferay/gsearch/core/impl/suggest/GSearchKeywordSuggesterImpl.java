@@ -304,7 +304,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
     	
     	long companyId = (long)queryContext.getParameter(ParameterNames.COMPANY_ID);
     	
-    	String indexName = "gsearch-query-suggestion-20101"; //"" !_coreConfigurationHelper.getSuggesterIndexName(companyId);
+    	String indexName = _coreConfigurationHelper.getSuggesterIndexName(companyId);
     			
         SuggestSearchRequest suggestSearchRequest =
                 new SuggestSearchRequest(indexName);

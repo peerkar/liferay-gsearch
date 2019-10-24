@@ -21,7 +21,7 @@ import org.osgi.service.component.annotations.Modified;
 public class IndexConfigurationHelper {
 
 	public static final String CONFIGURATION_PID =
-		"fi.soveltia.liferay.gsearch.core.impl.configuration.IndexConfigurationHelper";
+		"fi.soveltia.liferay.gsearch.core.impl.configuration.IndexConfiguration";
 
 	public String getKeywordSuggesterIndex() {
 		return _configuration.keywordSuggesterIndex();
