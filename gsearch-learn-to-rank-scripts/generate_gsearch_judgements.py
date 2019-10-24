@@ -1,5 +1,5 @@
 import requests
-from utils import elastic_connection, INDEX_NAME, JUDGMENTS_FILE, LIFERAY_USERNAME,LIFERAY_PASSWORD
+from utils import elastic_connection, INDEX_NAME, JUDGMENTS_FILE, LIFERAY_USERNAME,LIFERAY_PASSWORD,CLICK_COUNT_GRADE_4,CLICK_COUNT_GRADE_3,CLICK_COUNT_GRADE_2,CLICK_COUNT_GRADE_1
 
 #
 # The base query for finding the docId for an entryClassPK.
@@ -34,21 +34,34 @@ def _write_file(es_connection, data):
 	keywords_list = []
 	queries = ""
 	judgements = ""
-	
+
 	with open(JUDGMENTS_FILE, 'w') as judgmentFile:
 		for record in data:
 			entry_class_pk = record['entryClassPK']
 			doc_id = _find_doc_id(es_connection, entry_class_pk)
-			
+
 			qid = "qid:1"
-			
+
 			if doc_id is not None:
-				grade = 1
+
+				clicks = record['clickCount']
+
+				if clicks >= CLICK_COUNT_GRADE_4:
+					grade = 4
+				elif clicks >= CLICK_COUNT_GRADE_3:
+					grade = 3
+				elif clicks >= CLICK_COUNT_GRADE_2:
+					grade = 2
+				elif clicks >= CLICK_COUNT_GRADE_1:
+					grade = 1
+				else:
+					grade = 0
+
 				keywords = record['keywords']
 				if keywords not in keywords_list:
 					index = len(keywords_list)
 					qid = "qid:%s" % (index+1)
-				
+
 					keywords_list.append(keywords)
 					#
 					# Create keyword entry. Example:
@@ -56,11 +69,11 @@ def _write_file(es_connection, data):
 					# # qid:1: rambo
 					#
 					queries += "# %s:\t%s\n" % (qid, keywords)
-									
-				
+
+
 				# 4	qid:1 #	7555	Rambo
 				judgements += "%s\t%s\t # %s#\n"% (grade, qid, doc_id)
-				
+
 		judgmentFile.write(queries)
 		judgmentFile.write(judgements)
 

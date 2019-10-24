@@ -1,4 +1,5 @@
-# qid:1:	camera
-# qid:2:	iphone
-1	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_43927#
-1	qid:2	 # com.liferay.journal.model.JournalArticle_PORTLET_41738#
+# qid:1:	jacket
+2	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_38210#
+3	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_38242#
+4	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_38194#
+4	qid:1	 # com.liferay.journal.model.JournalArticle_PORTLET_38226#

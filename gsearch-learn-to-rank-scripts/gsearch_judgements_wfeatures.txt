@@ -1,2 +1,4 @@
-1	qid:1	1:0.0	2:6.1985917	3:0.0	4:2.8940465 # com.liferay.journal.model.JournalArticle_PORTLET_43927	camera
-1	qid:2	1:0.0	2:3.2665775	3:0.0	4:2.2323003 # com.liferay.journal.model.JournalArticle_PORTLET_41738	iphone
+2	qid:1	1:0.12298282	2:0.0	3:0.0041614496	4:0.0 # com.liferay.journal.model.JournalArticle_PORTLET_38210	jacket
+3	qid:1	1:0.12298282	2:0.0	3:0.0041614496	4:0.0 # com.liferay.journal.model.JournalArticle_PORTLET_38242	jacket
+4	qid:1	1:0.12298282	2:0.0	3:0.0041614496	4:0.0 # com.liferay.journal.model.JournalArticle_PORTLET_38194	jacket
+4	qid:1	1:0.12298282	2:0.0	3:0.00414455	4:0.0 # com.liferay.journal.model.JournalArticle_PORTLET_38226	jacket

@@ -26,12 +26,11 @@ JUDGMENTS_FILE_FEATURES = config[config_set]['JudgmentsFileWithFeature']
 INDEX_NAME = config[config_set]['IndexName']
 LIFERAY_USERNAME = config[config_set]['LiferayUserName']
 LIFERAY_PASSWORD = config[config_set]['LiferayPassword']
-CLICK_COUNT_GRADE_0 = config[config_set]['ClickCount_Grade0']
-CLICK_COUNT_GRADE_1 = config[config_set]['ClickCount_Grade1']
-CLICK_COUNT_GRADE_2 = config[config_set]['ClickCount_Grade2']
-CLICK_COUNT_GRADE_3 = config[config_set]['ClickCount_Grade3']
-CLICK_COUNT_GRADE_4 = config[config_set]['ClickCount_Grade4']
-
+CLICK_COUNT_GRADE_0 = int(config[config_set]['ClickCount_Grade0'])
+CLICK_COUNT_GRADE_1 = int(config[config_set]['ClickCount_Grade1'])
+CLICK_COUNT_GRADE_2 = int(config[config_set]['ClickCount_Grade2'])
+CLICK_COUNT_GRADE_3 = int(config[config_set]['ClickCount_Grade3'])
+CLICK_COUNT_GRADE_4 = int(config[config_set]['ClickCount_Grade4'])
 
 def elastic_connection(url=None, timeout=1000, http_auth=auth):
     if url is None:

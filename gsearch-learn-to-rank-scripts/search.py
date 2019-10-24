@@ -4,7 +4,7 @@ baseQuery = {
   "query": {
       "multi_match": {
           "query": "test",
-          "fields": ["title", "overview"]
+          "fields": ["title_en_US", "content_en_US"]
        }
    },
   "rescore": {
@@ -36,10 +36,10 @@ if __name__ == "__main__":
     from utils import elastic_connection, INDEX_NAME
 
     es = elastic_connection(timeout=1000)
-    model = "test_6"
+    model = "gsearch_model_6"
     if len(argv) > 2:
         model = argv[2]
-    results = es.search(index=INDEX_NAME, doc_type='movie', body=ltr_query(argv[1], model))
+    results = es.search(index=INDEX_NAME, doc_type='LiferayDocumentType', body=ltr_query(argv[1], model))
     for result in results['hits']['hits']:
-        Logger.logger.info(result['_source']['title'])
+        Logger.logger.info(result['_source']['title_en_US'])
 
