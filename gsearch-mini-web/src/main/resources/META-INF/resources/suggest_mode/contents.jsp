@@ -371,9 +371,11 @@
 					if ((category === 'show-more') || (typeof category === 'undefined')) {
 						return '';
 					}
-					
-					var link = '<%= searchPageURL %>' + '?entryClassName=' + 
-						suggestion.data.entryClassName + '&q=' + 
+
+					var facets = suggestion.data.facets;
+					var facetUrlParams = 'hf=' + facets.join('&hf=');
+					var link = '<%= searchPageURL %>' + '?' +
+						facetUrlParams + '&q=' +
 						$('#<portlet:namespace />MiniSearchField').val();
 
 			        return '<div class="autocomplete-group">' +
