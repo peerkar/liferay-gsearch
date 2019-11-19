@@ -361,7 +361,7 @@ public class UserClauseConditionHandler implements ClauseConditionHandler {
 
 		User user = (User)queryContext.getParameter(ParameterNames.USER);
 
-		long[] roleIds = user.getGroupIds();
+		long[] roleIds = user.getRoleIds();
 		
 		String matchType = configuration.getString(
 				ClauseConfigurationKeys.MATCH_TYPE);
@@ -384,9 +384,9 @@ public class UserClauseConditionHandler implements ClauseConditionHandler {
 		for (int i = 0; i < matchValues.length(); i++) {
 			long matchId = matchValues.getLong(i);
 
-			for (long groupId : roleIds) {
+			for (long roleId : roleIds) {
 				
-				if (matchId == groupId) {
+				if (matchId == roleId) {
 					matchCount++;
 				}
 			}
@@ -399,7 +399,8 @@ public class UserClauseConditionHandler implements ClauseConditionHandler {
 				return false;
 			}
 		}
-		else if (matchCount == matchValues.length()) {
+		else if (matchValues.length() > 0 
+				&& matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_NOT)) {
 			return true;
 		}
 
