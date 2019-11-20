@@ -1,6 +1,6 @@
 Bundle-Name: Liferay GSearch Open NLP
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.opennlp
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.3
 Import-Package:\
 	!org.apache.avalon.*,\
 	!org.apache.log.*,\
