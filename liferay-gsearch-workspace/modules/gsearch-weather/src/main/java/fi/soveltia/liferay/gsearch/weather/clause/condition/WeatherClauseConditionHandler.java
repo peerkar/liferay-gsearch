@@ -183,10 +183,11 @@ public class WeatherClauseConditionHandler implements ClauseConditionHandler {
 				return false;
 			}
 		}
-		else if (matchCount == matchValues.length()) {
+		else if (matchValues.length() > 0 
+				&& matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_NOT)) {
 			return true;
 		}
-
+		
 		return false;		
 	}
 	
