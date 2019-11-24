@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { createRef } from 'react';
 import Autosuggest from 'react-autosuggest';
 import AutosuggestHighlightMatch from 'autosuggest-highlight/match';
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse';
@@ -10,6 +10,7 @@ import { Icon } from 'semantic-ui-react';
 
 import { ConfigKeys } from '../../constants/configkeys';
 import { RequestParameterNames } from '../../constants/requestparameters';
+import { setMessage } from '../../store/actions/message';
 import { search } from "../../store/actions/search";
 import { suggestions } from "../../store/actions/suggestions";
 import { getSuggestions, isSuggestionsLoading  } from '../../store/reducers/suggestions';
@@ -79,7 +80,7 @@ function mapDispatchToProps(dispatch) {
   const getSuggestions = suggestions.request;
   const getSearchResults = search.request;
 
-  return bindActionCreators({ getSearchResults, getSuggestions }, dispatch);
+  return bindActionCreators({ getSearchResults, getSuggestions, setMessage }, dispatch);
 }
 
 /**
@@ -94,10 +95,9 @@ class SearchField extends React.Component {
     super(props);
 
     this.state = {
-
       value: (this.props.initialKeywords ? this.props.initialKeywords : '')
     }
-
+    
     // Bind functions to this instance.
 
     this.onChange = this.onChange.bind(this);
@@ -122,7 +122,14 @@ class SearchField extends React.Component {
    * @param {String} value 
    */
   doSearchRequest(value) { 
-    this.props.getSearchResults({ [RequestParameterNames.KEYWORDS]: value })
+
+    // Check for minimum character count.
+
+    if (value.trim().length >= this.searchFieldConfig.queryMinLength) {
+		this.props.getSearchResults({ [RequestParameterNames.KEYWORDS]: value })
+    } else {
+		this.props.setMessage(Liferay.Language.get('min-character-count-is') + ' ' + this.searchFieldConfig.queryMinLength);
+	}
   }
 
   /**
@@ -201,10 +208,8 @@ class SearchField extends React.Component {
       return false;
     }
 
-    // Check for minimum character count.
-
     if (value.trim().length >= this.searchFieldConfig.queryMinLength) {
-      return true;
+       return true;
     }
 
     return false;
@@ -214,9 +219,9 @@ class SearchField extends React.Component {
    * Render.
    */
   render() {
-
-    const { isLoading, results } = this.props
-    let { value } = this.state
+	  
+    const { isLoading, results } = this.props;
+    let { value } = this.state;
 
     // Props required by the Autosuggest component
 
@@ -232,7 +237,8 @@ class SearchField extends React.Component {
       // Using Semantic UI CSS classes.
 
       <div className="ui fluid search gsearch-searchfield">
-        <div className="ui icon input">
+
+      	<div className="ui icon input">
           <Autosuggest
             getSuggestionValue={getSuggestionValue}
             inputProps={inputProps}

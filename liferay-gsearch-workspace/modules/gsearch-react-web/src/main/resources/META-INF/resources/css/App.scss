@@ -11,6 +11,10 @@
     .inner-wrapper {
       margin: 0 auto;
       width: 500px;
+
+      .message {
+         float: left;
+      }
     }
 
     @media only screen and (max-width: 768px) {

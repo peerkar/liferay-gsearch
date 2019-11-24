@@ -8,6 +8,7 @@ import Errors from './containers/Errors/index';
 import Facets from './containers/Facets/index';
 import Filters from './containers/Filters/index';
 import Help from './containers/Help/index';
+import Message from './containers/Message/index';
 import Pagination from './containers/Pagination/index';
 import QuerySuggestions from './containers/QuerySuggestions/index'
 import ResultLayout from './containers/ResultLayout/index';
@@ -84,6 +85,7 @@ class App extends React.Component {
         <div className="gsearch-centered-wrapper searchfield">
           <div className="inner-wrapper">
             <Help />
+        	<Message />
             <SearchField />
           </div>
         </div>
