@@ -12,9 +12,25 @@
 {template .render}
 	
 	<div class="gsearch-container" id="{$id}" style="display: none;">
-	
-		<h2>{msg desc=""}search-title{/msg}</h2>
-	
+
+		<h2>{msg desc=""}search-title{/msg}
+
+			<div class="flamma-general-tooltip">
+				<button type="button" class="toggle-guide-text"
+						data-namespace="_gsearchportlet_"
+						data-guide-id="guide-text-gsearch"
+						data-article-name="haku_ohje"
+						id="_gsearchportlet_guide-text-gsearch-toggle"
+						aria-haspopup="true"
+						aria-expanded="false"
+						aria-controls="_gsearchportlet_guide-text-gsearch">
+					?
+				</button>
+				<div class="guide-text-popup" hidden="hidden" id="_gsearchportlet_guide-text-gsearch">
+				</div>
+			</div>
+		</h2>
+
 		// Searchfield.
 
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 gsearch-centered gsearch-searchfield">
