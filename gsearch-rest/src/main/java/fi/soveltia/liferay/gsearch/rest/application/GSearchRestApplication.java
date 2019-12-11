@@ -221,7 +221,7 @@ public class GSearchRestApplication extends Application {
 		QueryContext queryContext;
 		try {
 			queryContext = _queryContextBuilder.buildQueryContext(
-				httpServletRequest, null, null, null, null, null);
+				httpServletRequest, null, null, null, null, null, locale);
 
 			queryContext.setPageSize(GetterUtil.get(pageSize, 10));
 			queryContext.setParameter(ParameterNames.PATH_IMAGE, "/image");

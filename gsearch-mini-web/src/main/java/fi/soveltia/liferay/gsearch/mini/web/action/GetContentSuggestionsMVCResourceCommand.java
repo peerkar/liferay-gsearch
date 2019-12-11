@@ -80,7 +80,7 @@ public class GetContentSuggestionsMVCResourceCommand
 				PortalUtil.getHttpServletRequest(resourceRequest);
 
 			queryContext = _queryContextBuilder.buildQueryContext(httpServletRequest,
-				null, null, null, null, null);
+				null, null, null, null, null, resourceRequest.getLocale());
 			
 			_queryContextBuilder.parseParameters(queryContext);
 			

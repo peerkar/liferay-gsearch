@@ -96,8 +96,8 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 			HttpServletRequest httpServletRequest = PortalUtil.getHttpServletRequest(resourceRequest);
 
 			queryContext = _queryContextBuilder.buildQueryContext(httpServletRequest,
-				null, null, null, null, null);
-			
+				null, null, null, null, null, resourceRequest.getLocale());
+
 			_queryContextBuilder.parseParameters(queryContext);
 			
 			// Set other context parameters

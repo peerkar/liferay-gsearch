@@ -59,14 +59,14 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	public QueryContext buildQueryContext(HttpServletRequest httpServletRequest,
 		String[] filterConfiguration,
 		String[] clauseConfiguration, String[] facetConfiguration,
-		String[] sortConfiguration, String[] suggesterConfiguration)
+		String[] sortConfiguration, String[] suggesterConfiguration, Locale locale)
 		throws Exception {
 		 
 		QueryContext queryContext = new QueryContext();
 		
 		queryContext.setParameter(ParameterNames.HTTP_SERVLET_REQUEST, httpServletRequest);
 
-		queryContext.setLocale(httpServletRequest.getLocale());
+		queryContext.setLocale(locale);
 		queryContext.setPortalUrl(PortalUtil.getPortalURL(httpServletRequest));
 
 		if (filterConfiguration == null) {

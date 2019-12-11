@@ -147,7 +147,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		QueryContext queryContext = _queryContextBuilder.buildQueryContext(
 			httpServletRequest, getFilterConfiguration(preferences),
 			getClauseConfiguration(preferences),
-			_configurationHelper.getFacetConfiguration(), null, null);
+			_configurationHelper.getFacetConfiguration(), null, null, themeDisplay.getLocale());
 
 		queryContext.setParameter(
 			ParameterNames.COMPANY_ID, themeDisplay.getCompanyId());

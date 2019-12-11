@@ -42,7 +42,7 @@ public interface QueryContextBuilder {
 	public QueryContext buildQueryContext(
 		HttpServletRequest httpServletRequest, String[] filterConfiguration,
 		String[] clauseConfiguration, String[] facetConfiguration,
-		String[] sortConfiguration, String[] suggesterConfiguration)
+		String[] sortConfiguration, String[] suggesterConfiguration, Locale locale)
 		throws Exception;
 
 	/**
