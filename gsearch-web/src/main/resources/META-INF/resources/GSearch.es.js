@@ -50,7 +50,7 @@ class GSearch extends Component {
 		let context = this;
 
 		function onPopstate() {
-			if (window.history.state != null) {
+			if ((window.history.state != null) && (typeof window.history.state != 'object')) {
 				let searchfield = $('#' + context.portletNamespace + 'SearchField');
 				let searchbutton = $('#' + context.portletNamespace + 'SearchButton');
 				if (searchfield.length && searchbutton.length) {
