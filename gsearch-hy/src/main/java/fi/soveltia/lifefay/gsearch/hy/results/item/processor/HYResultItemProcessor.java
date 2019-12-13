@@ -98,10 +98,11 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 				String fullPath = matcher.group(1);
 
 				String friendlyURL = "";
-				if (fullPath.startsWith("/group/")) {
-					List<String> path = Arrays.asList(fullPath.split("/"));
-					friendlyURL =
-						"/" + String.join("/", path.subList(3, path.size()));
+				String pathRegex = "\\A(/(fi|sv|en)|)/group/.*?/";
+				Pattern pathPattern = Pattern.compile(pathRegex + ".*", Pattern.CASE_INSENSITIVE);
+				Matcher pathMatcher = pathPattern.matcher(fullPath);
+				if (pathMatcher.matches()) {
+					friendlyURL = "/" + fullPath.replaceFirst(pathRegex, "");
 				}
 				else {
 					friendlyURL = fullPath;
@@ -282,7 +283,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 	private Long getArticleViewGroupId(String link) {
 		Long viewGroupId = null;
 		if (link != null) {
-			String regex = ".*https?://[\\w.-]+/group(/[\\w-]+).*";
+			String regex = ".*https?://[\\w.-]+(/(fi|sv|en)|)/group(/[\\w-]+).*";
 
 			Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(link);
