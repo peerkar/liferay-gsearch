@@ -38,7 +38,7 @@
 
 				{if ($item.typeKey == 'tool' or $item.typeKey == 'person')}
 
-					<div class="item-icon col-md-1 col-lg-1 hidden-xs">
+					<div class="item-icon">
 						<a href="{$item.link}" data-index="{$index}">
 							<div class="{$item.typeKey}-icon">
 								{if ($item.typeKey == 'person')}
@@ -90,20 +90,22 @@
 				<div class="content col-xs-12">
 				{/if}
 
+                <a  href="{$item.link}" data-index="{$index}" class="areaLink">
+
 				{if ($item.typeKey == 'file')}
 					<div class="heading file">
 				{else}
 					<div class="heading">
 				{/if}
 
-						<h4>
+						<h4 class="highlightable">
 							{if ($item.typeKey == 'file')}
 								<svg role="presentation">
 									<use xlink:href="/o/flamma-theme/images/flamma/svg/svg.svg#icon-file-text"/>
 								</svg>
 							{/if}
 
-							<a class="highlightable"  href="{$item.link}" data-index="{$index}">{$item.title}</a>
+							<span class="">{$item.title}</span>
 
 							{if ($item.typeKey == 'file')}
 								<button class="file-link" aria-label="" aria-haspopup="true" aria-expanded="false">
@@ -135,6 +137,8 @@
 							<span class="date">{$item.date}</span>
 						{/if}
 					</div>
+
+					</a>
 
 					{if $item.categories}
 						<div class="categories">
