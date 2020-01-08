@@ -10,6 +10,10 @@ Be aware that *Raw Document* and *Explain* result layouts are enabled by default
 
 ## Changelog
 
+### 2020-01-08 (Version 1.0.2)
+* Fixed paging resetting on result layout change.
+* Fixed wrong offset on pages > 1
+
 ### 2019-11-01 (Version 1.0.0)
 
 * Initial version
