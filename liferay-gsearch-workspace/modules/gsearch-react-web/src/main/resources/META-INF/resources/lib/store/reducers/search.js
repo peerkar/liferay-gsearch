@@ -67,8 +67,11 @@ function mergeSearchParams(action, state) {
       if (state.searchParams[key] != action.searchParams[key]) {
         shouldReset = true;
       }
-    } else if (!RequestParameterNames[key]) {
-    	shouldResetPage = true;
+    } else {
+
+    	// Any other parameter is a facet. Changing a value has to reset paging. 
+
+    	shouldResetPage = isFacetVariable(key);
     }    
   });
 
@@ -93,6 +96,22 @@ function mergeSearchParams(action, state) {
   Object.keys(action.searchParams).forEach(e => params[e] = action.searchParams[e]);
 
   return params;
+}
+
+/**
+ * Checks whether the given parameter is a "known", fixed parameter or "unknown", meaning a facet.
+ * 
+ * @param key
+ * @returns
+ */
+function isFacetVariable(parameter) {
+
+	for (var property in RequestParameterNames) {
+        if (RequestParameterNames.hasOwnProperty(property) && RequestParameterNames[property] === parameter) {
+            return false;
+        }
+    }
+	return true;
 }
 
 // Search selectors.
