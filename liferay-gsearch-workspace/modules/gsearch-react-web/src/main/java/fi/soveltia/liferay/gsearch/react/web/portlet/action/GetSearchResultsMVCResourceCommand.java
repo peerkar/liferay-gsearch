@@ -520,7 +520,7 @@ public class GetSearchResultsMVCResourceCommand extends BaseMVCResourceCommand {
 		if (page == 1) {
 			return 0;
 		} else {
-			return (((page-1) * _moduleConfiguration.pageSize()) + 1);
+			return (((page-1) * _moduleConfiguration.pageSize()));
 		}
 	}
 	
