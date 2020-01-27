@@ -1,6 +1,6 @@
 Bundle-Name: Liferay GSearch Click Tracking API
 Bundle-SymbolicName: fi.soveltia.liferay.gsearch.click.tracking.api
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Export-Package:\
 	fi.soveltia.liferay.gsearch.click.tracking.exception,\
 	fi.soveltia.liferay.gsearch.click.tracking.model,\

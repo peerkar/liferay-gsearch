@@ -29,6 +29,10 @@ The application is modular and has multiple extension points for customizations.
 * [Modules](https://github.com/peerkar/liferay-gsearch/wiki/Modules)
 * [About the project](https://github.com/peerkar/liferay-gsearch/wiki/About)
 
+## License
+
+Liferay GSearch is, except the forked Learning the Rank demonstration which is Apache 2.0, licensed under LGPL v.3.
+
 ## Disclaimer
 
 This application hasn't been thoroughly tested, is to be considered experimental and is provided as is. If you have good development ideas, find bugs or need help in installing it, please file a ticket.
