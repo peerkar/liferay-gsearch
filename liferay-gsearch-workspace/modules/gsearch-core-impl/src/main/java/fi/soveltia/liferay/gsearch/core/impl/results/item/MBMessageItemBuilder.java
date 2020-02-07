@@ -109,12 +109,10 @@ public class MBMessageItemBuilder
 		Locale locale = (Locale)queryContext.getParameter(
 			ParameterNames.LOCALE);
 
-		String fieldName = getStringFieldContent(
-				document, Field.CONTENT, locale);
+		String title = getStringFieldContent(
+				document, Field.CONTENT, locale);		
 		
-		String description = document.getString(fieldName);
-
-		return GSearchUtil.stripHTML(description, _TITLE_MAX_LENGTH);
+		return GSearchUtil.stripHTML(title, _TITLE_MAX_LENGTH);
 	}
 
 	protected String getDLFileEntryCommentLink() {
