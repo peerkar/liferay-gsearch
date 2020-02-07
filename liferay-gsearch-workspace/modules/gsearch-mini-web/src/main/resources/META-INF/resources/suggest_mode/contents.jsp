@@ -151,8 +151,12 @@
 
 							// Shorten to (for now) fixed 75 chars.
 
-							var description = dataItem.description;
+							let description = dataItem.description ? dataItem.description : dataItem.content_highlight;
 
+							if (description == null) {
+								description = '';
+							}
+							
 							description = description.replace(/<liferay-hl>/g, '').replace(/<\/liferay-hl>/g, '');
 
 							if (description.length > 75) {
@@ -221,6 +225,7 @@
 	* Sorts objects by type.
 	*/
 	function <portlet:namespace />sortByType (A, B) {
+	
 		return ((A.type == B.type) ? 0 : ((A.type > B.type) ? 1 : -1 ));
 	}
 
