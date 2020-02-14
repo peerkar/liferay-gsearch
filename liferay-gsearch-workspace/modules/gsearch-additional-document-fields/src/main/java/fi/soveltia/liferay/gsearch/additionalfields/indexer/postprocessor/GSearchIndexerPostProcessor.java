@@ -176,12 +176,11 @@ public class GSearchIndexerPostProcessor extends BaseIndexerPostProcessor {
 		}
 	}
 	
-	private volatile ModuleConfiguration _moduleConfiguration;
-
 	private static final Logger _log =
 		LoggerFactory.getLogger(GSearchIndexerPostProcessor.class);
 
 	@Reference
-	Language _language;
+	private Language _language;
 	
+	private volatile ModuleConfiguration _moduleConfiguration;
 }
