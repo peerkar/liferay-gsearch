@@ -38,7 +38,7 @@ class GSearchQuery extends State {
 		}
 		
 		url = url.concat(params);
-		
+
 		return url;
 	}
 	
@@ -165,6 +165,17 @@ class GSearchQuery extends State {
 	 */
 	getParameterValue(key) {
 		return this.getValue(key, this.parameters);
+	}
+
+	getMultiParameterValue(key) {
+		let vals = [];
+		for(let i = 0; i < this.parameters.length; i++) {
+			let param = this.parameters[i];
+			if(param.key === key) {
+				vals.push(param.value);
+			}
+		}
+		return vals.join(',');
 	}
 
 	/**
