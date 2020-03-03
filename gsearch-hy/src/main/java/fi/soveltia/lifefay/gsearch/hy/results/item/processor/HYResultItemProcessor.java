@@ -38,8 +38,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fi.helsinki.flamma.common.category.FlammaAssetCategoryService;
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
+import fi.helsinki.flamma.expert.search.model.service.ExpertSearchContactLocalService;
 import fi.helsinki.flamma.profile.tools.model.ProfileTool;
 import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
@@ -404,6 +406,7 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put(
                     "breadcrumbs",
                     getExpertSearchContactBreadcrumbs(locale, document.get(Field.USER_NAME)));
+				setCategoriesForExpertSearchContact(resultItem, locale, document.get(Field.USER_ID));
             }
             else if (ProfileTool.class.getName().equals(entryClassName)) {
 
@@ -544,6 +547,26 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		}
 	}
 
+	private String getOrganizationAsStringForUser(String userId, Locale locale){
+		try{
+			ExpertSearchContact contact = expertSearchContactLocalService.findByuserId(Long.parseLong(userId));
+			return contact.getOrganizationLvl1(locale);
+		} catch (Exception e){
+			_log.error(String.format("Cannot get category for contact %s", userId));
+			return null;
+		}
+	}
+
+	private void setCategoriesForExpertSearchContact(JSONObject resultItem, Locale locale, String userId){
+		String organization = getOrganizationAsStringForUser(userId, locale);
+		AssetCategory assetCategory = flammaAssetCategoryService
+				.getOrganizationCategoryForOrganizationName(organization);
+		if(assetCategory != null){
+			resultItem.put("abbrevation", flammaAssetCategoryService.getCategoryAbbreviation(assetCategory));
+			resultItem.put("color", flammaAssetCategoryService.getCategoryColor(assetCategory));
+		}
+	}
+
 	private static final Logger _log =
 		LoggerFactory.getLogger(HYResultItemProcessor.class);
 
@@ -573,4 +596,10 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	@Reference
 	private FlammaGroupService flammaGroupService;
+
+	@Reference
+	private FlammaAssetCategoryService flammaAssetCategoryService;
+
+	@Reference
+	private ExpertSearchContactLocalService expertSearchContactLocalService;
 }
