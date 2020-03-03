@@ -117,8 +117,10 @@
 
 							{if ($item.typeKey == 'person')}
 
-								<span class="category" {if $item.colorCode != ''} style="background: {$item.colorCode}" {/if}>{$item.name}</span>
-
+								{if $item.name}
+									<span class="category" {if $item.colorCode != ''}
+										  style="background: {$item.colorCode}" {/if}>{$item.name}</span>
+								{/if}
                             {/if}
 
 

@@ -406,7 +406,6 @@ public class HYResultItemProcessor implements ResultItemProcessor {
                 resultItem.put(
                     "breadcrumbs",
                     getExpertSearchContactBreadcrumbs(locale, document.get(Field.USER_NAME)));
-				setCategoriesForExpertSearchContact(resultItem, locale, document.get(Field.USER_ID));
             }
             else if (ProfileTool.class.getName().equals(entryClassName)) {
 
@@ -539,6 +538,12 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 		}
 
+		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
+
+		if(ExpertSearchContact.class.getName().equals(entryClassName)){
+			setCategoryForExpertSearchContact(resultItem, document.get(Field.USER_ID));
+		}
+
 		// Set to result item.
 
 		if (categories != null && categories.size() > 0) {
@@ -547,18 +552,18 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		}
 	}
 
-	private String getOrganizationAsStringForUser(String userId, Locale locale){
+	private String getOrganizationNameForUser(String userId){
 		try{
 			ExpertSearchContact contact = expertSearchContactLocalService.findByuserId(Long.parseLong(userId));
-			return contact.getOrganizationLvl1(locale);
+			return contact.getOrganizationLvl1(LanguageUtil.getLanguageId(new Locale("fi", "FI")));
 		} catch (Exception e){
 			_log.error(String.format("Cannot get category for contact %s", userId));
 			return null;
 		}
 	}
 
-	private void setCategoriesForExpertSearchContact(JSONObject resultItem, Locale locale, String userId){
-		String organization = getOrganizationAsStringForUser(userId, locale);
+	private void setCategoryForExpertSearchContact(JSONObject resultItem, String userId){
+		String organization = getOrganizationNameForUser(userId);
 		AssetCategory assetCategory = flammaAssetCategoryService
 				.getOrganizationCategoryForOrganizationName(organization);
 		if(assetCategory != null){
