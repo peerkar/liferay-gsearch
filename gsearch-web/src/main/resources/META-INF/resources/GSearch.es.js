@@ -255,8 +255,10 @@ class GSearch extends Component {
 	updateAddressBar(address) {
 		if (window.history.pushState) {
 			let q = this.query.getParameterValue('q');
-			if (window.history.state !== q) {
-				window.history.pushState(q, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
+			let hf = this.query.getMultiParameterValue('hf');
+			let state = {q: q, hf: hf};
+			if (window.history.state.q !== state.q || window.history.state.hf  !== state.hf) {
+				window.history.pushState(state, this.query.getParameterValue('q') + '-' + Liferay.Language.get('search'), address);
 			}
 		} else {
 			document.location.hash = address;
