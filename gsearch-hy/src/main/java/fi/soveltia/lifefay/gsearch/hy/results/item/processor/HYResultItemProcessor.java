@@ -562,8 +562,8 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 		AssetCategory assetCategory = flammaAssetCategoryService
 				.getOrganizationCategoryForOrganizationName(organization);
 		if(assetCategory != null){
-			resultItem.put("abbrevation", flammaAssetCategoryService.getCategoryAbbreviation(assetCategory));
-			resultItem.put("color", flammaAssetCategoryService.getCategoryColor(assetCategory));
+			resultItem.put("name", flammaAssetCategoryService.getCategoryAbbreviation(assetCategory));
+			resultItem.put("colorCode", flammaAssetCategoryService.getCategoryColor(assetCategory));
 		}
 	}
 
