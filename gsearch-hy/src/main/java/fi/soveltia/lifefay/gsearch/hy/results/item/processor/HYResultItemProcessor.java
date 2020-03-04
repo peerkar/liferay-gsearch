@@ -38,8 +38,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fi.helsinki.flamma.common.category.FlammaAssetCategoryService;
 import fi.helsinki.flamma.common.group.FlammaGroupService;
 import fi.helsinki.flamma.expert.search.model.model.ExpertSearchContact;
+import fi.helsinki.flamma.expert.search.model.service.ExpertSearchContactLocalService;
 import fi.helsinki.flamma.profile.tools.model.ProfileTool;
 import fi.soveltia.liferay.gsearch.localization.LocalizationHelper;
 import org.osgi.service.component.annotations.Component;
@@ -537,11 +539,37 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 		}
 
+		String entryClassName = document.get(Field.ENTRY_CLASS_NAME);
+
+		if(ExpertSearchContact.class.getName().equals(entryClassName)){
+			setCategoryForExpertSearchContact(resultItem, document.get(Field.USER_ID));
+		}
+
 		// Set to result item.
 
 		if (categories != null && categories.size() > 0) {
 
 			resultItem.put("categories", categories);
+		}
+	}
+
+	private String getOrganizationNameForUser(String userId){
+		try{
+			ExpertSearchContact contact = expertSearchContactLocalService.findByuserId(Long.parseLong(userId));
+			return contact.getOrganizationLvl1(LanguageUtil.getLanguageId(new Locale("fi", "FI")));
+		} catch (Exception e){
+			_log.error(String.format("Cannot get category for contact %s", userId));
+			return null;
+		}
+	}
+
+	private void setCategoryForExpertSearchContact(JSONObject resultItem, String userId){
+		String organization = getOrganizationNameForUser(userId);
+		AssetCategory assetCategory = flammaAssetCategoryService
+				.getOrganizationCategoryForOrganizationName(organization);
+		if(assetCategory != null){
+			resultItem.put("name", flammaAssetCategoryService.getCategoryAbbreviation(assetCategory));
+			resultItem.put("colorCode", flammaAssetCategoryService.getCategoryColor(assetCategory));
 		}
 	}
 
@@ -574,4 +602,10 @@ public class HYResultItemProcessor implements ResultItemProcessor {
 
 	@Reference
 	private FlammaGroupService flammaGroupService;
+
+	@Reference
+	private FlammaAssetCategoryService flammaAssetCategoryService;
+
+	@Reference
+	private ExpertSearchContactLocalService expertSearchContactLocalService;
 }
