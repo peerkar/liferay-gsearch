@@ -55,7 +55,8 @@ class GSearchURLUtil {
     static encodeValues(value) {
         if (value) {
             value = value.toString();
-            return value.replace(/ /g, '%20').replace(/\"/g, '%22');
+            value = encodeURIComponent(value);
+            return value;
         }
     }
 
