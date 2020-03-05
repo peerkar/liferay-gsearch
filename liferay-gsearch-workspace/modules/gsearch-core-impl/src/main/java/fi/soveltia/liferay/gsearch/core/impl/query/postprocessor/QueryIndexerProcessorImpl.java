@@ -57,13 +57,19 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 
 		Hits hits = searchResponse.getHits();
 		
-		if (Validator.isNotNull(queryContext.getKeywords()) &&
+		// Use the raw keywords from the initial search only
+		// i.e. not from an alternate search.
+		
+		String keywords = 
+				(String)queryContext.getParameter(ParameterNames.RAW_KEYWORDS);
+				
+		if (Validator.isNotNull(keywords) &&
 			(hits.getLength() >=
 				_keywordSuggesterConfiguration.queryIndexingThreshold())) {
 
 			// Filter words.
 
-			String filteredWords = filterKeywords(queryContext.getKeywords());
+			String filteredWords = filterKeywords(keywords);
 
 			if (filteredWords.length() == 0) {
 				return true;
@@ -72,7 +78,7 @@ public class QueryIndexerProcessorImpl implements QueryPostProcessor {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"QueryIndexing threshold exceeded. Indexing keywords: " +
-						queryContext.getKeywords());
+							filteredWords);
 			}
 			
 			addDocument(

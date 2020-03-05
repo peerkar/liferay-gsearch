@@ -17,23 +17,35 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
-import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
-import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletResponse;
-
 import javax.servlet.http.HttpServletRequest;
 
+import fi.soveltia.liferay.gsearch.core.api.constants.ParameterNames;
+import fi.soveltia.liferay.gsearch.core.api.query.context.QueryContext;
+ 
 /**
  * GSearch utility class.
  *
  * @author Petteri Karttunen
  */
 public class GSearchUtil {
+
+
+	public static String encodeKeywords(String keywords) {
+
+		if (Validator.isNull(keywords)) {
+			return keywords;
+		}
+			
+		keywords = keywords.replaceAll("/", "&#8725;");
+		keywords = keywords.replaceAll("\\\\", "&#92;");
+		
+		return keywords;
+	}
 
 	/**
 	 * Tries to find an asset publisher instance id on the given layout

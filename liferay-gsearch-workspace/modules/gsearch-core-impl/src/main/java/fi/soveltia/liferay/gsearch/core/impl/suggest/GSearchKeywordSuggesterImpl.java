@@ -103,12 +103,13 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 						for (SuggestSearchResult.Entry.Option option :
 								entry.getOptions()) {
 
-							if (_log.isDebugEnabled()) {
-								_log.debug(
-									"Adding suggestion:" + option.getText());
-							}
-
 							if (!suggestions.contains(option.getText())) {
+
+								if (_log.isDebugEnabled()) {
+									_log.debug(
+										"Adding suggestion:" + option.getText());
+								}
+
 								suggestions.add(option.getText());
 							}
 						}
@@ -118,6 +119,12 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		}
 		catch (Exception e) {
 			_log.warn(e.getMessage(), e);
+		}
+
+		if (suggestions.size() == 1) {
+			String rawKeywords = (String)queryContext.getParameter(
+					ParameterNames.RAW_KEYWORDS);
+			suggestions.add(0, rawKeywords);
 		}
 
 		return suggestions.stream(

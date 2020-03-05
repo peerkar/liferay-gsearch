@@ -42,6 +42,8 @@ public class ParameterNames {
 
 	public static final String PATH_IMAGE = "pathImage";
 
+	public static final String RAW_KEYWORDS = "rawKeywords";
+
 	public static final String POST_FILTER_QUERY = "postFilterQuery";
 
 	public static final String SCOPE = "scope";

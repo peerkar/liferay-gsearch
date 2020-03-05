@@ -336,7 +336,8 @@ public class ResultsBuilderImpl implements ResultsBuilder {
 			jsonObject.put("originalQueryTerms", originalQueryTerms);
 		}
 
-		jsonObject.put("queryTerms", queryContext.getKeywords());
+		jsonObject.put("queryTerms", 
+				(String)queryContext.getParameter(ParameterNames.RAW_KEYWORDS));
 
 		jsonObject.put(
 			"executionTime", String.format("%.3f", hits.getSearchTime()));

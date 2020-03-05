@@ -238,7 +238,9 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 
 		StringBundler sb = new StringBundler();
 
-		String[] keywordsArray = keywords.split(" ");
+		String encodedKeywords = GSearchUtil.encodeKeywords(keywords);
+		
+		String[] keywordsArray = encodedKeywords.split(" ");
 
 		for (String s : keywordsArray) {
 			String[] fields = s.split(":");
@@ -261,6 +263,11 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 		queryContext.setKeywords(
 			sb.toString(
 			).trim());
+
+		// Also store raw keywords as we might need them to store keyword suggestions.
+		
+		queryContext.setParameter(ParameterNames.RAW_KEYWORDS, keywords);
+
 	}
 	
 	/**
@@ -344,7 +351,7 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 
 		}
 		
-		queryContext.setKeywords(keywords);
+		addKeywords(queryContext, keywords);
 
 		queryContext.setParameter(ParameterNames.LOCALE, locale);
 

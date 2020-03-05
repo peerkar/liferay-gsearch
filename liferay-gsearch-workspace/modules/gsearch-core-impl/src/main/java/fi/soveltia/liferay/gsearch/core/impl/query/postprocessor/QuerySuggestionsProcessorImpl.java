@@ -113,9 +113,8 @@ public class QuerySuggestionsProcessorImpl implements QueryPostProcessor {
 				_log.debug("Suggestions found.");
 			}
 
-			// New keywords is plainly the first in the list.
-
-			queryContext.setOriginalKeywords(queryContext.getKeywords());
+			queryContext.setOriginalKeywords(
+					(String)queryContext.getParameter(ParameterNames.RAW_KEYWORDS));
 
 			if (_log.isDebugEnabled()) {
 				_log.debug("Using querySuggestions[0] for alternative search.");

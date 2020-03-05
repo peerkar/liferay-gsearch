@@ -61,7 +61,7 @@
 			return false;
 		}
 
-		let url = "<%= searchPageURL %>?q=" + q;
+		let url = "<%= searchPageURL %>?q=" + encodeURIComponent(q);
 
 		window.location.href = url;
 	}
