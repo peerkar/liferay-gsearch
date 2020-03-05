@@ -124,7 +124,7 @@ public class GSearchKeywordSuggesterImpl implements GSearchKeywordSuggester {
 		if (suggestions.size() == 1) {
 			String rawKeywords = (String)queryContext.getParameter(
 					ParameterNames.RAW_KEYWORDS);
-			suggestions.add(0, rawKeywords);
+			suggestions.set(0, rawKeywords);
 		}
 
 		return suggestions.stream(
