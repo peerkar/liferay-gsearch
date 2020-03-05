@@ -166,10 +166,20 @@ public class ContextClauseConditionHandler implements ClauseConditionHandler {
 
 			for (int i = 0; i < matchValues.length(); i++) {
 				
-				if (keywords.equalsIgnoreCase(matchValues.getString(i))) {
+				if (keywords.equals(matchValues.getString(i))) {
 					matchCount++;
 				}
 			}
+		} else if (keywordsMatchType.equals("substring")) {
+
+				String keywords_lowercase = keywords.toLowerCase();
+			
+				for (int i = 0; i < matchValues.length(); i++) {
+					
+					if (keywords_lowercase.contains(matchValues.getString(i).toLowerCase())) {
+						matchCount++;
+					}
+				}
 		} else {
 			
 			String[] keywordArray = keywords.split(keywordsSplitter);
@@ -191,10 +201,13 @@ public class ContextClauseConditionHandler implements ClauseConditionHandler {
 				return true;
 			} else if (matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_NOT)) {
 				return false;
+			} else if (matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_ALL)) {
+				if (matchCount == matchValues.length()) {
+					return true;
+				}
 			}
 		}
-		else if (matchValues.length() > 0 
-				&& matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_NOT)) {
+		else if (matchType.equalsIgnoreCase(ClauseConfigurationValues.MATCH_NOT)) {
 			return true;
 		}
 		
