@@ -110,14 +110,14 @@
 						return '';
 					}
 
-					var link = '<%= searchPageURL %>' + '?entryClassName=' +
+					let link = '<%= searchPageURL %>' + '?entryClassName=' +
 						suggestion.data.entryClassName + '&q=' +
-						$('#<portlet:namespace />MiniSearchField').val();
+						encodeURIComponent($('#<portlet:namespace />MiniSearchField').val());
 
 					return '<div class="autocomplete-group">' +
 								'<span class="category">' + category + '</span>' +
 								'<span class="more">' +
-									'<a href="#" onClick="<portlet:namespace />openMoreLink(\'' + link + '\')"><liferay-ui:message key="more" /></a>' +
+									'<a href="#" onClick="<portlet:namespace />openMoreLink(\'' + link + '\'); return false;"><liferay-ui:message key="more" /></a>' +
 								'</span>' +
 							'</div>';
 				},
@@ -127,7 +127,7 @@
 				noSuggestionNotice: '<liferay-ui:message key="no-content-suggestions" />',
 				onSelect: function(suggestion) {
 
-					var link = suggestion.data.link;
+					let link = suggestion.data.link;
 
 					if (<%= appendRedirect %>) {
 						link += suggestion.data.redirect;
