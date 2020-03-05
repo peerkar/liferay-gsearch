@@ -19,7 +19,10 @@ const Basic = ({ items }) => {
 				let authorMeta = ResultItemUtil.getAuthorMeta(item);
 				let categoriesMeta = ResultItemUtil.getAssetCategoriesMeta(item);
 				let description = ResultItemUtil.getDescription(item);
-				let key = 'bi_' + item.link;
+
+                // Rerender always
+
+                let key = 'bi_' +  Math.floor(Math.random() * 1000000);
 				let link = ResultItemUtil.getLink(item);
 				let tagsMeta = ResultItemUtil.getAssetTagsMeta(item);
 				let title = ResultItemUtil.getTitle(item);

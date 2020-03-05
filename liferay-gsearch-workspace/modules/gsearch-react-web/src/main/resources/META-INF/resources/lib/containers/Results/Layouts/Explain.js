@@ -14,7 +14,9 @@ const Explain = ({ items }) => {
 
 			{items.map(function (item, i) {
 
-				let key = 'ei_' + item.link;
+                // Rerender always
+
+                let key = 'ei_' +  Math.floor(Math.random() * 1000000);
 
 				return (
 					<Item className="gsearch-explain-item" key={key}>

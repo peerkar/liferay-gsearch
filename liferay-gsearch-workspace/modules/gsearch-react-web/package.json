@@ -34,5 +34,5 @@
 	"scripts": {
 		"build": "babel --source-maps -d build/resources/main/META-INF/resources src/main/resources/META-INF/resources && liferay-npm-bundler"
 	},
-	"version": "1.0.3"
+	"version": "1.0.4"
 }

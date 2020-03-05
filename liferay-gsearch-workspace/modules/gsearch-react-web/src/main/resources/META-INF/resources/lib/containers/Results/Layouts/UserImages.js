@@ -18,7 +18,10 @@ const UserImages = ({ items }) => {
 
 				let categoriesMeta = ResultItemUtil.getAssetCategoriesMeta(item);
 				let description = ResultItemUtil.getDescription(item);
-				let key = 'ui_' + item.link;
+
+				// Rerender always
+
+	            let key = 'ui_' +  Math.floor(Math.random() * 1000000);
 				let link = ResultItemUtil.getLink(item);
 				let tagsMeta = ResultItemUtil.getAssetTagsMeta(item);
 				let title = ResultItemUtil.getTitle(item);

@@ -15,7 +15,9 @@ const RawDocument = ({ items }) => {
 
 			{items.map(function (item, i) {
 
-				let key = 'di_' + item.link;
+	            // Rerender always
+
+	            let key = 'di_' +  Math.floor(Math.random() * 1000000);
 
 				return (
 					<Item className="gsearch-document-item" key={key}>

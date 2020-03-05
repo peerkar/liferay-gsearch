@@ -19,7 +19,11 @@ const Cards = ({ items }) => {
 
                 let description = ResultItemUtil.getCardItemDescription(item);
                 let header = ResultItemUtil.getCardHeader(item);
-                let key = 'ci_' + item.link;
+                
+                // Rerender always
+
+                let key = 'ci_' +  Math.floor(Math.random() * 1000000);
+
                 let typeLabel = ResultItemUtil.getCardItemTypeLabel(item);
 
                 return (

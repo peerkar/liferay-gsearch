@@ -29,7 +29,7 @@ class Maps extends React.Component {
 			}
 
 			let marker = {
-				key: 'marker_' + item.link,
+				key: 'marker_' + Math.floor(Math.random() * 1000000),
 				title: item.title,
 				position: {
 					lat: item.latitude,
