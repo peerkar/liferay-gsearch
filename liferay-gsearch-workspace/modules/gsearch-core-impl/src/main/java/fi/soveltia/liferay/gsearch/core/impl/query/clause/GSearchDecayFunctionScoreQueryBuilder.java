@@ -122,7 +122,7 @@ public class GSearchDecayFunctionScoreQueryBuilder implements ClauseBuilder {
 				
 				Map<String, Object> origin = new HashMap<String, Object>();
 				origin.put("lat", GetterUtil.getFloat(coordinates.get("lat")));
-				origin.put("lon", GetterUtil.getFloat(coordinates.get("long")));
+				origin.put("lon", GetterUtil.getFloat(coordinates.get("lon")));
 				functionScoreQuery.setOrigin(origin);
 			}
 		}
