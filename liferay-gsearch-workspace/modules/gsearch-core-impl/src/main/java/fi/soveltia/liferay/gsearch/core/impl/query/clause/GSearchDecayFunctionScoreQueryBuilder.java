@@ -7,6 +7,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.search.query.FunctionScoreQuery;
 import com.liferay.portal.search.query.Query;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -108,9 +111,20 @@ public class GSearchDecayFunctionScoreQueryBuilder implements ClauseBuilder {
 
 		// Origin
 
-		if (Validator.isNotNull(configuration.get("origin")) && 
-				configuration.getString("origin_type").equals("date")) {
+		if (Validator.isNotNull(configuration.get("origin"))) {
+
+			if (configuration.getString("origin_type").equals("date")) {
 				functionScoreQuery.setOrigin(configuration.getString("origin"));
+				
+			} else if (configuration.getString("origin_type").equals("location")) {
+
+				JSONObject coordinates = configuration.getJSONObject("origin");
+				
+				Map<String, Object> origin = new HashMap<String, Object>();
+				origin.put("lat", GetterUtil.getFloat(coordinates.get("lat")));
+				origin.put("lon", GetterUtil.getFloat(coordinates.get("long")));
+				functionScoreQuery.setOrigin(origin);
+			}
 		}
 
 		// Scale
