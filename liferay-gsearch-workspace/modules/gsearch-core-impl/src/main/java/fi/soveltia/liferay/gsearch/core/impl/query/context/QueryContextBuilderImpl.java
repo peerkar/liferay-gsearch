@@ -7,6 +7,7 @@ import com.liferay.portal.kernel.security.auth.http.HttpAuthManagerUtil;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.ArrayList;
@@ -233,6 +234,13 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 	 */
 	protected void addKeywords(QueryContext queryContext, String keywords) {
 
+		// We can also have empty keywords (recommender)
+		
+		if (Validator.isBlank(keywords)) {
+			queryContext.setKeywords(keywords);
+			return;
+		}
+		
 		// Try to check if we have a Lucene style search eg. userName:foo
 		// title:bar and don't lowercase the field names.
 		// Also, don't lowercase BOOLEAN uppercase operators.
