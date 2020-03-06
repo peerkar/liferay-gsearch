@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import javax.portlet.PortletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -238,8 +239,18 @@ public class QueryContextBuilderImpl implements QueryContextBuilder {
 
 		StringBundler sb = new StringBundler();
 
-		String encodedKeywords = GSearchUtil.encodeKeywords(keywords);
+		// Remove quotes id there's an uneven count of them.
 		
+		int quoteCount = StringUtils.countMatches(keywords, "\"");
+		
+		if (quoteCount % 2 != 0) {
+			keywords = keywords.replaceAll("\"", "");
+		}
+		
+		// Encode.
+		
+		String encodedKeywords = GSearchUtil.encodeKeywords(keywords);
+				
 		String[] keywordsArray = encodedKeywords.split(" ");
 
 		for (String s : keywordsArray) {
