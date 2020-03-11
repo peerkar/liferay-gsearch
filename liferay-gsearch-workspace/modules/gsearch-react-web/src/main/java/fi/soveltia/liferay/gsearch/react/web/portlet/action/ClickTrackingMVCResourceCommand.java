@@ -3,6 +3,7 @@ package fi.soveltia.liferay.gsearch.react.web.portlet.action;
 
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCResourceCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCResourceCommand;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -124,6 +125,11 @@ public class ClickTrackingMVCResourceCommand extends BaseMVCResourceCommand {
 	@Reference(
 		cardinality=ReferenceCardinality.OPTIONAL
 	)
-	private ClicksLocalService _clicksLocalService;
+	private volatile ClicksLocalService _clicksLocalService;
+	
+	@Reference(
+			target = ModuleServiceLifecycle.PORTAL_INITIALIZED
+	)
+	ModuleServiceLifecycle _portalInitialized;
 
 }
