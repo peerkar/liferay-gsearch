@@ -115,8 +115,14 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 
 		String description = null;
 
-		description = document.get(
-			locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
+		if (isHighlight) {
+		
+			description = document.get(
+				locale, Field.SNIPPET + StringPool.UNDERLINE + Field.CONTENT);
+		} else {
+			description = document.get(
+				locale, Field.CONTENT);
+		}
 
 		if (Validator.isNull(description)) {
 
@@ -125,7 +131,7 @@ public class MBMessageItemBuilder extends BaseResultItemBuilder
 			if (portletRequest != null) {
 			
 				description = getSummary(
-					queryContext, document, true,
+					queryContext, document, isHighlight,
 					TITLE_MAX_LENGTH).getContent();
 			} else {
 				description = document.get(Field.CONTENT);
