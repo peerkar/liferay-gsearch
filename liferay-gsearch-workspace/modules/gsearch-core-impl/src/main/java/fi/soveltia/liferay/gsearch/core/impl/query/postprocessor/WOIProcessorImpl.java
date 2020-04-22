@@ -80,7 +80,9 @@ public class WOIProcessorImpl implements QueryPostProcessor {
 
 		keywords = keywords.trim().toLowerCase();
 		
-		String[] words = keywords.split("[ ,.;\\-]+");
+		keywords = keywords.replaceAll("[^a-zA-Z0-9 ]", "");
+		
+		String[] words = keywords.split("[ ]+");
 
 		List<String>processedwords = new ArrayList<String>();
 		
