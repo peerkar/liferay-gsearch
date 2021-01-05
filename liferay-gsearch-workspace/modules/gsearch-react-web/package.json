@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"autosuggest-highlight": "^3.1.1",
-		"axios": "^0.19.0",
+		"axios": "^0.21.1",
 		"prop-types": "^15.7.2",
 		"react": "16.8.6",
 		"react-autosuggest": "^9.4.3",
